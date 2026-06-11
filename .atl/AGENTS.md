@@ -74,6 +74,12 @@ Antes de tomar decisiones arquitectónicas, **leé**:
 - Seguridad Producción: `.atl/standards/security-production.md` ⭐ CRÍTICO
 - SDD Workflow: `.atl/standards/sdd-workflow.md`
 
+## Skills del Proyecto
+
+**Usá estos skills al codificar**:
+
+- Documentación: `.atl/skills/code-doc-friendly.md` ⭐ OBLIGATORIO para todo código nuevo
+
 ## Protocolo de Trabajo (SDD OBLIGATORIO)
 
 **TODO el desarrollo DEBE seguir SDD (Spec-Driven Development)**. Sin excepciones.
