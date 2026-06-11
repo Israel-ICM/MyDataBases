@@ -87,7 +87,7 @@ suspend fun connect(config: ConnectionConfig): Result<Connection>
 
 ```kotlin
 /**
- * Conecta a la base de datos usando la configuración que le pasás.
+ * Conecta a la base de datos usando la configuración que le pasas.
  *
  * @param config Tiene el host, puerto, usuario y contraseña
  * @return La conexión lista para usar o un error si falló
@@ -117,7 +117,7 @@ suspend fun executeQuery(query: String): Result<QueryResult>
  *
  * Usa prepared statements automáticamente para evitar inyección SQL.
  *
- * @param query La query SQL que querés ejecutar (ej: "SELECT * FROM users")
+ * @param query La query SQL que quieres ejecutar (ej: "SELECT * FROM users")
  * @return Los datos que devolvió la DB o un error si algo salió mal
  * @author israel-icm
  * @date 2026-06-11
@@ -132,9 +132,9 @@ suspend fun executeQuery(query: String): Result<QueryResult>
 - ✅ "Conecta a la base de datos"
 - ❌ "Establece una conexión con el servidor de base de datos"
 
-### Hablar en segunda persona (vos/tú implícito)
+### Hablar en segunda persona (tú implícito, sin voseo)
 
-- ✅ "Le pasás el ID del usuario"
+- ✅ "Le pasas el ID del usuario"
 - ✅ "Devuelve null si no encuentra nada"
 - ❌ "Se debe pasar el identificador del usuario"
 - ❌ "Retorna valor nulo en caso de ausencia"
@@ -146,7 +146,7 @@ suspend fun executeQuery(query: String): Result<QueryResult>
 
 ### Dar contexto útil
 
-- ✅ "Usa esto cuando necesites ejecutar múltiples queries en una transacción"
+- ✅ "Usa esto cuando necesitas ejecutar múltiples queries en una transacción"
 - ❌ "Método para transacciones"
 
 ### Mencionar gotchas importantes
@@ -248,7 +248,7 @@ class ConnectionRepository @Inject constructor(
  * Tiene todos los datos necesarios para conectarse: host, puerto, credenciales, etc.
  *
  * @property id ID único de la conexión (auto-generado)
- * @property name Nombre que le pusiste (ej: "Producción MySQL")
+ * @property name Nombre que le pusiste a la conexión (ej: "Producción MySQL")
  * @property type Tipo de motor (MySQL, PostgreSQL, etc)
  * @property host Dirección del servidor (ej: "localhost", "192.168.1.100")
  * @property port Puerto del servidor (ej: 3306 para MySQL)
@@ -287,7 +287,7 @@ Para los strings de la UI (NO en KDoc, que va en español neutro):
 
 ```xml
 <string name="connection_test_success">La conexión funcionó bien</string>
-<string name="connection_test_failed">Uy, la conexión falló. Revisá los datos</string>
+<string name="connection_test_failed">Uy, la conexión falló. Revisa los datos</string>
 ```
 
 ### Inglés USA (`values/strings.xml`)
@@ -322,4 +322,4 @@ Antes de commitear código:
 
 ---
 
-**Recordá**: La documentación es para que otro dev (o vos dentro de 6 meses) entienda rápido qué hace el código. Escribí como le explicarías a un compañero tomando café.
+**Recuerda**: La documentación es para que otro dev (o tú dentro de 6 meses) entienda rápido qué hace el código. Escribe como le explicarías a un compañero tomando café.
