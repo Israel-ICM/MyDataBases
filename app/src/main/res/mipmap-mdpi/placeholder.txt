@@ -1,2 +1,0 @@
-Placeholder for mipmap-mdpi icons
-Use Android Studio > New > Image Asset to generate proper icons
