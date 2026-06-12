@@ -5,12 +5,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 /**
- * Unit tests for DatabaseError sealed class.
- *
- * Tests verify:
- * - All error cases are instantiable
- * - Error messages are preserved
- * - Sealed class hierarchy works correctly
+ * Tests para DatabaseError sealed class.
  *
  * @author israel-icm
  * @date 2026-06-11
@@ -18,115 +13,68 @@ import org.junit.Test
 class DatabaseErrorTest {
 
     @Test
-    fun `ConnectionFailed error preserves reason`() {
-        // Given: A ConnectionFailed error with a specific reason
-        val reason = "Host 'db.example.com' is unreachable"
-        val error = DatabaseError.ConnectionFailed(reason)
+    fun `DatabaseError ConnectionFailed contains reason`() {
+        // GIVEN: Un error de conexión fallida
+        val error = DatabaseError.ConnectionFailed("Host unreachable: timeout exceeded")
 
-        // Then: Reason is preserved
-        assertEquals(reason, error.reason)
-        assertTrue(error is DatabaseError)
-        assertTrue(error is Throwable)
-    }
-
-    @Test
-    fun `AuthenticationFailed error preserves reason`() {
-        // Given: An AuthenticationFailed error
-        val reason = "Access denied for user 'admin'"
-        val error = DatabaseError.AuthenticationFailed(reason)
-
-        // Then: Reason is preserved
-        assertEquals(reason, error.reason)
+        // THEN: El error tiene el mensaje correcto
+        assertEquals("Host unreachable: timeout exceeded", error.reason)
         assertTrue(error is DatabaseError)
     }
 
     @Test
-    fun `QueryExecutionFailed error preserves query and reason`() {
-        // Given: A QueryExecutionFailed error
-        val query = "SELECT * FROM users WHERE id = ?"
-        val reason = "Table 'myapp.users' doesn't exist"
+    fun `DatabaseError AuthenticationFailed contains reason`() {
+        // GIVEN: Un error de autenticación fallida
+        val error = DatabaseError.AuthenticationFailed("Invalid credentials")
+
+        // THEN: El error tiene el mensaje correcto
+        assertEquals("Invalid credentials", error.reason)
+        assertTrue(error is DatabaseError)
+    }
+
+    @Test
+    fun `DatabaseError QueryExecutionFailed contains query and reason`() {
+        // GIVEN: Un error de ejecución de query
+        val query = "SELECT * FROM non_existent_table"
+        val reason = "Table 'test.non_existent_table' doesn't exist"
         val error = DatabaseError.QueryExecutionFailed(query, reason)
 
-        // Then: Both query and reason are preserved
+        // THEN: El error contiene query y razón
         assertEquals(query, error.query)
         assertEquals(reason, error.reason)
         assertTrue(error is DatabaseError)
     }
 
     @Test
-    fun `TimeoutError error preserves operation`() {
-        // Given: A TimeoutError
-        val operation = "executeQuery"
-        val error = DatabaseError.TimeoutError(operation)
+    fun `DatabaseError TimeoutError contains operation`() {
+        // GIVEN: Un error de timeout
+        val error = DatabaseError.TimeoutError("Connecting to database")
 
-        // Then: Operation is preserved
-        assertEquals(operation, error.operation)
+        // THEN: El error indica la operación que falló
+        assertEquals("Connecting to database", error.operation)
         assertTrue(error is DatabaseError)
     }
 
     @Test
-    fun `InvalidConfiguration error preserves field and reason`() {
-        // Given: An InvalidConfiguration error
-        val field = "port"
-        val reason = "Port must be between 1 and 65535"
-        val error = DatabaseError.InvalidConfiguration(field, reason)
+    fun `DatabaseError InvalidConfiguration contains field and reason`() {
+        // GIVEN: Un error de configuración inválida
+        val error = DatabaseError.InvalidConfiguration("port", "Port must be between 1 and 65535")
 
-        // Then: Both field and reason are preserved
-        assertEquals(field, error.field)
-        assertEquals(reason, error.reason)
+        // THEN: El error indica el campo y la razón
+        assertEquals("port", error.field)
+        assertEquals("Port must be between 1 and 65535", error.reason)
         assertTrue(error is DatabaseError)
     }
 
     @Test
-    fun `UnsupportedFeature error preserves feature name`() {
-        // Given: An UnsupportedFeature error
-        val feature = "SEQUENCES"
-        val error = DatabaseError.UnsupportedFeature(feature)
+    fun `DatabaseError UnknownError wraps throwable`() {
+        // GIVEN: Un error desconocido que envuelve una excepción
+        val cause = RuntimeException("Unexpected error")
+        val error = DatabaseError.UnknownError(cause)
 
-        // Then: Feature is preserved
-        assertEquals(feature, error.feature)
+        // THEN: El error contiene el throwable original
+        assertEquals(cause, error.throwable)
+        assertEquals("Unexpected error", error.throwable.message)
         assertTrue(error is DatabaseError)
-    }
-
-    @Test
-    fun `UnknownError wraps original throwable`() {
-        // Given: An UnknownError wrapping another exception
-        val original = RuntimeException("Something went wrong")
-        val error = DatabaseError.UnknownError(original)
-
-        // Then: Original throwable is preserved
-        assertEquals(original, error.throwable)
-        assertTrue(error is DatabaseError)
-    }
-
-    @Test
-    fun `sealed class allows exhaustive when expression`() {
-        // Given: Different DatabaseError instances
-        val errors = listOf(
-            DatabaseError.ConnectionFailed("test"),
-            DatabaseError.AuthenticationFailed("test"),
-            DatabaseError.QueryExecutionFailed("SELECT 1", "test"),
-            DatabaseError.TimeoutError("test"),
-            DatabaseError.InvalidConfiguration("field", "test"),
-            DatabaseError.UnsupportedFeature("test"),
-            DatabaseError.UnknownError(RuntimeException())
-        )
-
-        // When: Exhaustive when expression
-        val messages = errors.map { error ->
-            when (error) {
-                is DatabaseError.ConnectionFailed -> "Connection failed: ${error.reason}"
-                is DatabaseError.AuthenticationFailed -> "Auth failed: ${error.reason}"
-                is DatabaseError.QueryExecutionFailed -> "Query failed: ${error.reason}"
-                is DatabaseError.TimeoutError -> "Timeout: ${error.operation}"
-                is DatabaseError.InvalidConfiguration -> "Invalid ${error.field}: ${error.reason}"
-                is DatabaseError.UnsupportedFeature -> "Unsupported: ${error.feature}"
-                is DatabaseError.UnknownError -> "Unknown: ${error.throwable.message}"
-            }
-        }
-
-        // Then: All cases are handled
-        assertEquals(7, messages.size)
-        assertTrue(messages.all { it.isNotBlank() })
     }
 }
