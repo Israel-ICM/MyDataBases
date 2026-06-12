@@ -1,6 +1,8 @@
 package com.sphynxs.mydatabases.core.di
 
+import com.sphynxs.mydatabases.data.repositories.ConnectionRepositoryImpl
 import com.sphynxs.mydatabases.data.repositories.SettingsRepositoryImpl
+import com.sphynxs.mydatabases.domain.repositories.ConnectionRepository
 import com.sphynxs.mydatabases.domain.repositories.SettingsRepository
 import dagger.Binds
 import dagger.Module
@@ -31,4 +33,16 @@ abstract class RepositoryModule {
     abstract fun bindSettingsRepository(
         impl: SettingsRepositoryImpl
     ): SettingsRepository
+
+    /**
+     * Vincula ConnectionRepository con su implementación usando Room.
+     *
+     * @param impl Implementación del repositorio
+     * @return Interfaz del repositorio
+     */
+    @Binds
+    @Singleton
+    abstract fun bindConnectionRepository(
+        impl: ConnectionRepositoryImpl
+    ): ConnectionRepository
 }
