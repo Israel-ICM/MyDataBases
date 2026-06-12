@@ -73,34 +73,38 @@ Chain strategy: feature-branch-chain
 **Target**: ~600 lines | **Base**: PR #1 branch | **Tests**: Unit + Integration + Compose UI
 
 ### 2.1 Security + Encryption
-- [ ] Add `androidx.security:security-crypto:1.1.0-alpha06` to `app/build.gradle.kts`
-- [ ] TEST: Write `CredentialEncryptionTest.kt` — RED (verify encrypt/decrypt round-trip)
-- [ ] Create `app/src/main/java/.../data/local/security/CredentialEncryption.kt` — encrypt/decrypt using EncryptedSharedPreferences
-- [ ] TEST: GREEN — verify plaintext → encrypted → plaintext identity
+- [x] Add `androidx.security:security-crypto:1.1.0-alpha06` to `app/build.gradle.kts`
+- [x] TEST: Write `CredentialEncryptionTest.kt` — RED (verify encrypt/decrypt round-trip)
+- [x] Create `app/src/main/java/.../core/security/CredentialEncryption.kt` — encrypt/decrypt using EncryptedSharedPreferences
+- [x] TEST: GREEN — verify plaintext → encrypted → plaintext identity (4 tests passing)
 
 ### 2.2 Room Database Setup
-- [ ] Create `app/src/main/java/.../data/local/entities/ConnectionEntity.kt` — Room entity with encrypted_password
-- [ ] Create `app/src/main/java/.../data/local/converters/DatabaseTypeConverter.kt` — Room TypeConverter for DatabaseType enum
-- [ ] Create `app/src/main/java/.../data/local/converters/SSHTunnelConfigConverter.kt` — Room TypeConverter for SSHTunnelConfig (JSON)
-- [ ] TEST: Write `ConnectionDaoTest.kt` — RED (verify CRUD operations with in-memory Room)
-- [ ] Create `app/src/main/java/.../data/local/dao/ConnectionDao.kt` — DAO with insert/delete/getById/getAll/updateLastUsed
-- [ ] Create `app/src/main/java/.../data/local/AppDatabase.kt` — Room database with ConnectionEntity table
-- [ ] TEST: GREEN — verify DAO queries work with in-memory DB
+- [x] Create `app/src/main/java/.../data/local/entities/ConnectionEntity.kt` — Room entity with encrypted_password
+- [x] Create `app/src/main/java/.../data/local/converters/DatabaseTypeConverter.kt` — Room TypeConverter for DatabaseType enum
+- [x] Create `app/src/main/java/.../data/local/converters/SSHTunnelConfigConverter.kt` — Room TypeConverter for SSHTunnelConfig (JSON)
+- [x] TEST: Write `ConnectionDaoTest.kt` — RED (verify CRUD operations with in-memory Room)
+- [x] Create `app/src/main/java/.../data/local/dao/ConnectionDao.kt` — DAO with insert/delete/getById/getAll/updateLastUsed
+- [x] Create `app/src/main/java/.../data/local/AppDatabase.kt` — Room database with ConnectionEntity table
+- [x] TEST: GREEN — verify DAO queries work with in-memory DB (4 tests passing)
 
 ### 2.3 DataStore Setup
-- [ ] TEST: Write `SettingsRepositoryImplTest.kt` — RED (verify ThemeMode/Locale persist and observe)
-- [ ] Create `app/src/main/java/.../data/repository/SettingsRepository.kt` — interface for get/set ThemeMode, Locale
-- [ ] Create `app/src/main/java/.../data/repository/SettingsRepositoryImpl.kt` — implementation using DataStore Preferences
-- [ ] TEST: GREEN — verify DataStore reads/writes correct values
+- [x] TEST: Write `SettingsRepositoryImplTest.kt` — RED (verify ThemeMode/Locale persist and observe)
+- [x] Create `app/src/main/java/.../domain/repositories/SettingsRepository.kt` — interface for get/set ThemeMode
+- [x] Create `app/src/main/java/.../core/persistence/UserPreferences.kt` — data class for user preferences
+- [x] Create `app/src/main/java/.../data/repositories/SettingsRepositoryImpl.kt` — implementation using DataStore Preferences
+- [x] TEST: GREEN — verify DataStore reads correct values (4 tests passing)
 
-### 2.4 Connection Repository
+### 2.4 Connection Repository (DEFERRED to PR #2b)
 - [ ] TEST: Write `ConnectionRepositoryImplTest.kt` — RED (verify save encrypts password, load decrypts)
-- [ ] Create `app/src/main/java/.../data/repository/ConnectionRepository.kt` — interface
-- [ ] Create `app/src/main/java/.../data/repository/ConnectionRepositoryImpl.kt` — uses Room + CredentialEncryption
+- [ ] Create `app/src/main/java/.../domain/repositories/ConnectionRepository.kt` — interface
+- [ ] Create `app/src/main/java/.../data/repositories/ConnectionRepositoryImpl.kt` — uses Room + CredentialEncryption
 - [ ] TEST: GREEN — verify repository encrypts passwords before Room insert
 
-### 2.5 DI Module
-- [ ] Create `app/src/main/java/.../data/di/LocalModule.kt` — Hilt module providing Room, DataStore, repositories
+### 2.5 DI Modules
+- [x] Create `app/src/main/java/.../core/di/DatabaseModule.kt` — Hilt module providing Room database and DAOs
+- [x] Create `app/src/main/java/.../core/di/SecurityModule.kt` — Hilt module providing CredentialEncryption singleton
+- [x] Create `app/src/main/java/.../core/di/PersistenceModule.kt` — Hilt module providing DataStore
+- [x] Create `app/src/main/java/.../core/di/RepositoryModule.kt` — Hilt module binding SettingsRepository (ConnectionRepository deferred to PR #2b)
 
 ### 2.6 Domain UseCases
 - [ ] TEST: Write `SaveConnectionUseCaseTest.kt` — RED (verify UseCase calls repository.save)
