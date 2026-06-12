@@ -18,6 +18,11 @@ sealed class Routes(val route: String) {
     data object Connections : Routes("connections")
     
     /**
+     * Pantalla de formulario de conexión (crear/editar).
+     */
+    data object ConnectionForm : Routes("connection_form")
+    
+    /**
      * Pantalla de lista de bases de datos disponibles en la conexión activa.
      */
     data object DatabaseList : Routes("database_list")

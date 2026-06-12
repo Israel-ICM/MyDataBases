@@ -14,6 +14,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.sphynxs.mydatabases.ui.screens.connections.ConnectionFormScreen
+import com.sphynxs.mydatabases.ui.screens.connections.ConnectionsListScreen
 
 /**
  * NavHost principal de la aplicación.
@@ -33,7 +35,36 @@ fun MyDataBasesNavHost() {
         startDestination = Routes.Connections.route
     ) {
         composable(Routes.Connections.route) {
-            PlaceholderScreen("Connections")
+            ConnectionsListScreen(
+                onNavigateToForm = { connectionId ->
+                    if (connectionId == null) {
+                        navController.navigate(Routes.ConnectionForm.route)
+                    } else {
+                        navController.navigate("${Routes.ConnectionForm.route}?connectionId=$connectionId")
+                    }
+                },
+                onConnect = { connectionId ->
+                    // TODO: navigate to DatabaseList after successful connection
+                    navController.navigate(Routes.DatabaseList.route)
+                }
+            )
+        }
+        
+        composable(
+            route = "${Routes.ConnectionForm.route}?connectionId={connectionId}",
+            arguments = listOf(
+                navArgument("connectionId") {
+                    type = NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                }
+            )
+        ) { backStackEntry ->
+            val connectionId = backStackEntry.arguments?.getString("connectionId")
+            ConnectionFormScreen(
+                connectionId = connectionId,
+                onNavigateBack = { navController.popBackStack() }
+            )
         }
         
         composable(Routes.DatabaseList.route) {

@@ -15,4 +15,43 @@
     <string name="action_edit">Editar</string>
     <string name="action_delete">Eliminar</string>
     <string name="action_retry">Reintentar</string>
+    <string name="action_save">Guardar</string>
+    <string name="action_test">Probar</string>
+    <string name="action_cancel">Cancelar</string>
+    <string name="action_connect">Conectar</string>
+    
+    <!-- Connections screen -->
+    <string name="connections_title">Conexiones</string>
+    <string name="connections_empty_title">No hay conexiones</string>
+    <string name="connections_empty_message">Agregá tu primera conexión para empezar</string>
+    <string name="connections_add_new">Nueva conexión</string>
+    <string name="connection_action_edit">Editar conexión</string>
+    <string name="connection_action_delete">Eliminar conexión</string>
+    <string name="connection_delete_confirm_title">¿Eliminar conexión?</string>
+    <string name="connection_delete_confirm_message">Esto eliminará permanentemente la conexión "%1$s"</string>
+    
+    <!-- Connection form -->
+    <string name="connection_form_title_new">Nueva Conexión</string>
+    <string name="connection_form_title_edit">Editar Conexión</string>
+    <string name="connection_field_name">Nombre</string>
+    <string name="connection_field_name_hint">Mi Base de Datos</string>
+    <string name="connection_field_type">Tipo de Base de Datos</string>
+    <string name="connection_field_host">Host</string>
+    <string name="connection_field_host_hint">localhost</string>
+    <string name="connection_field_port">Puerto</string>
+    <string name="connection_field_port_hint">3306</string>
+    <string name="connection_field_database">Base de Datos</string>
+    <string name="connection_field_database_hint">mibasededatos</string>
+    <string name="connection_field_username">Usuario</string>
+    <string name="connection_field_username_hint">admin</string>
+    <string name="connection_field_password">Contraseña</string>
+    <string name="connection_field_password_hint">••••••••</string>
+    <string name="connection_test_success">¡Conexión exitosa!</string>
+    <string name="connection_test_failed">Conexión falló: %1$s</string>
+    <string name="connection_save_success">Conexión guardada</string>
+    <string name="connection_save_failed">Error al guardar: %1$s</string>
+    
+    <!-- Errors -->
+    <string name="error_generic">Ocurrió un error</string>
+    <string name="error_loading">Error al cargar datos</string>
 </resources>

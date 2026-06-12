@@ -15,4 +15,43 @@
     <string name="action_edit">Edit</string>
     <string name="action_delete">Delete</string>
     <string name="action_retry">Retry</string>
+    <string name="action_save">Save</string>
+    <string name="action_test">Test</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_connect">Connect</string>
+    
+    <!-- Connections screen -->
+    <string name="connections_title">Connections</string>
+    <string name="connections_empty_title">No connections yet</string>
+    <string name="connections_empty_message">Add your first database connection to get started</string>
+    <string name="connections_add_new">New connection</string>
+    <string name="connection_action_edit">Edit connection</string>
+    <string name="connection_action_delete">Delete connection</string>
+    <string name="connection_delete_confirm_title">Delete connection?</string>
+    <string name="connection_delete_confirm_message">This will permanently delete the connection "%1$s"</string>
+    
+    <!-- Connection form -->
+    <string name="connection_form_title_new">New Connection</string>
+    <string name="connection_form_title_edit">Edit Connection</string>
+    <string name="connection_field_name">Name</string>
+    <string name="connection_field_name_hint">My Database</string>
+    <string name="connection_field_type">Database Type</string>
+    <string name="connection_field_host">Host</string>
+    <string name="connection_field_host_hint">localhost</string>
+    <string name="connection_field_port">Port</string>
+    <string name="connection_field_port_hint">3306</string>
+    <string name="connection_field_database">Database</string>
+    <string name="connection_field_database_hint">mydb</string>
+    <string name="connection_field_username">Username</string>
+    <string name="connection_field_username_hint">admin</string>
+    <string name="connection_field_password">Password</string>
+    <string name="connection_field_password_hint">••••••••</string>
+    <string name="connection_test_success">Connection successful!</string>
+    <string name="connection_test_failed">Connection failed: %1$s</string>
+    <string name="connection_save_success">Connection saved</string>
+    <string name="connection_save_failed">Save failed: %1$s</string>
+    
+    <!-- Errors -->
+    <string name="error_generic">An error occurred</string>
+    <string name="error_loading">Failed to load data</string>
 </resources>
