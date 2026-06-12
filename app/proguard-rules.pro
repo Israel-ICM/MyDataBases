@@ -49,3 +49,7 @@
 # Keep JDBC driver names (loaded dynamically via Class.forName)
 -keepnames class com.mysql.cj.jdbc.Driver
 -keepnames class org.mariadb.jdbc.Driver
+
+# SLF4J (usado por HikariCP)
+-dontwarn org.slf4j.**
+-keep class org.slf4j.** { *; }

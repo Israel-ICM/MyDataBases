@@ -1,6 +1,7 @@
 package com.sphynxs.mydatabases.core.database.models
 
 import com.sphynxs.mydatabases.core.database.engine.DatabaseType
+import io.mockk.mockk
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
@@ -93,8 +94,8 @@ class DataModelsTest {
             database = "myapp",
             type = TableType.TABLE,
             engine = "InnoDB",
-            rowCount = 1000,
-            dataLength = 65536,
+            rowCount = 1000L,
+            dataLength = 65536L,
             createdAt = 1702345678000L,
             comment = "User accounts"
         )
@@ -104,8 +105,8 @@ class DataModelsTest {
         assertEquals("myapp", table.database)
         assertEquals(TableType.TABLE, table.type)
         assertEquals("InnoDB", table.engine)
-        assertEquals(1000, table.rowCount)
-        assertEquals(65536, table.dataLength)
+        assertEquals(1000L, table.rowCount)
+        assertEquals(65536L, table.dataLength)
         assertEquals(1702345678000L, table.createdAt)
         assertEquals("User accounts", table.comment)
     }
@@ -246,16 +247,19 @@ class DataModelsTest {
     }
 
     @Test
-    fun `Transaction model is instantiable`() {
-        // Given: A mock connection (we'll use null for testing structure)
-        // Note: Real tests would use a mock JDBC connection
+    fun `Transaction can be created with callbacks`() {
+        // Given: Mock callbacks
+        var commitCalled = false
+        var rollbackCalled = false
+        val mockConnection = mockk<java.sql.Connection>(relaxed = true)
+        
         val transaction = Transaction(
-            id = "txn-123",
-            startedAt = System.currentTimeMillis()
+            connection = mockConnection,
+            onCommit = { commitCalled = true },
+            onRollback = { rollbackCalled = true }
         )
 
-        // Then: Properties are accessible
-        assertNotNull(transaction.id)
-        assertTrue(transaction.startedAt > 0)
+        // Then: Transaction is created
+        assertNotNull(transaction)
     }
 }

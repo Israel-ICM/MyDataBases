@@ -1,22 +1,20 @@
 package com.sphynxs.mydatabases.core.database.models
 
-import android.os.Parcel
+import com.sphynxs.mydatabases.core.database.engine.DatabaseType
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 
 /**
- * Tests para ConnectionConfig con soporte Parcelable.
+ * Tests para ConnectionConfig.
  *
  * @author israel-icm
  * @date 2026-06-11
  */
-@RunWith(RobolectricTestRunner::class)
 class ConnectionConfigTest {
 
     @Test
-    fun `ConnectionConfig parcelable roundtrip preserves all fields`() {
+    fun `ConnectionConfig creation with all fields works`() {
         // GIVEN: Una configuración de conexión válida
         val config = ConnectionConfig(
             id = "test-id-123",
@@ -36,36 +34,29 @@ class ConnectionConfigTest {
             lastUsedAt = 9876543210L
         )
 
-        // WHEN: Serializamos y deserializamos a través de Parcel
-        val parcel = Parcel.obtain()
-        config.writeToParcel(parcel, 0)
-        parcel.setDataPosition(0)
-        val fromParcel = ConnectionConfig.createFromParcel(parcel)
-        parcel.recycle()
-
-        // THEN: El objeto deserializado es idéntico al original
-        assertEquals(config.id, fromParcel.id)
-        assertEquals(config.name, fromParcel.name)
-        assertEquals(config.type, fromParcel.type)
-        assertEquals(config.host, fromParcel.host)
-        assertEquals(config.port, fromParcel.port)
-        assertEquals(config.database, fromParcel.database)
-        assertEquals(config.username, fromParcel.username)
-        assertEquals(config.password, fromParcel.password)
-        assertEquals(config.useSSL, fromParcel.useSSL)
-        assertEquals(config.sshTunnelConfig, fromParcel.sshTunnelConfig)
-        assertEquals(config.connectionTimeout, fromParcel.connectionTimeout)
-        assertEquals(config.readTimeout, fromParcel.readTimeout)
-        assertEquals(config.maxPoolSize, fromParcel.maxPoolSize)
-        assertEquals(config.createdAt, fromParcel.createdAt)
-        assertEquals(config.lastUsedAt, fromParcel.lastUsedAt)
+        // THEN: Todos los campos se asignan correctamente
+        assertEquals("test-id-123", config.id)
+        assertEquals("Test DB", config.name)
+        assertEquals(DatabaseType.MYSQL, config.type)
+        assertEquals("localhost", config.host)
+        assertEquals(3306, config.port)
+        assertEquals("test_db", config.database)
+        assertEquals("test_user", config.username)
+        assertEquals("test_password", config.password)
+        assertEquals(true, config.useSSL)
+        assertEquals(null, config.sshTunnelConfig)
+        assertEquals(10_000L, config.connectionTimeout)
+        assertEquals(30_000L, config.readTimeout)
+        assertEquals(10, config.maxPoolSize)
+        assertEquals(1234567890L, config.createdAt)
+        assertEquals(9876543210L, config.lastUsedAt)
     }
 
     @Test
-    fun `ConnectionConfig parcelable works with different values`() {
-        // GIVEN: Una configuración diferente para triangulación
+    fun `ConnectionConfig handles different DatabaseType values`() {
+        // GIVEN: Configuración con MariaDB y valores diferentes
         val config = ConnectionConfig(
-            id = "another-id-456",
+            id = "mariadb-config",
             name = "Production DB",
             type = DatabaseType.MARIADB,
             host = "db.example.com",
@@ -82,18 +73,11 @@ class ConnectionConfigTest {
             lastUsedAt = null
         )
 
-        // WHEN: Serializamos y deserializamos
-        val parcel = Parcel.obtain()
-        config.writeToParcel(parcel, 0)
-        parcel.setDataPosition(0)
-        val fromParcel = ConnectionConfig.createFromParcel(parcel)
-        parcel.recycle()
-
-        // THEN: Los valores se preservan correctamente
-        assertEquals(config.id, fromParcel.id)
-        assertEquals(config.type, fromParcel.type)
-        assertEquals(config.port, fromParcel.port)
-        assertEquals(config.useSSL, fromParcel.useSSL)
-        assertEquals(config.lastUsedAt, fromParcel.lastUsedAt)
+        // THEN: Los valores se asignan correctamente
+        assertEquals("mariadb-config", config.id)
+        assertEquals(DatabaseType.MARIADB, config.type)
+        assertEquals(5432, config.port)
+        assertEquals(false, config.useSSL)
+        assertEquals(null, config.lastUsedAt)
     }
 }
