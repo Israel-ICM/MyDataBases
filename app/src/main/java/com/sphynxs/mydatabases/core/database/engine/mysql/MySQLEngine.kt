@@ -65,20 +65,7 @@ class MySQLEngine : DatabaseEngine {
                 connectedAt = System.currentTimeMillis()
             )
         }.recoverCatching { throwable ->
-            // Mapear excepciones específicas a DatabaseError
-            throw when {
-                throwable is SQLNonTransientConnectionException -> 
-                    DatabaseError.ConnectionFailed("Host '${config.host}' no alcanzable")
-                
-                throwable is SQLException && throwable.message?.contains("Access denied") == true ->
-                    DatabaseError.AuthenticationFailed("Usuario o contraseña incorrectos")
-                
-                throwable is SocketTimeoutException ->
-                    DatabaseError.TimeoutError("Timeout conectando a ${config.host}")
-                
-                else ->
-                    DatabaseError.UnknownError(throwable)
-            }
+            throw mapConnectionError(throwable, config.host)
         }
     }
     
@@ -143,10 +130,7 @@ class MySQLEngine : DatabaseEngine {
                 }
             }
         }.recoverCatching { throwable ->
-            throw when (throwable) {
-                is SQLException -> DatabaseError.QueryExecutionFailed(query, throwable.message ?: "Error desconocido")
-                else -> throwable
-            }
+            throw mapQueryError(throwable, query)
         }
     }
     
@@ -174,10 +158,7 @@ class MySQLEngine : DatabaseEngine {
                 statement.executeUpdate()
             }
         }.recoverCatching { throwable ->
-            throw when (throwable) {
-                is SQLException -> DatabaseError.QueryExecutionFailed(query, throwable.message ?: "Error desconocido")
-                else -> throwable
-            }
+            throw mapQueryError(throwable, query)
         }
     }
     
@@ -202,10 +183,7 @@ class MySQLEngine : DatabaseEngine {
             
             metadataReader.readDatabases(connectionPool!!.getConnection(), query)
         }.recoverCatching { throwable ->
-            throw when (throwable) {
-                is SQLException -> DatabaseError.QueryExecutionFailed("getDatabases", throwable.message ?: "Error desconocido")
-                else -> throwable
-            }
+            throw mapQueryError(throwable, "getDatabases")
         }
     }
     
@@ -234,10 +212,7 @@ class MySQLEngine : DatabaseEngine {
             
             metadataReader.readTables(connectionPool!!.getConnection(), query, database)
         }.recoverCatching { throwable ->
-            throw when (throwable) {
-                is SQLException -> DatabaseError.QueryExecutionFailed("getTables", throwable.message ?: "Error desconocido")
-                else -> throwable
-            }
+            throw mapQueryError(throwable, "getTables")
         }
     }
     
@@ -266,10 +241,7 @@ class MySQLEngine : DatabaseEngine {
             
             metadataReader.readColumns(connectionPool!!.getConnection(), query, table)
         }.recoverCatching { throwable ->
-            throw when (throwable) {
-                is SQLException -> DatabaseError.QueryExecutionFailed("getColumns", throwable.message ?: "Error desconocido")
-                else -> throwable
-            }
+            throw mapQueryError(throwable, "getColumns")
         }
     }
     
@@ -296,10 +268,7 @@ class MySQLEngine : DatabaseEngine {
             
             metadataReader.readIndexes(connectionPool!!.getConnection(), query, table)
         }.recoverCatching { throwable ->
-            throw when (throwable) {
-                is SQLException -> DatabaseError.QueryExecutionFailed("getIndexes", throwable.message ?: "Error desconocido")
-                else -> throwable
-            }
+            throw mapQueryError(throwable, "getIndexes")
         }
     }
     
@@ -328,10 +297,7 @@ class MySQLEngine : DatabaseEngine {
             
             metadataReader.readForeignKeys(connectionPool!!.getConnection(), query, table)
         }.recoverCatching { throwable ->
-            throw when (throwable) {
-                is SQLException -> DatabaseError.QueryExecutionFailed("getForeignKeys", throwable.message ?: "Error desconocido")
-                else -> throwable
-            }
+            throw mapQueryError(throwable, "getForeignKeys")
         }
     }
     
@@ -394,10 +360,7 @@ class MySQLEngine : DatabaseEngine {
                 }
             }
         }.recoverCatching { throwable ->
-            throw when (throwable) {
-                is SQLException -> DatabaseError.QueryExecutionFailed("getVersion", throwable.message ?: "Error desconocido")
-                else -> throwable
-            }
+            throw mapQueryError(throwable, "getVersion")
         }
     }
     
@@ -412,5 +375,42 @@ class MySQLEngine : DatabaseEngine {
         require(config.port in 1..65535) { "Port debe estar entre 1 y 65535" }
         require(config.database.isNotBlank()) { "Database no puede estar vacío" }
         require(config.username.isNotBlank()) { "Username no puede estar vacío" }
+    }
+    
+    /**
+     * Función pura que mapea excepciones de conexión a DatabaseError específicos.
+     * 
+     * @param throwable Excepción original del JDBC driver
+     * @param host Hostname usado en la conexión (para mensajes de error)
+     * @return DatabaseError apropiado según el tipo de excepción
+     */
+    private fun mapConnectionError(throwable: Throwable, host: String): DatabaseError {
+        return when {
+            throwable is SQLNonTransientConnectionException -> 
+                DatabaseError.ConnectionFailed("Host '$host' no alcanzable")
+            
+            throwable is SQLException && throwable.message?.contains("Access denied") == true ->
+                DatabaseError.AuthenticationFailed("Usuario o contraseña incorrectos")
+            
+            throwable is SocketTimeoutException ->
+                DatabaseError.TimeoutError("Timeout conectando a $host")
+            
+            else ->
+                DatabaseError.UnknownError(throwable)
+        }
+    }
+    
+    /**
+     * Función pura que mapea excepciones de query a DatabaseError específicos.
+     * 
+     * @param throwable Excepción original del JDBC driver
+     * @param context Contexto de la operación (query o nombre de método)
+     * @return DatabaseError apropiado
+     */
+    private fun mapQueryError(throwable: Throwable, context: String): Throwable {
+        return when (throwable) {
+            is SQLException -> DatabaseError.QueryExecutionFailed(context, throwable.message ?: "Error desconocido")
+            else -> throwable
+        }
     }
 }
