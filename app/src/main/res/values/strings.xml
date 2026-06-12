@@ -51,6 +51,20 @@
     <string name="connection_save_success">Connection saved</string>
     <string name="connection_save_failed">Save failed: %1$s</string>
     
+    <!-- Databases screen -->
+    <string name="databases_title">Databases</string>
+    <string name="databases_empty">No databases available</string>
+    
+    <!-- Tables screen -->
+    <string name="tables_title">Tables - %1$s</string>
+    <string name="tables_empty">No tables in this database</string>
+    
+    <!-- Table viewer screen -->
+    <string name="table_viewer_title">Table: %1$s</string>
+    <string name="table_viewer_tab_rows">Rows</string>
+    <string name="table_viewer_tab_schema">Schema</string>
+    <string name="table_viewer_empty">This table has no rows</string>
+    
     <!-- Errors -->
     <string name="error_generic">An error occurred</string>
     <string name="error_loading">Failed to load data</string>

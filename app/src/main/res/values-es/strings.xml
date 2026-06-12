@@ -51,6 +51,20 @@
     <string name="connection_save_success">Conexión guardada</string>
     <string name="connection_save_failed">Error al guardar: %1$s</string>
     
+    <!-- Databases screen -->
+    <string name="databases_title">Bases de Datos</string>
+    <string name="databases_empty">No hay bases de datos disponibles</string>
+    
+    <!-- Tables screen -->
+    <string name="tables_title">Tablas - %1$s</string>
+    <string name="tables_empty">No hay tablas en esta base de datos</string>
+    
+    <!-- Table viewer screen -->
+    <string name="table_viewer_title">Tabla: %1$s</string>
+    <string name="table_viewer_tab_rows">Filas</string>
+    <string name="table_viewer_tab_schema">Esquema</string>
+    <string name="table_viewer_empty">Esta tabla no tiene filas</string>
+    
     <!-- Errors -->
     <string name="error_generic">Ocurrió un error</string>
     <string name="error_loading">Error al cargar datos</string>

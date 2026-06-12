@@ -16,6 +16,9 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.sphynxs.mydatabases.ui.screens.connections.ConnectionFormScreen
 import com.sphynxs.mydatabases.ui.screens.connections.ConnectionsListScreen
+import com.sphynxs.mydatabases.ui.screens.databases.DatabasesListScreen
+import com.sphynxs.mydatabases.ui.screens.tables.TablesListScreen
+import com.sphynxs.mydatabases.ui.screens.tableviewer.TableViewerScreen
 
 /**
  * NavHost principal de la aplicación.
@@ -68,7 +71,11 @@ fun MyDataBasesNavHost() {
         }
         
         composable(Routes.DatabaseList.route) {
-            PlaceholderScreen("Database List")
+            DatabasesListScreen(
+                onNavigateToTables = { databaseName ->
+                    navController.navigate("tables/$databaseName")
+                }
+            )
         }
         
         composable(
@@ -78,7 +85,12 @@ fun MyDataBasesNavHost() {
             )
         ) {
             val databaseName = it.arguments?.getString("databaseName") ?: ""
-            PlaceholderScreen("Table List: $databaseName")
+            TablesListScreen(
+                databaseName = databaseName,
+                onNavigateToTableViewer = { tableName ->
+                    navController.navigate("table_viewer/$databaseName/$tableName")
+                }
+            )
         }
         
         composable(
@@ -90,7 +102,10 @@ fun MyDataBasesNavHost() {
         ) {
             val databaseName = it.arguments?.getString("databaseName") ?: ""
             val tableName = it.arguments?.getString("tableName") ?: ""
-            PlaceholderScreen("Table Viewer: $databaseName.$tableName")
+            TableViewerScreen(
+                databaseName = databaseName,
+                tableName = tableName
+            )
         }
         
         composable(Routes.QueryEditor.route) {
