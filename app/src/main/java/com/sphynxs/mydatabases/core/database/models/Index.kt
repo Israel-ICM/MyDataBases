@@ -1,19 +1,12 @@
 package com.sphynxs.mydatabases.core.database.models
 
 /**
- * Representa un índice de una tabla.
+ * Representa un índice en una tabla.
  *
- * Soporta:
- * - Índices simples (1 columna)
- * - Índices compuestos (múltiples columnas)
- * - Unique vs non-unique
- * - Diferentes tipos (BTREE, HASH, FULLTEXT, SPATIAL)
- *
- * @property name Nombre del índice (ej: "idx_email", "PRIMARY")
- * @property columns Lista de columnas en el índice (orden importa para compuestos)
- * @property unique Si el índice es UNIQUE
+ * @property name Nombre del índice
+ * @property columns Lista de columnas que forman el índice (en orden)
+ * @property unique Si es un índice único
  * @property type Tipo de índice (BTREE, HASH, FULLTEXT, SPATIAL)
- *
  * @author israel-icm
  * @date 2026-06-11
  */
@@ -26,18 +19,17 @@ data class Index(
 
 /**
  * Tipo de índice.
- *
- * @property BTREE B-Tree (por defecto en MySQL/MariaDB)
- * @property HASH Hash index (solo en MEMORY engine)
- * @property FULLTEXT Full-text search index
- * @property SPATIAL Spatial index (para geometrías)
- *
- * @author israel-icm
- * @date 2026-06-11
  */
 enum class IndexType {
+    /** B-Tree (default) */
     BTREE,
+
+    /** Hash */
     HASH,
+
+    /** Full-text search */
     FULLTEXT,
+
+    /** Spatial (geometría) */
     SPATIAL
 }

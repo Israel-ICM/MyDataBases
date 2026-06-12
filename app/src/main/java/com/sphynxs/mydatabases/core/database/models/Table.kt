@@ -1,23 +1,16 @@
 package com.sphynxs.mydatabases.core.database.models
 
 /**
- * Representa una tabla o vista en una base de datos.
- *
- * Contiene metadata completa:
- * - Nombre y tipo (TABLE, VIEW, SYSTEM_TABLE)
- * - Storage engine (InnoDB, MyISAM, etc.)
- * - Estadísticas (row count, data size)
- * - Timestamps y comentarios
+ * Representa una tabla o vista en la base de datos.
  *
  * @property name Nombre de la tabla
  * @property database Nombre de la base de datos a la que pertenece
- * @property type Tipo de tabla (TABLE, VIEW, SYSTEM_TABLE)
- * @property engine Storage engine (InnoDB, MyISAM, etc.) - null para vistas
+ * @property type Tipo (TABLE, VIEW, SYSTEM_TABLE)
+ * @property engine Motor de almacenamiento (ej: InnoDB, MyISAM) - null para vistas
  * @property rowCount Número aproximado de filas - null si no disponible
- * @property dataLength Tamaño de los datos en bytes - null si no disponible
- * @property createdAt Timestamp de creación (milisegundos desde epoch) - null si no disponible
- * @property comment Comentario de la tabla - null si no tiene
- *
+ * @property dataLength Tamaño en bytes de los datos - null si no disponible
+ * @property createdAt Timestamp de creación - null si no disponible
+ * @property comment Comentario de la tabla
  * @author israel-icm
  * @date 2026-06-11
  */
@@ -33,17 +26,15 @@ data class Table(
 )
 
 /**
- * Tipo de tabla en el motor de base de datos.
- *
- * @property TABLE Tabla normal (BASE TABLE)
- * @property VIEW Vista (definición de query almacenada)
- * @property SYSTEM_TABLE Tabla del sistema (information_schema, mysql.*)
- *
- * @author israel-icm
- * @date 2026-06-11
+ * Tipo de tabla.
  */
 enum class TableType {
+    /** Tabla normal */
     TABLE,
+
+    /** Vista */
     VIEW,
+
+    /** Tabla del sistema */
     SYSTEM_TABLE
 }

@@ -3,21 +3,13 @@ package com.sphynxs.mydatabases.core.database.models
 /**
  * Representa una columna de una tabla.
  *
- * Contiene metadata completa de la columna:
- * - Nombre y tipo de datos
- * - Nullability
- * - Key type (PRIMARY, UNIQUE, etc.)
- * - Default value
- * - Extra flags (auto_increment, on update, etc.)
- *
  * @property name Nombre de la columna
  * @property type Tipo de datos (ej: "int(11)", "varchar(255)", "datetime")
- * @property nullable Si la columna acepta NULL
+ * @property nullable Si permite valores NULL
  * @property key Tipo de clave (PRIMARY, UNIQUE, MULTIPLE, NONE)
  * @property default Valor por defecto - null si no tiene
- * @property extra Flags adicionales (auto_increment, on update CURRENT_TIMESTAMP, etc.) - null si no tiene
- * @property comment Comentario de la columna - null si no tiene
- *
+ * @property extra Información adicional (ej: "auto_increment", "on update CURRENT_TIMESTAMP")
+ * @property comment Comentario de la columna
  * @author israel-icm
  * @date 2026-06-11
  */
@@ -33,20 +25,17 @@ data class Column(
 
 /**
  * Tipo de clave de una columna.
- *
- * Basado en el campo COLUMN_KEY de information_schema.COLUMNS en MySQL.
- *
- * @property PRIMARY Primary key
- * @property UNIQUE Unique key
- * @property MULTIPLE Múltiples keys (índices compuestos)
- * @property NONE Sin clave
- *
- * @author israel-icm
- * @date 2026-06-11
  */
 enum class ColumnKey {
+    /** Clave primaria */
     PRIMARY,
+
+    /** Clave única */
     UNIQUE,
+
+    /** Parte de un índice no único (múltiples columnas) */
     MULTIPLE,
+
+    /** Sin clave */
     NONE
 }

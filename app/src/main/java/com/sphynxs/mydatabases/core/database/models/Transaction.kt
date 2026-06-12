@@ -1,24 +1,35 @@
 package com.sphynxs.mydatabases.core.database.models
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+
 /**
- * Representa una transacción activa en la base de datos.
+ * Representa una transacción activa de base de datos.
  *
- * Una transacción permite agrupar múltiples operaciones (INSERT/UPDATE/DELETE)
- * en una unidad atómica que puede ser confirmada (commit) o revertida (rollback).
+ * Permite hacer commit o rollback de cambios.
  *
- * Lifecycle:
- * 1. beginTransaction() → Transaction creada, auto-commit deshabilitado
- * 2. executeUpdate() múltiples veces
- * 3. commit() → cambios confirmados, auto-commit habilitado
- *    OR rollback() → cambios revertidos, auto-commit habilitado
- *
- * @property id Identificador único de la transacción
- * @property startedAt Timestamp de inicio de la transacción (milisegundos desde epoch)
- *
+ * @property connection Conexión JDBC subyacente (privada)
+ * @property onCommit Callback para confirmar la transacción
+ * @property onRollback Callback para revertir la transacción
  * @author israel-icm
  * @date 2026-06-11
  */
 data class Transaction(
-    val id: String,
-    val startedAt: Long
-)
+    private val connection: java.sql.Connection,
+    private val onCommit: () -> Unit,
+    private val onRollback: () -> Unit
+) {
+    /**
+     * Confirma la transacción (COMMIT).
+     */
+    suspend fun commit() = withContext(Dispatchers.IO) {
+        onCommit()
+    }
+
+    /**
+     * Revierte la transacción (ROLLBACK).
+     */
+    suspend fun rollback() = withContext(Dispatchers.IO) {
+        onRollback()
+    }
+}
