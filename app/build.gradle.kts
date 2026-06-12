@@ -102,6 +102,9 @@ dependencies {
     // DataStore
     implementation("androidx.datastore:datastore-preferences:1.0.0")
     
+    // Security
+    implementation("androidx.security:security-crypto:1.1.0-alpha06")
+    
     // Database Drivers (JDBC)
     implementation("mysql:mysql-connector-java:8.0.33")
     implementation("org.mariadb.jdbc:mariadb-java-client:3.1.4")
@@ -114,6 +117,7 @@ dependencies {
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
     testImplementation("io.mockk:mockk:1.13.9")
     testImplementation("org.robolectric:robolectric:4.11.1")
+    testImplementation("androidx.test:core:1.5.0")
     testImplementation("org.testcontainers:mysql:1.19.0")
     testImplementation("org.testcontainers:mariadb:1.19.0")
     

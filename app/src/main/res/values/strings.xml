@@ -1,4 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">MyDataBases</string>
+    
+    <!-- Navigation routes -->
+    <string name="nav_connections">Connections</string>
+    <string name="nav_database_list">Databases</string>
+    <string name="nav_table_list">Tables</string>
+    <string name="nav_table_viewer">Table Viewer</string>
+    <string name="nav_query_editor">Query Editor</string>
+    <string name="nav_settings">Settings</string>
+    
+    <!-- Common actions -->
+    <string name="action_add">Add</string>
+    <string name="action_edit">Edit</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_retry">Retry</string>
 </resources>

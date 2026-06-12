@@ -4,53 +4,65 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
+import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.tooling.preview.Preview
+import com.sphynxs.mydatabases.domain.models.ThemeMode
+import com.sphynxs.mydatabases.ui.navigation.MyDataBasesNavHost
 import com.sphynxs.mydatabases.ui.theme.MyDataBasesTheme
 import dagger.hilt.android.AndroidEntryPoint
 
+/**
+ * CompositionLocal para exponer el WindowSizeClass a toda la jerarquía de Composables.
+ *
+ * @author israel-icm
+ * @date 2026-06-12
+ */
+val LocalWindowSizeClass = staticCompositionLocalOf<WindowSizeClass?> {
+    null
+}
+
+/**
+ * Actividad principal de la aplicación.
+ *
+ * Configura el tema adaptativo, WindowSizeClass y el NavHost principal.
+ *
+ * @author israel-icm
+ * @date 2026-06-12
+ */
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            MyDataBasesTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "MyDataBases",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+            // Calcular WindowSizeClass para adaptación de UI
+            val windowSizeClass = calculateWindowSizeClass(this)
+            
+            // ThemeMode hardcodeado a SYSTEM por ahora (será dinámico en PR #2)
+            val themeMode = remember { mutableStateOf(ThemeMode.SYSTEM) }
+            
+            CompositionLocalProvider(LocalWindowSizeClass provides windowSizeClass) {
+                MyDataBasesTheme(themeMode = themeMode.value) {
+                    MyDataBasesNavHost()
                 }
             }
         }
     }
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Surface(
-        modifier = modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
-    ) {
-        Text(
-            text = "Welcome to $name!",
-            style = MaterialTheme.typography.headlineMedium
-        )
-    }
-}
-
 @Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
+fun MainActivityPreview() {
     MyDataBasesTheme {
-        Greeting("MyDataBases")
+        MyDataBasesNavHost()
     }
 }
