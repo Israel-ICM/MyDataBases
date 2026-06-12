@@ -9,18 +9,40 @@
 
 ## 1. Architecture Overview
 
-### 1.1 Clean Architecture Layers
+### 1.1 Documentation & UI Standards
+
+**Documentation Language**: Español
+- Todo KDoc de APIs públicas en español
+- Comentarios inline complejos en español
+- Identificadores en inglés (convención estándar)
+
+**UI Theme Support**: Dark + Light Mode
+- Material 3 Dynamic Color
+- Soporte dark/light desde el inicio
+- Respetar preferencia del sistema
+
+**UI Design Principle**: Simplicidad extrema
+- Claridad sobre densidad
+- Acciones primarias siempre visibles
+- Feedback inmediato (loading, error, success)
+- Navegación predecible (max 3 niveles)
+- Mobile-first
+
+### 1.2 Clean Architecture Layers
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                      Presentation Layer                      │
 │  (Compose UI, ViewModels, Navigation)                        │
+│  - Dark/Light theme support (Material 3)                     │
+│  - Simple, mobile-first UI                                   │
 └─────────────────────────────────────────────────────────────┘
                             │
                             ▼
 ┌─────────────────────────────────────────────────────────────┐
 │                       Domain Layer                           │
 │  (Use Cases, Repository Interface, Models)                   │
+│  - KDoc en español                                           │
 └─────────────────────────────────────────────────────────────┘
                             │
                             ▼
@@ -1307,7 +1329,188 @@ dependencies {
 
 ---
 
-## 13. Out of Scope
+## 13. UI Theme Design
+
+### 13.1 Material 3 Theme Configuration
+
+```kotlin
+// ui/theme/Color.kt
+package com.sphynxs.mydatabases.ui.theme
+
+import androidx.compose.ui.graphics.Color
+
+// Light Theme Colors
+val md_theme_light_primary = Color(0xFF1976D2)        // Blue 700
+val md_theme_light_onPrimary = Color(0xFFFFFFFF)
+val md_theme_light_primaryContainer = Color(0xFFBBDEFB) // Blue 100
+val md_theme_light_onPrimaryContainer = Color(0xFF0D47A1)
+
+val md_theme_light_secondary = Color(0xFF00796B)      // Teal 700
+val md_theme_light_onSecondary = Color(0xFFFFFFFF)
+val md_theme_light_secondaryContainer = Color(0xFFB2DFDB)
+val md_theme_light_onSecondaryContainer = Color(0xFF004D40)
+
+val md_theme_light_error = Color(0xFFD32F2F)          // Red 700
+val md_theme_light_onError = Color(0xFFFFFFFF)
+val md_theme_light_errorContainer = Color(0xFFFFCDD2)
+val md_theme_light_onErrorContainer = Color(0xFFB71C1C)
+
+val md_theme_light_background = Color(0xFFFAFAFA)     // Gray 50
+val md_theme_light_onBackground = Color(0xFF212121)
+val md_theme_light_surface = Color(0xFFFFFFFF)
+val md_theme_light_onSurface = Color(0xFF212121)
+
+// Dark Theme Colors
+val md_theme_dark_primary = Color(0xFF64B5F6)         // Blue 300
+val md_theme_dark_onPrimary = Color(0xFF0D47A1)
+val md_theme_dark_primaryContainer = Color(0xFF1565C0)
+val md_theme_dark_onPrimaryContainer = Color(0xFFE3F2FD)
+
+val md_theme_dark_secondary = Color(0xFF4DB6AC)       // Teal 300
+val md_theme_dark_onSecondary = Color(0xFF004D40)
+val md_theme_dark_secondaryContainer = Color(0xFF00796B)
+val md_theme_dark_onSecondaryContainer = Color(0xFFE0F2F1)
+
+val md_theme_dark_error = Color(0xFFEF5350)           // Red 400
+val md_theme_dark_onError = Color(0xFFB71C1C)
+val md_theme_dark_errorContainer = Color(0xFFC62828)
+val md_theme_dark_onErrorContainer = Color(0xFFFFEBEE)
+
+val md_theme_dark_background = Color(0xFF121212)      // Material Dark
+val md_theme_dark_onBackground = Color(0xFFE0E0E0)
+val md_theme_dark_surface = Color(0xFF1E1E1E)
+val md_theme_dark_onSurface = Color(0xFFE0E0E0)
+```
+
+```kotlin
+// ui/theme/Theme.kt
+package com.sphynxs.mydatabases.ui.theme
+
+import android.app.Activity
+import android.os.Build
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.dynamicDarkColorScheme
+import androidx.compose.material3.dynamicLightColorScheme
+import androidx.compose.material3.lightColorScheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
+import androidx.core.view.WindowCompat
+
+private val DarkColorScheme = darkColorScheme(
+    primary = md_theme_dark_primary,
+    onPrimary = md_theme_dark_onPrimary,
+    primaryContainer = md_theme_dark_primaryContainer,
+    onPrimaryContainer = md_theme_dark_onPrimaryContainer,
+    secondary = md_theme_dark_secondary,
+    onSecondary = md_theme_dark_onSecondary,
+    secondaryContainer = md_theme_dark_secondaryContainer,
+    onSecondaryContainer = md_theme_dark_onSecondaryContainer,
+    error = md_theme_dark_error,
+    onError = md_theme_dark_onError,
+    errorContainer = md_theme_dark_errorContainer,
+    onErrorContainer = md_theme_dark_onErrorContainer,
+    background = md_theme_dark_background,
+    onBackground = md_theme_dark_onBackground,
+    surface = md_theme_dark_surface,
+    onSurface = md_theme_dark_onSurface,
+)
+
+private val LightColorScheme = lightColorScheme(
+    primary = md_theme_light_primary,
+    onPrimary = md_theme_light_onPrimary,
+    primaryContainer = md_theme_light_primaryContainer,
+    onPrimaryContainer = md_theme_light_onPrimaryContainer,
+    secondary = md_theme_light_secondary,
+    onSecondary = md_theme_light_onSecondary,
+    secondaryContainer = md_theme_light_secondaryContainer,
+    onSecondaryContainer = md_theme_light_onSecondaryContainer,
+    error = md_theme_light_error,
+    onError = md_theme_light_onError,
+    errorContainer = md_theme_light_errorContainer,
+    onErrorContainer = md_theme_light_onErrorContainer,
+    background = md_theme_light_background,
+    onBackground = md_theme_light_onBackground,
+    surface = md_theme_light_surface,
+    onSurface = md_theme_light_onSurface,
+)
+
+/**
+ * Tema principal de MyDataBases con soporte para Dark y Light mode.
+ * 
+ * Usa Material 3 Dynamic Color en Android 12+ cuando está disponible,
+ * de lo contrario usa el esquema de colores estático.
+ * 
+ * @param darkTheme Si true, usa tema oscuro. Por defecto sigue la preferencia del sistema.
+ * @param dynamicColor Si true, usa Dynamic Color en Android 12+. Por defecto true.
+ */
+@Composable
+fun MyDataBasesTheme(
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    dynamicColor: Boolean = true,
+    content: @Composable () -> Unit
+) {
+    val colorScheme = when {
+        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+            val context = LocalContext.current
+            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+        }
+        darkTheme -> DarkColorScheme
+        else -> LightColorScheme
+    }
+    
+    val view = LocalView.current
+    if (!view.isInEditMode) {
+        SideEffect {
+            val window = (view.context as Activity).window
+            window.statusBarColor = colorScheme.primary.toArgb()
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
+        }
+    }
+
+    MaterialTheme(
+        colorScheme = colorScheme,
+        typography = Typography,
+        content = content
+    )
+}
+```
+
+### 13.2 UI Simplicity Guidelines
+
+**Spacing System** (Material 3):
+```kotlin
+// ui/theme/Dimensions.kt
+object Spacing {
+    val extraSmall = 4.dp
+    val small = 8.dp
+    val medium = 16.dp
+    val large = 24.dp
+    val extraLarge = 32.dp
+}
+```
+
+**Component Guidelines**:
+- **Buttons**: Usar FilledButton para acciones primarias, OutlinedButton para secundarias
+- **Cards**: Elevation 1.dp en light, 2.dp en dark
+- **Dialogs**: Max width 560.dp, padding 24.dp
+- **Lists**: Min touch target 48.dp, dividers solo cuando necesario
+- **Input fields**: Siempre con label, error message debajo, max 1 por fila en mobile
+
+**Anti-patterns Banned**:
+- ❌ Text menor a 14sp (accesibilidad)
+- ❌ Iconos sin contentDescription
+- ❌ Botones destructivos (delete) sin color error
+- ❌ Loading states sin indicador visual
+- ❌ Formularios largos sin progress indicator
+
+---
+
+## 14. Out of Scope
 
 ❌ SSH Tunneling (change separado)  
 ❌ Credential encryption (change separado)  
@@ -1315,10 +1518,11 @@ dependencies {
 ❌ PostgreSQL/SQLite engines (v1.1)  
 ❌ Query history/favorites (change separado)  
 ❌ Visual query builder (v2.0)  
+❌ UI implementation (change separado - este change solo es core-database)
 
 ---
 
-## 14. Success Criteria
+## 15. Success Criteria
 
 ✅ MySQLEngine + MariaDBEngine implementados  
 ✅ DatabaseEngineFactory crea engines correctamente  
