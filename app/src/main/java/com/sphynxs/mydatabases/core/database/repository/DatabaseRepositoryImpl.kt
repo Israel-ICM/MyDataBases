@@ -1,0 +1,82 @@
+package com.sphynxs.mydatabases.core.database.repository
+
+import com.sphynxs.mydatabases.core.database.engine.DatabaseEngine
+import com.sphynxs.mydatabases.core.database.engine.DatabaseEngineFactory
+import com.sphynxs.mydatabases.core.database.engine.DatabaseFeature
+import com.sphynxs.mydatabases.core.database.models.*
+import javax.inject.Inject
+
+/**
+ * Implementación del repository usando DatabaseEngine.
+ * 
+ * Mantiene una referencia al motor actual y delega todas las operaciones.
+ * Si no hay motor conectado, retorna DatabaseError.ConnectionFailed.
+ * 
+ * @param engineFactory Factory para crear instancias de DatabaseEngine
+ * @author israel-icm
+ * @date 2026-06-12
+ */
+class DatabaseRepositoryImpl @Inject constructor(
+    private val engineFactory: DatabaseEngineFactory
+) : DatabaseRepository {
+    
+    private var currentEngine: DatabaseEngine? = null
+    
+    override suspend fun connect(config: ConnectionConfig): Result<Connection> {
+        currentEngine = engineFactory.create(config.type)
+        return currentEngine!!.connect(config)
+    }
+    
+    override suspend fun disconnect(): Result<Unit> {
+        return currentEngine?.disconnect() ?: Result.success(Unit)
+    }
+    
+    override suspend fun executeQuery(query: String, params: List<Any>): Result<QueryResult> {
+        return currentEngine?.executeQuery(query, params)
+            ?: Result.failure(DatabaseError.ConnectionFailed("No conectado"))
+    }
+    
+    override suspend fun executeUpdate(query: String, params: List<Any>): Result<Int> {
+        return currentEngine?.executeUpdate(query, params)
+            ?: Result.failure(DatabaseError.ConnectionFailed("No conectado"))
+    }
+    
+    override suspend fun getDatabases(): Result<List<Database>> {
+        return currentEngine?.getDatabases()
+            ?: Result.failure(DatabaseError.ConnectionFailed("No conectado"))
+    }
+    
+    override suspend fun getTables(database: String): Result<List<Table>> {
+        return currentEngine?.getTables(database)
+            ?: Result.failure(DatabaseError.ConnectionFailed("No conectado"))
+    }
+    
+    override suspend fun getColumns(table: String): Result<List<Column>> {
+        return currentEngine?.getColumns(table)
+            ?: Result.failure(DatabaseError.ConnectionFailed("No conectado"))
+    }
+    
+    override suspend fun getIndexes(table: String): Result<List<Index>> {
+        return currentEngine?.getIndexes(table)
+            ?: Result.failure(DatabaseError.ConnectionFailed("No conectado"))
+    }
+    
+    override suspend fun getForeignKeys(table: String): Result<List<ForeignKey>> {
+        return currentEngine?.getForeignKeys(table)
+            ?: Result.failure(DatabaseError.ConnectionFailed("No conectado"))
+    }
+    
+    override suspend fun beginTransaction(): Result<Transaction> {
+        return currentEngine?.beginTransaction()
+            ?: Result.failure(DatabaseError.ConnectionFailed("No conectado"))
+    }
+    
+    override suspend fun getVersion(): Result<String> {
+        return currentEngine?.getVersion()
+            ?: Result.failure(DatabaseError.ConnectionFailed("No conectado"))
+    }
+    
+    override fun getSupportedFeatures(): Set<DatabaseFeature> {
+        return currentEngine?.getSupportedFeatures() ?: emptySet()
+    }
+}
