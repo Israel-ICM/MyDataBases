@@ -29,3 +29,23 @@
 -keep class * extends androidx.room.RoomDatabase
 -keep @androidx.room.Entity class *
 -dontwarn androidx.room.paging.**
+
+# MySQL Connector
+-keep class com.mysql.** { *; }
+-dontwarn com.mysql.**
+
+# MariaDB Client
+-keep class org.mariadb.** { *; }
+-dontwarn org.mariadb.**
+
+# HikariCP
+-keep class com.zaxxer.hikari.** { *; }
+-dontwarn com.zaxxer.hikari.**
+
+# JDBC
+-keep class java.sql.** { *; }
+-keep class javax.sql.** { *; }
+
+# Keep JDBC driver names (loaded dynamically via Class.forName)
+-keepnames class com.mysql.cj.jdbc.Driver
+-keepnames class org.mariadb.jdbc.Driver
