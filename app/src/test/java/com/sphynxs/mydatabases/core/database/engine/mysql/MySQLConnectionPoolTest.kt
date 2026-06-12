@@ -2,12 +2,12 @@ package com.sphynxs.mydatabases.core.database.engine.mysql
 
 import com.sphynxs.mydatabases.core.database.engine.DatabaseType
 import com.sphynxs.mydatabases.core.database.models.ConnectionConfig
-import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Test
-import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
-import kotlin.test.assertFalse
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
+import org.junit.Assert.assertFalse
 
 /**
  * Tests unitarios para MySQLConnectionPool.
@@ -30,7 +30,7 @@ class MySQLConnectionPoolTest {
     }
     
     @Test
-    fun `pool creates valid connection with minimal config`() = runTest {
+    fun `pool creates valid connection with minimal config`() = runBlocking {
         // Arrange
         val config = ConnectionConfig(
             name = "Test MySQL",
@@ -48,13 +48,13 @@ class MySQLConnectionPoolTest {
         val connection = pool!!.getConnection()
         
         // Assert - conexión válida
-        assertNotNull(connection, "Connection should not be null")
-        assertTrue(connection.isValid(5), "Connection should be valid within 5 seconds")
-        assertFalse(connection.isClosed, "Connection should not be closed")
+        assertNotNull("Connection should not be null", connection)
+        assertTrue("Connection should be valid within 5 seconds", connection.isValid(5))
+        assertFalse("Connection should not be closed", connection.isClosed)
     }
     
     @Test
-    fun `pool creates connection with SSL enabled`() = runTest {
+    fun `pool creates connection with SSL enabled`() = runBlocking {
         // Arrange
         val config = ConnectionConfig(
             name = "Test MySQL SSL",
@@ -72,12 +72,12 @@ class MySQLConnectionPoolTest {
         val connection = pool!!.getConnection()
         
         // Assert - conexión válida con SSL
-        assertNotNull(connection, "Connection with SSL should not be null")
-        assertTrue(connection.isValid(5), "SSL connection should be valid")
+        assertNotNull("Connection with SSL should not be null", connection)
+        assertTrue("SSL connection should be valid", connection.isValid(5))
     }
     
     @Test
-    fun `pool reuses connections from pool`() = runTest {
+    fun `pool reuses connections from pool`() = runBlocking {
         // Arrange
         val config = ConnectionConfig(
             name = "Test Pool Reuse",
@@ -99,12 +99,12 @@ class MySQLConnectionPoolTest {
         val conn2 = pool!!.getConnection()
         
         // Assert - segunda conexión reutiliza del pool (HikariCP maneja esto)
-        assertNotNull(conn2, "Reused connection should not be null")
-        assertTrue(conn2.isValid(5), "Reused connection should be valid")
+        assertNotNull("Reused connection should not be null", conn2)
+        assertTrue("Reused connection should be valid", conn2.isValid(5))
     }
     
     @Test
-    fun `pool closes successfully and releases resources`() = runTest {
+    fun `pool closes successfully and releases resources`() = runBlocking {
         // Arrange
         val config = ConnectionConfig(
             name = "Test Close",
@@ -123,6 +123,6 @@ class MySQLConnectionPoolTest {
         pool!!.close()
         
         // Assert - pool cerrado, conexión ya no válida
-        assertTrue(connection.isClosed, "Connection should be closed after pool.close()")
+        assertTrue("Connection should be closed after pool.close()", connection.isClosed)
     }
 }
