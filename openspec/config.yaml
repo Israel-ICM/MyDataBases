@@ -1,0 +1,74 @@
+# openspec/config.yaml — MyDataBases SDD configuration
+schema: spec-driven
+
+context: |
+  Project: MyDataBases (com.sphynxs.mydatabases) — Android DB administration client.
+  Stack: Kotlin 1.9.22, AGP 8.2.2, Jetpack Compose BOM 2024.02.00, Material 3, Hilt 2.50, Room 2.6.1, DataStore, Navigation Compose 2.7.7, Coroutines 1.7.3, KSP.
+  Architecture: Clean Architecture + MVVM, modular feature/core split, target single-module currently with `:app`.
+  Testing: JUnit 4 (4.13.2) + Mockk 1.13.9 + kotlinx-coroutines-test on JVM; AndroidX JUnit + Espresso + Compose UI Test on instrumentation. Gradle: `./gradlew test` and `./gradlew connectedAndroidTest`.
+  Style: 100% Kotlin, 100% Compose (no XML), strings localized es/en, adaptive layouts (WindowSizeClass), security-by-default.
+
+# Strict TDD enabled per project standards (.atl/standards/sdd-workflow.md + testing.md).
+strict_tdd: true
+
+testing:
+  unit:
+    command: "./gradlew test"
+    framework: "JUnit 4 + Mockk + kotlinx-coroutines-test"
+    location: "app/src/test/"
+  integration:
+    command: "./gradlew test"
+    framework: "JUnit 4 + Mockk (in-process, prefer fakes)"
+    location: "app/src/test/"
+  ui:
+    command: "./gradlew connectedAndroidTest"
+    framework: "Compose UI Test + Espresso + AndroidX JUnit"
+    location: "app/src/androidTest/"
+  coverage:
+    available: false
+    command: ""
+    note: "Jacoco/Kover not yet configured. Project standard requires 80% min coverage — recommend enabling Kover in a follow-up change."
+  quality:
+    linter:
+      available: false
+      command: ""
+      note: "ktlint/detekt not yet configured."
+    type_checker:
+      available: true
+      command: "./gradlew compileDebugKotlin"
+    formatter:
+      available: false
+      command: ""
+
+rules:
+  proposal:
+    - Include rollback plan for risky changes
+    - State impact on Compact/Medium/Expanded WindowSizeClass
+    - State impact on supported locales (es, en)
+  specs:
+    - Use Given/When/Then for scenarios
+    - Use RFC 2119 keywords (MUST, SHALL, SHOULD, MAY)
+    - Define localized strings (es + en) for all user-facing text
+    - Define adaptive behavior per WindowSizeClass when UI is involved
+    - Define security requirements for any credential or network handling
+  design:
+    - Document architecture decisions as ADRs under .atl/architecture/decisions/
+    - Keep Clean Architecture layers (presentation/domain/data) separated
+    - Use Hilt for DI; never construct dependencies manually in Composables
+    - Specify testing strategy (unit + integration + UI)
+  tasks:
+    - Group by phase, use hierarchical numbering
+    - Keep tasks completable in one session
+    - Include test tasks BEFORE or alongside implementation tasks (Strict TDD)
+  apply:
+    - Follow existing code patterns and .atl/standards/coding.md
+    tdd: true
+    test_command: "./gradlew test"
+  verify:
+    test_command: "./gradlew test"
+    build_command: "./gradlew assembleDebug"
+    instrumentation_command: "./gradlew connectedAndroidTest"
+    coverage_threshold: 0
+  archive:
+    - Warn before merging destructive deltas
+    - Update affected .atl/product/features/*.md if feature scope shifted
