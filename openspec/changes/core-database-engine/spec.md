@@ -11,6 +11,72 @@
 
 Este spec define los requisitos detallados para el módulo `core-database` que provee una capa de abstracción extensible para conectar y operar con múltiples motores de bases de datos (MySQL, MariaDB, PostgreSQL, SQLite).
 
+### 1.1 Documentation Language
+
+**REQUIREMENT**: Toda la documentación KDoc de métodos, clases, interfaces y funciones públicas DEBE estar en **español**.
+
+**Justificación**: El equipo de desarrollo trabaja en español, y la documentación en el idioma nativo facilita la comprensión y reduce errores.
+
+**Scope**:
+- ✅ KDoc de interfaces públicas (DatabaseEngine, DatabaseRepository, etc.)
+- ✅ KDoc de data classes y models
+- ✅ KDoc de use cases
+- ✅ Comentarios inline complejos que explican lógica no trivial
+- ❌ Identificadores (nombres de variables, funciones, clases) → permanecen en inglés
+- ❌ Strings literales de UI → se manejan en strings.xml con i18n
+
+**Ejemplo**:
+```kotlin
+/**
+ * Conecta al servidor de base de datos usando la configuración provista.
+ * 
+ * @param config Configuración de conexión (host, port, credenciales, etc.)
+ * @return Result con Connection si exitoso, DatabaseError si falla
+ * @throws DatabaseError.ConnectionFailed si el host no es alcanzable
+ * @throws DatabaseError.AuthenticationFailed si las credenciales son inválidas
+ */
+suspend fun connect(config: ConnectionConfig): Result<Connection>
+```
+
+### 1.2 UI Theme Support
+
+**REQUIREMENT**: La UI DEBE soportar tema **Dark Mode** y **Light Mode** desde el inicio.
+
+**Justificación**: Dark mode es estándar en apps modernas y reduce fatiga visual durante sesiones largas de trabajo con bases de datos.
+
+**Implementation**:
+- Usar Material 3 Dynamic Color con soporte dark/light
+- Definir `ui/theme/Theme.kt` con `DarkColorScheme` y `LightColorScheme`
+- Respetar preferencia del sistema por default
+- Permitir override manual en Settings (fase futura)
+
+**Color Palette Guidelines**:
+- **Light Mode**: Fondo blanco/gris claro, texto oscuro, acentos vibrantes
+- **Dark Mode**: Fondo gris oscuro (#121212), texto claro, acentos suavizados
+
+### 1.3 UI Simplicity Principle
+
+**REQUIREMENT**: La UI DEBE ser **simple y muy fácil de usar**.
+
+**Design Principles**:
+1. **Claridad sobre densidad**: Preferir espacio en blanco antes que sobrecarga visual
+2. **Acciones primarias visibles**: Botones principales siempre accesibles sin scroll
+3. **Feedback inmediato**: Estados de carga, errores y éxito claramente indicados
+4. **Navegación predecible**: Máximo 3 niveles de profundidad
+5. **Mobile-first**: Diseñar para pantallas pequeñas primero
+
+**Anti-patterns a evitar**:
+- ❌ Menús anidados con >2 niveles
+- ❌ Iconos sin labels (ambiguos)
+- ❌ Formularios largos (dividir en pasos)
+- ❌ Acciones destructivas sin confirmación
+- ❌ Jerga técnica sin contexto (ej: "HikariCP pool size" → "Conexiones simultáneas")
+
+**Target Personas**:
+- Desarrolladores backend que necesitan ejecutar queries rápidas
+- DBAs que inspeccionan metadata y estructura
+- Usuarios no técnicos que consultan reportes pre-guardados (fase futura)
+
 ---
 
 ## 2. Functional Requirements
