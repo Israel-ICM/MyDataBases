@@ -8,30 +8,24 @@ import java.util.UUID
 /**
  * Configuración de conexión a una base de datos.
  *
- * Contiene toda la información necesaria para establecer una conexión:
- * - Credenciales (host, port, database, username, password)
- * - Opciones de seguridad (SSL/TLS, SSH tunneling)
- * - Timeouts y pool settings
- * - Metadata (createdAt, lastUsedAt)
+ * Contiene todos los parámetros necesarios para establecer una conexión:
+ * credenciales, timeouts, pool settings, etc.
  *
- * Esta clase es Parcelable para poder pasarla entre Activities/Fragments.
- *
- * @property id Identificador único de la conexión (UUID auto-generado)
- * @property name Nombre descriptivo para mostrar en UI
- * @property type Tipo de motor de base de datos (MySQL, MariaDB, etc.)
- * @property host Hostname o IP del servidor
+ * @property id Identificador único de la configuración
+ * @property name Nombre descriptivo para el usuario
+ * @property type Tipo de motor de base de datos
+ * @property host Dirección del servidor (hostname o IP)
  * @property port Puerto del servidor
  * @property database Nombre de la base de datos
  * @property username Usuario para autenticación
- * @property password Contraseña encriptada (Android Keystore)
- * @property useSSL Habilitar conexión SSL/TLS
+ * @property password Contraseña (debe estar encriptada antes de persistir)
+ * @property useSSL Si se debe usar SSL/TLS para la conexión
  * @property sshTunnelConfig Configuración de túnel SSH (opcional)
- * @property connectionTimeout Timeout en milisegundos para establecer conexión
- * @property readTimeout Timeout en milisegundos para queries
+ * @property connectionTimeout Timeout para establecer la conexión (ms)
+ * @property readTimeout Timeout para ejecutar queries (ms)
  * @property maxPoolSize Número máximo de conexiones en el pool
- * @property createdAt Timestamp de creación (milisegundos desde epoch)
+ * @property createdAt Timestamp de creación de la configuración
  * @property lastUsedAt Timestamp del último uso (null si nunca se usó)
- *
  * @author israel-icm
  * @date 2026-06-11
  */
@@ -52,33 +46,4 @@ data class ConnectionConfig(
     val maxPoolSize: Int = 10,
     val createdAt: Long = System.currentTimeMillis(),
     val lastUsedAt: Long? = null
-) : Parcelable
-
-/**
- * Configuración de túnel SSH para conexiones remotas.
- *
- * Permite conectar a bases de datos que solo son accesibles a través de un servidor SSH.
- *
- * @property sshHost Hostname del servidor SSH
- * @property sshPort Puerto del servidor SSH
- * @property sshUsername Usuario SSH
- * @property sshPassword Contraseña SSH (opcional si se usa key)
- * @property sshKeyPath Path a la clave privada SSH (opcional)
- * @property localPort Puerto local para el túnel
- * @property remoteHost Host remoto de la base de datos
- * @property remotePort Puerto remoto de la base de datos
- *
- * @author israel-icm
- * @date 2026-06-11
- */
-@Parcelize
-data class SSHTunnelConfig(
-    val sshHost: String,
-    val sshPort: Int = 22,
-    val sshUsername: String,
-    val sshPassword: String? = null,
-    val sshKeyPath: String? = null,
-    val localPort: Int,
-    val remoteHost: String,
-    val remotePort: Int
 ) : Parcelable
