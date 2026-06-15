@@ -59,21 +59,26 @@ fun MyDataBasesNavHost(
     val windowSizeClass = LocalWindowSizeClass.current
         ?: throw IllegalStateException("WindowSizeClass no disponible — MainActivity debe proveerlo vía LocalWindowSizeClass")
     
-    AdaptiveNavigationScaffold(
-        windowSizeClass = windowSizeClass,
-        navigationContext = navigationContext,
-        currentRoute = currentBackStackEntry?.destination?.route,
-        onNavigate = { route ->
-            navController.navigate(route) {
-                // Evitar múltiples copias de la misma pantalla en el back stack
-                launchSingleTop = true
-            }
-        }
+    // WorkspaceOverlay envuelve TODO - Scaffold adaptativo + NavHost
+    com.sphynxs.mydatabases.ui.workspace.WorkspaceOverlay(
+        workspaceManager = workspaceManager,
+        modifier = Modifier.fillMaxSize()
     ) {
-        NavHost(
-            navController = navController,
-            startDestination = Routes.Connections.route
+        AdaptiveNavigationScaffold(
+            windowSizeClass = windowSizeClass,
+            navigationContext = navigationContext,
+            currentRoute = currentBackStackEntry?.destination?.route,
+            onNavigate = { route ->
+                navController.navigate(route) {
+                    // Evitar múltiples copias de la misma pantalla en el back stack
+                    launchSingleTop = true
+                }
+            }
         ) {
+            NavHost(
+                navController = navController,
+                startDestination = Routes.Connections.route
+            ) {
             composable(Routes.Connections.route) {
                 ConnectionsListScreen(
                     onNavigateToForm = { connectionId ->
@@ -204,13 +209,12 @@ fun MyDataBasesNavHost(
                 SettingsScreen()
             }
         }
-    }
+        } // Cierre AdaptiveNavigationScaffold
+    } // Cierre WorkspaceOverlay
 }
 
 /**
- * Pantalla placeholder temporal para desarrollo.
- *
- * Muestra el título de la pantalla centrado.
+ * Pantalla placeholder para rutas en desarrollo.
  *
  * @param title Título de la pantalla
  *

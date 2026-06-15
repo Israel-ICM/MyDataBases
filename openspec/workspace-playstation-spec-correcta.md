@@ -1,7 +1,8 @@
 # Workspace PlayStation - Especificación CORRECTA
 
 **Fecha**: 2026-06-15
-**Estado**: Especificación recuperada después de pérdida de contexto matutino
+**Estado**: Fase 1 COMPLETADA ✅
+**Última actualización**: 2026-06-15
 
 ---
 
@@ -49,11 +50,34 @@
 
 ## Fases de implementación CORREGIDAS
 
-### Fase 1: Card única con drag correcto (PENDIENTE RE-HACER)
-- Card posicionada ARRIBA en estado minimizado
-- Drag DOWN → expande y baja
-- Drag UP → colapsa y sube
-- Animaciones suaves spring
+### Fase 1: Card única con drag correcto ✅ COMPLETADA
+**Componentes implementados:**
+- `TopSheet.kt`: Bottom sheet invertido que baja desde arriba
+- `WorkspaceOverlay.kt`: Capa que integra TopSheet sobre contenido de fondo
+- `WorkspaceManager.kt`: Singleton para gestión de estado de cards
+- `WorkspaceCard.kt`: Sealed class para tipos de cards (Table, Query, View, etc.)
+- `TableCardContent.kt`: Contenido específico para cards de tipo Table
+
+**Funcionalidad completada:**
+- ✅ Card posicionada ARRIBA en estado minimizado (peek 60dp)
+- ✅ Drag DOWN → expande y baja (hasta 92% altura de pantalla)
+- ✅ Drag UP → colapsa y sube (vuelve a peek)
+- ✅ Animaciones fluidas: 0ms durante drag (sigue el dedo), 300ms al soltar
+- ✅ Backdrop progresivo: alpha 0.0→0.5 según expansión
+- ✅ Backdrop cubre toda la pantalla (TopAppBar + contenido + bottom nav)
+- ✅ Auto-expansión al seleccionar tabla
+- ✅ Click en backdrop cierra el panel (colapsa)
+- ✅ Handle visible de 48x5dp en parte inferior del panel
+- ✅ Threshold de 100dp para cambio de estado (evita cambios accidentales)
+- ✅ Integrado con Hilt para inyección de WorkspaceManager
+
+**Detalles técnicos:**
+- Altura panel: 92% de screenHeight (calculado con LocalConfiguration)
+- Offset minimizado: `-sheetHeightPx + peekHeightPx` (negativo, oculto arriba)
+- Offset expandido: `0f` (visible desde el top)
+- Drag state: `isDragging` controla animationSpec (0ms vs 300ms)
+- LaunchedEffect sincroniza `rawOffset` cuando `isExpanded` cambia externamente
+- Backdrop alpha = `expansionProgress × 0.5f`
 
 ### Fase 2: Sistema de apilado
 - Hasta 3 cards visibles apiladas arriba
@@ -68,3 +92,49 @@
 ### Fase 4: Contenido real + Bottom navigation
 - Integrar TableCardContent en cards expandidas
 - Bottom nav: Tablas/Queries/Vistas/Backups
+
+---
+
+## Historial de correcciones - Fase 1
+
+### Commit f6f580a - Backdrop fullscreen
+**Problema**: Backdrop no cubría TopAppBar ni bottom navigation
+**Solución**: Agregar `Modifier.fillMaxSize()` explícito a TopSheet en WorkspaceOverlay
+**Resultado**: Backdrop cubre toda la pantalla incluyendo UI del sistema
+
+### Commit 79d9407 - Auto-expansión
+**Problema**: Panel quedaba minimizado al seleccionar tabla
+**Solución**: LaunchedEffect que detecta cambios en `activeCards.size` y expande automáticamente
+**Resultado**: Panel se abre directo cuando usuario toca una tabla
+
+### Commit b689af8 - Sincronización backdrop click
+**Problema**: Click en backdrop cambiaba estado pero panel no se animaba hacia arriba
+**Solución**: LaunchedEffect que actualiza `rawOffset` cuando `isExpanded` cambia externamente
+**Resultado**: Panel sube suavemente al hacer click en backdrop
+
+### Commit caa81ce - Ajuste altura
+**Problema**: Panel ocupaba 97% de pantalla (muy alto)
+**Solución**: Cambiar de 97% a 92% de screenHeight
+**Resultado**: Panel deja más espacio visible arriba cuando está expandido
+
+### Commit 4ff7281 - Implementación inicial
+**Funcionalidad**: TopSheet component completo con drag fluido, backdrop progresivo, integración con WorkspaceManager
+**Archivos creados**: TopSheet.kt, WorkspaceOverlay.kt, DraggableCard.kt
+**Docs**: PLAYSTATION_WORKSPACE_DESIGN.md, workspace-playstation-spec-correcta.md
+
+---
+
+## Próximos pasos (Fase 2)
+
+1. Sistema de apilado de cards
+   - Mostrar hasta 3 cards apiladas arriba
+   - Offset visual de ~8dp entre cards
+   - Indicador "+" cuando hay 4 o más cards
+   
+2. Selección de card activa
+   - Tap en card minimizada la trae al frente
+   - Card activa tiene mayor elevación
+   
+3. Cierre individual
+   - Botón X en cada card minimizada
+   - Animación de salida suave

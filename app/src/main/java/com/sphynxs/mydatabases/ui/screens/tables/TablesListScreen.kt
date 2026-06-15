@@ -67,18 +67,13 @@ fun TablesListScreen(
         viewModel.loadTables(databaseName)
     }
 
-    // WorkspaceOverlay envuelve todo el contenido
-    WorkspaceOverlay(
-        workspaceManager = workspaceManager,
-        modifier = modifier
-    ) {
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = { Text(stringResource(R.string.tables_title, databaseName)) }
-                )
-            }
-        ) { paddingValues ->
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(R.string.tables_title, databaseName)) }
+            )
+        }
+    ) { paddingValues ->
         when (uiState) {
             is TablesUiState.Loading -> {
                 TableListSkeleton(modifier = Modifier.padding(paddingValues))
@@ -138,8 +133,7 @@ fun TablesListScreen(
                 )
             }
         }
-        } // Cierre del Scaffold
-    } // Cierre del WorkspaceOverlay
+    } // Cierre del Scaffold
 }
 
 /**
