@@ -85,7 +85,8 @@ fun WorkspaceOverlay(
                         } else {
                             workspaceManager.peek()
                         }
-                    }
+                    },
+                    modifier = Modifier.fillMaxSize()
                 ) {
                     WorkspaceCardContent(
                         card = card,
