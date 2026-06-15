@@ -95,6 +95,16 @@ object AppIcons {
          * Logo SQL Server (estilizado).
          */
         @DrawableRes val SqlServer: Int = R.drawable.ic_db_sqlserver
+        
+        /**
+         * Obtiene el ícono correcto según el tipo de base de datos.
+         */
+        fun icon(type: com.sphynxs.mydatabases.core.database.engine.DatabaseType): Int = when (type) {
+            com.sphynxs.mydatabases.core.database.engine.DatabaseType.MYSQL -> MySql
+            com.sphynxs.mydatabases.core.database.engine.DatabaseType.POSTGRESQL -> Postgres
+            com.sphynxs.mydatabases.core.database.engine.DatabaseType.SQLITE -> Sqlite
+            com.sphynxs.mydatabases.core.database.engine.DatabaseType.MARIADB -> MariaDb
+        }
     }
     
     /**

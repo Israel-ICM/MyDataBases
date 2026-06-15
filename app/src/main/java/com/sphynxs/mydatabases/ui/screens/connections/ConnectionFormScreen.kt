@@ -1,5 +1,7 @@
 package com.sphynxs.mydatabases.ui.screens.connections
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -9,45 +11,41 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material3.Button
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.runtime.collectAsState
 import com.sphynxs.mydatabases.R
 import com.sphynxs.mydatabases.core.database.engine.DatabaseType
 import com.sphynxs.mydatabases.core.database.models.ConnectionConfig
 import com.sphynxs.mydatabases.ui.components.DatabaseTypeSelector
-import com.sphynxs.mydatabases.ui.components.SectionCard
-import kotlinx.coroutines.launch
+import com.sphynxs.mydatabases.ui.components.ios.IOSButton
+import com.sphynxs.mydatabases.ui.components.ios.IOSButtonStyle
+import com.sphynxs.mydatabases.ui.components.ios.IOSGroupedCard
+import com.sphynxs.mydatabases.ui.components.ios.IOSTextField
 
 /**
  * Pantalla de formulario de conexión (crear/editar).
@@ -74,7 +72,6 @@ fun ConnectionFormScreen(
     val formState by viewModel.formState.collectAsState()
     val testState by viewModel.testState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
 
     // Form fields state
     var name by remember { mutableStateOf("") }
@@ -134,153 +131,34 @@ fun ConnectionFormScreen(
     }
 
     Scaffold(
+        modifier = modifier.background(Color(0xFFF2F2F7)),
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        stringResource(
-                            if (connectionId == null) R.string.connection_form_title_new
-                            else R.string.connection_form_title_edit
-                        )
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
-                        )
-                    }
-                }
-            )
-        },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-        modifier = modifier
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState())
-        ) {
-            // Sección 1: Identidad
-            SectionCard(title = "Identidad") {
-                OutlinedTextField(
-                    value = name,
-                    onValueChange = { name = it },
-                    label = { Text(stringResource(R.string.connection_field_name)) },
-                    placeholder = { Text(stringResource(R.string.connection_field_name_hint)) },
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                DatabaseTypeSelector(
-                    selected = selectedType,
-                    onSelect = { selectedType = it }
-                )
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Sección 2: Conexión
-            SectionCard(title = "Conexión") {
-                OutlinedTextField(
-                    value = host,
-                    onValueChange = { host = it },
-                    label = { Text(stringResource(R.string.connection_field_host)) },
-                    placeholder = { Text(stringResource(R.string.connection_field_host_hint)) },
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Row(modifier = Modifier.fillMaxWidth()) {
-                    OutlinedTextField(
-                        value = port,
-                        onValueChange = { port = it },
-                        label = { Text(stringResource(R.string.connection_field_port)) },
-                        placeholder = { Text(stringResource(R.string.connection_field_port_hint)) },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        modifier = Modifier.weight(1f)
+            // iOS-style header
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color(0xFFF2F2F7))
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = onNavigateBack) {
+                    Icon(
+                        Icons.Default.Close,
+                        contentDescription = "Cancelar",
+                        tint = Color(0xFF007AFF)
                     )
                 }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                OutlinedTextField(
-                    value = database,
-                    onValueChange = { database = it },
-                    label = { Text(stringResource(R.string.connection_field_database)) },
-                    placeholder = { Text(stringResource(R.string.connection_field_database_hint)) },
-                    modifier = Modifier.fillMaxWidth()
+                Text(
+                    stringResource(
+                        if (connectionId == null) R.string.connection_form_title_new
+                        else R.string.connection_form_title_edit
+                    ),
+                    fontSize = 17.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color.Black
                 )
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Sección 3: Autenticación
-            SectionCard(title = "Autenticación") {
-                OutlinedTextField(
-                    value = username,
-                    onValueChange = { username = it },
-                    label = { Text(stringResource(R.string.connection_field_username)) },
-                    placeholder = { Text(stringResource(R.string.connection_field_username_hint)) },
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                OutlinedTextField(
-                    value = password,
-                    onValueChange = { password = it },
-                    label = { Text(stringResource(R.string.connection_field_password)) },
-                    placeholder = { Text(stringResource(R.string.connection_field_password_hint)) },
-                    visualTransformation = if (passwordVisible) VisualTransformation.None
-                    else PasswordVisualTransformation(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                    trailingIcon = {
-                        IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                            Icon(
-                                imageVector = if (passwordVisible) Icons.Default.Visibility
-                                else Icons.Default.VisibilityOff,
-                                contentDescription = if (passwordVisible) "Ocultar contraseña"
-                                else "Mostrar contraseña"
-                            )
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Action buttons
-            Row(modifier = Modifier.fillMaxWidth()) {
-                OutlinedButton(
-                    onClick = {
-                        val config = createConnectionConfig(
-                            id = connectionId,
-                            name = name,
-                            type = selectedType,
-                            host = host,
-                            port = port.toIntOrNull() ?: 3306,
-                            database = database,
-                            username = username,
-                            password = password
-                        )
-                        viewModel.testConnection(config)
-                    },
-                    modifier = Modifier.weight(1f),
-                    enabled = testState != ConnectionTestUiState.Testing
-                ) {
-                    Text(stringResource(R.string.action_test))
-                }
-
-                Spacer(modifier = Modifier.width(16.dp))
-
-                Button(
+                IconButton(
                     onClick = {
                         val config = createConnectionConfig(
                             id = connectionId,
@@ -294,12 +172,130 @@ fun ConnectionFormScreen(
                         )
                         viewModel.saveConnection(config)
                     },
-                    modifier = Modifier.weight(1f),
                     enabled = formState != ConnectionFormUiState.Saving
                 ) {
-                    Text(stringResource(R.string.action_save))
+                    Icon(
+                        Icons.Default.Check,
+                        contentDescription = "Guardar",
+                        tint = if (formState != ConnectionFormUiState.Saving) 
+                            Color(0xFF007AFF) else Color(0xFF007AFF).copy(alpha = 0.3f)
+                    )
                 }
             }
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color(0xFFF2F2F7))
+                .padding(paddingValues)
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp)
+        ) {
+            // Card 1: Identidad
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    "IDENTIDAD",
+                    fontSize = 13.sp,
+                    color = Color(0xFF8E8E93),
+                    modifier = Modifier.padding(start = 16.dp)
+                )
+                IOSGroupedCard {
+                    IOSTextField(
+                        value = name,
+                        onValueChange = { name = it },
+                        placeholder = stringResource(R.string.connection_field_name_hint)
+                    )
+                    
+                    // Database type selector incrustado
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color.White)
+                            .padding(horizontal = 16.dp, vertical = 12.dp)
+                    ) {
+                        DatabaseTypeSelector(
+                            selected = selectedType,
+                            onSelect = { selectedType = it }
+                        )
+                    }
+                }
+            }
+
+            // Card 2: Conexión
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    "CONEXIÓN",
+                    fontSize = 13.sp,
+                    color = Color(0xFF8E8E93),
+                    modifier = Modifier.padding(start = 16.dp)
+                )
+                IOSGroupedCard {
+                    IOSTextField(
+                        value = host,
+                        onValueChange = { host = it },
+                        placeholder = stringResource(R.string.connection_field_host_hint)
+                    )
+                    IOSTextField(
+                        value = port,
+                        onValueChange = { port = it },
+                        placeholder = stringResource(R.string.connection_field_port_hint),
+                        keyboardType = KeyboardType.Number
+                    )
+                    IOSTextField(
+                        value = database,
+                        onValueChange = { database = it },
+                        placeholder = stringResource(R.string.connection_field_database_hint),
+                        showDivider = false
+                    )
+                }
+            }
+
+            // Card 3: Autenticación
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    "AUTENTICACIÓN",
+                    fontSize = 13.sp,
+                    color = Color(0xFF8E8E93),
+                    modifier = Modifier.padding(start = 16.dp)
+                )
+                IOSGroupedCard {
+                    IOSTextField(
+                        value = username,
+                        onValueChange = { username = it },
+                        placeholder = stringResource(R.string.connection_field_username_hint)
+                    )
+                    IOSTextField(
+                        value = password,
+                        onValueChange = { password = it },
+                        placeholder = stringResource(R.string.connection_field_password_hint),
+                        isPassword = true,
+                        showDivider = false
+                    )
+                }
+            }
+
+            // Botón de test
+            IOSButton(
+                text = stringResource(R.string.action_test),
+                onClick = {
+                    val config = createConnectionConfig(
+                        id = connectionId,
+                        name = name,
+                        type = selectedType,
+                        host = host,
+                        port = port.toIntOrNull() ?: 3306,
+                        database = database,
+                        username = username,
+                        password = password
+                    )
+                    viewModel.testConnection(config)
+                },
+                style = IOSButtonStyle.Secondary,
+                enabled = testState != ConnectionTestUiState.Testing
+            )
         }
     }
 }
