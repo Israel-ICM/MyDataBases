@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -77,6 +78,7 @@ fun ConnectionsListScreen(
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val connectingState by viewModel.connectingState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
@@ -129,7 +131,19 @@ fun ConnectionsListScreen(
                         DatabaseTypeCard(
                             type = type,
                             connections = groupedConnections[type] ?: emptyList(),
-                            onConnectionClick = onConnect,
+                            onConnectionClick = { connectionId ->
+                                scope.launch {
+                                    val result = viewModel.connect(connectionId)
+                                    result.fold(
+                                        onSuccess = { onConnect(connectionId) },
+                                        onFailure = { error ->
+                                            snackbarHostState.showSnackbar(
+                                                message = "Error al conectar: ${error.message}"
+                                            )
+                                        }
+                                    )
+                                }
+                            },
                             onAddConnection = { selectedType ->
                                 preselectedType = selectedType
                                 editingConnectionId = null
@@ -181,7 +195,29 @@ fun ConnectionsListScreen(
                     Text(stringResource(R.string.action_cancel))
                 }
             }
-        )
+        }
+    }
+    
+    // Loading indicator mientras conecta
+    if (connectingState != null) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.5f)),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                androidx.compose.material3.CircularProgressIndicator(
+                    color = Color(0xFF007AFF)
+                )
+                Spacer(Modifier.height(16.dp))
+                Text(
+                    "Conectando...",
+                    color = Color.White,
+                    fontSize = 17.sp
+                )
+            }
+        }
     }
     
     // Bottom Sheet del formulario

@@ -3,12 +3,16 @@ package com.sphynxs.mydatabases.ui.screens.connections
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sphynxs.mydatabases.core.database.models.ConnectionConfig
+import com.sphynxs.mydatabases.domain.usecases.ConnectToDatabaseUseCase
 import com.sphynxs.mydatabases.domain.usecases.connections.DeleteConnectionUseCase
 import com.sphynxs.mydatabases.domain.usecases.connections.GetConnectionsUseCase
+import com.sphynxs.mydatabases.domain.usecases.connections.GetConnectionUseCase
 import com.sphynxs.mydatabases.domain.usecases.connections.TestConnectionUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -30,8 +34,10 @@ import javax.inject.Inject
 @HiltViewModel
 class ConnectionsListViewModel @Inject constructor(
     getConnectionsUseCase: GetConnectionsUseCase,
+    private val getConnectionUseCase: GetConnectionUseCase,
     private val deleteConnectionUseCase: DeleteConnectionUseCase,
-    private val testConnectionUseCase: TestConnectionUseCase
+    private val testConnectionUseCase: TestConnectionUseCase,
+    private val connectToDatabaseUseCase: ConnectToDatabaseUseCase
 ) : ViewModel() {
 
     /**
@@ -65,6 +71,9 @@ class ConnectionsListViewModel @Inject constructor(
         }
     }
 
+    private val _connectingState = MutableStateFlow<String?>(null)
+    val connectingState: StateFlow<String?> = _connectingState.asStateFlow()
+
     /**
      * Prueba una conexión sin guardarla.
      *
@@ -73,5 +82,30 @@ class ConnectionsListViewModel @Inject constructor(
      */
     suspend fun testConnection(config: ConnectionConfig): Result<Unit> {
         return testConnectionUseCase(config)
+    }
+
+    /**
+     * Conecta a una base de datos usando una conexión guardada.
+     * 
+     * @param connectionId El ID de la conexión a usar
+     * @return Result con Unit si exitoso, error si falla
+     */
+    suspend fun connect(connectionId: String): Result<Unit> {
+        return try {
+            _connectingState.value = connectionId
+            val config = getConnectionUseCase(connectionId)
+            if (config == null) {
+                _connectingState.value = null
+                return Result.failure(Exception("Conexión no encontrada"))
+            }
+            
+            val result = connectToDatabaseUseCase(config)
+            _connectingState.value = null
+            
+            result.map { Unit }
+        } catch (e: Exception) {
+            _connectingState.value = null
+            Result.failure(e)
+        }
     }
 }
