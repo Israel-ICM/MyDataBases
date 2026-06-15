@@ -80,7 +80,6 @@ fun ConnectionFormScreen(
     var selectedType by remember { mutableStateOf(preselectedType ?: DatabaseType.MYSQL) }
     var host by remember { mutableStateOf("") }
     var port by remember { mutableStateOf((preselectedType?.defaultPort ?: 3306).toString()) }
-    var database by remember { mutableStateOf("") }
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
@@ -93,7 +92,6 @@ fun ConnectionFormScreen(
                 selectedType = config.type
                 host = config.host
                 port = config.port.toString()
-                database = config.database
                 username = config.username
                 password = config.password
             }
@@ -167,8 +165,7 @@ fun ConnectionFormScreen(
                             name = name,
                             type = selectedType,
                             host = host,
-                            port = port.toIntOrNull() ?: 3306,
-                            database = database,
+                            port = port.toIntOrNull() ?: selectedType.defaultPort,
                             username = username,
                             password = password
                         )
@@ -247,12 +244,7 @@ fun ConnectionFormScreen(
                         value = port,
                         onValueChange = { port = it },
                         placeholder = stringResource(R.string.connection_field_port_hint),
-                        keyboardType = KeyboardType.Number
-                    )
-                    IOSTextField(
-                        value = database,
-                        onValueChange = { database = it },
-                        placeholder = stringResource(R.string.connection_field_database_hint),
+                        keyboardType = KeyboardType.Number,
                         showDivider = false
                     )
                 }
@@ -291,8 +283,7 @@ fun ConnectionFormScreen(
                         name = name,
                         type = selectedType,
                         host = host,
-                        port = port.toIntOrNull() ?: 3306,
-                        database = database,
+                        port = port.toIntOrNull() ?: selectedType.defaultPort,
                         username = username,
                         password = password
                     )
@@ -307,6 +298,7 @@ fun ConnectionFormScreen(
 
 /**
  * Helper para crear el ConnectionConfig desde los campos del formulario.
+ * Database se deja vacío - se seleccionará después de conectar.
  */
 private fun createConnectionConfig(
     id: String?,
@@ -314,7 +306,6 @@ private fun createConnectionConfig(
     type: DatabaseType,
     host: String,
     port: Int,
-    database: String,
     username: String,
     password: String
 ): ConnectionConfig {
@@ -324,7 +315,7 @@ private fun createConnectionConfig(
         type = type,
         host = host,
         port = port,
-        database = database,
+        database = "",  // Se selecciona después de conectar
         username = username,
         password = password
     )
