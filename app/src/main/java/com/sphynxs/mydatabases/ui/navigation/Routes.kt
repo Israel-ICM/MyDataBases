@@ -63,9 +63,92 @@ sealed class Routes(val route: String) {
     }
     
     /**
-     * Pantalla del editor de consultas SQL.
+     * Pantalla del editor de consultas SQL dentro de una conexión.
+     *
+     * @property route Template con argumento `connectionId`
      */
-    data object QueryEditor : Routes("query_editor")
+    data object QueryEditor : Routes("connection/{connectionId}/editor") {
+        /**
+         * Crea la ruta completa reemplazando el argumento connectionId.
+         *
+         * @param connectionId ID de la conexión activa
+         * @return Ruta navegable (ej: "connection/abc-123/editor")
+         */
+        fun createRoute(connectionId: String): String {
+            return "connection/$connectionId/editor"
+        }
+    }
+    
+    /**
+     * Pantalla de lista de vistas (views) dentro de una conexión.
+     *
+     * @property route Template con argumento `connectionId`
+     */
+    data object Views : Routes("connection/{connectionId}/views") {
+        /**
+         * Crea la ruta completa reemplazando el argumento connectionId.
+         *
+         * @param connectionId ID de la conexión activa
+         * @return Ruta navegable (ej: "connection/abc-123/views")
+         */
+        fun createRoute(connectionId: String): String {
+            return "connection/$connectionId/views"
+        }
+    }
+    
+    /**
+     * Pantalla de lista de funciones/stored procedures dentro de una conexión.
+     *
+     * @property route Template con argumento `connectionId`
+     */
+    data object Functions : Routes("connection/{connectionId}/functions") {
+        /**
+         * Crea la ruta completa reemplazando el argumento connectionId.
+         *
+         * @param connectionId ID de la conexión activa
+         * @return Ruta navegable (ej: "connection/abc-123/functions")
+         */
+        fun createRoute(connectionId: String): String {
+            return "connection/$connectionId/functions"
+        }
+    }
+    
+    /**
+     * Pantalla de backup/export de base de datos dentro de una conexión.
+     *
+     * @property route Template con argumento `connectionId`
+     */
+    data object Backup : Routes("connection/{connectionId}/backup") {
+        /**
+         * Crea la ruta completa reemplazando el argumento connectionId.
+         *
+         * @param connectionId ID de la conexión activa
+         * @return Ruta navegable (ej: "connection/abc-123/backup")
+         */
+        fun createRoute(connectionId: String): String {
+            return "connection/$connectionId/backup"
+        }
+    }
+    
+    /**
+     * Pantalla de lista de tablas dentro de una conexión.
+     *
+     * NOTA: Esta ruta usa el modelo contextual connection/{id}/tables
+     * para ser consistente con el resto de destinos InsideConnection.
+     *
+     * @property route Template con argumento `connectionId`
+     */
+    data object Tables : Routes("connection/{connectionId}/tables") {
+        /**
+         * Crea la ruta completa reemplazando el argumento connectionId.
+         *
+         * @param connectionId ID de la conexión activa
+         * @return Ruta navegable (ej: "connection/abc-123/tables")
+         */
+        fun createRoute(connectionId: String): String {
+            return "connection/$connectionId/tables"
+        }
+    }
     
     /**
      * Pantalla de ajustes de la aplicación (tema, idioma, etc.).

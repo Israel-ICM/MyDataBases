@@ -5,9 +5,11 @@
     <!-- Navigation routes -->
     <string name="nav_connections">Connections</string>
     <string name="nav_database_list">Databases</string>
-    <string name="nav_table_list">Tables</string>
-    <string name="nav_table_viewer">Table Viewer</string>
-    <string name="nav_query_editor">Query Editor</string>
+    <string name="nav_tables">Tables</string>
+    <string name="nav_views">Views</string>
+    <string name="nav_editor">Editor</string>
+    <string name="nav_functions">Functions</string>
+    <string name="nav_backup">Backup</string>
     <string name="nav_settings">Settings</string>
     
     <!-- Common actions -->

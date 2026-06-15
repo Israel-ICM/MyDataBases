@@ -5,10 +5,12 @@
     <!-- Navigation routes -->
     <string name="nav_connections">Conexiones</string>
     <string name="nav_database_list">Bases de Datos</string>
-    <string name="nav_table_list">Tablas</string>
-    <string name="nav_table_viewer">Visualizador de Tabla</string>
-    <string name="nav_query_editor">Editor de Consultas</string>
-    <string name="nav_settings">Ajustes</string>
+    <string name="nav_tables">Tablas</string>
+    <string name="nav_views">Vistas</string>
+    <string name="nav_editor">Editor</string>
+    <string name="nav_functions">Funciones</string>
+    <string name="nav_backup">Backup</string>
+    <string name="nav_settings">Configuración</string>
     
     <!-- Common actions -->
     <string name="action_add">Agregar</string>
