@@ -68,4 +68,12 @@
     <!-- Errors -->
     <string name="error_generic">Ocurrió un error</string>
     <string name="error_loading">Error al cargar datos</string>
+    
+    <!-- Settings screen -->
+    <string name="settings_title">Configuración</string>
+    <string name="settings_branded_palette_title">Paleta branded</string>
+    <string name="settings_branded_palette_description">Usar colores branded personalizados en lugar del tema dinámico</string>
+    
+    <!-- Loading states -->
+    <string name="loading">Cargando…</string>
 </resources>

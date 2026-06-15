@@ -2,41 +2,39 @@ package com.sphynxs.mydatabases.data.repositories
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.stringPreferencesKey
-import com.sphynxs.mydatabases.domain.models.ThemeMode
 import com.sphynxs.mydatabases.domain.repositories.SettingsRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
- * Implementación de SettingsRepository usando DataStore Preferences.
+ * Implementación de SettingsRepository usando DataStore.
  *
- * Guarda las preferencias del usuario en disco de forma asíncrona y type-safe.
+ * @param dataStore DataStore<Preferences> inyectado por Hilt
  *
- * @property dataStore DataStore de preferencias inyectado por Hilt
- * @author israel-icm
- * @date 2026-06-12
+ * @author israel-icm (TDD GREEN)
+ * @date 2026-06-15
  */
+@Singleton
 class SettingsRepositoryImpl @Inject constructor(
     private val dataStore: DataStore<Preferences>
 ) : SettingsRepository {
-
-    override fun getThemeMode(): Flow<ThemeMode> {
-        return dataStore.data.map { preferences ->
-            val themeName = preferences[KEY_THEME_MODE] ?: ThemeMode.SYSTEM.name
-            ThemeMode.valueOf(themeName)
-        }
-    }
-
-    override suspend fun setThemeMode(mode: ThemeMode) {
-        dataStore.edit { preferences ->
-            preferences[KEY_THEME_MODE] = mode.name
-        }
-    }
-
+    
     companion object {
-        private val KEY_THEME_MODE = stringPreferencesKey("theme_mode")
+        private val BRANDED_PALETTE_KEY = booleanPreferencesKey("branded_palette_enabled")
+    }
+    
+    override fun observeBrandedPaletteEnabled(): Flow<Boolean> =
+        dataStore.data.map { prefs ->
+            prefs[BRANDED_PALETTE_KEY] ?: false  // Default: false (dynamic color)
+        }
+    
+    override suspend fun setBrandedPaletteEnabled(enabled: Boolean) {
+        dataStore.edit { prefs ->
+            prefs[BRANDED_PALETTE_KEY] = enabled
+        }
     }
 }

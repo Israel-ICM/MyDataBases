@@ -80,3 +80,38 @@ val md_theme_dark_surfaceVariant = Color(0xFF404943)
 val md_theme_dark_onSurfaceVariant = Color(0xFFBFC9C3)
 val md_theme_dark_outline = Color(0xFF89938D)
 val md_theme_dark_outlineVariant = Color(0xFF404943)
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Branded Palette — Sistema de colores personalizado de MyDataBases
+// ══════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Paleta branded de MyDataBases — dark-first.
+ *
+ * Estos colores definen la identidad visual única de la app cuando el usuario
+ * opta por no usar dynamic color (Android 12+) o en dispositivos anteriores.
+ *
+ * Dark mode (base):
+ * - #1A1F2E → background (azul oscuro profundo)
+ * - #222837 → surface (azul grisáceo oscuro)
+ * - #7C80E8 → primary (violeta brillante)
+ * - #8EE3D3 → tertiary (turquesa menta)
+ * - #5B5F7D → outline / onSurfaceVariant (gris violáceo)
+ * - #E6E8F0 → onBackground / onSurface (gris muy claro)
+ *
+ * @author israel-icm
+ * @date 2026-06-15
+ */
+
+// Tokens de color branded — Dark mode
+val brand_bg = Color(0xFF1A1F2E)           // Background principal
+val brand_surface = Color(0xFF222837)      // Surface elevada
+val brand_primary = Color(0xFF7C80E8)      // Primary (violeta)
+val brand_tertiary = Color(0xFF8EE3D3)     // Tertiary (turquesa)
+val brand_outline = Color(0xFF5B5F7D)      // Outline y onSurfaceVariant
+val brand_on_bg = Color(0xFFE6E8F0)        // onBackground y onSurface
+
+// Tokens de color branded — Light mode (derivados por inversión de luminancia)
+val brand_light_bg = Color(0xFFF5F6FA)         // Background claro (inverso)
+val brand_light_surface = Color(0xFFFFFFFF)    // Surface clara (blanco puro)
+val brand_light_on_bg = Color(0xFF1A1F2E)      // onBackground oscuro (inverso)

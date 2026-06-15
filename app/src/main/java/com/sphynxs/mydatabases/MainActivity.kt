@@ -16,6 +16,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.tooling.preview.Preview
 import com.sphynxs.mydatabases.domain.models.ThemeMode
 import com.sphynxs.mydatabases.ui.navigation.MyDataBasesNavHost
+import com.sphynxs.mydatabases.ui.theme.AppTheme
 import com.sphynxs.mydatabases.ui.theme.MyDataBasesTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -51,7 +52,7 @@ class MainActivity : ComponentActivity() {
             val themeMode = remember { mutableStateOf(ThemeMode.SYSTEM) }
             
             CompositionLocalProvider(LocalWindowSizeClass provides windowSizeClass) {
-                MyDataBasesTheme(themeMode = themeMode.value) {
+                AppTheme(themeMode = themeMode.value) {
                     MyDataBasesNavHost()
                 }
             }

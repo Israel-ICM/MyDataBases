@@ -44,6 +44,7 @@ import com.sphynxs.mydatabases.ui.components.ConnectionCard
 import com.sphynxs.mydatabases.ui.components.ErrorCard
 import com.sphynxs.mydatabases.ui.components.LoadingIndicator
 import com.sphynxs.mydatabases.ui.theme.MyDataBasesTheme
+import com.sphynxs.mydatabases.ui.theme.tokens.LocalAppSpacing
 import kotlinx.coroutines.launch
 
 /**
@@ -110,11 +111,12 @@ fun ConnectionsListScreen(
                     )
                 } else {
                     // Lista de conexiones
+                    val spacing = LocalAppSpacing.current
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(paddingValues)
-                            .padding(horizontal = 16.dp)
+                            .padding(horizontal = spacing.lg)  // Prueba de consumo de tokens
                     ) {
                         items(
                             items = connections,

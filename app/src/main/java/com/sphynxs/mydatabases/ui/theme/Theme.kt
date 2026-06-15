@@ -127,7 +127,8 @@ fun MyDataBasesTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = colorScheme.primary.toArgb()
+            // DEPRECATED: statusBarColor removido — edge-to-edge manejado en AppTheme
+            // window.statusBarColor = colorScheme.primary.toArgb()
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
         }
     }
@@ -137,4 +138,30 @@ fun MyDataBasesTheme(
         typography = Typography,
         content = content
     )
+}
+
+/**
+ * Alias deprecated de MyDataBasesTheme.
+ *
+ * MIGRAR A: AppTheme (nuevo tema con design tokens y branded palette)
+ *
+ * Este wrapper se mantiene temporalmente para compatibilidad pero será removido
+ * en un cambio futuro. Todos los consumers deben migrar a `AppTheme` directamente.
+ *
+ * @deprecated Use AppTheme instead
+ * @see AppTheme
+ * @author israel-icm
+ * @date 2026-06-15
+ */
+@Deprecated(
+    message = "Use AppTheme directly for design tokens and branded palette support",
+    replaceWith = ReplaceWith("AppTheme(themeMode, content)", "com.sphynxs.mydatabases.ui.theme.AppTheme")
+)
+@Composable
+fun MyDataBasesThemeDeprecated(
+    themeMode: ThemeMode = ThemeMode.SYSTEM,
+    dynamicColor: Boolean = true,
+    content: @Composable () -> Unit
+) {
+    MyDataBasesTheme(themeMode, dynamicColor, content)
 }
