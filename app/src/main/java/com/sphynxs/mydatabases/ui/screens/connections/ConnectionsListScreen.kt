@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -218,13 +219,20 @@ fun ConnectionsListScreen(
         ModalBottomSheet(
             onDismissRequest = { showFormSheet = false },
             sheetState = formSheetState,
-            containerColor = Color(0xFFF2F2F7)
+            containerColor = Color(0xFFF2F2F7),
+            sheetMaxWidth = 10000.dp // Sin límite de ancho
         ) {
-            ConnectionFormScreen(
-                connectionId = editingConnectionId,
-                onNavigateBack = { showFormSheet = false },
-                modifier = Modifier.fillMaxSize()
-            )
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 60.dp) // Margen superior
+            ) {
+                ConnectionFormScreen(
+                    connectionId = editingConnectionId,
+                    onNavigateBack = { showFormSheet = false },
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
         }
     }
 }
