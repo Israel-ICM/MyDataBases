@@ -1,13 +1,19 @@
 package com.sphynxs.mydatabases.ui.components
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
@@ -16,12 +22,15 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -29,8 +38,9 @@ import androidx.compose.ui.unit.dp
 import com.sphynxs.mydatabases.R
 import com.sphynxs.mydatabases.core.database.engine.DatabaseType
 import com.sphynxs.mydatabases.core.database.models.ConnectionConfig
+import com.sphynxs.mydatabases.ui.theme.DbAccents
 import com.sphynxs.mydatabases.ui.theme.MyDataBasesTheme
-import com.sphynxs.mydatabases.ui.theme.tokens.LocalAppElevation
+import com.sphynxs.mydatabases.ui.theme.pressAnimation
 import com.sphynxs.mydatabases.ui.theme.tokens.LocalAppShapes
 import com.sphynxs.mydatabases.ui.theme.tokens.LocalAppSpacing
 
@@ -58,76 +68,121 @@ fun ConnectionCard(
 ) {
     val spacing = LocalAppSpacing.current
     val shapes = LocalAppShapes.current
-    val elevation = LocalAppElevation.current
+    val accentColor = DbAccents.accentFor(connection.type)
+    val interactionSource = remember { MutableInteractionSource() }
+
+    // Gradient sutil: acento al 8% → surface
+    val gradient = Brush.linearGradient(
+        colors = listOf(
+            accentColor.copy(alpha = 0.08f),
+            MaterialTheme.colorScheme.surface
+        )
+    )
 
     Card(
         onClick = onCardClick,
         modifier = modifier
             .fillMaxWidth()
-            .shadow(elevation = elevation.cardResting, shape = shapes.medium),
-        shape = shapes.medium,
-        colors = CardDefaults.cardColors()
+            .pressAnimation(interactionSource),
+        shape = shapes.large,
+        colors = CardDefaults.cardColors(
+            containerColor = Color.Transparent
+        ),
+        interactionSource = interactionSource
     ) {
-        Row(
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(spacing.lg)
-                .animateContentSize(),
-            verticalAlignment = Alignment.CenterVertically
+                .background(gradient)
         ) {
-            // Contenido principal
-            Column(modifier = Modifier.weight(1f)) {
-                // Nombre de la conexión
-                Text(
-                    text = connection.name,
-                    style = MaterialTheme.typography.titleMedium,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-
-                Spacer(modifier = Modifier.height(spacing.xxs))
-
-                // Host:puerto
-                Text(
-                    text = "${connection.host}:${connection.port}",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.outline
-                )
-
-                Spacer(modifier = Modifier.height(spacing.sm))
-
-                // Chip con el tipo de DB
-                SuggestionChip(
-                    onClick = { /* No interactivo */ },
-                    label = {
-                        Text(
-                            text = when (connection.type) {
-                                DatabaseType.MYSQL -> "MySQL"
-                                DatabaseType.MARIADB -> "MariaDB"
-                                DatabaseType.POSTGRESQL -> "PostgreSQL"
-                                DatabaseType.SQLITE -> "SQLite"
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(spacing.lg)
+                    .animateContentSize(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(spacing.md)
+            ) {
+                // Hero Icon 56dp con container circular tinted
+                Box(
+                    modifier = Modifier
+                        .size(56.dp)
+                        .clip(CircleShape)
+                        .background(accentColor.copy(alpha = 0.15f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        painter = painterResource(
+                            when (connection.type) {
+                                DatabaseType.MYSQL -> AppIcons.Db.MySql
+                                DatabaseType.POSTGRESQL -> AppIcons.Db.Postgres
+                                DatabaseType.MARIADB -> AppIcons.Db.MariaDb
+                                DatabaseType.SQLITE -> AppIcons.Db.Sqlite
                             }
+                        ),
+                        contentDescription = connection.type.displayName,
+                        tint = accentColor,
+                        modifier = Modifier.size(32.dp)
+                    )
+                }
+
+                // Contenido principal
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(spacing.xxs)
+                ) {
+                    // Nombre de la conexión (titleLarge)
+                    Text(
+                        text = connection.name,
+                        style = MaterialTheme.typography.titleLarge,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+
+                    // Status dot con legend
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(8.dp)
+                                .background(Color(0xFF4CAF50), CircleShape)
+                        )
+                        Text(
+                            text = "Inactiva",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
-                )
-            }
 
-            // Acciones
-            IconButton(onClick = onEditClick) {
-                Icon(
-                    imageVector = Icons.Default.Edit,
-                    contentDescription = stringResource(R.string.connection_action_edit)
-                )
-            }
+                    Spacer(modifier = Modifier.height(spacing.xs))
 
-            Spacer(modifier = Modifier.width(spacing.xxs))
+                    // Metadata en bodySmall
+                    Text(
+                        text = "${connection.host}:${connection.port} • ${connection.database}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.outline,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
 
-            IconButton(onClick = onDeleteClick) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = stringResource(R.string.connection_action_delete),
-                    tint = MaterialTheme.colorScheme.error
-                )
+                // Acciones
+                IconButton(onClick = onEditClick) {
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = stringResource(R.string.connection_action_edit)
+                    )
+                }
+
+                IconButton(onClick = onDeleteClick) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = stringResource(R.string.connection_action_delete),
+                        tint = MaterialTheme.colorScheme.error
+                    )
+                }
             }
         }
     }
