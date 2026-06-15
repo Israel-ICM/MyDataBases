@@ -13,7 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.AlertDialog
@@ -43,7 +43,9 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.runtime.collectAsState
 import com.sphynxs.mydatabases.R
+import com.sphynxs.mydatabases.core.database.engine.DatabaseType
 import com.sphynxs.mydatabases.ui.components.AppIcons
+import com.sphynxs.mydatabases.ui.components.DatabaseTypeCard
 import com.sphynxs.mydatabases.ui.components.EmptyState
 import com.sphynxs.mydatabases.ui.components.ErrorCard
 import com.sphynxs.mydatabases.ui.components.ios.IOSGroupedCard
@@ -84,27 +86,13 @@ fun ConnectionsListScreen(
     // Estado para el bottom sheet del formulario
     var showFormSheet by remember { mutableStateOf(false) }
     var editingConnectionId by remember { mutableStateOf<String?>(null) }
+    var preselectedType by remember { mutableStateOf<DatabaseType?>(null) }
     val formSheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
     )
 
     Scaffold(
         modifier = modifier.background(Color(0xFFF2F2F7)),
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = { 
-                    editingConnectionId = null
-                    showFormSheet = true
-                },
-                containerColor = Color(0xFF007AFF)
-            ) {
-                Icon(
-                    Icons.Default.Add,
-                    contentDescription = stringResource(R.string.connections_add_new),
-                    tint = Color.White
-                )
-            }
-        },
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
         when (uiState) {
@@ -115,62 +103,39 @@ fun ConnectionsListScreen(
             is ConnectionsUiState.Success -> {
                 val connections = (uiState as ConnectionsUiState.Success).connections
 
-                if (connections.isEmpty()) {
-                    // Empty state
-                    EmptyState(
-                        icon = painterResource(AppIcons.State.EmptyConnections),
-                        title = stringResource(R.string.empty_connections_title),
-                        description = stringResource(R.string.empty_connections_description),
-                        action = {
-                            Button(onClick = { onNavigateToForm(null) }) {
-                                Text(stringResource(R.string.connections_add_new))
+                // Agrupar conexiones por tipo
+                val groupedConnections = DatabaseType.entries.associateWith { type ->
+                    connections.filter { it.type == type }
+                }
+
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color(0xFFF2F2F7))
+                        .padding(paddingValues)
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    item {
+                        Text(
+                            "BASES DE DATOS",
+                            fontSize = 13.sp,
+                            color = Color(0xFF8E8E93),
+                            modifier = Modifier.padding(start = 16.dp, bottom = 8.dp)
+                        )
+                    }
+
+                    items(DatabaseType.entries) { type ->
+                        DatabaseTypeCard(
+                            type = type,
+                            connections = groupedConnections[type] ?: emptyList(),
+                            onConnectionClick = onConnect,
+                            onAddConnection = { selectedType ->
+                                preselectedType = selectedType
+                                editingConnectionId = null
+                                showFormSheet = true
                             }
-                        },
-                        modifier = Modifier.padding(paddingValues)
-                    )
-                } else {
-                    // Lista de conexiones estilo iOS
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(Color(0xFFF2F2F7))
-                            .padding(paddingValues)
-                            .padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        item {
-                            Text(
-                                "CONEXIONES",
-                                fontSize = 13.sp,
-                                color = Color(0xFF8E8E93),
-                                modifier = Modifier.padding(start = 16.dp, bottom = 8.dp)
-                            )
-                        }
-                        
-                        item {
-                            IOSGroupedCard {
-                                connections.forEachIndexed { index, connection ->
-                                    IOSListItem(
-                                        title = connection.name,
-                                        subtitle = "${connection.host}:${connection.port}",
-                                        onClick = { onConnect(connection.id) },
-                                        leadingIcon = {
-                                            Icon(
-                                                painter = painterResource(AppIcons.Db.icon(connection.type)),
-                                                contentDescription = null,
-                                                tint = DbAccents.accentFor(connection.type),
-                                                modifier = Modifier.size(32.dp)
-                                            )
-                                        },
-                                        showDivider = index < connections.size - 1
-                                    )
-                                }
-                            }
-                        }
-                        
-                        item {
-                            Spacer(modifier = Modifier.height(80.dp)) // Para que no tape el FAB
-                        }
+                        )
                     }
                 }
             }
@@ -237,6 +202,7 @@ fun ConnectionsListScreen(
             ) {
                 ConnectionFormScreen(
                     connectionId = editingConnectionId,
+                    preselectedType = preselectedType,
                     onNavigateBack = { showFormSheet = false },
                     modifier = Modifier.fillMaxSize()
                 )

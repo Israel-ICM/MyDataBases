@@ -54,6 +54,7 @@ import com.sphynxs.mydatabases.ui.components.ios.IOSTextField
  * y guardarla.
  *
  * @param connectionId El ID de la conexión a editar (null para nueva)
+ * @param preselectedType Tipo de base de datos preseleccionado (null para default MySQL)
  * @param onNavigateBack Callback para volver atrás después de guardar
  * @param viewModel El ViewModel con la lógica de estado
  * @param modifier Modificador opcional
@@ -65,6 +66,7 @@ import com.sphynxs.mydatabases.ui.components.ios.IOSTextField
 @Composable
 fun ConnectionFormScreen(
     connectionId: String?,
+    preselectedType: DatabaseType? = null,
     onNavigateBack: () -> Unit,
     viewModel: ConnectionFormViewModel = hiltViewModel(),
     modifier: Modifier = Modifier
@@ -75,9 +77,9 @@ fun ConnectionFormScreen(
 
     // Form fields state
     var name by remember { mutableStateOf("") }
-    var selectedType by remember { mutableStateOf(DatabaseType.MYSQL) }
+    var selectedType by remember { mutableStateOf(preselectedType ?: DatabaseType.MYSQL) }
     var host by remember { mutableStateOf("") }
-    var port by remember { mutableStateOf("3306") }
+    var port by remember { mutableStateOf((preselectedType?.defaultPort ?: 3306).toString()) }
     var database by remember { mutableStateOf("") }
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -206,20 +208,23 @@ fun ConnectionFormScreen(
                     IOSTextField(
                         value = name,
                         onValueChange = { name = it },
-                        placeholder = stringResource(R.string.connection_field_name_hint)
+                        placeholder = stringResource(R.string.connection_field_name_hint),
+                        showDivider = preselectedType == null
                     )
                     
-                    // Database type selector incrustado
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(Color.White)
-                            .padding(horizontal = 16.dp, vertical = 12.dp)
-                    ) {
-                        DatabaseTypeSelector(
-                            selected = selectedType,
-                            onSelect = { selectedType = it }
-                        )
+                    // Database type selector solo si NO viene preseleccionado
+                    if (preselectedType == null) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(Color.White)
+                                .padding(horizontal = 16.dp, vertical = 12.dp)
+                        ) {
+                            DatabaseTypeSelector(
+                                selected = selectedType,
+                                onSelect = { selectedType = it }
+                            )
+                        }
                     }
                 }
             }
