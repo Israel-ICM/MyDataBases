@@ -1,5 +1,6 @@
 package com.sphynxs.mydatabases.ui.components
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,12 +18,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.sphynxs.mydatabases.core.database.models.Table
 import com.sphynxs.mydatabases.core.database.models.TableType
 import com.sphynxs.mydatabases.ui.theme.MyDataBasesTheme
+import com.sphynxs.mydatabases.ui.theme.tokens.LocalAppElevation
+import com.sphynxs.mydatabases.ui.theme.tokens.LocalAppShapes
+import com.sphynxs.mydatabases.ui.theme.tokens.LocalAppSpacing
 
 /**
  * Tarjeta reutilizable para mostrar una tabla en la lista.
@@ -42,17 +47,23 @@ fun TableCard(
     onCardClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val spacing = LocalAppSpacing.current
+    val shapes = LocalAppShapes.current
+    val elevation = LocalAppElevation.current
+
     Card(
         onClick = onCardClick,
-        modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        )
+        modifier = modifier
+            .fillMaxWidth()
+            .shadow(elevation = elevation.cardResting, shape = shapes.medium),
+        shape = shapes.medium,
+        colors = CardDefaults.cardColors()
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(spacing.lg)
+                .animateContentSize(),
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Contenido principal
@@ -65,7 +76,7 @@ fun TableCard(
                     overflow = TextOverflow.Ellipsis
                 )
 
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(spacing.xxs))
 
                 // Tipo y engine
                 val details = buildString {
@@ -80,7 +91,7 @@ fun TableCard(
                 Text(
                     text = details,
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.outline
                 )
             }
 
@@ -88,7 +99,7 @@ fun TableCard(
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                tint = MaterialTheme.colorScheme.outline
             )
         }
     }

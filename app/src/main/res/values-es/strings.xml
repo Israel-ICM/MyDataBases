@@ -78,4 +78,12 @@
     
     <!-- Loading states -->
     <string name="loading">Cargando…</string>
+    
+    <!-- Empty states -->
+    <string name="empty_connections_title">Sin conexiones</string>
+    <string name="empty_connections_description">Agregá una conexión para empezar</string>
+    <string name="empty_tables_title">Sin tablas</string>
+    <string name="empty_tables_description">Esta base de datos no tiene tablas</string>
+    <string name="empty_databases_title">Sin bases de datos</string>
+    <string name="empty_databases_description">Esta conexión no tiene bases de datos</string>
 </resources>

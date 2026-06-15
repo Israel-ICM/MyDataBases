@@ -43,6 +43,7 @@ import com.sphynxs.mydatabases.core.database.models.Column
 import com.sphynxs.mydatabases.core.database.models.ColumnKey
 import com.sphynxs.mydatabases.ui.components.ErrorCard
 import com.sphynxs.mydatabases.ui.components.LoadingIndicator
+import com.sphynxs.mydatabases.ui.components.skeleton.TableViewerSkeleton
 import com.sphynxs.mydatabases.ui.theme.MyDataBasesTheme
 
 /**
@@ -86,7 +87,7 @@ fun TableViewerScreen(
     ) { paddingValues ->
         when (val state = uiState) {
             is TableViewerUiState.Loading -> {
-                LoadingIndicator(modifier = Modifier.padding(paddingValues))
+                TableViewerSkeleton(modifier = Modifier.padding(paddingValues))
             }
 
             is TableViewerUiState.Success -> {

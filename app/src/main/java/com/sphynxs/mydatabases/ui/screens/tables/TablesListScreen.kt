@@ -18,15 +18,19 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.sphynxs.mydatabases.R
+import com.sphynxs.mydatabases.ui.components.AppIcons
+import com.sphynxs.mydatabases.ui.components.EmptyState
 import com.sphynxs.mydatabases.ui.components.ErrorCard
 import com.sphynxs.mydatabases.ui.components.LoadingIndicator
 import com.sphynxs.mydatabases.ui.components.TableCard
+import com.sphynxs.mydatabases.ui.components.skeleton.TableListSkeleton
 import com.sphynxs.mydatabases.ui.theme.MyDataBasesTheme
 
 /**
@@ -68,7 +72,7 @@ fun TablesListScreen(
     ) { paddingValues ->
         when (uiState) {
             is TablesUiState.Loading -> {
-                LoadingIndicator(modifier = Modifier.padding(paddingValues))
+                TableListSkeleton(modifier = Modifier.padding(paddingValues))
             }
 
             is TablesUiState.Success -> {
@@ -94,20 +98,13 @@ fun TablesListScreen(
             }
 
             is TablesUiState.Empty -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = stringResource(R.string.tables_empty),
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(16.dp)
-                    )
-                }
+                EmptyState(
+                    icon = painterResource(AppIcons.State.EmptyTables),
+                    title = stringResource(R.string.empty_tables_title),
+                    description = stringResource(R.string.empty_tables_description),
+                    action = null,  // No action para empty tables (se crean desde Editor)
+                    modifier = Modifier.padding(paddingValues)
+                )
             }
 
             is TablesUiState.Error -> {

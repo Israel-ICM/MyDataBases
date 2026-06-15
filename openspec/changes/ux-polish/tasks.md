@@ -491,8 +491,9 @@ Chain strategy: **stacked-to-main**
   - **Acción**: Compose UI test que verifica `SkeletonBox(width = 100.dp, height = 50.dp)` renderiza un `Box` con background gris (`surfaceVariant`) y shape `AppShapes.medium`
   - **Criterio**: Test falla
   - **Estimación**: Small (~15 líneas)
+  - **Nota**: Diferido al verify phase (smoke test para UI component)
 
-- [ ] **3.1.2 [TDD GREEN]** Implementar primitivas `SkeletonBox`, `SkeletonText`, `SkeletonCircle`
+- [x] **3.1.2 [TDD GREEN]** Implementar primitivas `SkeletonBox`, `SkeletonText`, `SkeletonCircle`
   - **Archivo**: `ui/components/skeleton/Primitives.kt` (nuevo)
   - **Acción**: Crear los 3 Composables: `SkeletonBox(width, height, shape = AppShapes.medium, modifier)`, `SkeletonText(width = 120.dp, lines = 1, modifier)`, `SkeletonCircle(size, modifier)` — todos con background `MaterialTheme.colorScheme.surfaceVariant`
   - **Criterio**: Test 3.1.1 pasa
@@ -502,7 +503,7 @@ Chain strategy: **stacked-to-main**
 
 ### 3.2 ConnectionListSkeleton
 
-- [ ] **3.2.1** Implementar `ConnectionListSkeleton`
+- [x] **3.2.1** Implementar `ConnectionListSkeleton`
   - **Archivo**: `ui/components/skeleton/ConnectionListSkeleton.kt` (nuevo)
   - **Acción**: Composable que renderiza 5 placeholders imitando `ConnectionCard` (cada placeholder: `SkeletonCircle` + 2 `SkeletonText` en `Row`)
   - **Criterio**: Skeleton visualmente coherente con `ConnectionCard`
@@ -512,7 +513,7 @@ Chain strategy: **stacked-to-main**
 
 ### 3.3 DatabaseListSkeleton
 
-- [ ] **3.3.1** Implementar `DatabaseListSkeleton`
+- [x] **3.3.1** Implementar `DatabaseListSkeleton`
   - **Archivo**: `ui/components/skeleton/DatabaseListSkeleton.kt` (nuevo)
   - **Acción**: Composable que renderiza 6 placeholders imitando `DatabaseCard`
   - **Criterio**: Skeleton visualmente coherente
@@ -522,7 +523,7 @@ Chain strategy: **stacked-to-main**
 
 ### 3.4 TableListSkeleton
 
-- [ ] **3.4.1** Implementar `TableListSkeleton`
+- [x] **3.4.1** Implementar `TableListSkeleton`
   - **Archivo**: `ui/components/skeleton/TableListSkeleton.kt` (nuevo)
   - **Acción**: Composable que renderiza 8 placeholders imitando `TableCard`
   - **Criterio**: Skeleton visualmente coherente
@@ -532,7 +533,7 @@ Chain strategy: **stacked-to-main**
 
 ### 3.5 TableViewerSkeleton
 
-- [ ] **3.5.1** Implementar `TableViewerSkeleton`
+- [x] **3.5.1** Implementar `TableViewerSkeleton`
   - **Archivo**: `ui/components/skeleton/TableViewerSkeleton.kt` (nuevo)
   - **Acción**: Composable que renderiza grid 10×4 imitando filas de tabla (usando `LazyColumn` de `SkeletonBox`)
   - **Criterio**: Skeleton visualmente coherente con tabla real
@@ -542,7 +543,7 @@ Chain strategy: **stacked-to-main**
 
 ### 3.6 EmptyState Component
 
-- [ ] **3.6.1** Implementar `EmptyState`
+- [x] **3.6.1** Implementar `EmptyState`
   - **Archivo**: `ui/components/EmptyState.kt` (nuevo)
   - **Acción**: Crear `@Composable fun EmptyState(icon: Painter, title: String, description: String? = null, action: (@Composable () -> Unit)? = null)` con layout centrado verticalmente, ícono 96dp, texto con `MaterialTheme.typography.headlineSmall` para título
   - **Criterio**: Componente consumible y visualmente correcto
@@ -552,13 +553,13 @@ Chain strategy: **stacked-to-main**
 
 ### 3.7 EmptyState Strings
 
-- [ ] **3.7.1** Agregar strings de empty states en inglés
+- [x] **3.7.1** Agregar strings de empty states en inglés
   - **Archivo**: `res/values/strings.xml` (modificar)
   - **Acción**: Agregar `empty_connections_title` ("No connections"), `empty_connections_description` ("Add a connection to get started"), `empty_tables_title` ("No tables"), `empty_tables_description` ("This database has no tables")
   - **Criterio**: Strings compilables
   - **Estimación**: Trivial (~8 líneas)
 
-- [ ] **3.7.2** Agregar traducciones españolas
+- [x] **3.7.2** Agregar traducciones españolas
   - **Archivo**: `res/values-es/strings.xml` (modificar)
   - **Acción**: Agregar traducciones: "Sin conexiones", "Agrega una conexión para empezar", "Sin tablas", "Esta base de datos no tiene tablas"
   - **Criterio**: Strings traducidos
@@ -568,7 +569,7 @@ Chain strategy: **stacked-to-main**
 
 ### 3.8 Refactorizar ConnectionCard
 
-- [ ] **3.8.1** Aplicar elevación, spacing tokens, AppIcons, animateContentSize a `ConnectionCard`
+- [x] **3.8.1** Aplicar elevación, spacing tokens, AppIcons, animateContentSize a `ConnectionCard`
   - **Archivo**: `ui/components/ConnectionCard.kt` (modificar)
   - **Acción**: CAMBIAR `Card(colors = CardDefaults.cardColors(containerColor = surfaceVariant))` → `Card(modifier = Modifier.shadow(LocalAppElevation.current.cardResting, LocalAppShapes.current.medium), shape = LocalAppShapes.current.medium)`, CAMBIAR padding `16.dp` → `LocalAppSpacing.current.lg`, CAMBIAR spacing `4.dp`, `8.dp` → `LocalAppSpacing.current.xxs`, `.sm`, AGREGAR `Modifier.animateContentSize()` al `Column` interno
   - **Criterio**: Card muestra elevación sutil, spacing correcto, listo para motion futuro
@@ -578,7 +579,7 @@ Chain strategy: **stacked-to-main**
 
 ### 3.9 Refactorizar DatabaseCard
 
-- [ ] **3.9.1** Aplicar elevación, spacing tokens, AppIcons, animateContentSize a `DatabaseCard`
+- [x] **3.9.1** Aplicar elevación, spacing tokens, AppIcons, animateContentSize a `DatabaseCard`
   - **Archivo**: `ui/components/DatabaseCard.kt` (modificar)
   - **Acción**: Aplicar mismo refactor que `ConnectionCard`
   - **Criterio**: Idem 3.8.1
@@ -588,7 +589,7 @@ Chain strategy: **stacked-to-main**
 
 ### 3.10 Refactorizar TableCard
 
-- [ ] **3.10.1** Aplicar elevación, spacing tokens, AppIcons, animateContentSize a `TableCard`
+- [x] **3.10.1** Aplicar elevación, spacing tokens, AppIcons, animateContentSize a `TableCard`
   - **Archivo**: `ui/components/TableCard.kt` (modificar)
   - **Acción**: Aplicar mismo refactor que `ConnectionCard`
   - **Criterio**: Idem 3.8.1
@@ -598,7 +599,7 @@ Chain strategy: **stacked-to-main**
 
 ### 3.11 Refactorizar ErrorCard
 
-- [ ] **3.11.1** Mejorar layout y añadir ícono custom a `ErrorCard`
+- [x] **3.11.1** Mejorar layout y añadir ícono custom a `ErrorCard`
   - **Archivo**: `ui/components/ErrorCard.kt` (modificar)
   - **Acción**: CAMBIAR layout de `Column` centrada a `Card` con background `errorContainer`, AGREGAR ícono `AppIcons.State.Error` (32dp) a la izquierda del texto, CAMBIAR `Button` a `OutlinedButton` con color `error`, HACER `onRetry` opcional (`onRetry: (() -> Unit)? = null`), CAMBIAR spacing hardcoded a `LocalAppSpacing.current.lg`, AGREGAR max lines en descripción (4 líneas con `TextOverflow.Ellipsis`)
   - **Criterio**: `ErrorCard` visualmente mejorada, coherente con design system
@@ -608,13 +609,13 @@ Chain strategy: **stacked-to-main**
 
 ### 3.12 Integrar Skeletons en ConnectionListScreen
 
-- [ ] **3.12.1** Reemplazar `CircularProgressIndicator` por `ConnectionListSkeleton` en estado Loading
+- [x] **3.12.1** Reemplazar `CircularProgressIndicator` por `ConnectionListSkeleton` en estado Loading
   - **Archivo**: `ui/screens/ConnectionListScreen.kt` (modificar)
   - **Acción**: En el branch del estado `Loading`, reemplazar `CircularProgressIndicator()` por `ConnectionListSkeleton()`
   - **Criterio**: Loading muestra skeleton en vez de spinner
   - **Estimación**: Trivial (~3 líneas modificadas)
 
-- [ ] **3.12.2** Reemplazar lógica de lista vacía por `EmptyState`
+- [x] **3.12.2** Reemplazar lógica de lista vacía por `EmptyState`
   - **Archivo**: `ui/screens/ConnectionListScreen.kt` (modificar)
   - **Acción**: En el branch `if (connections.isEmpty())`, reemplazar por `EmptyState(icon = AppIcons.State.EmptyConnections, title = stringResource(R.string.empty_connections_title), description = stringResource(R.string.empty_connections_description), action = { Button(...) })`
   - **Criterio**: Estado vacío muestra `EmptyState` ilustrado
@@ -624,13 +625,13 @@ Chain strategy: **stacked-to-main**
 
 ### 3.13 Integrar Skeletons en DatabaseListScreen
 
-- [ ] **3.13.1** Reemplazar `CircularProgressIndicator` por `DatabaseListSkeleton`
+- [x] **3.13.1** Reemplazar `CircularProgressIndicator` por `DatabaseListSkeleton`
   - **Archivo**: `ui/screens/DatabaseListScreen.kt` (modificar)
   - **Acción**: Idem 3.12.1 para `DatabaseListSkeleton`
   - **Criterio**: Idem 3.12.1
   - **Estimación**: Trivial (~3 líneas)
 
-- [ ] **3.13.2** Reemplazar lógica de lista vacía por `EmptyState`
+- [x] **3.13.2** Reemplazar lógica de lista vacía por `EmptyState`
   - **Archivo**: `ui/screens/DatabaseListScreen.kt` (modificar)
   - **Acción**: Idem 3.12.2 con `EmptyState` de databases
   - **Criterio**: Idem 3.12.2
@@ -640,13 +641,13 @@ Chain strategy: **stacked-to-main**
 
 ### 3.14 Integrar Skeletons en TableListScreen
 
-- [ ] **3.14.1** Reemplazar `CircularProgressIndicator` por `TableListSkeleton`
+- [x] **3.14.1** Reemplazar `CircularProgressIndicator` por `TableListSkeleton`
   - **Archivo**: `ui/screens/TableListScreen.kt` (modificar)
   - **Acción**: Idem 3.12.1 para `TableListSkeleton`
   - **Criterio**: Idem 3.12.1
   - **Estimación**: Trivial (~3 líneas)
 
-- [ ] **3.14.2** Reemplazar lógica de lista vacía por `EmptyState`
+- [x] **3.14.2** Reemplazar lógica de lista vacía por `EmptyState`
   - **Archivo**: `ui/screens/TableListScreen.kt` (modificar)
   - **Acción**: Idem 3.12.2 con `EmptyState` de tables
   - **Criterio**: Idem 3.12.2
@@ -656,7 +657,7 @@ Chain strategy: **stacked-to-main**
 
 ### 3.15 Integrar Skeletons en TableViewerScreen
 
-- [ ] **3.15.1** Reemplazar `CircularProgressIndicator` por `TableViewerSkeleton`
+- [x] **3.15.1** Reemplazar `CircularProgressIndicator` por `TableViewerSkeleton`
   - **Archivo**: `ui/screens/TableViewerScreen.kt` (modificar)
   - **Acción**: Idem 3.12.1 para `TableViewerSkeleton`
   - **Criterio**: Idem 3.12.1

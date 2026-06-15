@@ -1,0 +1,89 @@
+package com.sphynxs.mydatabases.ui.components.skeleton
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.sphynxs.mydatabases.ui.theme.MyDataBasesTheme
+import com.sphynxs.mydatabases.ui.theme.tokens.LocalAppSpacing
+
+/**
+ * Skeleton de carga para TableListScreen.
+ *
+ * Reproduce la silueta de 8 TableCard placeholders.
+ * Cada placeholder simula: nombre tabla + tipo/engine/rows + icono flecha.
+ *
+ * @param modifier Modificador opcional
+ *
+ * @author israel-icm
+ * @date 2026-06-15
+ */
+@Composable
+fun TableListSkeleton(
+    modifier: Modifier = Modifier
+) {
+    val spacing = LocalAppSpacing.current
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = spacing.lg)
+            .semantics { contentDescription = "Cargando tablas" },
+        verticalArrangement = Arrangement.spacedBy(spacing.sm)
+    ) {
+        Spacer(modifier = Modifier.height(spacing.sm))
+        repeat(8) {
+            TableCardPlaceholder()
+        }
+    }
+}
+
+/**
+ * Placeholder individual que simula un TableCard.
+ */
+@Composable
+private fun TableCardPlaceholder() {
+    val spacing = LocalAppSpacing.current
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(spacing.lg),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // Contenido principal (nombre + metadata)
+        Column(modifier = Modifier.weight(1f)) {
+            SkeletonText(width = 100.dp, lines = 1)
+            Spacer(modifier = Modifier.height(spacing.xs))
+            SkeletonText(width = 200.dp, lines = 1)
+        }
+
+        Spacer(modifier = Modifier.width(spacing.md))
+
+        // Ícono de navegación
+        SkeletonCircle(size = 24.dp)
+    }
+}
+
+/**
+ * Preview para TableListSkeleton.
+ */
+@Preview(showBackground = true)
+@Composable
+private fun TableListSkeletonPreview() {
+    MyDataBasesTheme {
+        TableListSkeleton()
+    }
+}

@@ -1,5 +1,6 @@
 package com.sphynxs.mydatabases.ui.components
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -28,6 +30,9 @@ import com.sphynxs.mydatabases.R
 import com.sphynxs.mydatabases.core.database.engine.DatabaseType
 import com.sphynxs.mydatabases.core.database.models.ConnectionConfig
 import com.sphynxs.mydatabases.ui.theme.MyDataBasesTheme
+import com.sphynxs.mydatabases.ui.theme.tokens.LocalAppElevation
+import com.sphynxs.mydatabases.ui.theme.tokens.LocalAppShapes
+import com.sphynxs.mydatabases.ui.theme.tokens.LocalAppSpacing
 
 /**
  * Tarjeta reutilizable para mostrar una conexión en la lista.
@@ -51,17 +56,23 @@ fun ConnectionCard(
     onCardClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val spacing = LocalAppSpacing.current
+    val shapes = LocalAppShapes.current
+    val elevation = LocalAppElevation.current
+
     Card(
         onClick = onCardClick,
-        modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        )
+        modifier = modifier
+            .fillMaxWidth()
+            .shadow(elevation = elevation.cardResting, shape = shapes.medium),
+        shape = shapes.medium,
+        colors = CardDefaults.cardColors()
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(spacing.lg)
+                .animateContentSize(),
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Contenido principal
@@ -74,16 +85,16 @@ fun ConnectionCard(
                     overflow = TextOverflow.Ellipsis
                 )
 
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(spacing.xxs))
 
                 // Host:puerto
                 Text(
                     text = "${connection.host}:${connection.port}",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.outline
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(spacing.sm))
 
                 // Chip con el tipo de DB
                 SuggestionChip(
@@ -109,7 +120,7 @@ fun ConnectionCard(
                 )
             }
 
-            Spacer(modifier = Modifier.width(4.dp))
+            Spacer(modifier = Modifier.width(spacing.xxs))
 
             IconButton(onClick = onDeleteClick) {
                 Icon(

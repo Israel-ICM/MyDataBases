@@ -18,6 +18,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -25,9 +26,12 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.sphynxs.mydatabases.R
 import com.sphynxs.mydatabases.core.database.models.Database
+import com.sphynxs.mydatabases.ui.components.AppIcons
 import com.sphynxs.mydatabases.ui.components.DatabaseCard
+import com.sphynxs.mydatabases.ui.components.EmptyState
 import com.sphynxs.mydatabases.ui.components.ErrorCard
 import com.sphynxs.mydatabases.ui.components.LoadingIndicator
+import com.sphynxs.mydatabases.ui.components.skeleton.DatabaseListSkeleton
 import com.sphynxs.mydatabases.ui.theme.MyDataBasesTheme
 
 /**
@@ -67,27 +71,20 @@ fun DatabasesListScreen(
     ) { paddingValues ->
         when (uiState) {
             is DatabasesUiState.Loading -> {
-                LoadingIndicator(modifier = Modifier.padding(paddingValues))
+                DatabaseListSkeleton(modifier = Modifier.padding(paddingValues))
             }
 
             is DatabasesUiState.Success -> {
                 val databases = (uiState as DatabasesUiState.Success).databases
                 
                 if (databases.isEmpty()) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(paddingValues),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = stringResource(R.string.databases_empty),
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.padding(16.dp)
-                        )
-                    }
+                    EmptyState(
+                        icon = painterResource(AppIcons.State.EmptyTables),  // Usar mismo ícono que emptyTables
+                        title = stringResource(R.string.empty_databases_title),
+                        description = stringResource(R.string.empty_databases_description),
+                        action = null,  // No action para empty databases
+                        modifier = Modifier.padding(paddingValues)
+                    )
                 } else {
                     LazyColumn(
                         modifier = Modifier

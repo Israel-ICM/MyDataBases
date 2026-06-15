@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -31,6 +32,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -40,9 +42,12 @@ import androidx.compose.runtime.collectAsState
 import com.sphynxs.mydatabases.R
 import com.sphynxs.mydatabases.core.database.engine.DatabaseType
 import com.sphynxs.mydatabases.core.database.models.ConnectionConfig
+import com.sphynxs.mydatabases.ui.components.AppIcons
 import com.sphynxs.mydatabases.ui.components.ConnectionCard
+import com.sphynxs.mydatabases.ui.components.EmptyState
 import com.sphynxs.mydatabases.ui.components.ErrorCard
 import com.sphynxs.mydatabases.ui.components.LoadingIndicator
+import com.sphynxs.mydatabases.ui.components.skeleton.ConnectionListSkeleton
 import com.sphynxs.mydatabases.ui.theme.MyDataBasesTheme
 import com.sphynxs.mydatabases.ui.theme.tokens.LocalAppSpacing
 import kotlinx.coroutines.launch
@@ -97,7 +102,7 @@ fun ConnectionsListScreen(
     ) { paddingValues ->
         when (uiState) {
             is ConnectionsUiState.Loading -> {
-                LoadingIndicator(modifier = Modifier.padding(paddingValues))
+                ConnectionListSkeleton(modifier = Modifier.padding(paddingValues))
             }
 
             is ConnectionsUiState.Success -> {
@@ -105,8 +110,15 @@ fun ConnectionsListScreen(
 
                 if (connections.isEmpty()) {
                     // Empty state
-                    EmptyConnectionsState(
-                        onAddClick = { onNavigateToForm(null) },
+                    EmptyState(
+                        icon = painterResource(AppIcons.State.EmptyConnections),
+                        title = stringResource(R.string.empty_connections_title),
+                        description = stringResource(R.string.empty_connections_description),
+                        action = {
+                            Button(onClick = { onNavigateToForm(null) }) {
+                                Text(stringResource(R.string.connections_add_new))
+                            }
+                        },
                         modifier = Modifier.padding(paddingValues)
                     )
                 } else {
@@ -141,7 +153,7 @@ fun ConnectionsListScreen(
                 val message = (uiState as ConnectionsUiState.Error).message
                 ErrorCard(
                     message = message,
-                    onRetry = { /* El Flow se recarga automáticamente */ },
+                    onRetry = null,  // Flow se recarga automáticamente
                     modifier = Modifier.padding(paddingValues)
                 )
             }
@@ -183,45 +195,6 @@ fun ConnectionsListScreen(
 }
 
 /**
- * Estado vacío cuando no hay conexiones.
- */
-@Composable
-private fun EmptyConnectionsState(
-    onAddClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Box(
-        modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(32.dp)
-        ) {
-            Text(
-                text = stringResource(R.string.connections_empty_title),
-                style = MaterialTheme.typography.titleLarge,
-                textAlign = TextAlign.Center
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = stringResource(R.string.connections_empty_message),
-                style = MaterialTheme.typography.bodyMedium,
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Spacer(modifier = Modifier.height(24.dp))
-            FloatingActionButton(onClick = onAddClick) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = stringResource(R.string.connections_add_new)
-                )
-            }
-        }
-    }
-}
-
-/**
  * Preview para ConnectionsListScreen con lista.
  */
 @Preview(showBackground = true)
@@ -236,13 +209,4 @@ private fun ConnectionsListScreenPreview() {
     }
 }
 
-/**
- * Preview para empty state.
- */
-@Preview(showBackground = true)
-@Composable
-private fun EmptyConnectionsStatePreview() {
-    MyDataBasesTheme {
-        EmptyConnectionsState(onAddClick = {})
-    }
-}
+
