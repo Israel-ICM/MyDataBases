@@ -52,6 +52,7 @@ import com.sphynxs.mydatabases.ui.components.ErrorCard
 import com.sphynxs.mydatabases.ui.components.LoadingIndicator
 import com.sphynxs.mydatabases.ui.components.skeleton.TableViewerSkeleton
 import com.sphynxs.mydatabases.ui.theme.MyDataBasesTheme
+import com.sphynxs.mydatabases.ui.workspace.TableCardContent
 
 /**
  * Pantalla de visor de tabla.
@@ -134,9 +135,9 @@ fun TableViewerScreen(
 
                     // Contenido del tab seleccionado
                     when (selectedTab) {
-                        0 -> RowsTab(
-                            columns = state.rows.columns,
-                            rows = state.rows.rows,
+                        0 -> TableCardContent(
+                            databaseName = databaseName,
+                            tableName = tableName,
                             modifier = Modifier.fillMaxSize()
                         )
                         1 -> SchemaTab(
@@ -183,18 +184,11 @@ fun TableViewerScreen(
                     }
 
                     when (selectedTab) {
-                        0 -> Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = stringResource(R.string.table_viewer_empty),
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier.padding(16.dp)
-                            )
-                        }
+                        0 -> TableCardContent(
+                            databaseName = databaseName,
+                            tableName = tableName,
+                            modifier = Modifier.fillMaxSize()
+                        )
                         1 -> SchemaTab(
                             columns = state.columns,
                             modifier = Modifier.fillMaxSize()
