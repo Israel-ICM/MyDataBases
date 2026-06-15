@@ -13,10 +13,16 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
@@ -32,6 +38,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -92,17 +99,36 @@ fun TableViewerScreen(
 
             is TableViewerUiState.Success -> {
                 Column(modifier = Modifier.padding(paddingValues)) {
-                    // Tabs
-                    TabRow(selectedTabIndex = selectedTab) {
+                    // Tabs con iconos y badges
+                    TabRow(
+                        selectedTabIndex = selectedTab,
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        contentColor = MaterialTheme.colorScheme.primary
+                    ) {
+                        // Tab Filas con badge numérico
                         Tab(
                             selected = selectedTab == 0,
                             onClick = { selectedTab = 0 },
-                            text = { Text(stringResource(R.string.table_viewer_tab_rows)) }
+                            text = { Text(stringResource(R.string.table_viewer_tab_rows)) },
+                            icon = {
+                                BadgedBox(
+                                    badge = {
+                                        Badge { Text("${state.rows.rows.size}") }
+                                    }
+                                ) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.ic_nav_tables),
+                                        contentDescription = null
+                                    )
+                                }
+                            }
                         )
+                        // Tab SQL
                         Tab(
                             selected = selectedTab == 1,
                             onClick = { selectedTab = 1 },
-                            text = { Text(stringResource(R.string.table_viewer_tab_schema)) }
+                            text = { Text(stringResource(R.string.table_viewer_tab_schema)) },
+                            icon = { Icon(Icons.Filled.Settings, contentDescription = null) }
                         )
                     }
 
@@ -124,16 +150,35 @@ fun TableViewerScreen(
             is TableViewerUiState.Empty -> {
                 Column(modifier = Modifier.padding(paddingValues)) {
                     // Tabs (schema sigue disponible aunque no haya rows)
-                    TabRow(selectedTabIndex = selectedTab) {
+                    TabRow(
+                        selectedTabIndex = selectedTab,
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        contentColor = MaterialTheme.colorScheme.primary
+                    ) {
+                        // Tab Filas con badge 0
                         Tab(
                             selected = selectedTab == 0,
                             onClick = { selectedTab = 0 },
-                            text = { Text(stringResource(R.string.table_viewer_tab_rows)) }
+                            text = { Text(stringResource(R.string.table_viewer_tab_rows)) },
+                            icon = {
+                                BadgedBox(
+                                    badge = {
+                                        Badge { Text("0") }
+                                    }
+                                ) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.ic_nav_tables),
+                                        contentDescription = null
+                                    )
+                                }
+                            }
                         )
+                        // Tab SQL
                         Tab(
                             selected = selectedTab == 1,
                             onClick = { selectedTab = 1 },
-                            text = { Text(stringResource(R.string.table_viewer_tab_schema)) }
+                            text = { Text(stringResource(R.string.table_viewer_tab_schema)) },
+                            icon = { Icon(Icons.Filled.Settings, contentDescription = null) }
                         )
                     }
 
