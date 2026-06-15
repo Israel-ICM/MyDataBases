@@ -21,6 +21,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
@@ -114,7 +115,10 @@ fun ConnectionFormScreen(
             }
             is ConnectionFormUiState.Error -> {
                 val message = (formState as ConnectionFormUiState.Error).message
-                snackbarHostState.showSnackbar("Save failed: $message")
+                snackbarHostState.showSnackbar(
+                    message = "Save failed: $message",
+                    duration = SnackbarDuration.Long
+                )
             }
             else -> {}
         }
@@ -128,7 +132,10 @@ fun ConnectionFormScreen(
             }
             is ConnectionTestUiState.Error -> {
                 val message = (testState as ConnectionTestUiState.Error).message
-                snackbarHostState.showSnackbar("Test failed: $message")
+                snackbarHostState.showSnackbar(
+                    message = "Test failed: $message",
+                    duration = SnackbarDuration.Long
+                )
             }
             else -> {}
         }

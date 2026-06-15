@@ -1,8 +1,10 @@
 package com.sphynxs.mydatabases.ui.screens.tableviewer
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sphynxs.mydatabases.domain.usecases.ExecuteQueryUseCase
+import com.sphynxs.mydatabases.domain.usecases.ExecuteUpdateUseCase
 import com.sphynxs.mydatabases.domain.usecases.GetColumnsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
@@ -19,6 +21,7 @@ import javax.inject.Inject
  * de una tabla seleccionada.
  *
  * @property executeQueryUseCase Use case para obtener rows (SELECT * LIMIT 1000)
+ * @property executeUpdateUseCase Use case para comandos DDL (USE database)
  * @property getColumnsUseCase Use case para obtener metadata de columnas
  *
  * @author israel-icm
@@ -27,6 +30,7 @@ import javax.inject.Inject
 @HiltViewModel
 class TableViewerViewModel @Inject constructor(
     private val executeQueryUseCase: ExecuteQueryUseCase,
+    private val executeUpdateUseCase: ExecuteUpdateUseCase,
     private val getColumnsUseCase: GetColumnsUseCase
 ) : ViewModel() {
 
@@ -54,21 +58,40 @@ class TableViewerViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = TableViewerUiState.Loading
             
+            // Cambiar a la database correcta antes de consultar metadata
+            // Esto es necesario porque getColumns usa DATABASE() en la query
+            // USE es un comando DDL, no retorna ResultSet → usar executeUpdate
+            val useDatabaseResult = executeUpdateUseCase("USE `$databaseName`", emptyList())
+            if (useDatabaseResult.isFailure) {
+                val error = "Failed to switch database: ${useDatabaseResult.exceptionOrNull()?.message}"
+                Log.e("TableViewerViewModel", error, useDatabaseResult.exceptionOrNull())
+                _uiState.value = TableViewerUiState.Error(error)
+                return@launch
+            }
+            
             // Ejecutar rows y columns en paralelo
-            val columnsDeferred = async { getColumnsUseCase("$databaseName.$tableName") }
-            val rowsDeferred = async { executeQueryUseCase("SELECT * FROM $databaseName.$tableName LIMIT 1000", emptyList()) }
+            // getColumns espera SOLO el nombre de la tabla (sin DB prefix)
+            // porque la query usa TABLE_SCHEMA = DATABASE() internamente
+            val columnsDeferred = async { getColumnsUseCase(tableName) }
+            
+            // executeQuery sí necesita DB.table con backticks para evitar errores de sintaxis
+            val rowsDeferred = async { executeQueryUseCase("SELECT * FROM `$databaseName`.`$tableName` LIMIT 1000", emptyList()) }
             
             val columnsResult = columnsDeferred.await()
             val rowsResult = rowsDeferred.await()
             
             // Evaluar resultados
             if (rowsResult.isFailure) {
-                _uiState.value = TableViewerUiState.Error(rowsResult.exceptionOrNull()?.message ?: "Unknown error")
+                val error = "Query execution failed: ${rowsResult.exceptionOrNull()?.message}"
+                Log.e("TableViewerViewModel", error, rowsResult.exceptionOrNull())
+                _uiState.value = TableViewerUiState.Error(error)
                 return@launch
             }
             
             if (columnsResult.isFailure) {
-                _uiState.value = TableViewerUiState.Error(columnsResult.exceptionOrNull()?.message ?: "Unknown error")
+                val error = "Failed to load columns: ${columnsResult.exceptionOrNull()?.message}"
+                Log.e("TableViewerViewModel", error, columnsResult.exceptionOrNull())
+                _uiState.value = TableViewerUiState.Error(error)
                 return@launch
             }
             

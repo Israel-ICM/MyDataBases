@@ -18,7 +18,9 @@ import com.sphynxs.mydatabases.domain.models.ThemeMode
 import com.sphynxs.mydatabases.ui.navigation.MyDataBasesNavHost
 import com.sphynxs.mydatabases.ui.theme.AppTheme
 import com.sphynxs.mydatabases.ui.theme.MyDataBasesTheme
+import com.sphynxs.mydatabases.ui.workspace.WorkspaceManager
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 /**
  * CompositionLocal para exponer el WindowSizeClass a toda la jerarquía de Composables.
@@ -40,6 +42,10 @@ val LocalWindowSizeClass = staticCompositionLocalOf<WindowSizeClass?> {
  */
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    
+    @Inject
+    lateinit var workspaceManager: WorkspaceManager
+    
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,7 +59,7 @@ class MainActivity : ComponentActivity() {
             
             CompositionLocalProvider(LocalWindowSizeClass provides windowSizeClass) {
                 AppTheme(themeMode = themeMode.value) {
-                    MyDataBasesNavHost()
+                    MyDataBasesNavHost(workspaceManager = workspaceManager)
                 }
             }
         }
@@ -64,6 +70,6 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainActivityPreview() {
     MyDataBasesTheme {
-        MyDataBasesNavHost()
+        MyDataBasesNavHost(workspaceManager = WorkspaceManager())
     }
 }

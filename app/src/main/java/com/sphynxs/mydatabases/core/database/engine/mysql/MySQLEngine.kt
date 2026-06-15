@@ -230,7 +230,7 @@ class MySQLEngine : DatabaseEngine {
                     COLUMN_NAME as name,
                     COLUMN_TYPE as type,
                     IS_NULLABLE as nullable,
-                    COLUMN_KEY as key,
+                    COLUMN_KEY as `key`,
                     COLUMN_DEFAULT as default_value,
                     EXTRA as extra,
                     COLUMN_COMMENT as comment
@@ -373,7 +373,6 @@ class MySQLEngine : DatabaseEngine {
     private fun validateConfig(config: ConnectionConfig) {
         require(config.host.isNotBlank()) { "Host no puede estar vacío" }
         require(config.port in 1..65535) { "Port debe estar entre 1 y 65535" }
-        require(config.database.isNotBlank()) { "Database no puede estar vacío" }
         require(config.username.isNotBlank()) { "Username no puede estar vacío" }
     }
     
@@ -391,6 +390,15 @@ class MySQLEngine : DatabaseEngine {
             
             throwable is SQLException && throwable.message?.contains("Access denied") == true ->
                 DatabaseError.AuthenticationFailed("Usuario o contraseña incorrectos")
+
+            throwable is SQLException && throwable.message?.contains("Communications link failure") == true ->
+                DatabaseError.ConnectionFailed("No se pudo establecer comunicación con '$host'")
+
+            throwable is SQLException && throwable.message?.contains("Connection refused") == true ->
+                DatabaseError.ConnectionFailed("El servidor '$host' rechazó la conexión")
+
+            throwable is SQLException && throwable.message?.contains("Unknown host") == true ->
+                DatabaseError.ConnectionFailed("Host '$host' no encontrado")
             
             throwable is SocketTimeoutException ->
                 DatabaseError.TimeoutError("Timeout conectando a $host")
@@ -399,7 +407,7 @@ class MySQLEngine : DatabaseEngine {
                 DatabaseError.UnknownError(throwable)
         }
     }
-    
+
     /**
      * Función pura que mapea excepciones de query a DatabaseError específicos.
      * 

@@ -10,6 +10,19 @@ package com.sphynxs.mydatabases.core.database.models
  */
 sealed class DatabaseError(override val message: String) : Throwable(message) {
 
+    companion object {
+        fun describeThrowable(throwable: Throwable): String {
+            return sequenceOf(
+                throwable.message,
+                throwable.cause?.message,
+                throwable.cause?.cause?.message,
+                throwable.localizedMessage,
+                throwable::class.simpleName?.takeIf { it.isNotBlank() }
+            ).firstOrNull { !it.isNullOrBlank() }
+                ?: "No se pudo determinar la causa exacta"
+        }
+    }
+
     /**
      * Error al intentar conectar al servidor de base de datos.
      *
@@ -52,7 +65,7 @@ sealed class DatabaseError(override val message: String) : Throwable(message) {
      *
      * @property throwable Excepción original
      */
-    data class UnknownError(val throwable: Throwable) : DatabaseError("Unknown error: ${throwable.message}") {
+    data class UnknownError(val throwable: Throwable) : DatabaseError("Unknown error: ${describeThrowable(throwable)}") {
         override val cause: Throwable? = throwable
     }
 }

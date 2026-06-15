@@ -1,5 +1,6 @@
 package com.sphynxs.mydatabases.ui.screens.connections
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sphynxs.mydatabases.core.database.models.ConnectionConfig
@@ -39,6 +40,10 @@ class ConnectionsListViewModel @Inject constructor(
     private val testConnectionUseCase: TestConnectionUseCase,
     private val connectToDatabaseUseCase: ConnectToDatabaseUseCase
 ) : ViewModel() {
+
+    companion object {
+        private const val TAG = "DBConnectionsList"
+    }
 
     /**
      * Estado de la UI reactivo.
@@ -96,16 +101,26 @@ class ConnectionsListViewModel @Inject constructor(
             val config = getConnectionUseCase(connectionId)
             if (config == null) {
                 _connectingState.value = null
+                Log.e(TAG, "Connect failed: connection not found, id=$connectionId")
                 return Result.failure(Exception("Conexión no encontrada"))
             }
             
             val result = connectToDatabaseUseCase(config)
             _connectingState.value = null
+
+            result.exceptionOrNull()?.let { error ->
+                Log.e(TAG, "Connect failed: ${config.toSafeLogString()}", error)
+            }
             
             result.map { Unit }
         } catch (e: Exception) {
             _connectingState.value = null
+            Log.e(TAG, "Connect crashed: id=$connectionId", e)
             Result.failure(e)
         }
     }
+}
+
+private fun ConnectionConfig.toSafeLogString(): String {
+    return "id=$id, name=$name, type=$type, host=$host, port=$port, database=$database, username=$username, useSSL=$useSSL"
 }

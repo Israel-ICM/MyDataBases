@@ -1,80 +1,79 @@
 package com.sphynxs.mydatabases.core.database.engine.mysql
 
 import com.sphynxs.mydatabases.core.database.models.ConnectionConfig
-import com.zaxxer.hikari.HikariConfig
-import com.zaxxer.hikari.HikariDataSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.sql.Connection
+import java.sql.DriverManager
+import java.util.Properties
 
 /**
- * Connection pool para MySQL usando HikariCP.
+ * Connection manager para MySQL usando DriverManager directo.
+ * 
+ * Esta implementación copia el enfoque probado de MyDataBasesDeprecated:
+ * - Sin HikariCP (evita incompatibilidades JVM/server en Android)
+ * - DriverManager.getConnection() directo con Properties
+ * - Driver viejo mysql-connector-java:5.1.46 (único compatible con Android)
  * 
  * Características:
- * - Pool de conexiones reutilizables (máx configurable)
- * - Soporte SSL/TLS
- * - Optimizaciones de performance (prepared statements cache, server config cache)
- * - Timeouts configurables
+ * - Soporte SSL/TLS opcional
+ * - Timeouts básicos de socket
+ * - Sin pooling (una conexión por request)
  * 
- * @param config Configuración de conexión con credenciales y parámetros de pool
+ * @param config Configuración de conexión con credenciales
  * @author israel-icm
- * @date 2026-06-12
+ * @date 2026-06-15
  */
 class MySQLConnectionPool(private val config: ConnectionConfig) {
     
-    private val hikariConfig = HikariConfig().apply {
-        jdbcUrl = "jdbc:mysql://${config.host}:${config.port}/${config.database}"
-        username = config.username
-        password = config.password // TODO: Decrypt from Android Keystore
-        
-        // Pool settings
-        maximumPoolSize = config.maxPoolSize
-        minimumIdle = 2
-        connectionTimeout = config.connectionTimeout
-        idleTimeout = 600_000L // 10 minutos
-        maxLifetime = 1_800_000L // 30 minutos
-        
-        // SSL settings
-        if (config.useSSL) {
-            addDataSourceProperty("useSSL", "true")
-            addDataSourceProperty("requireSSL", "true")
-        } else {
-            addDataSourceProperty("useSSL", "false")
-        }
-        
-        // Performance settings
-        addDataSourceProperty("cachePrepStmts", "true")
-        addDataSourceProperty("prepStmtCacheSize", "250")
-        addDataSourceProperty("prepStmtCacheSqlLimit", "2048")
-        addDataSourceProperty("useServerPrepStmts", "true")
-        addDataSourceProperty("useLocalSessionState", "true")
-        addDataSourceProperty("rewriteBatchedStatements", "true")
-        addDataSourceProperty("cacheResultSetMetadata", "true")
-        addDataSourceProperty("cacheServerConfiguration", "true")
-        addDataSourceProperty("elideSetAutoCommits", "true")
-        addDataSourceProperty("maintainTimeStats", "false")
-    }
-    
-    private val dataSource = HikariDataSource(hikariConfig)
+    private var activeConnection: Connection? = null
     
     /**
-     * Obtiene una conexión del pool.
-     * HikariCP maneja automáticamente el pooling y timeout.
+     * Obtiene una conexión directa usando DriverManager.
+     * Copia la receta probada de MyDataBasesDeprecated.
      * 
      * @return Conexión JDBC válida
      * @throws SQLException si no se puede obtener conexión
      */
     suspend fun getConnection(): Connection = withContext(Dispatchers.IO) {
-        dataSource.connection
+        // Cargar driver explícitamente (necesario en Android)
+        Class.forName("com.mysql.jdbc.Driver")
+        
+        val connectionProps = Properties().apply {
+            put("user", config.username)
+            put("password", config.password)
+            
+            // SSL settings
+            if (config.useSSL) {
+                put("useSSL", "true")
+                put("requireSSL", "true")
+            } else {
+                put("useSSL", "false")
+            }
+            
+            // Timeout básico (milisegundos)
+            put("connectTimeout", config.connectionTimeout.toString())
+        }
+        
+        val databaseSegment = config.database.takeIf { it.isNotBlank() } ?: ""
+        val jdbcUrl = "jdbc:mysql://${config.host}:${config.port}/$databaseSegment"
+        
+        // DriverManager directo - la receta probada
+        val connection = DriverManager.getConnection(jdbcUrl, connectionProps)
+        activeConnection = connection
+        connection
     }
     
     /**
-     * Cierra el pool y libera todas las conexiones.
+     * Cierra la conexión activa si existe.
      * Debe llamarse al desconectar para evitar leaks.
      */
     fun close() {
-        if (!dataSource.isClosed) {
-            dataSource.close()
+        activeConnection?.let {
+            if (!it.isClosed) {
+                it.close()
+            }
         }
+        activeConnection = null
     }
 }

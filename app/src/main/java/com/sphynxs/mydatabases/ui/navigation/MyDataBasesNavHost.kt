@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -26,6 +27,8 @@ import com.sphynxs.mydatabases.ui.screens.databases.DatabasesListScreen
 import com.sphynxs.mydatabases.ui.screens.settings.SettingsScreen
 import com.sphynxs.mydatabases.ui.screens.tables.TablesListScreen
 import com.sphynxs.mydatabases.ui.screens.tableviewer.TableViewerScreen
+import com.sphynxs.mydatabases.ui.workspace.WorkspaceManager
+import javax.inject.Inject
 
 /**
  * NavHost principal de la aplicación envuelto con AdaptiveNavigationScaffold.
@@ -41,7 +44,9 @@ import com.sphynxs.mydatabases.ui.screens.tableviewer.TableViewerScreen
  * @date 2026-06-12 (updated 2026-06-15 para PR 4b)
  */
 @Composable
-fun MyDataBasesNavHost() {
+fun MyDataBasesNavHost(
+    workspaceManager: WorkspaceManager
+) {
     val navController = rememberNavController()
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     
@@ -106,7 +111,7 @@ fun MyDataBasesNavHost() {
             composable(Routes.DatabaseList.route) {
                 DatabasesListScreen(
                     onNavigateToTables = { databaseName ->
-                        navController.navigate("tables/$databaseName")
+                        navController.navigate(Routes.TableList.createRoute(databaseName))
                     }
                 )
             }
@@ -120,8 +125,9 @@ fun MyDataBasesNavHost() {
                 val databaseName = it.arguments?.getString("databaseName") ?: ""
                 TablesListScreen(
                     databaseName = databaseName,
+                    workspaceManager = workspaceManager,
                     onNavigateToTableViewer = { tableName ->
-                        navController.navigate("table_viewer/$databaseName/$tableName")
+                        navController.navigate(Routes.TableViewer.createRoute(databaseName, tableName))
                     }
                 )
             }

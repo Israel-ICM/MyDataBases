@@ -107,11 +107,9 @@ dependencies {
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
     
     // Database Drivers (JDBC)
-    implementation("mysql:mysql-connector-java:8.0.33")
-    implementation("org.mariadb.jdbc:mariadb-java-client:3.1.4")
-    
-    // Connection Pooling
-    implementation("com.zaxxer:HikariCP:5.0.1")
+    // Usando driver viejo 5.1.46 - única versión compatible con Android
+    // Receta probada en MyDataBasesDeprecated
+    implementation("mysql:mysql-connector-java:5.1.46")
     
     // Testing
     testImplementation("junit:junit:4.13.2")

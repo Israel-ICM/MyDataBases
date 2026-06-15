@@ -1,5 +1,6 @@
 package com.sphynxs.mydatabases.ui.screens.connections
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sphynxs.mydatabases.core.database.models.ConnectionConfig
@@ -32,6 +33,10 @@ class ConnectionFormViewModel @Inject constructor(
     private val testConnectionUseCase: TestConnectionUseCase
 ) : ViewModel() {
 
+    companion object {
+        private const val TAG = "DBConnectionForm"
+    }
+
     private val _formState = MutableStateFlow<ConnectionFormUiState>(ConnectionFormUiState.Idle)
     /**
      * Estado del formulario reactivo (Idle, Saving, Saved, Error).
@@ -58,7 +63,14 @@ class ConnectionFormViewModel @Inject constructor(
                 saveConnectionUseCase(config)
                 _formState.value = ConnectionFormUiState.Saved
             } catch (e: Exception) {
-                _formState.value = ConnectionFormUiState.Error(e.message ?: "Unknown error")
+                Log.e(
+                    TAG,
+                    "Save connection failed: ${config.toSafeLogString()}",
+                    e
+                )
+                _formState.value = ConnectionFormUiState.Error(
+                    e.message ?: "No se pudo guardar la conexión"
+                )
             }
         }
     }
@@ -77,8 +89,13 @@ class ConnectionFormViewModel @Inject constructor(
             if (result.isSuccess) {
                 _testState.value = ConnectionTestUiState.Success
             } else {
+                Log.e(
+                    TAG,
+                    "Test connection failed: ${config.toSafeLogString()}",
+                    result.exceptionOrNull()
+                )
                 _testState.value = ConnectionTestUiState.Error(
-                    result.exceptionOrNull()?.message ?: "Unknown error"
+                    result.exceptionOrNull()?.message ?: "No se pudo probar la conexión"
                 )
             }
         }
@@ -93,4 +110,8 @@ class ConnectionFormViewModel @Inject constructor(
     suspend fun loadConnection(connectionId: String): ConnectionConfig? {
         return getConnectionByIdUseCase(connectionId)
     }
+}
+
+private fun ConnectionConfig.toSafeLogString(): String {
+    return "id=$id, name=$name, type=$type, host=$host, port=$port, database=$database, username=$username, useSSL=$useSSL"
 }

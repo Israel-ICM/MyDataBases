@@ -32,6 +32,10 @@ import com.sphynxs.mydatabases.ui.components.LoadingIndicator
 import com.sphynxs.mydatabases.ui.components.TableCard
 import com.sphynxs.mydatabases.ui.components.skeleton.TableListSkeleton
 import com.sphynxs.mydatabases.ui.theme.MyDataBasesTheme
+import com.sphynxs.mydatabases.ui.workspace.WorkspaceCard
+import com.sphynxs.mydatabases.ui.workspace.WorkspaceManager
+import com.sphynxs.mydatabases.ui.workspace.WorkspaceOverlay
+import javax.inject.Inject
 
 /**
  * Pantalla de lista de tablas.
@@ -52,6 +56,7 @@ import com.sphynxs.mydatabases.ui.theme.MyDataBasesTheme
 fun TablesListScreen(
     databaseName: String,
     onNavigateToTableViewer: (tableName: String) -> Unit,
+    workspaceManager: WorkspaceManager,
     viewModel: TablesListViewModel = hiltViewModel(),
     modifier: Modifier = Modifier
 ) {
@@ -62,14 +67,18 @@ fun TablesListScreen(
         viewModel.loadTables(databaseName)
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.tables_title, databaseName)) }
-            )
-        },
+    // WorkspaceOverlay envuelve todo el contenido
+    WorkspaceOverlay(
+        workspaceManager = workspaceManager,
         modifier = modifier
-    ) { paddingValues ->
+    ) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text(stringResource(R.string.tables_title, databaseName)) }
+                )
+            }
+        ) { paddingValues ->
         when (uiState) {
             is TablesUiState.Loading -> {
                 TableListSkeleton(modifier = Modifier.padding(paddingValues))
@@ -86,7 +95,18 @@ fun TablesListScreen(
                     items(tables, key = { it.name }) { table ->
                         TableCard(
                             table = table,
-                            onCardClick = { onNavigateToTableViewer(table.name) },
+                            onCardClick = {
+                                // Abrir tabla en el workspace en lugar de navegar
+                                workspaceManager.openCard(
+                                    WorkspaceCard.Table(
+                                        id = "table:${databaseName}:${table.name}",
+                                        title = table.name,
+                                        connectionId = "current", // TODO: obtener connectionId real
+                                        databaseName = databaseName,
+                                        tableName = table.name
+                                    )
+                                )
+                            },
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                         )
                     }
@@ -118,7 +138,8 @@ fun TablesListScreen(
                 )
             }
         }
-    }
+        } // Cierre del Scaffold
+    } // Cierre del WorkspaceOverlay
 }
 
 /**
