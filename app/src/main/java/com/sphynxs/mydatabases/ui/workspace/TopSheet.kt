@@ -72,9 +72,9 @@ fun TopSheet(
     val density = LocalDensity.current
     val peekHeightPx = with(density) { peekHeight.toPx() }
     
-    // Altura del panel: 97% de la pantalla
+    // Altura del panel: 92% de la pantalla
     val screenHeightDp = configuration.screenHeightDp.dp
-    val sheetHeight = screenHeightDp * 0.97f
+    val sheetHeight = screenHeightDp * 0.92f
     val sheetHeightPx = with(density) { sheetHeight.toPx() }
     
     // Target offset según estado
