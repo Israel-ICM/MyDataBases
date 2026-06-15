@@ -21,10 +21,10 @@ import androidx.compose.ui.unit.dp
 @Immutable
 data class AppElevation(
     val none: Dp = 0.dp,
-    val cardResting: Dp = 1.dp,
-    val cardHover: Dp = 3.dp,
-    val cardPressed: Dp = 6.dp,
-    val modal: Dp = 8.dp
+    val cardResting: Dp = 4.dp,  // Aumentado de 1dp a 4dp para más contraste
+    val cardHover: Dp = 6.dp,
+    val cardPressed: Dp = 8.dp,
+    val modal: Dp = 12.dp
 )
 
 /**

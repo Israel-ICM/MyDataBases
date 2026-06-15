@@ -29,7 +29,7 @@ class SettingsRepositoryImpl @Inject constructor(
     
     override fun observeBrandedPaletteEnabled(): Flow<Boolean> =
         dataStore.data.map { prefs ->
-            prefs[BRANDED_PALETTE_KEY] ?: false  // Default: false (dynamic color)
+            prefs[BRANDED_PALETTE_KEY] ?: true  // Default: true (branded colors)
         }
     
     override suspend fun setBrandedPaletteEnabled(enabled: Boolean) {
