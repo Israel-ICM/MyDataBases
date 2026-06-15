@@ -64,34 +64,12 @@ fun AppTheme(
         ThemeMode.SYSTEM -> systemInDarkTheme
     }
     
-    // Observar preferencia de branded palette desde SettingsViewModel
-    val settingsViewModel: SettingsViewModel = hiltViewModel()
-    val userPrefersBranded by settingsViewModel.brandedPaletteEnabled.collectAsState()
+    // TEMPORAL: Forzar branded colors SIEMPRE para ver la diferencia
+    // TODO: Restaurar lógica con SettingsViewModel después
+    val colorScheme = if (darkTheme) BrandedDarkColorScheme else BrandedLightColorScheme
     
     // Detectar reduced motion
     val isReducedMotion by rememberReducedMotion(context)
-    
-    // Selección de ColorScheme
-    val colorScheme = when {
-        // Usuario eligió branded explícitamente
-        userPrefersBranded -> {
-            if (darkTheme) BrandedDarkColorScheme else BrandedLightColorScheme
-        }
-        
-        // Dynamic color disponible (Android 12+)
-        Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            if (darkTheme) {
-                dynamicDarkColorScheme(context)
-            } else {
-                dynamicLightColorScheme(context)
-            }
-        }
-        
-        // Fallback a branded para dispositivos < Android 12
-        else -> {
-            if (darkTheme) BrandedDarkColorScheme else BrandedLightColorScheme
-        }
-    }
     
     // Edge-to-edge: configurar appearance de status bar
     val view = LocalView.current
