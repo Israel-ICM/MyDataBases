@@ -21,6 +21,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -83,6 +85,7 @@ fun ConnectionFormScreen(
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
+    var useSSL by remember { mutableStateOf(false) }  // Default false - mayoría de DBs locales no usan SSL
 
     // Load existing connection if editing
     LaunchedEffect(connectionId) {
@@ -94,6 +97,7 @@ fun ConnectionFormScreen(
                 port = config.port.toString()
                 username = config.username
                 password = config.password
+                useSSL = config.useSSL
             }
         }
     }
@@ -167,7 +171,8 @@ fun ConnectionFormScreen(
                             host = host,
                             port = port.toIntOrNull() ?: selectedType.defaultPort,
                             username = username,
-                            password = password
+                            password = password,
+                            useSSL = useSSL
                         )
                         viewModel.saveConnection(config)
                     },
@@ -244,9 +249,34 @@ fun ConnectionFormScreen(
                         value = port,
                         onValueChange = { port = it },
                         placeholder = stringResource(R.string.connection_field_port_hint),
-                        keyboardType = KeyboardType.Number,
-                        showDivider = false
+                        keyboardType = KeyboardType.Number
                     )
+                    
+                    // SSL Toggle
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color.White)
+                            .padding(horizontal = 16.dp, vertical = 12.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            "Usar SSL/TLS",
+                            fontSize = 17.sp,
+                            color = Color.Black
+                        )
+                        Switch(
+                            checked = useSSL,
+                            onCheckedChange = { useSSL = it },
+                            colors = SwitchDefaults.colors(
+                                checkedThumbColor = Color.White,
+                                checkedTrackColor = Color(0xFF34C759),
+                                uncheckedThumbColor = Color.White,
+                                uncheckedTrackColor = Color(0xFFE5E5EA)
+                            )
+                        )
+                    }
                 }
             }
 
@@ -285,7 +315,8 @@ fun ConnectionFormScreen(
                         host = host,
                         port = port.toIntOrNull() ?: selectedType.defaultPort,
                         username = username,
-                        password = password
+                        password = password,
+                        useSSL = useSSL
                     )
                     viewModel.testConnection(config)
                 },
@@ -307,7 +338,8 @@ private fun createConnectionConfig(
     host: String,
     port: Int,
     username: String,
-    password: String
+    password: String,
+    useSSL: Boolean
 ): ConnectionConfig {
     return ConnectionConfig(
         id = id ?: java.util.UUID.randomUUID().toString(),
@@ -317,6 +349,7 @@ private fun createConnectionConfig(
         port = port,
         database = "",  // Se selecciona después de conectar
         username = username,
-        password = password
+        password = password,
+        useSSL = useSSL
     )
 }
