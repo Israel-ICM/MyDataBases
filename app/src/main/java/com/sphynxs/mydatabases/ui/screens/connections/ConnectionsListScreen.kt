@@ -85,7 +85,7 @@ fun ConnectionsListScreen(
     var showFormSheet by remember { mutableStateOf(false) }
     var editingConnectionId by remember { mutableStateOf<String?>(null) }
     val formSheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = false
+        skipPartiallyExpanded = true
     )
 
     Scaffold(
