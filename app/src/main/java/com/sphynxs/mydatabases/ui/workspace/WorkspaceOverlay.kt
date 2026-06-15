@@ -21,6 +21,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -56,8 +57,15 @@ fun WorkspaceOverlay(
     val activeCards by workspaceManager.cards.collectAsState()
     val selectedCardIndex by workspaceManager.activeIndex.collectAsState()
     
-    // Card empieza MINIMIZADA (arriba) por defecto
+    // Card empieza EXPANDIDA cuando hay cards activas
     var isCardExpanded by remember { mutableStateOf(false) }
+    
+    // Auto-expandir cuando aparece una nueva card
+    LaunchedEffect(activeCards.size) {
+        if (activeCards.isNotEmpty()) {
+            isCardExpanded = true
+        }
+    }
     
     Box(modifier = modifier.fillMaxSize()) {
         // Contenido de fondo (lista de tablas)
