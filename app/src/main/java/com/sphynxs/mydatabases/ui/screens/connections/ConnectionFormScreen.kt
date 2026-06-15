@@ -13,7 +13,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.AccountBox
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -44,6 +45,8 @@ import androidx.compose.runtime.collectAsState
 import com.sphynxs.mydatabases.R
 import com.sphynxs.mydatabases.core.database.engine.DatabaseType
 import com.sphynxs.mydatabases.core.database.models.ConnectionConfig
+import com.sphynxs.mydatabases.ui.components.DatabaseTypeSelector
+import com.sphynxs.mydatabases.ui.components.SectionCard
 import kotlinx.coroutines.launch
 
 /**
@@ -75,6 +78,7 @@ fun ConnectionFormScreen(
 
     // Form fields state
     var name by remember { mutableStateOf("") }
+    var selectedType by remember { mutableStateOf(DatabaseType.MYSQL) }
     var host by remember { mutableStateOf("") }
     var port by remember { mutableStateOf("3306") }
     var database by remember { mutableStateOf("") }
@@ -87,6 +91,7 @@ fun ConnectionFormScreen(
         connectionId?.let { id ->
             viewModel.loadConnection(id)?.let { config ->
                 name = config.name
+                selectedType = config.type
                 host = config.host
                 port = config.port.toString()
                 database = config.database
@@ -159,82 +164,95 @@ fun ConnectionFormScreen(
                 .padding(16.dp)
                 .verticalScroll(rememberScrollState())
         ) {
-            // Name field
-            OutlinedTextField(
-                value = name,
-                onValueChange = { name = it },
-                label = { Text(stringResource(R.string.connection_field_name)) },
-                placeholder = { Text(stringResource(R.string.connection_field_name_hint)) },
-                modifier = Modifier.fillMaxWidth()
-            )
+            // Sección 1: Identidad
+            SectionCard(title = "Identidad") {
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    label = { Text(stringResource(R.string.connection_field_name)) },
+                    placeholder = { Text(stringResource(R.string.connection_field_name_hint)) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                DatabaseTypeSelector(
+                    selected = selectedType,
+                    onSelect = { selectedType = it }
+                )
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Host field
-            OutlinedTextField(
-                value = host,
-                onValueChange = { host = it },
-                label = { Text(stringResource(R.string.connection_field_host)) },
-                placeholder = { Text(stringResource(R.string.connection_field_host_hint)) },
-                modifier = Modifier.fillMaxWidth()
-            )
+            // Sección 2: Conexión
+            SectionCard(title = "Conexión") {
+                OutlinedTextField(
+                    value = host,
+                    onValueChange = { host = it },
+                    label = { Text(stringResource(R.string.connection_field_host)) },
+                    placeholder = { Text(stringResource(R.string.connection_field_host_hint)) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    OutlinedTextField(
+                        value = port,
+                        onValueChange = { port = it },
+                        label = { Text(stringResource(R.string.connection_field_port)) },
+                        placeholder = { Text(stringResource(R.string.connection_field_port_hint)) },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                OutlinedTextField(
+                    value = database,
+                    onValueChange = { database = it },
+                    label = { Text(stringResource(R.string.connection_field_database)) },
+                    placeholder = { Text(stringResource(R.string.connection_field_database_hint)) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Port field
-            OutlinedTextField(
-                value = port,
-                onValueChange = { port = it },
-                label = { Text(stringResource(R.string.connection_field_port)) },
-                placeholder = { Text(stringResource(R.string.connection_field_port_hint)) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth()
-            )
+            // Sección 3: Autenticación
+            SectionCard(title = "Autenticación") {
+                OutlinedTextField(
+                    value = username,
+                    onValueChange = { username = it },
+                    label = { Text(stringResource(R.string.connection_field_username)) },
+                    placeholder = { Text(stringResource(R.string.connection_field_username_hint)) },
+                    modifier = Modifier.fillMaxWidth()
+                )
 
-            Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-            // Database field
-            OutlinedTextField(
-                value = database,
-                onValueChange = { database = it },
-                label = { Text(stringResource(R.string.connection_field_database)) },
-                placeholder = { Text(stringResource(R.string.connection_field_database_hint)) },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Username field
-            OutlinedTextField(
-                value = username,
-                onValueChange = { username = it },
-                label = { Text(stringResource(R.string.connection_field_username)) },
-                placeholder = { Text(stringResource(R.string.connection_field_username_hint)) },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Password field
-            OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
-                label = { Text(stringResource(R.string.connection_field_password)) },
-                placeholder = { Text(stringResource(R.string.connection_field_password_hint)) },
-                visualTransformation = if (passwordVisible) VisualTransformation.None
-                else PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                trailingIcon = {
-                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                        Icon(
-                            imageVector = Icons.Default.AccountBox,
-                            contentDescription = if (passwordVisible) "Hide password"
-                            else "Show password"
-                        )
-                    }
-                },
-                modifier = Modifier.fillMaxWidth()
-            )
+                OutlinedTextField(
+                    value = password,
+                    onValueChange = { password = it },
+                    label = { Text(stringResource(R.string.connection_field_password)) },
+                    placeholder = { Text(stringResource(R.string.connection_field_password_hint)) },
+                    visualTransformation = if (passwordVisible) VisualTransformation.None
+                    else PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    trailingIcon = {
+                        IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                            Icon(
+                                imageVector = if (passwordVisible) Icons.Default.Visibility
+                                else Icons.Default.VisibilityOff,
+                                contentDescription = if (passwordVisible) "Ocultar contraseña"
+                                else "Mostrar contraseña"
+                            )
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
 
             Spacer(modifier = Modifier.height(24.dp))
 
@@ -245,6 +263,7 @@ fun ConnectionFormScreen(
                         val config = createConnectionConfig(
                             id = connectionId,
                             name = name,
+                            type = selectedType,
                             host = host,
                             port = port.toIntOrNull() ?: 3306,
                             database = database,
@@ -266,6 +285,7 @@ fun ConnectionFormScreen(
                         val config = createConnectionConfig(
                             id = connectionId,
                             name = name,
+                            type = selectedType,
                             host = host,
                             port = port.toIntOrNull() ?: 3306,
                             database = database,
@@ -290,6 +310,7 @@ fun ConnectionFormScreen(
 private fun createConnectionConfig(
     id: String?,
     name: String,
+    type: DatabaseType,
     host: String,
     port: Int,
     database: String,
@@ -299,7 +320,7 @@ private fun createConnectionConfig(
     return ConnectionConfig(
         id = id ?: java.util.UUID.randomUUID().toString(),
         name = name,
-        type = DatabaseType.MYSQL, // TODO: agregar selector de tipo
+        type = type,
         host = host,
         port = port,
         database = database,
