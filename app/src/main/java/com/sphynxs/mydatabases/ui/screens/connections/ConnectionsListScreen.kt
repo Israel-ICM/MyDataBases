@@ -2,13 +2,16 @@ package com.sphynxs.mydatabases.ui.screens.connections
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
@@ -81,7 +84,9 @@ fun ConnectionsListScreen(
     // Estado para el bottom sheet del formulario
     var showFormSheet by remember { mutableStateOf(false) }
     var editingConnectionId by remember { mutableStateOf<String?>(null) }
-    val formSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val formSheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = false
+    )
 
     Scaffold(
         modifier = modifier.background(Color(0xFFF2F2F7)),
@@ -216,16 +221,19 @@ fun ConnectionsListScreen(
     
     // Bottom Sheet del formulario
     if (showFormSheet) {
+        val configuration = LocalConfiguration.current
+        val maxHeight = (configuration.screenHeightDp * 0.85f).dp // 85% de altura
+        
         ModalBottomSheet(
             onDismissRequest = { showFormSheet = false },
             sheetState = formSheetState,
             containerColor = Color(0xFFF2F2F7),
-            sheetMaxWidth = 10000.dp // Sin límite de ancho
+            sheetMaxWidth = 10000.dp
         ) {
-            Column(
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 60.dp) // Margen superior
+                    .heightIn(max = maxHeight)
             ) {
                 ConnectionFormScreen(
                     connectionId = editingConnectionId,
