@@ -222,7 +222,7 @@ fun ConnectionsListScreen(
     // Bottom Sheet del formulario
     if (showFormSheet) {
         val configuration = LocalConfiguration.current
-        val maxHeight = (configuration.screenHeightDp * 0.85f).dp // 85% de altura
+        val maxHeight = (configuration.screenHeightDp).dp - 20.dp // Separación de 20dp arriba
         
         ModalBottomSheet(
             onDismissRequest = { showFormSheet = false },
