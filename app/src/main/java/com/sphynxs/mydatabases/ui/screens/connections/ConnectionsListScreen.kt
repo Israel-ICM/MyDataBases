@@ -195,7 +195,7 @@ fun ConnectionsListScreen(
                     Text(stringResource(R.string.action_cancel))
                 }
             }
-        }
+        )
     }
     
     // Loading indicator mientras conecta
