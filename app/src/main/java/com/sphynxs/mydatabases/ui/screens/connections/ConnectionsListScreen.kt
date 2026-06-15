@@ -90,7 +90,7 @@ fun ConnectionsListScreen(
     var editingConnectionId by remember { mutableStateOf<String?>(null) }
     var preselectedType by remember { mutableStateOf<DatabaseType?>(null) }
     val formSheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = true
+        skipPartiallyExpanded = false
     )
 
     Scaffold(
@@ -148,6 +148,9 @@ fun ConnectionsListScreen(
                                 preselectedType = selectedType
                                 editingConnectionId = null
                                 showFormSheet = true
+                                scope.launch {
+                                    formSheetState.expand()
+                                }
                             }
                         )
                     }
@@ -226,10 +229,16 @@ fun ConnectionsListScreen(
         val maxHeight = (configuration.screenHeightDp).dp - 20.dp // Separación de 20dp arriba
         
         ModalBottomSheet(
-            onDismissRequest = { showFormSheet = false },
+            onDismissRequest = { 
+                scope.launch {
+                    formSheetState.hide()
+                    showFormSheet = false
+                }
+            },
             sheetState = formSheetState,
             containerColor = Color(0xFFF2F2F7),
-            sheetMaxWidth = 10000.dp
+            sheetMaxWidth = 10000.dp,
+            scrimColor = Color.Black.copy(alpha = 0.5f)
         ) {
             Box(
                 modifier = Modifier
@@ -239,7 +248,12 @@ fun ConnectionsListScreen(
                 ConnectionFormScreen(
                     connectionId = editingConnectionId,
                     preselectedType = preselectedType,
-                    onNavigateBack = { showFormSheet = false },
+                    onNavigateBack = { 
+                        scope.launch {
+                            formSheetState.hide()
+                            showFormSheet = false
+                        }
+                    },
                     modifier = Modifier.fillMaxSize()
                 )
             }
