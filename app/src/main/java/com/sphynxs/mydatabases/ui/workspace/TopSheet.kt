@@ -24,6 +24,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -83,6 +84,13 @@ fun TopSheet(
     // Offset actual que sigue el dedo o anima
     var rawOffset by remember { mutableFloatStateOf(targetOffset) }
     var isDragging by remember { mutableStateOf(false) }
+    
+    // Sincronizar rawOffset cuando isExpanded cambia externamente (ej: click en backdrop)
+    LaunchedEffect(isExpanded) {
+        if (!isDragging) {
+            rawOffset = targetOffset
+        }
+    }
     
     // Solo animar cuando NO está arrastrando
     val animatedOffset by animateFloatAsState(
