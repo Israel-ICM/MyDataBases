@@ -17,11 +17,13 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -74,12 +76,20 @@ fun ConnectionsListScreen(
 
     // Estado para el diálogo de confirmación de eliminación
     var connectionToDelete by remember { mutableStateOf<com.sphynxs.mydatabases.core.database.models.ConnectionConfig?>(null) }
+    
+    // Estado para el bottom sheet del formulario
+    var showFormSheet by remember { mutableStateOf(false) }
+    var editingConnectionId by remember { mutableStateOf<String?>(null) }
+    val formSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     Scaffold(
         modifier = modifier.background(Color(0xFFF2F2F7)),
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { onNavigateToForm(null) },
+                onClick = { 
+                    editingConnectionId = null
+                    showFormSheet = true
+                },
                 containerColor = Color(0xFF007AFF)
             ) {
                 Icon(
@@ -201,6 +211,21 @@ fun ConnectionsListScreen(
                 }
             }
         )
+    }
+    
+    // Bottom Sheet del formulario
+    if (showFormSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showFormSheet = false },
+            sheetState = formSheetState,
+            containerColor = Color(0xFFF2F2F7)
+        ) {
+            ConnectionFormScreen(
+                connectionId = editingConnectionId,
+                onNavigateBack = { showFormSheet = false },
+                modifier = Modifier.fillMaxSize()
+            )
+        }
     }
 }
 
