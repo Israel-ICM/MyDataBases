@@ -23,6 +23,7 @@ fun IOSListItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     leadingIcon: (@Composable () -> Unit)? = null,
+    trailingIcon: (@Composable () -> Unit)? = null,
     showChevron: Boolean = true,
     showDivider: Boolean = true
 ) {
@@ -56,6 +57,11 @@ fun IOSListItem(
                         color = Color(0xFF8E8E93)
                     )
                 }
+            }
+            
+            if (trailingIcon != null) {
+                trailingIcon()
+                Spacer(Modifier.width(8.dp))
             }
             
             if (showChevron) {

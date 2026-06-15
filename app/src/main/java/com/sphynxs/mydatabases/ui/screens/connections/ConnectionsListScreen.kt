@@ -144,6 +144,14 @@ fun ConnectionsListScreen(
                                     )
                                 }
                             },
+                            onEditConnection = { connectionId ->
+                                editingConnectionId = connectionId
+                                preselectedType = null  // Permitir ver el tipo al editar
+                                showFormSheet = true
+                                scope.launch {
+                                    formSheetState.expand()
+                                }
+                            },
                             onAddConnection = { selectedType ->
                                 preselectedType = selectedType
                                 editingConnectionId = null

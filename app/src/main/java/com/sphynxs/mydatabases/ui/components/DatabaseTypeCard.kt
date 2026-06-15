@@ -12,10 +12,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -45,6 +47,7 @@ fun DatabaseTypeCard(
     type: DatabaseType,
     connections: List<ConnectionConfig>,
     onConnectionClick: (String) -> Unit,
+    onEditConnection: (String) -> Unit,
     onAddConnection: (DatabaseType) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -120,6 +123,19 @@ fun DatabaseTypeCard(
                             title = connection.name,
                             subtitle = "${connection.host}:${connection.port}",
                             onClick = { onConnectionClick(connection.id) },
+                            trailingIcon = {
+                                IconButton(
+                                    onClick = { onEditConnection(connection.id) },
+                                    modifier = Modifier.size(32.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Edit,
+                                        contentDescription = "Editar",
+                                        tint = Color(0xFF007AFF),
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                }
+                            },
                             showDivider = index < connections.size - 1
                         )
                     }
