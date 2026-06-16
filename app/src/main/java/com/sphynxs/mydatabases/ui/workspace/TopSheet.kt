@@ -62,6 +62,7 @@ import kotlin.math.roundToInt
  * @param onExpandedChange Callback cuando cambia el estado
  * @param modifier Modificador
  * @param peekHeight Altura del peek visible cuando está minimizado
+ * @param onProgressChange Callback con el progreso de expansión (0.0 - 1.0) y estado de drag
  * @param sheetContent Contenido del sheet
  */
 @Composable
@@ -70,6 +71,7 @@ fun TopSheet(
     onExpandedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     peekHeight: Dp = 60.dp,
+    onProgressChange: ((progress: Float, isDragging: Boolean) -> Unit)? = null,
     sheetContent: @Composable ColumnScope.() -> Unit
 ) {
     val configuration = LocalConfiguration.current
@@ -118,6 +120,11 @@ fun TopSheet(
     
     // Calcular el progreso de expansión (0 = minimizado, 1 = expandido)
     val expansionProgress = ((displayOffset - collapsedOffsetPx) / (-collapsedOffsetPx)).coerceIn(0f, 1f)
+    
+    // Notificar progreso al callback
+    LaunchedEffect(expansionProgress, isDragging) {
+        onProgressChange?.invoke(expansionProgress, isDragging)
+    }
     
     // Alpha del backdrop proporcional al progreso (0 cuando minimizado, 0.5 cuando expandido)
     val backdropAlpha = expansionProgress * 0.5f

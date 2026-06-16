@@ -24,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -60,6 +61,10 @@ fun WorkspaceOverlay(
     // Card empieza EXPANDIDA cuando hay cards activas
     var isCardExpanded by remember { mutableStateOf(false) }
     
+    // Estado compartido para sincronizar el frame decorativo
+    var expansionProgress by remember { mutableFloatStateOf(0f) }
+    var isDragging by remember { mutableStateOf(false) }
+    
     // Auto-expandir cuando aparece una nueva card
     LaunchedEffect(activeCards.size) {
         if (activeCards.isNotEmpty()) {
@@ -71,11 +76,12 @@ fun WorkspaceOverlay(
         // Contenido de fondo (lista de tablas)
         backgroundContent()
         
-        // TopSheet si hay cards activas
+        // TopSheet si hay cards activas (dual-layer: base + frame decorativo)
         if (workspaceState != WorkspaceState.Collapsed && activeCards.isNotEmpty()) {
             val selectedCard = activeCards.getOrNull(selectedCardIndex)
             
             selectedCard?.let { card ->
+                // Capa 1: TopSheet base con contenido (rectangular)
                 TopSheet(
                     isExpanded = isCardExpanded,
                     onExpandedChange = { expanded ->
@@ -86,6 +92,10 @@ fun WorkspaceOverlay(
                             workspaceManager.peek()
                         }
                     },
+                    onProgressChange = { progress, dragging ->
+                        expansionProgress = progress
+                        isDragging = dragging
+                    },
                     modifier = Modifier.fillMaxSize()
                 ) {
                     WorkspaceCardContent(
@@ -94,6 +104,13 @@ fun WorkspaceOverlay(
                         onClose = { workspaceManager.closeCard(selectedCardIndex) }
                     )
                 }
+                
+                // Capa 2: TopSheetFrame decorativo con escalón (baja más rápido)
+                TopSheetFrame(
+                    expansionProgress = expansionProgress,
+                    isDragging = isDragging,
+                    modifier = Modifier.fillMaxSize()
+                )
             }
         }
     }
