@@ -124,12 +124,12 @@ fun TopSheetFrame(
                 .align(Alignment.TopCenter)
                 .statusBarsPadding(),
             shape = StepNotchShape(
-                stepWidthFraction = 0.25f,
+                stepWidthFraction = 0.4f,
                 stepHeightDp = 60f,
                 cornerRadiusDp = cornerRadius
             ),
-            tonalElevation = 12.dp,
-            shadowElevation = 16.dp,
+            tonalElevation = 1.dp,
+            shadowElevation = 2.dp,
             color = MaterialTheme.colorScheme.surface
         ) {
             // Contenido real de la workspace card
