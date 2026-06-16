@@ -81,7 +81,7 @@ fun WorkspaceOverlay(
             val selectedCard = activeCards.getOrNull(selectedCardIndex)
             
             selectedCard?.let { card ->
-                // Capa 1: TopSheet base con contenido (rectangular)
+                // Capa 1: TopSheet base VACÍO (rectangular, fondo/sombra)
                 TopSheet(
                     isExpanded = isCardExpanded,
                     onExpandedChange = { expanded ->
@@ -98,18 +98,17 @@ fun WorkspaceOverlay(
                     },
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    WorkspaceCardContent(
-                        card = card,
-                        isExpanded = isCardExpanded,
-                        onClose = { workspaceManager.closeCard(selectedCardIndex) }
-                    )
+                    // Vacío - solo backdrop/fondo
                 }
                 
-                // Capa 2: TopSheetFrame decorativo con escalón (baja más rápido)
+                // Capa 2: TopSheetFrame CON CONTENIDO (escalón, baja más rápido)
                 TopSheetFrame(
                     expansionProgress = expansionProgress,
                     isDragging = isDragging,
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxSize(),
+                    card = card,
+                    isExpanded = isCardExpanded,
+                    onClose = { workspaceManager.closeCard(selectedCardIndex) }
                 )
             }
         }
@@ -122,7 +121,7 @@ fun WorkspaceOverlay(
  * Muestra solo título cuando está minimizada, contenido completo cuando expandida.
  */
 @Composable
-private fun WorkspaceCardContent(
+internal fun WorkspaceCardContent(
     card: WorkspaceCard,
     isExpanded: Boolean,
     onClose: () -> Unit,

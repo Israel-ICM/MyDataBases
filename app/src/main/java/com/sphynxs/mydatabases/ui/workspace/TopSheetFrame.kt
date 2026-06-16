@@ -3,6 +3,7 @@ package com.sphynxs.mydatabases.ui.workspace
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -27,13 +28,16 @@ import androidx.compose.foundation.layout.statusBars
 import kotlin.math.roundToInt
 
 /**
- * TopSheet Frame - Capa decorativa con forma de escalón que baja más rápido que el TopSheet base.
+ * TopSheet Frame - Capa CON CONTENIDO que tiene forma de escalón y baja más rápido que el TopSheet base.
  * 
- * Se posiciona ENCIMA del TopSheet base y "persigue" al contenido con velocidad mayor,
+ * Se posiciona ENCIMA del TopSheet base vacío y contiene el contenido real (tabla, query, etc.),
  * creando un efecto de reveal progresivo donde ambas capas terminan alineadas al expandirse.
  * 
  * @param expansionProgress Progreso de expansión del TopSheet base (0.0 = minimizado, 1.0 = expandido)
  * @param isDragging Si el usuario está arrastrando activamente
+ * @param card WorkspaceCard con los datos a mostrar
+ * @param isExpanded Si el frame está expandido (muestra contenido completo)
+ * @param onClose Callback cuando se cierra la card
  * @param speedMultiplier Multiplicador de velocidad respecto al base (ej: 1.5 = baja 50% más rápido)
  * @param peekHeight Altura peek del TopSheet base (para sincronizar posiciones)
  */
@@ -41,6 +45,9 @@ import kotlin.math.roundToInt
 fun TopSheetFrame(
     expansionProgress: Float,
     isDragging: Boolean,
+    card: WorkspaceCard,
+    isExpanded: Boolean,
+    onClose: () -> Unit,
     modifier: Modifier = Modifier,
     speedMultiplier: Float = 1.8f,
     peekHeight: Dp = 60.dp
@@ -123,10 +130,20 @@ fun TopSheetFrame(
             ),
             tonalElevation = 12.dp,
             shadowElevation = 16.dp,
-            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.95f)
+            color = MaterialTheme.colorScheme.surface
         ) {
-            // Frame vacío - solo decoración
-            Box(modifier = Modifier.statusBarsPadding())
+            // Contenido real de la workspace card
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .statusBarsPadding()
+            ) {
+                WorkspaceCardContent(
+                    card = card,
+                    isExpanded = isExpanded,
+                    onClose = onClose
+                )
+            }
         }
     }
 }
