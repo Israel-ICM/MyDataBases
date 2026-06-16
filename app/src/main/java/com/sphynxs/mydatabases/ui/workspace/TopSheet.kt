@@ -118,8 +118,9 @@ fun TopSheet(
     
     val displayOffset = animatedOffset
     
-    // Calcular el progreso de expansión (0 = minimizado, 1 = expandido)
-    val expansionProgress = ((displayOffset - collapsedOffsetPx) / (-collapsedOffsetPx)).coerceIn(0f, 1f)
+    // Calcular el progreso de expansión desde rawOffset (inmediato, sin lag de animación)
+    // Esto asegura que el callback reciba el progreso REAL durante el drag
+    val expansionProgress = ((rawOffset - collapsedOffsetPx) / (-collapsedOffsetPx)).coerceIn(0f, 1f)
     
     // Notificar progreso al callback
     LaunchedEffect(expansionProgress, isDragging) {
