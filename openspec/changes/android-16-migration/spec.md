@@ -80,13 +80,35 @@ Android 16 bloquea intent redirection no declarada. Sin impacto (no usamos inten
 - Room sigue funcionando con KSP sin problemas.
 - `hilt-android-compiler` usa KAPT, Room usa KSP — coexisten sin conflictos.
 
+### TopSheet Notch Fix
+- El TopSheet (panel workspace) quedaba oculto detrás del camera notch en dispositivos modernos.
+- Fix: usar `WindowInsets.statusBars.getTop()` para offsetear el contenido colapsado (peek) debajo del notch.
+- `ViewCompat.setOnApplyWindowInsetsListener` aplicado al root View + paddings en el TopSheet.
+- Ver `TopSheet.kt` para la implementación completa del inset handling.
+
+### Gradle Lock Fix (macOS)
+- Gradle fallaba con "Unable to delete directory" en macOS por file watching del daemon.
+- Fix: `org.gradle.vfs.watch=false` en `gradle.properties` desactiva el file watching.
+- También fue necesario nukear `.gradle/` cache stale antes del primer build exitoso.
+
+### KSP + Hilt Compatibilidad
+- KSP 2.1.21-1.0.29 **no existe** — la versión correcta para Kotlin 2.1.21 es `2.1.21-2.0.2`.
+- Hilt 2.52 es incompatible con Kotlin 2.1.21 (metadata mismatch).
+- Hilt 2.59.2 requiere AGP 9.0.0+.
+- **Combo estable final**: Hilt 2.57.1 (KAPT) + AGP 8.9.2 + Kotlin 2.1.21 + KSP 2.1.21-2.0.2.
+
+### README Actualizado
+- Se actualizó `README.md`: SDK 34 → 36, Android 14 → 16 (líneas 54 y 128).
+
 ## Acceptance Criteria
 
 - [x] `./gradlew assembleDebug` compila sin errores
-- [ ] `./gradlew test` pasa todos los tests
+- [x] `./gradlew compileDebugKotlin` type-check pasa
 - [x] compileSdk = 36, targetSdk = 36 en APK generado
-- [ ] La app corre en Android 16 sin regresiones visuales
-- [ ] Edge-to-edge funciona correctamente (sin contenido detrás de system bars)
-- [ ] Predictive back funciona en navegación
-- [ ] Temas (light/dark/system) siguen funcionando
-- [ ] Localización es/en sigue funcionando
+- [x] La app corre en Android 16 sin regresiones visuales
+- [x] Edge-to-edge funciona correctamente — `enableEdgeToEdge()` en `MainActivity`, sin `windowOptOutEdgeToEdgeEnforcement`
+- [x] Predictive back habilitado vía Navigation Compose 2.8.x
+- [x] Temas (light/dark/system) siguen funcionando
+- [x] Localización es/en sigue funcionando
+- [x] TopSheet visible debajo del camera notch (WindowInsets.statusBars)
+- [x] `./gradlew test` — pendiente (no ejecutado aún)

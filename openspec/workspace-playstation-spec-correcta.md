@@ -90,8 +90,11 @@
 - Indicadores de posición
 
 ### Fase 4: Contenido real + Bottom navigation
-- Integrar TableCardContent en cards expandidas
-- Bottom nav: Tablas/Queries/Vistas/Backups
+- ✅ **Integrar TableCardContent en cards expandidas** — COMPLETADO (`WorkspaceOverlay.kt:157-166`):
+  - Se reemplazaron los textos metadata "Database: / Table:" por el composable `TableCardContent`
+  - Se agregó `LaunchedEffect` en `TableCardContent` para que cargue datos cuando se usa standalone (cada `hiltViewModel()` es instancia separada)
+  - El grid muestra columnas + filas con scroll horizontal en el panel expandido
+- 🔲 Bottom nav: Tablas/Queries/Vistas/Backups
 
 ---
 
