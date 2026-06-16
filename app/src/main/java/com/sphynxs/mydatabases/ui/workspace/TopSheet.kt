@@ -18,7 +18,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -73,13 +76,19 @@ fun TopSheet(
     val density = LocalDensity.current
     val peekHeightPx = with(density) { peekHeight.toPx() }
     
+    // Altura de la barra de estado (cámara/notch incluido)
+    val statusBarHeightPx = with(density) { WindowInsets.statusBars.getTop(density).toFloat() }
+    
     // Altura del panel: 92% de la pantalla
     val screenHeightDp = configuration.screenHeightDp.dp
     val sheetHeight = screenHeightDp * 0.92f
     val sheetHeightPx = with(density) { sheetHeight.toPx() }
     
+    // Offset colapsado: el sheet se esconde dejando solo peekHeight visible DEBAJO de la barra de estado
+    val collapsedOffsetPx = -sheetHeightPx + peekHeightPx + statusBarHeightPx
+    
     // Target offset según estado
-    val targetOffset = if (isExpanded) 0f else -sheetHeightPx + peekHeightPx
+    val targetOffset = if (isExpanded) 0f else collapsedOffsetPx
     
     // Offset actual que sigue el dedo o anima
     var rawOffset by remember { mutableFloatStateOf(targetOffset) }
@@ -108,9 +117,7 @@ fun TopSheet(
     val displayOffset = animatedOffset
     
     // Calcular el progreso de expansión (0 = minimizado, 1 = expandido)
-    // Minimizado: offset = -sheetHeightPx + peekHeightPx (negativo grande)
-    // Expandido: offset = 0
-    val expansionProgress = ((displayOffset - (-sheetHeightPx + peekHeightPx)) / (sheetHeightPx - peekHeightPx)).coerceIn(0f, 1f)
+    val expansionProgress = ((displayOffset - collapsedOffsetPx) / (-collapsedOffsetPx)).coerceIn(0f, 1f)
     
     // Alpha del backdrop proporcional al progreso (0 cuando minimizado, 0.5 cuando expandido)
     val backdropAlpha = expansionProgress * 0.5f
@@ -145,11 +152,12 @@ fun TopSheet(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
+                    .statusBarsPadding()
                     .draggable(
                         state = rememberDraggableState { delta ->
                             accumulatedDrag += delta
                             // Actualizar rawOffset directamente - sigue el dedo sin animación
-                            rawOffset = (rawOffset + delta).coerceIn(-sheetHeightPx + peekHeightPx, 100f)
+                            rawOffset = (rawOffset + delta).coerceIn(collapsedOffsetPx, 100f)
                         },
                         orientation = Orientation.Vertical,
                         onDragStarted = {
@@ -171,7 +179,7 @@ fun TopSheet(
                                 rawOffset = 0f // Animar a expandido
                             } else if (shouldCollapse) {
                                 onExpandedChange(false)
-                                rawOffset = -sheetHeightPx + peekHeightPx // Animar a colapsado
+                                rawOffset = collapsedOffsetPx // Animar a colapsado
                             } else {
                                 // No cambió estado - volver a la posición original
                                 rawOffset = targetOffset
