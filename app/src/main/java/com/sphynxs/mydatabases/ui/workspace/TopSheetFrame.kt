@@ -53,24 +53,24 @@ fun TopSheetFrame(
     val sheetHeight = screenHeightDp * 0.92f
     val sheetHeightPx = with(density) { sheetHeight.toPx() }
     
-    // Extra hidden: el frame empieza MÁS arriba que el base
-    // Calculamos cuánto extra debe estar oculto para que llegue justo cuando base está en 1.0
-    val extraHiddenPx = sheetHeightPx * (speedMultiplier - 1f)
-    
     // Offset colapsado del base (referencia)
     val baseCollapsedOffsetPx = -sheetHeightPx + peekHeightPx + statusBarHeightPx
-    
-    // Offset colapsado del frame (más arriba que el base)
-    val frameCollapsedOffsetPx = baseCollapsedOffsetPx - extraHiddenPx
     
     // Offset expandido (mismo que el base: 0)
     val frameExpandedOffsetPx = 0f
     
-    // Progress acelerado del frame
-    val frameProgress = (expansionProgress * speedMultiplier).coerceIn(0f, 1f)
+    // Distancia total que el BASE recorre
+    val baseTravelDistance = frameExpandedOffsetPx - baseCollapsedOffsetPx // positivo
     
-    // Offset target calculado con el progress acelerado
-    val targetOffset = frameCollapsedOffsetPx + (frameExpandedOffsetPx - frameCollapsedOffsetPx) * frameProgress
+    // El frame recorre MÁS distancia (speedMultiplier veces) en el MISMO tiempo
+    val frameTravelDistance = baseTravelDistance * speedMultiplier
+    
+    // Offset colapsado del frame: empieza MÁS arriba (más oculto)
+    val frameCollapsedOffsetPx = frameExpandedOffsetPx - frameTravelDistance
+    
+    // El frame usa el MISMO expansionProgress que el base (0.0 -> 1.0)
+    // pero recorre más distancia, por eso se ve más rápido
+    val targetOffset = frameCollapsedOffsetPx + frameTravelDistance * expansionProgress
     
     // Animación (0ms durante drag, 300ms al soltar)
     val animatedOffset by animateFloatAsState(
