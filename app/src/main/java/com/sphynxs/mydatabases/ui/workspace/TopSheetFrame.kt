@@ -10,7 +10,11 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -72,9 +76,23 @@ fun TopSheetFrame(
     // pero recorre más distancia, por eso se ve más rápido
     val targetOffset = frameCollapsedOffsetPx + frameTravelDistance * expansionProgress
     
+    // Raw offset que se actualiza directamente durante drag (sin animación)
+    var rawOffset by remember { mutableFloatStateOf(targetOffset) }
+    
+    // Sincronizar rawOffset cuando expansionProgress cambia
+    LaunchedEffect(expansionProgress, isDragging) {
+        if (isDragging) {
+            // Durante drag: actualizar inmediatamente (sigue al base sin delay)
+            rawOffset = targetOffset
+        } else {
+            // Al soltar: animar suavemente
+            rawOffset = targetOffset
+        }
+    }
+    
     // Animación (0ms durante drag, 300ms al soltar)
     val animatedOffset by animateFloatAsState(
-        targetValue = targetOffset,
+        targetValue = rawOffset,
         animationSpec = if (isDragging) {
             TweenSpec(durationMillis = 0)
         } else {
