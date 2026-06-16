@@ -153,29 +153,18 @@ private fun WorkspaceCardContent(
                 modifier = Modifier.padding(top = 8.dp)
             )
             
-            // Datos específicos si es una tabla
+            // Contenido según tipo de card
             when (card) {
                 is WorkspaceCard.Table -> {
-                    Text(
-                        text = "Database: ${card.databaseName}",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(top = 4.dp)
-                    )
-                    Text(
-                        text = "Table: ${card.tableName}",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(top = 2.dp)
+                    TableCardContent(
+                        databaseName = card.databaseName,
+                        tableName = card.tableName,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(top = 12.dp)
                     )
                 }
             }
-            
-            // TODO: Fase 2 - Mostrar contenido real según card type
-            // - TABLE: TableCardContent
-            // - QUERY: QueryEditor
-            // - VIEW: ViewContent
-            // etc.
         }
     }
 }

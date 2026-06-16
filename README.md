@@ -51,7 +51,7 @@ core-designsystem/            # Tema Material 3
 
 - Android Studio Hedgehog | 2023.1.1 o superior
 - JDK 17
-- Android SDK 34
+- Android SDK 36
 - Gradle 8.2+
 
 ### Configuración
@@ -126,4 +126,4 @@ Este proyecto sigue estándares estrictos de calidad. Consulta `.atl/standards/`
 **Empresa**: Sphynxs  
 **Versión**: 1.0.0  
 **Min SDK**: 29 (Android 10)  
-**Target SDK**: 34 (Android 14)
+**Target SDK**: 36 (Android 16)

@@ -65,8 +65,9 @@ fun TableCardContent(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    // NO cargar aquí - TableViewerScreen ya lo hace con su LaunchedEffect
-    // Este composable solo renderiza el estado actual del ViewModel
+    LaunchedEffect(databaseName, tableName) {
+        viewModel.loadTable(databaseName, tableName)
+    }
 
     when (val state = uiState) {
         is TableViewerUiState.Loading -> {
