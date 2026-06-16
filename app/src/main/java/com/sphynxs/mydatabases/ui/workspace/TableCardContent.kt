@@ -40,6 +40,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -142,26 +144,58 @@ private fun RowsContent(
 ) {
     val scrollState = rememberScrollState()
     val borderColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+    val configuration = LocalConfiguration.current
+    val density = LocalDensity.current
     
     // Estado de celda seleccionada (rowIndex, columnName, valor)
     var selectedCell by remember { mutableStateOf<Triple<Int, String, String?>?>(null) }
     
-    // Estado de zoom (escala visual)
+    // Estado de zoom (escala visual) y offset
     var scale by remember { mutableStateOf(1f) }
+    var offsetX by remember { mutableStateOf(0f) }
+    
+    // Calcular límite de zoom out
+    // Ancho total tabla = columnas * 150dp
+    val tableWidthPx = with(density) { (150.dp * columns.size).toPx() }
+    val screenWidthPx = with(density) { configuration.screenWidthDp.dp.toPx() }
+    
+    // minScale = cuando la tabla escalada cabe exactamente en la pantalla
+    val minScale = (screenWidthPx / tableWidthPx).coerceIn(0.3f, 1f)
+    
+    // Calcular límites de offset según el zoom actual
+    // Cuando scale < 1, la tabla es más pequeña que su tamaño original
+    val scaledTableWidth = tableWidthPx * scale
+    val maxOffsetX = if (scaledTableWidth < screenWidthPx) {
+        // Si la tabla escalada cabe completa, centrarla
+        (screenWidthPx - scaledTableWidth) / 2f
+    } else {
+        0f // Borde izquierdo pegado a la pantalla
+    }
+    val minOffsetX = if (scaledTableWidth < screenWidthPx) {
+        maxOffsetX // Centrada
+    } else {
+        screenWidthPx - scaledTableWidth // Borde derecho pegado a la pantalla
+    }
     
     Box(modifier = modifier) {
         Column(
             modifier = Modifier
                 .horizontalScroll(scrollState)
-                .pointerInput(Unit) {
+                .pointerInput(minScale) {
                     awaitEachGesture {
                         awaitFirstDown(requireUnconsumed = false)
                         do {
                             val event = awaitPointerEvent()
                             val zoom = event.calculateZoom()
+                            val pan = event.calculatePan()
                             
                             if (zoom != 1f) {
-                                scale = (scale * zoom).coerceIn(0.5f, 2.5f)
+                                scale = (scale * zoom).coerceIn(minScale, 2.5f)
+                                event.changes.forEach { it.consume() }
+                            }
+                            
+                            if (pan.x != 0f) {
+                                offsetX = (offsetX + pan.x).coerceIn(minOffsetX, maxOffsetX)
                                 event.changes.forEach { it.consume() }
                             }
                         } while (event.changes.any { it.pressed })
@@ -170,7 +204,8 @@ private fun RowsContent(
                 .graphicsLayer {
                     scaleX = scale
                     scaleY = scale
-                    transformOrigin = androidx.compose.ui.graphics.TransformOrigin.Center
+                    translationX = offsetX
+                    transformOrigin = androidx.compose.ui.graphics.TransformOrigin(0f, 0f)
                 }
         ) {
         // Header row estilo Excel
