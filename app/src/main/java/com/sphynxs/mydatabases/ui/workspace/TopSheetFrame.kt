@@ -7,7 +7,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.TableChart
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -25,6 +30,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.ui.draw.alpha
 import kotlin.math.roundToInt
 
 /**
@@ -132,18 +138,60 @@ fun TopSheetFrame(
             shadowElevation = 2.dp,
             color = MaterialTheme.colorScheme.surface
         ) {
-            // Contenido real de la workspace card
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .statusBarsPadding()
             ) {
-                WorkspaceCardContent(
-                    card = card,
-                    isExpanded = isExpanded,
-                    onClose = onClose
-                )
+                // Contenido real de la workspace card con fade in
+                Box(modifier = Modifier.alpha(expansionProgress)) {
+                    WorkspaceCardContent(
+                        card = card,
+                        isExpanded = isExpanded,
+                        onClose = onClose
+                    )
+                }
             }
         }
+        
+        // Ícono en el escalón con fade in (posicionado sobre el Surface sin padding)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(sheetHeight)
+                .offset { IntOffset(0, animatedOffset.roundToInt()) }
+                .align(Alignment.TopCenter)
+        ) {
+            StepIcon(
+                card = card,
+                alpha = expansionProgress,
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(start = configuration.screenWidthDp.dp * 0.18f, bottom = 24.dp)
+            )
+        }
     }
+}
+
+/**
+ * Ícono en el escalón del TopSheet que indica el tipo de workspace card.
+ */
+@Composable
+private fun StepIcon(
+    card: WorkspaceCard,
+    alpha: Float,
+    modifier: Modifier = Modifier
+) {
+    val icon = when (card) {
+        is WorkspaceCard.Table -> Icons.Default.TableChart
+        // Future: Query -> Icons.Default.Code
+        // Future: Editor -> Icons.Default.Edit
+    }
+    
+    Icon(
+        imageVector = icon,
+        contentDescription = card.title,
+        tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f * alpha),
+        modifier = modifier.size(24.dp)
+    )
 }
