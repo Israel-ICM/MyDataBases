@@ -1,9 +1,11 @@
 package com.sphynxs.mydatabases.ui.screens.connections
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,13 +13,18 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.painterResource
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -39,6 +46,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -52,8 +60,8 @@ import com.sphynxs.mydatabases.ui.components.EmptyState
 import com.sphynxs.mydatabases.ui.components.ErrorCard
 import com.sphynxs.mydatabases.ui.components.ios.IOSGroupedCard
 import com.sphynxs.mydatabases.ui.components.ios.IOSListItem
-import com.sphynxs.mydatabases.ui.components.skeleton.ConnectionListSkeleton
 import com.sphynxs.mydatabases.ui.theme.DbAccents
+import com.sphynxs.mydatabases.ui.components.skeleton.ConnectionListSkeleton
 import kotlinx.coroutines.launch
 
 /**
@@ -86,6 +94,10 @@ fun ConnectionsListScreen(
     // Estado para el diálogo de confirmación de eliminación
     var connectionToDelete by remember { mutableStateOf<com.sphynxs.mydatabases.core.database.models.ConnectionConfig?>(null) }
     
+    // Estado para el bottom sheet del selector de tipo
+    var showTypeSelectorSheet by remember { mutableStateOf(false) }
+    val typeSelectorSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    
     // Estado para el bottom sheet del formulario
     var showFormSheet by remember { mutableStateOf(false) }
     var editingConnectionId by remember { mutableStateOf<String?>(null) }
@@ -96,7 +108,19 @@ fun ConnectionsListScreen(
 
     Scaffold(
         modifier = modifier.background(Color(0xFFF2F2F7)),
-        snackbarHost = { SnackbarHost(snackbarHostState) }
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        floatingActionButton = {
+            if (uiState is ConnectionsUiState.Success) {
+                FloatingActionButton(
+                    onClick = {
+                        showTypeSelectorSheet = true
+                        scope.launch { typeSelectorSheetState.show() }
+                    }
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = "Add connection")
+                }
+            }
+        }
     ) { paddingValues ->
         when (uiState) {
             is ConnectionsUiState.Loading -> {
@@ -106,63 +130,79 @@ fun ConnectionsListScreen(
             is ConnectionsUiState.Success -> {
                 val connections = (uiState as ConnectionsUiState.Success).connections
 
-                // Agrupar conexiones por tipo
-                val groupedConnections = DatabaseType.entries.associateWith { type ->
-                    connections.filter { it.type == type }
-                }
+                if (connections.isEmpty()) {
+                    EmptyState(
+                        icon = painterResource(R.drawable.ic_state_empty_connections),
+                        title = "No connections",
+                        description = "Tap + to add your first database connection",
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues)
+                    )
+                } else {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color(0xFFF2F2F7))
+                            .padding(paddingValues)
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        item {
+                            Text(
+                                "CONNECTIONS",
+                                fontSize = 13.sp,
+                                color = Color(0xFF8E8E93),
+                                modifier = Modifier.padding(start = 16.dp, bottom = 8.dp)
+                            )
+                        }
 
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color(0xFFF2F2F7))
-                        .padding(paddingValues)
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    item {
-                        Text(
-                            "BASES DE DATOS",
-                            fontSize = 13.sp,
-                            color = Color(0xFF8E8E93),
-                            modifier = Modifier.padding(start = 16.dp, bottom = 8.dp)
-                        )
-                    }
-
-                    items(DatabaseType.entries) { type ->
-                        DatabaseTypeCard(
-                            type = type,
-                            connections = groupedConnections[type] ?: emptyList(),
-                            onConnectionClick = { connectionId ->
-                                scope.launch {
-                                    val result = viewModel.connect(connectionId)
-                                    result.fold(
-                                        onSuccess = { onConnect(connectionId) },
-                                        onFailure = { error ->
-                                            snackbarHostState.showSnackbar(
-                                                message = "Error al conectar: ${error.message}",
-                                                duration = SnackbarDuration.Long
+                        items(connections) { connection ->
+                            IOSGroupedCard {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    IOSListItem(
+                                        title = connection.name,
+                                        subtitle = "${connection.type.displayName} • ${connection.host}:${connection.port}",
+                                        leadingIcon = {
+                                            Icon(
+                                                painter = painterResource(AppIcons.Db.icon(connection.type)),
+                                                contentDescription = null,
+                                                tint = DbAccents.accentFor(connection.type),
+                                                modifier = Modifier.size(32.dp)
                                             )
+                                        },
+                                        showChevron = false,
+                                        modifier = Modifier.weight(1f),
+                                        onClick = {
+                                            scope.launch {
+                                                val result = viewModel.connect(connection.id)
+                                                result.fold(
+                                                    onSuccess = { onConnect(connection.id) },
+                                                    onFailure = { error ->
+                                                        snackbarHostState.showSnackbar(
+                                                            message = "Error: ${error.message}",
+                                                            duration = SnackbarDuration.Long
+                                                        )
+                                                    }
+                                                )
+                                            }
                                         }
                                     )
-                                }
-                            },
-                            onEditConnection = { connectionId ->
-                                editingConnectionId = connectionId
-                                preselectedType = null  // Permitir ver el tipo al editar
-                                showFormSheet = true
-                                scope.launch {
-                                    formSheetState.expand()
-                                }
-                            },
-                            onAddConnection = { selectedType ->
-                                preselectedType = selectedType
-                                editingConnectionId = null
-                                showFormSheet = true
-                                scope.launch {
-                                    formSheetState.expand()
+                                    
+                                    IconButton(onClick = {
+                                        editingConnectionId = connection.id
+                                        preselectedType = null
+                                        showFormSheet = true
+                                        scope.launch { formSheetState.expand() }
+                                    }) {
+                                        Icon(Icons.Default.Edit, contentDescription = "Edit")
+                                    }
                                 }
                             }
-                        )
+                        }
                     }
                 }
             }
@@ -234,6 +274,52 @@ fun ConnectionsListScreen(
         }
     }
     
+    // Bottom Sheet selector de tipo de DB
+    if (showTypeSelectorSheet) {
+        ModalBottomSheet(
+            onDismissRequest = {
+                scope.launch {
+                    typeSelectorSheetState.hide()
+                    showTypeSelectorSheet = false
+                }
+            },
+            sheetState = typeSelectorSheetState,
+            containerColor = Color(0xFFF2F2F7)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text(
+                    text = "Select Database Type",
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                
+                DatabaseType.entries.forEach { type ->
+                    DatabaseTypeSelectorCard(
+                        type = type,
+                        onClick = {
+                            scope.launch {
+                                typeSelectorSheetState.hide()
+                                showTypeSelectorSheet = false
+                                preselectedType = type
+                                editingConnectionId = null
+                                showFormSheet = true
+                                formSheetState.expand()
+                            }
+                        }
+                    )
+                }
+                
+                Spacer(modifier = Modifier.height(32.dp))
+            }
+        }
+    }
+    
     // Bottom Sheet del formulario
     if (showFormSheet) {
         val configuration = LocalConfiguration.current
@@ -272,5 +358,63 @@ fun ConnectionsListScreen(
     }
 }
 
+/**
+ * Card para seleccionar tipo de base de datos.
+ */
+@Composable
+private fun DatabaseTypeSelectorCard(
+    type: DatabaseType,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    androidx.compose.material3.Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .clickable(onClick = onClick),
+        tonalElevation = 2.dp,
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                painter = painterResource(AppIcons.Db.icon(type)),
+                contentDescription = null,
+                tint = DbAccents.accentFor(type),
+                modifier = Modifier.size(48.dp)
+            )
+            
+            Spacer(modifier = Modifier.size(16.dp))
+            
+            Column {
+                Text(
+                    text = type.displayName,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Text(
+                    text = getDescriptionForType(type),
+                    fontSize = 14.sp,
+                    color = Color(0xFF8E8E93)
+                )
+            }
+        }
+    }
+}
 
+/**
+ * Descripción para cada tipo de DB.
+ */
+private fun getDescriptionForType(type: DatabaseType): String {
+    return when (type) {
+        DatabaseType.MYSQL -> "Popular open-source relational database"
+        DatabaseType.POSTGRESQL -> "Advanced open-source relational database"
+        DatabaseType.SQLITE -> "Lightweight embedded database"
+        DatabaseType.MARIADB -> "MySQL-compatible database server"
+    }
+}
 

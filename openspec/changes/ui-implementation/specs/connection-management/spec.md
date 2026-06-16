@@ -4,27 +4,43 @@
 
 CRUD UI for database connections with encrypted credential persistence (Room + Android Keystore), test-connection flow, and a typed form for host, port, user, password, database, and SSH tunnel toggle.
 
+**UI Pattern**: Flat list of all connections + FAB with type selector bottom sheet.
+
 ## Requirements
 
 ### Requirement: Connections List
 
-The system MUST display all saved connections in a `LazyColumn` showing alias, host, and engine. An empty-state SHALL invite the user to create the first connection.
+The system MUST display all saved connections in a flat `LazyColumn` (no accordion grouping) showing connection name, type, host:port. Each item MUST show the database type icon with accent color and an edit button. An empty-state SHALL invite the user to tap the FAB to create the first connection.
 
 #### Scenario: Empty state
 
 - GIVEN no saved connections
 - WHEN the user opens the Connections screen
-- THEN an empty-state message and a "New connection" CTA are shown
+- THEN an empty-state message "No connections" and "Tap + to add your first database connection" are shown
+- AND a FAB with + icon is visible
 
 #### Scenario: List rendering
 
-- GIVEN three saved connections
+- GIVEN three saved connections (MySQL, PostgreSQL, MongoDB)
 - WHEN the screen renders
-- THEN all three items are visible with alias, host:port, and engine badge
+- THEN all three items are visible in a flat list
+- AND each shows: type icon (colored), connection name, "TYPE • host:port" subtitle, and edit button
+- AND connections are NOT grouped by type
+
+#### Scenario: Add connection via FAB
+
+- GIVEN the user is on the Connections list
+- WHEN the user taps the FAB
+- THEN a BottomSheet opens showing all 4 database types as cards (MySQL, PostgreSQL, SQLite, MariaDB)
+- AND each card shows: type icon (48dp, colored), type name (bold), and description
+- WHEN the user taps a type card
+- THEN the type selector closes AND the connection form opens with that type preselected
 
 ### Requirement: Create / Edit Connection
 
-The form MUST accept: alias (required), engine (MySQL or MariaDB), host (required), port (required, 1–65535), user (required), password (required), database (optional), SSH tunnel toggle. Validation errors MUST display inline.
+The form MUST accept: name (required), type (4 types: MySQL, PostgreSQL, SQLite, MariaDB), host (required), port (required, 1–65535), user (required), password (required), database (optional), SSH tunnel toggle. Validation errors MUST display inline.
+
+When creating via FAB → type selector, the type field is preselected and immutable. When editing, the type field shows current value and is editable.
 
 #### Scenario: Valid create
 
@@ -102,9 +118,29 @@ The id of the last successfully connected connection SHALL be stored in DataStor
 - WHEN the user opens the Connections screen
 - THEN item 7 is visually marked as "last used"
 
+## UI Components
+
+### DatabaseTypeSelectorCard
+
+A card composable for the type selector BottomSheet:
+- **Icon**: Type icon, 48dp, colored with `DbAccents.getColorFor(type)`
+- **Title**: `type.displayName`, 18sp, SemiBold
+- **Description**: Short description of the database (e.g., "Popular open-source relational database" for MySQL)
+- **Interaction**: Full card clickable, closes BottomSheet and opens form with preselected type
+
+### IOSListItem (for connection list)
+
+Reuses existing iOS-style list item:
+- **Leading icon**: Type icon, 32dp, colored
+- **Title**: Connection name
+- **Subtitle**: "TYPE • host:port"
+- **Trailing**: Edit IconButton
+- **Click**: Connects to the database
+
 ## Non-Functional
 
 - **Security**: Master key alias MUST be unique per app install; key MUST NOT leave Keystore; key MUST be `AES256_GCM`.
 - **Performance**: List render MUST complete within 200ms for up to 100 connections.
 - **Testability**: Encryption round-trip MUST be covered by an integration test; ViewModel MUST be unit-testable with a fake `ConnectionRepository`.
 - **Accessibility**: All form fields MUST have associated labels and content descriptions in es and en.
+- **UX**: Type selector BottomSheet MUST show all 4 types (MySQL, PostgreSQL, SQLite, MariaDB); FAB MUST be visible when connections exist; empty state MUST guide user to FAB.
