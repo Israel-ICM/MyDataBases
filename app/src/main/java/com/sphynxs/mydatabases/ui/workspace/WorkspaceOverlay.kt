@@ -136,7 +136,7 @@ internal fun WorkspaceCardContent(
         Column(
             modifier = modifier
                 .fillMaxSize()
-                .padding(horizontal = 24.dp, vertical = 16.dp)
+                .padding(horizontal = 8.dp, vertical = 16.dp)
         ) {
             // Header de la card con botón cerrar
             Row(

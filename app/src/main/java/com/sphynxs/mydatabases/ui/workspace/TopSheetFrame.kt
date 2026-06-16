@@ -121,6 +121,10 @@ fun TopSheetFrame(
         label = "frameCornerRadius"
     )
     
+    // Shadow elevation progresiva: mayor cuando minimizado (arriba), menor cuando expandido (abajo)
+    val shadowElevation = (24f - (22f * expansionProgress)).dp // 24dp -> 2dp
+    val tonalElevation = (12f - (11f * expansionProgress)).dp  // 12dp -> 1dp
+    
     Box(modifier = modifier) {
         Surface(
             modifier = Modifier
@@ -134,14 +138,15 @@ fun TopSheetFrame(
                 stepHeightDp = 60f,
                 cornerRadiusDp = cornerRadius
             ),
-            tonalElevation = 1.dp,
-            shadowElevation = 2.dp,
+            tonalElevation = tonalElevation,
+            shadowElevation = shadowElevation,
             color = MaterialTheme.colorScheme.surface
         ) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .statusBarsPadding()
+                    .padding(bottom = 60.dp) // Espacio para el escalón
             ) {
                 // Contenido real de la workspace card con fade in
                 Box(modifier = Modifier.alpha(expansionProgress)) {

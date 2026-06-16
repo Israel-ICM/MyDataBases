@@ -1,5 +1,14 @@
 package com.sphynxs.mydatabases.ui.workspace
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.calculatePan
+import androidx.compose.foundation.gestures.calculateZoom
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,18 +22,28 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.sphynxs.mydatabases.R
@@ -113,12 +132,7 @@ fun TableCardContent(
 }
 
 /**
- * Rows content — grid de datos con scroll horizontal.
- *
- * Layout:
- * - Header row: Nombres de columnas (bold)
- * - Data rows: Valores de cada row
- * - Cada columna tiene width fijo de 150dp
+ * Rows content — tabla estilo Excel 2021 con edición.
  */
 @Composable
 private fun RowsContent(
@@ -126,51 +140,205 @@ private fun RowsContent(
     rows: List<Map<String, Any?>>,
     modifier: Modifier = Modifier
 ) {
-    LazyColumn(modifier = modifier) {
-        // Header row
-        item {
+    val scrollState = rememberScrollState()
+    val borderColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+    
+    // Estado de celda seleccionada (rowIndex, columnName, valor)
+    var selectedCell by remember { mutableStateOf<Triple<Int, String, String?>?>(null) }
+    
+    // Estado de zoom (escala visual)
+    var scale by remember { mutableStateOf(1f) }
+    
+    Box(modifier = modifier) {
+        Column(
+            modifier = Modifier
+                .horizontalScroll(scrollState)
+                .pointerInput(Unit) {
+                    awaitEachGesture {
+                        awaitFirstDown(requireUnconsumed = false)
+                        do {
+                            val event = awaitPointerEvent()
+                            val zoom = event.calculateZoom()
+                            
+                            if (zoom != 1f) {
+                                scale = (scale * zoom).coerceIn(0.5f, 2.5f)
+                                event.changes.forEach { it.consume() }
+                            }
+                        } while (event.changes.any { it.pressed })
+                    }
+                }
+                .graphicsLayer {
+                    scaleX = scale
+                    scaleY = scale
+                    transformOrigin = androidx.compose.ui.graphics.TransformOrigin.Center
+                }
+        ) {
+        // Header row estilo Excel
+        Surface(
+            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f),
+            tonalElevation = 2.dp
+        ) {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .horizontalScroll(rememberScrollState())
-                    .padding(8.dp)
+                modifier = Modifier.border(width = 1.dp, color = borderColor)
             ) {
                 columns.forEach { column ->
-                    Text(
-                        text = column,
-                        style = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.Bold,
+                    Box(
                         modifier = Modifier
                             .width(150.dp)
-                            .padding(horizontal = 4.dp)
-                    )
-                }
-            }
-            HorizontalDivider()
-        }
-
-        // Data rows
-        items(rows) { row ->
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .horizontalScroll(rememberScrollState())
-                    .padding(8.dp)
-            ) {
-                columns.forEach { column ->
-                    Text(
-                        text = row[column]?.toString() ?: "NULL",
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier
-                            .width(150.dp)
-                            .padding(horizontal = 4.dp)
-                    )
+                            .border(
+                                width = 0.5.dp,
+                                color = borderColor
+                            )
+                            .padding(horizontal = 8.dp, vertical = 10.dp)
+                    ) {
+                        Text(
+                            text = column,
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
                 }
             }
         }
 
-        item {
+        // Data rows con bordes estilo Excel
+        LazyColumn {
+            items(rows.size) { index ->
+                val row = rows[index]
+                val backgroundColor = if (index % 2 == 0) 
+                    MaterialTheme.colorScheme.surface
+                else 
+                    MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.15f)
+                
+                Row(
+                    modifier = Modifier
+                        .background(backgroundColor)
+                        .border(width = 0.5.dp, color = borderColor)
+                ) {
+                    columns.forEach { column ->
+                        val value = row[column]?.toString() ?: ""
+                        val isNull = row[column] == null
+                        val isSelected = selectedCell?.let { it.first == index && it.second == column } == true
+                        
+                        Box(
+                            modifier = Modifier
+                                .width(150.dp)
+                                .border(
+                                    width = if (isSelected) 2.dp else 0.5.dp, 
+                                    color = if (isSelected) MaterialTheme.colorScheme.primary else borderColor
+                                )
+                                .background(
+                                    if (isSelected) 
+                                        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f) 
+                                    else 
+                                        backgroundColor
+                                )
+                                .clickable {
+                                    selectedCell = Triple(index, column, if (isNull) null else value)
+                                }
+                                .padding(horizontal = 12.dp, vertical = 10.dp)
+                        ) {
+                            Text(
+                                text = if (isNull) "NULL" else value,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = if (isNull) 
+                                    MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
+                                else 
+                                    MaterialTheme.colorScheme.onSurface,
+                                fontWeight = FontWeight.Normal,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+                    }
+                }
+            }
+            
+            item {
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+        }
+        
+            }
+        }
+        
+        // Editor flotante (aparece cuando hay celda seleccionada)
+        selectedCell?.let { (rowIndex, columnName, currentValue) ->
+            CellEditor(
+                columnName = columnName,
+                value = currentValue ?: "",
+                onSave = { newValue ->
+                    // TODO: Guardar cambio en la base de datos
+                    selectedCell = null
+                },
+                onCancel = {
+                    selectedCell = null
+                }
+            )
+        }
+    }
+
+
+/**
+ * Editor flotante para editar una celda.
+ */
+@Composable
+private fun CellEditor(
+    columnName: String,
+    value: String,
+    onSave: (String) -> Unit,
+    onCancel: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var editedValue by remember { mutableStateOf(value) }
+    
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
+        tonalElevation = 8.dp,
+        shadowElevation = 16.dp
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text(
+                text = columnName,
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.primary
+            )
+            
+            Spacer(modifier = Modifier.height(12.dp))
+            
+            OutlinedTextField(
+                value = editedValue,
+                onValueChange = { editedValue = it },
+                modifier = Modifier.fillMaxWidth(),
+                label = { Text("Value") },
+                singleLine = false,
+                minLines = 3,
+                maxLines = 6
+            )
+            
             Spacer(modifier = Modifier.height(16.dp))
+            
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = androidx.compose.foundation.layout.Arrangement.End
+            ) {
+                OutlinedButton(onClick = onCancel) {
+                    Text("Cancel")
+                }
+                
+                Spacer(modifier = Modifier.width(8.dp))
+                
+                Button(onClick = { onSave(editedValue) }) {
+                    Text("Save")
+                }
+            }
         }
     }
 }
