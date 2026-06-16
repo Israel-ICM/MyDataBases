@@ -16,7 +16,7 @@
         android:roundIcon="@drawable/ic_launcher_foreground"
         android:supportsRtl="true"
         android:theme="@style/Theme.MyDataBases"
-        tools:targetApi="31">
+        tools:targetApi="36">
         
         <activity
             android:name=".MainActivity"
