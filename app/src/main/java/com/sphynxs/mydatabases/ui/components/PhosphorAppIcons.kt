@@ -1,14 +1,14 @@
 package com.sphynxs.mydatabases.ui.components
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.*
 import androidx.compose.ui.graphics.vector.ImageVector
+import compose.icons.TablerIcons
+import compose.icons.tablericons.*
 import com.sphynxs.mydatabases.core.database.engine.DatabaseType
 
 /**
- * Mapeo de íconos de la aplicación usando Material Icons Rounded.
+ * Mapeo de íconos de la aplicación usando Tabler Icons.
  *
- * Todos los íconos son minimalistas, modernos y con esquinas redondeadas.
+ * Todos los íconos son clean, minimal y consistentes.
  *
  * ## Uso
  *
@@ -29,24 +29,24 @@ object PhosphorAppIcons {
      * Íconos de navegación (BottomBar, Rail, Drawer).
      */
     object Nav {
-        val connections: ImageVector get() = Icons.Rounded.Dns  // Servidores/infraestructura
-        val settings: ImageVector get() = Icons.Rounded.Settings
-        val tables: ImageVector get() = Icons.Rounded.TableChart
-        val views: ImageVector get() = Icons.Rounded.Visibility
-        val editor: ImageVector get() = Icons.Rounded.Code
-        val functions: ImageVector get() = Icons.Rounded.Functions
-        val backup: ImageVector get() = Icons.Rounded.Save
+        val connections: ImageVector get() = TablerIcons.Server
+        val settings: ImageVector get() = TablerIcons.Settings
+        val tables: ImageVector get() = TablerIcons.Table
+        val views: ImageVector get() = TablerIcons.Eye
+        val editor: ImageVector get() = TablerIcons.Code
+        val functions: ImageVector get() = TablerIcons.Math
+        val backup: ImageVector get() = TablerIcons.DeviceFloppy
     }
     
     /**
      * Íconos de tipos de base de datos.
      */
     object Db {
-        val mysql: ImageVector get() = Icons.Rounded.Storage  // Cilindro de database
-        val postgres: ImageVector get() = Icons.Rounded.Storage
-        val sqlite: ImageVector get() = Icons.Rounded.Storage
-        val mariadb: ImageVector get() = Icons.Rounded.Storage
-        val sqlServer: ImageVector get() = Icons.Rounded.Storage
+        val mysql: ImageVector get() = TablerIcons.Database
+        val postgres: ImageVector get() = TablerIcons.Database
+        val sqlite: ImageVector get() = TablerIcons.Database
+        val mariadb: ImageVector get() = TablerIcons.Database
+        val sqlServer: ImageVector get() = TablerIcons.Database
         
         fun icon(type: DatabaseType): ImageVector = when (type) {
             DatabaseType.MYSQL -> mysql
@@ -60,21 +60,21 @@ object PhosphorAppIcons {
      * Íconos de estados (empty states, error states).
      */
     object State {
-        val emptyConnections: ImageVector get() = Icons.Rounded.Storage
-        val emptyTables: ImageVector get() = Icons.Rounded.FolderOpen
-        val error: ImageVector get() = Icons.Rounded.Warning
+        val emptyConnections: ImageVector get() = TablerIcons.Database
+        val emptyTables: ImageVector get() = TablerIcons.Folder
+        val error: ImageVector get() = TablerIcons.AlertTriangle
     }
     
     /**
      * Íconos de acciones comunes.
      */
     object Action {
-        val add: ImageVector get() = Icons.Rounded.Add
-        val edit: ImageVector get() = Icons.Rounded.Edit
-        val delete: ImageVector get() = Icons.Rounded.Delete
-        val search: ImageVector get() = Icons.Rounded.Search
-        val close: ImageVector get() = Icons.Rounded.Close
-        val check: ImageVector get() = Icons.Rounded.Check
-        val info: ImageVector get() = Icons.Rounded.Info
+        val add: ImageVector get() = TablerIcons.Plus
+        val edit: ImageVector get() = TablerIcons.Edit
+        val delete: ImageVector get() = TablerIcons.Trash
+        val search: ImageVector get() = TablerIcons.Search
+        val close: ImageVector get() = TablerIcons.X
+        val check: ImageVector get() = TablerIcons.Check
+        val info: ImageVector get() = TablerIcons.InfoCircle
     }
 }

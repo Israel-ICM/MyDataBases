@@ -80,6 +80,9 @@ dependencies {
     implementation("androidx.compose.material3:material3-window-size-class")
     implementation("androidx.compose.material:material-icons-extended")
     
+    // Tabler Icons - Clean and minimal icon library
+    implementation("br.com.devsrsouza.compose.icons:tabler-icons:1.1.0")
+    
     // Compose Navigation
     implementation("androidx.navigation:navigation-compose:2.8.6")
     
