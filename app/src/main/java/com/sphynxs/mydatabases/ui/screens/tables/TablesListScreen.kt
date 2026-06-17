@@ -27,8 +27,10 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.sphynxs.mydatabases.R
 import com.sphynxs.mydatabases.ui.components.AppIcons
+import com.sphynxs.mydatabases.ui.components.BreathingBackground
 import com.sphynxs.mydatabases.ui.components.EmptyState
 import com.sphynxs.mydatabases.ui.components.ErrorCard
+import com.sphynxs.mydatabases.ui.components.LoadingIndicator
 import com.sphynxs.mydatabases.ui.components.TableCard
 import com.sphynxs.mydatabases.ui.components.ios.IOSSearchBar
 import com.sphynxs.mydatabases.ui.components.skeleton.TableListSkeleton
@@ -78,19 +80,14 @@ fun TablesListScreen(
             is TablesUiState.Success -> {
                 val tables = (uiState as TablesUiState.Success).tables
                 
-                Column(
+                BreathingBackground(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(paddingValues)
-                        .background(
-                            brush = androidx.compose.ui.graphics.Brush.verticalGradient(
-                                colors = listOf(
-                                    DesignTokens.BackgroundGradientStart,
-                                    DesignTokens.BackgroundGradientEnd
-                                )
-                            )
-                        )
                 ) {
+                    Column(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
                     Spacer(modifier = Modifier.height(16.dp))
                     
                     // Título grande estilo iOS 26
@@ -147,6 +144,7 @@ fun TablesListScreen(
                         item {
                             Spacer(modifier = Modifier.height(80.dp))
                         }
+                    }
                     }
                 }
             }

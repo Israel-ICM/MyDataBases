@@ -53,6 +53,7 @@ import androidx.compose.runtime.collectAsState
 import com.sphynxs.mydatabases.R
 import com.sphynxs.mydatabases.core.database.engine.DatabaseType
 import com.sphynxs.mydatabases.ui.components.AppIcons
+import com.sphynxs.mydatabases.ui.components.BreathingBackground
 import com.sphynxs.mydatabases.ui.components.ConnectionCard
 import com.sphynxs.mydatabases.ui.components.DatabaseTypeCard
 import com.sphynxs.mydatabases.ui.components.EmptyState
@@ -141,19 +142,14 @@ fun ConnectionsListScreen(
                             .padding(paddingValues)
                     )
                 } else {
-                    Column(
+                    BreathingBackground(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(paddingValues)
-                            .background(
-                                brush = androidx.compose.ui.graphics.Brush.verticalGradient(
-                                    colors = listOf(
-                                        DesignTokens.BackgroundGradientStart,
-                                        DesignTokens.BackgroundGradientEnd
-                                    )
-                                )
-                            )
                     ) {
+                        Column(
+                            modifier = Modifier.fillMaxSize()
+                        ) {
                         Spacer(modifier = Modifier.height(16.dp))
                         
                         // Título grande estilo iOS 26
@@ -206,6 +202,7 @@ fun ConnectionsListScreen(
                             item {
                                 Spacer(modifier = Modifier.height(80.dp))
                             }
+                        }
                         }
                     }
                 }
