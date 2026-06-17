@@ -1,7 +1,6 @@
 package com.sphynxs.mydatabases.ui.components.ios
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
@@ -13,12 +12,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 /**
- * Card moderno con diseño vibrante y profesional.
+ * Card moderno con sombras suaves y sin bordes.
  *
  * @param onClick Callback cuando se toca el card
  * @param modifier Modificador opcional
@@ -39,22 +37,12 @@ fun IOSCard(
         modifier = modifier
             .fillMaxWidth()
             .shadow(
-                elevation = 8.dp,
-                shape = RoundedCornerShape(20.dp),
-                ambientColor = Color(0xFF7C80E8).copy(alpha = 0.08f),  // Violeta branded
-                spotColor = Color(0xFF7C80E8).copy(alpha = 0.12f)
+                elevation = 6.dp,
+                shape = RoundedCornerShape(24.dp),
+                ambientColor = Color(0xFF7C80E8).copy(alpha = 0.10f),  // Violeta branded
+                spotColor = Color(0xFF7C80E8).copy(alpha = 0.15f)
             )
-            .clip(RoundedCornerShape(20.dp))
-            .border(
-                width = 1.dp,
-                brush = Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFF7C80E8).copy(alpha = 0.15f),  // Violeta branded
-                        Color(0xFF8EE3D3).copy(alpha = 0.10f)   // Turquesa branded
-                    )
-                ),
-                shape = RoundedCornerShape(20.dp)
-            )
+            .clip(RoundedCornerShape(24.dp))
             .background(Color.White)
             .clickable(
                 interactionSource = interactionSource,
