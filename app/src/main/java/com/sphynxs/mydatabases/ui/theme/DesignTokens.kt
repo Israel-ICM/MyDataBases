@@ -125,11 +125,11 @@ object DesignTokens {
     /** Radio de bordes de cards - mucho más redondeados */
     val CardCornerRadius = 24.dp
     
-    /** Elevación de sombra de cards - suave pero visible */
-    val CardElevation = 6.dp
+    /** Elevación de sombra de cards - pronunciada */
+    val CardElevation = 12.dp
     
     /** Sombra con color de acento - violeta branded */
-    val CardShadowColor = Color(0xFF7C80E8).copy(alpha = 0.10f)
+    val CardShadowColor = Color(0xFF7C80E8).copy(alpha = 0.15f)
     
     /** Radio de bordes de íconos */
     val IconCornerRadius = 16.dp

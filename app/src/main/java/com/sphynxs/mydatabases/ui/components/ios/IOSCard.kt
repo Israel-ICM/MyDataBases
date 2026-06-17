@@ -37,10 +37,10 @@ fun IOSCard(
         modifier = modifier
             .fillMaxWidth()
             .shadow(
-                elevation = 6.dp,
+                elevation = 12.dp,
                 shape = RoundedCornerShape(24.dp),
-                ambientColor = Color(0xFF7C80E8).copy(alpha = 0.10f),  // Violeta branded
-                spotColor = Color(0xFF7C80E8).copy(alpha = 0.15f)
+                ambientColor = Color(0xFF7C80E8).copy(alpha = 0.15f),  // Violeta branded
+                spotColor = Color(0xFF7C80E8).copy(alpha = 0.25f)
             )
             .clip(RoundedCornerShape(24.dp))
             .background(Color.White)
