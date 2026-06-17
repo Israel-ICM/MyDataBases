@@ -52,7 +52,7 @@ fun DatabaseCard(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(DesignTokens.InnerSpacing)
         ) {
-            // Ícono con gradiente cyan
+            // Ícono de database con gradiente turquesa
             Box(
                 modifier = Modifier
                     .size(56.dp)
@@ -68,7 +68,7 @@ fun DatabaseCard(
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    painter = painterResource(R.drawable.ic_nav_tables),
+                    painter = painterResource(AppIcons.Nav.Connections),
                     contentDescription = null,
                     tint = androidx.compose.ui.graphics.Color(0xFF006B63),  // Turquesa oscuro branded
                     modifier = Modifier.size(32.dp)
