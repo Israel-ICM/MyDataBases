@@ -9,9 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -26,6 +23,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.adamglin.phosphoricons.PhosphorIcons
+import com.adamglin.phosphoricons.regular.Notepencil
+import com.adamglin.phosphoricons.regular.Trash
 import com.sphynxs.mydatabases.R
 import com.sphynxs.mydatabases.core.database.engine.DatabaseType
 import com.sphynxs.mydatabases.core.database.models.ConnectionConfig
@@ -126,7 +126,7 @@ fun ConnectionCard(
             // Botones de acción
             IconButton(onClick = onEditClick) {
                 Icon(
-                    imageVector = Icons.Default.Edit,
+                    imageVector = PhosphorAppIcons.Action.edit,
                     contentDescription = stringResource(R.string.connection_action_edit),
                     tint = DesignTokens.IconNormal,
                     modifier = Modifier.size(DesignTokens.IconSmall)
@@ -135,7 +135,7 @@ fun ConnectionCard(
 
             IconButton(onClick = onDeleteClick) {
                 Icon(
-                    imageVector = Icons.Default.Delete,
+                    imageVector = PhosphorAppIcons.Action.delete,
                     contentDescription = stringResource(R.string.connection_action_delete),
                     tint = DesignTokens.IconNormal,
                     modifier = Modifier.size(DesignTokens.IconSmall)

@@ -58,6 +58,7 @@ import com.sphynxs.mydatabases.ui.components.ConnectionCard
 import com.sphynxs.mydatabases.ui.components.DatabaseTypeCard
 import com.sphynxs.mydatabases.ui.components.EmptyState
 import com.sphynxs.mydatabases.ui.components.ErrorCard
+import com.sphynxs.mydatabases.ui.components.PhosphorAppIcons
 import com.sphynxs.mydatabases.ui.components.ios.IOSGroupedCard
 import com.sphynxs.mydatabases.ui.components.ios.IOSListItem
 import com.sphynxs.mydatabases.ui.theme.DbAccents
@@ -119,7 +120,7 @@ fun ConnectionsListScreen(
                         scope.launch { typeSelectorSheetState.show() }
                     }
                 ) {
-                    Icon(Icons.Default.Add, contentDescription = "Add connection")
+                    Icon(PhosphorAppIcons.Action.add, contentDescription = "Add connection")
                 }
             }
         }

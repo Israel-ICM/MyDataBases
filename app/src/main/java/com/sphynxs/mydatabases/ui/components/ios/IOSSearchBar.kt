@@ -12,9 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -29,6 +26,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.sphynxs.mydatabases.ui.components.PhosphorAppIcons
 
 /**
  * Search bar estilo iOS 26 — ultra minimalista, sin fondo de color.
@@ -72,7 +70,7 @@ fun IOSSearchBar(
             ) {
                 // Lupa GRANDE y NEGRA
                 Icon(
-                    imageVector = Icons.Default.Search,
+                    imageVector = PhosphorAppIcons.Action.search,
                     contentDescription = null,
                     tint = Color(0xFF000000),  // NEGRO PROFUNDO
                     modifier = Modifier.size(24.dp)  // MÁS GRANDE
@@ -118,7 +116,7 @@ fun IOSSearchBar(
                         modifier = Modifier.size(28.dp)
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Close,
+                            imageVector = PhosphorAppIcons.Action.close,
                             contentDescription = "Clear",
                             tint = Color(0xFF000000).copy(alpha = 0.5f),
                             modifier = Modifier.size(18.dp)
