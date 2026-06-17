@@ -10,13 +10,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -103,7 +101,7 @@ fun ConnectionsListScreen(
     var editingConnectionId by remember { mutableStateOf<String?>(null) }
     var preselectedType by remember { mutableStateOf<DatabaseType?>(null) }
     val formSheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = false
+        skipPartiallyExpanded = true
     )
 
     Scaffold(
@@ -322,9 +320,6 @@ fun ConnectionsListScreen(
     
     // Bottom Sheet del formulario
     if (showFormSheet) {
-        val configuration = LocalConfiguration.current
-        val maxHeight = (configuration.screenHeightDp).dp - 20.dp // Separación de 20dp arriba
-        
         ModalBottomSheet(
             onDismissRequest = { 
                 scope.launch {
@@ -337,23 +332,17 @@ fun ConnectionsListScreen(
             sheetMaxWidth = 10000.dp,
             scrimColor = Color.Black.copy(alpha = 0.5f)
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(max = maxHeight)
-            ) {
-                ConnectionFormScreen(
-                    connectionId = editingConnectionId,
-                    preselectedType = preselectedType,
-                    onNavigateBack = { 
-                        scope.launch {
-                            formSheetState.hide()
-                            showFormSheet = false
-                        }
-                    },
-                    modifier = Modifier.fillMaxSize()
-                )
-            }
+            ConnectionFormScreen(
+                connectionId = editingConnectionId,
+                preselectedType = preselectedType,
+                onNavigateBack = { 
+                    scope.launch {
+                        formSheetState.hide()
+                        showFormSheet = false
+                    }
+                },
+                modifier = Modifier.fillMaxSize()
+            )
         }
     }
 }

@@ -56,10 +56,12 @@
     <!-- Databases screen -->
     <string name="databases_title">Databases</string>
     <string name="databases_empty">No databases available</string>
+    <string name="databases_search_hint">Search databases…</string>
     
     <!-- Tables screen -->
     <string name="tables_title">Tables - %1$s</string>
     <string name="tables_empty">No tables in this database</string>
+    <string name="tables_search_hint">Search tables…</string>
     
     <!-- Table viewer screen -->
     <string name="table_viewer_title">Table: %1$s</string>

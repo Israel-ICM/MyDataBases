@@ -1,28 +1,30 @@
 package com.sphynxs.mydatabases.ui.screens.databases
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.sphynxs.mydatabases.R
 import com.sphynxs.mydatabases.core.database.models.Database
@@ -47,7 +49,6 @@ import com.sphynxs.mydatabases.ui.theme.MyDataBasesTheme
  * @author israel-icm
  * @date 2026-06-12
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DatabasesListScreen(
     onNavigateToTables: (databaseName: String) -> Unit,
@@ -55,6 +56,7 @@ fun DatabasesListScreen(
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val searchQuery by viewModel.searchQuery.collectAsState()
 
     // Cargar databases al montar la pantalla
     LaunchedEffect(Unit) {
@@ -62,11 +64,6 @@ fun DatabasesListScreen(
     }
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.databases_title)) }
-            )
-        },
         modifier = modifier
     ) { paddingValues ->
         when (uiState) {
@@ -77,33 +74,69 @@ fun DatabasesListScreen(
             is DatabasesUiState.Success -> {
                 val databases = (uiState as DatabasesUiState.Success).databases
                 
-                if (databases.isEmpty()) {
-                    EmptyState(
-                        icon = painterResource(AppIcons.State.EmptyTables),  // Usar mismo ícono que emptyTables
-                        title = stringResource(R.string.empty_databases_title),
-                        description = stringResource(R.string.empty_databases_description),
-                        action = null,  // No action para empty databases
-                        modifier = Modifier.padding(paddingValues)
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues)
+                ) {
+                    Text(
+                        text = stringResource(R.string.databases_title),
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color(0xFF8E8E93),
+                        modifier = Modifier.padding(start = 16.dp, bottom = 8.dp)
                     )
-                } else {
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(paddingValues)
-                    ) {
-                        items(databases, key = { it.name }) { database ->
-                            DatabaseCard(
-                                database = database,
-                                onCardClick = { onNavigateToTables(database.name) },
-                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+
+                    OutlinedTextField(
+                        value = searchQuery,
+                        onValueChange = viewModel::setSearchQuery,
+                        placeholder = { Text(stringResource(R.string.databases_search_hint)) },
+                        leadingIcon = {
+                            Icon(
+                                painter = painterResource(android.R.drawable.ic_menu_search),
+                                contentDescription = null
                             )
-                        }
-                        
-                        item {
-                            Spacer(modifier = Modifier.height(16.dp))
+                        },
+                        singleLine = true,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                    )
+
+                    if (databases.isEmpty()) {
+                        EmptyState(
+                            icon = painterResource(AppIcons.State.EmptyTables),
+                            title = stringResource(R.string.empty_databases_title),
+                            description = stringResource(R.string.empty_databases_description),
+                            action = null,
+                            modifier = Modifier.weight(1f)
+                        )
+                    } else {
+                        LazyColumn(modifier = Modifier.weight(1f)) {
+                            items(databases, key = { it.name }) { database ->
+                                DatabaseCard(
+                                    database = database,
+                                    onCardClick = { onNavigateToTables(database.name) },
+                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                                )
+                            }
+                            
+                            item {
+                                Spacer(modifier = Modifier.height(16.dp))
+                            }
                         }
                     }
                 }
+            }
+
+            is DatabasesUiState.Empty -> {
+                EmptyState(
+                    icon = painterResource(AppIcons.State.EmptyTables),
+                    title = stringResource(R.string.empty_databases_title),
+                    description = stringResource(R.string.empty_databases_description),
+                    action = null,
+                    modifier = Modifier.padding(paddingValues)
+                )
             }
 
             is DatabasesUiState.Error -> {

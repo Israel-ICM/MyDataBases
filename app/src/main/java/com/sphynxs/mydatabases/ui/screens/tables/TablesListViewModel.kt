@@ -2,6 +2,7 @@ package com.sphynxs.mydatabases.ui.screens.tables
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.sphynxs.mydatabases.core.database.models.Table
 import com.sphynxs.mydatabases.domain.usecases.GetTablesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,6 +37,30 @@ class TablesListViewModel @Inject constructor(
      */
     val uiState: StateFlow<TablesUiState> = _uiState.asStateFlow()
 
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
+
+    private var allTables: List<Table> = emptyList()
+
+    fun setSearchQuery(query: String) {
+        _searchQuery.value = query
+        applyFilter()
+    }
+
+    private fun applyFilter() {
+        val query = _searchQuery.value
+        val tables = allTables
+        val filtered = if (query.isBlank()) {
+            tables
+        } else {
+            tables.filter { it.name.contains(query, ignoreCase = true) }
+        }
+        _uiState.value = when {
+            tables.isEmpty() -> TablesUiState.Empty
+            else -> TablesUiState.Success(filtered)
+        }
+    }
+
     /**
      * Carga la lista de tablas de una base de datos.
      *
@@ -46,14 +71,12 @@ class TablesListViewModel @Inject constructor(
     fun loadTables(databaseName: String) {
         viewModelScope.launch {
             _uiState.value = TablesUiState.Loading
+            _searchQuery.value = ""
             
             getTablesUseCase(databaseName).fold(
                 onSuccess = { tables ->
-                    _uiState.value = if (tables.isEmpty()) {
-                        TablesUiState.Empty
-                    } else {
-                        TablesUiState.Success(tables)
-                    }
+                    allTables = tables
+                    applyFilter()
                 },
                 onFailure = { error ->
                     _uiState.value = TablesUiState.Error(error.message ?: "Unknown error")

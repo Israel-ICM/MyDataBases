@@ -110,8 +110,8 @@ fun ConnectionFormScreen(
     LaunchedEffect(formState) {
         when (formState) {
             is ConnectionFormUiState.Saved -> {
-                snackbarHostState.showSnackbar(saveSuccessMsg)
                 onNavigateBack()
+                snackbarHostState.showSnackbar(saveSuccessMsg)
             }
             is ConnectionFormUiState.Error -> {
                 val message = (formState as ConnectionFormUiState.Error).message

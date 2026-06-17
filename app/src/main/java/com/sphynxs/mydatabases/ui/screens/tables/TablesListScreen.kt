@@ -1,41 +1,40 @@
 package com.sphynxs.mydatabases.ui.screens.tables
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.sphynxs.mydatabases.R
 import com.sphynxs.mydatabases.ui.components.AppIcons
 import com.sphynxs.mydatabases.ui.components.EmptyState
 import com.sphynxs.mydatabases.ui.components.ErrorCard
-import com.sphynxs.mydatabases.ui.components.LoadingIndicator
 import com.sphynxs.mydatabases.ui.components.TableCard
 import com.sphynxs.mydatabases.ui.components.skeleton.TableListSkeleton
 import com.sphynxs.mydatabases.ui.theme.MyDataBasesTheme
 import com.sphynxs.mydatabases.ui.workspace.WorkspaceCard
 import com.sphynxs.mydatabases.ui.workspace.WorkspaceManager
-import com.sphynxs.mydatabases.ui.workspace.WorkspaceOverlay
-import javax.inject.Inject
 
 /**
  * Pantalla de lista de tablas.
@@ -51,7 +50,6 @@ import javax.inject.Inject
  * @author israel-icm
  * @date 2026-06-12
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TablesListScreen(
     databaseName: String,
@@ -61,6 +59,7 @@ fun TablesListScreen(
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val searchQuery by viewModel.searchQuery.collectAsState()
 
     // Cargar tables al montar la pantalla
     LaunchedEffect(databaseName) {
@@ -68,11 +67,7 @@ fun TablesListScreen(
     }
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.tables_title, databaseName)) }
-            )
-        }
+        modifier = modifier
     ) { paddingValues ->
         when (uiState) {
             is TablesUiState.Loading -> {
@@ -82,32 +77,57 @@ fun TablesListScreen(
             is TablesUiState.Success -> {
                 val tables = (uiState as TablesUiState.Success).tables
                 
-                LazyColumn(
+                Column(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(paddingValues)
                 ) {
-                    items(tables, key = { it.name }) { table ->
-                        TableCard(
-                            table = table,
-                            onCardClick = {
-                                // Abrir tabla en el workspace en lugar de navegar
-                                workspaceManager.openCard(
-                                    WorkspaceCard.Table(
-                                        id = "table:${databaseName}:${table.name}",
-                                        title = table.name,
-                                        connectionId = "current", // TODO: obtener connectionId real
-                                        databaseName = databaseName,
-                                        tableName = table.name
+                    Text(
+                        text = stringResource(R.string.tables_title, databaseName),
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color(0xFF8E8E93),
+                        modifier = Modifier.padding(start = 16.dp, bottom = 8.dp)
+                    )
+
+                    OutlinedTextField(
+                        value = searchQuery,
+                        onValueChange = viewModel::setSearchQuery,
+                        placeholder = { Text(stringResource(R.string.tables_search_hint)) },
+                        leadingIcon = {
+                            Icon(
+                                painter = painterResource(android.R.drawable.ic_menu_search),
+                                contentDescription = null
+                            )
+                        },
+                        singleLine = true,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                    )
+
+                    LazyColumn(modifier = Modifier.weight(1f)) {
+                        items(tables, key = { it.name }) { table ->
+                            TableCard(
+                                table = table,
+                                onCardClick = {
+                                    workspaceManager.openCard(
+                                        WorkspaceCard.Table(
+                                            id = "table:${databaseName}:${table.name}",
+                                            title = table.name,
+                                            connectionId = "current",
+                                            databaseName = databaseName,
+                                            tableName = table.name
+                                        )
                                     )
-                                )
-                            },
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                        )
-                    }
-                    
-                    item {
-                        Spacer(modifier = Modifier.height(16.dp))
+                                },
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                            )
+                        }
+                        
+                        item {
+                            Spacer(modifier = Modifier.height(16.dp))
+                        }
                     }
                 }
             }

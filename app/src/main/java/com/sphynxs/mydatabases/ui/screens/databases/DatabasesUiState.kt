@@ -25,6 +25,11 @@ sealed class DatabasesUiState {
     data class Success(val databases: List<Database>) : DatabasesUiState()
 
     /**
+     * Sin bases de datos disponibles.
+     */
+    data object Empty : DatabasesUiState()
+
+    /**
      * Error al cargar las bases de datos.
      *
      * @property message Mensaje de error localizado

@@ -2,6 +2,7 @@ package com.sphynxs.mydatabases.ui.screens.databases
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.sphynxs.mydatabases.core.database.models.Database
 import com.sphynxs.mydatabases.domain.usecases.GetDatabasesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,6 +37,29 @@ class DatabasesListViewModel @Inject constructor(
      */
     val uiState: StateFlow<DatabasesUiState> = _uiState.asStateFlow()
 
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
+
+    private var allDatabases: List<Database> = emptyList()
+
+    fun setSearchQuery(query: String) {
+        _searchQuery.value = query
+        applyFilter()
+    }
+
+    private fun applyFilter() {
+        val query = _searchQuery.value
+        val filtered = if (query.isBlank()) {
+            allDatabases
+        } else {
+            allDatabases.filter { it.name.contains(query, ignoreCase = true) }
+        }
+        _uiState.value = when {
+            allDatabases.isEmpty() -> DatabasesUiState.Empty
+            else -> DatabasesUiState.Success(filtered)
+        }
+    }
+
     /**
      * Carga la lista de bases de datos disponibles.
      *
@@ -44,10 +68,12 @@ class DatabasesListViewModel @Inject constructor(
     fun loadDatabases() {
         viewModelScope.launch {
             _uiState.value = DatabasesUiState.Loading
-            
+            _searchQuery.value = ""
+
             getDatabasesUseCase().fold(
                 onSuccess = { databases ->
-                    _uiState.value = DatabasesUiState.Success(databases)
+                    allDatabases = databases
+                    applyFilter()
                 },
                 onFailure = { error ->
                     _uiState.value = DatabasesUiState.Error(error.message ?: "Unknown error")
