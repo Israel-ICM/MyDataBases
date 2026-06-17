@@ -18,7 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.sphynxs.mydatabases.core.database.models.Table
+import com.sphynxs.mydatabases.core.database.models.Table as TableModel
 import com.sphynxs.mydatabases.ui.components.ios.IOSCard
 import com.sphynxs.mydatabases.ui.theme.DesignTokens
 import com.sphynxs.mydatabases.ui.theme.MyDataBasesTheme
@@ -35,7 +35,7 @@ import com.sphynxs.mydatabases.ui.theme.MyDataBasesTheme
  */
 @Composable
 fun TableCard(
-    table: Table,
+    table: TableModel,
     onCardClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -117,10 +117,10 @@ fun TableCard(
 private fun TableCardPreview() {
     MyDataBasesTheme {
         TableCard(
-            table = Table(
+            table = TableModel(
                 name = "users",
                 database = "mydb",
-                type = TableType.TABLE,
+                type = com.sphynxs.mydatabases.core.database.models.TableType.TABLE,
                 engine = "InnoDB",
                 rowCount = 1234
             ),
