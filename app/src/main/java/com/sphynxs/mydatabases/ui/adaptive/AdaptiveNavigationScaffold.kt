@@ -137,7 +137,7 @@ fun AdaptiveNavigationScaffold(
                             onClick = { onNavigate(destination.route) },
                             icon = {
                                 Icon(
-                                    painter = painterResource(destination.iconRes),
+                                    imageVector = destination.icon,
                                     contentDescription = stringResource(destination.labelRes)
                                 )
                             },
@@ -165,7 +165,7 @@ fun AdaptiveNavigationScaffold(
                                 },
                                 icon = {
                                     Icon(
-                                        painter = painterResource(destination.iconRes),
+                                        imageVector = destination.icon,
                                         contentDescription = stringResource(destination.labelRes)
                                     )
                                 },
@@ -262,7 +262,7 @@ private fun LiquidGlassBottomBar(
                         verticalArrangement = Arrangement.spacedBy(3.dp)
                     ) {
                         Icon(
-                            painter = painterResource(destination.iconRes),
+                            imageVector = destination.icon,
                             contentDescription = stringResource(destination.labelRes),
                             modifier = Modifier.size(DesignTokens.IconSmall),
                             tint = if (isSelected)

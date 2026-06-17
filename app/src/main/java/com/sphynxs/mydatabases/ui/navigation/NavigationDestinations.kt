@@ -2,6 +2,7 @@ package com.sphynxs.mydatabases.ui.navigation
 
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Immutable
+import androidx.compose.ui.graphics.vector.ImageVector
 import com.sphynxs.mydatabases.R
 
 /**
@@ -11,7 +12,7 @@ import com.sphynxs.mydatabases.R
  *
  * @property id Identificador único del destino (usado para selección)
  * @property labelRes Resource ID del string traducible para el label
- * @property iconRes Resource ID del vector drawable del ícono
+ * @property icon ImageVector del ícono (Material Icons Rounded)
  * @property route Ruta de navegación completa (puede incluir connectionId interpolado)
  *
  * @author israel-icm
@@ -21,7 +22,7 @@ import com.sphynxs.mydatabases.R
 data class NavigationDestination(
     val id: String,
     @StringRes val labelRes: Int,
-    val iconRes: Int,
+    val icon: ImageVector,
     val route: String,
 )
 
@@ -55,13 +56,13 @@ fun destinationsForContext(context: NavigationContext): List<NavigationDestinati
             NavigationDestination(
                 id = "connections",
                 labelRes = R.string.nav_connections,
-                iconRes = R.drawable.ic_nav_connections,
+                icon = com.sphynxs.mydatabases.ui.components.PhosphorAppIcons.Nav.connections,
                 route = Routes.Connections.route,
             ),
             NavigationDestination(
                 id = "settings",
                 labelRes = R.string.nav_settings,
-                iconRes = R.drawable.ic_nav_settings,
+                icon = com.sphynxs.mydatabases.ui.components.PhosphorAppIcons.Nav.settings,
                 route = Routes.Settings.route,
             ),
         )
@@ -70,31 +71,31 @@ fun destinationsForContext(context: NavigationContext): List<NavigationDestinati
             NavigationDestination(
                 id = "tables",
                 labelRes = R.string.nav_tables,
-                iconRes = R.drawable.ic_nav_tables,
+                icon = com.sphynxs.mydatabases.ui.components.PhosphorAppIcons.Nav.tables,
                 route = Routes.Tables.createRoute(context.connectionId),
             ),
             NavigationDestination(
                 id = "views",
                 labelRes = R.string.nav_views,
-                iconRes = R.drawable.ic_nav_views,
+                icon = com.sphynxs.mydatabases.ui.components.PhosphorAppIcons.Nav.views,
                 route = Routes.Views.createRoute(context.connectionId),
             ),
             NavigationDestination(
                 id = "editor",
                 labelRes = R.string.nav_editor,
-                iconRes = R.drawable.ic_nav_editor,
+                icon = com.sphynxs.mydatabases.ui.components.PhosphorAppIcons.Nav.editor,
                 route = Routes.QueryEditor.createRoute(context.connectionId),
             ),
             NavigationDestination(
                 id = "functions",
                 labelRes = R.string.nav_functions,
-                iconRes = R.drawable.ic_nav_functions,
+                icon = com.sphynxs.mydatabases.ui.components.PhosphorAppIcons.Nav.functions,
                 route = Routes.Functions.createRoute(context.connectionId),
             ),
             NavigationDestination(
                 id = "backup",
                 labelRes = R.string.nav_backup,
-                iconRes = R.drawable.ic_nav_backup,
+                icon = com.sphynxs.mydatabases.ui.components.PhosphorAppIcons.Nav.backup,
                 route = Routes.Backup.createRoute(context.connectionId),
             ),
         )
