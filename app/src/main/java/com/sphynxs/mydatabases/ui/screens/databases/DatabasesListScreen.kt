@@ -1,5 +1,6 @@
 package com.sphynxs.mydatabases.ui.screens.databases
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -9,8 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,7 +32,9 @@ import com.sphynxs.mydatabases.ui.components.DatabaseCard
 import com.sphynxs.mydatabases.ui.components.EmptyState
 import com.sphynxs.mydatabases.ui.components.ErrorCard
 import com.sphynxs.mydatabases.ui.components.LoadingIndicator
+import com.sphynxs.mydatabases.ui.components.ios.IOSSearchBar
 import com.sphynxs.mydatabases.ui.components.skeleton.DatabaseListSkeleton
+import com.sphynxs.mydatabases.ui.theme.DesignTokens
 import com.sphynxs.mydatabases.ui.theme.MyDataBasesTheme
 
 /**
@@ -78,29 +79,33 @@ fun DatabasesListScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(paddingValues)
+                        .background(
+                            brush = androidx.compose.ui.graphics.Brush.verticalGradient(
+                                colors = listOf(
+                                    DesignTokens.BackgroundGradientStart,
+                                    DesignTokens.BackgroundGradientEnd
+                                )
+                            )
+                        )
                 ) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    // Título grande estilo iOS 26
                     Text(
                         text = stringResource(R.string.databases_title),
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = Color(0xFF8E8E93),
-                        modifier = Modifier.padding(start = 16.dp, bottom = 8.dp)
+                        fontSize = DesignTokens.LargeTitleSize,
+                        fontWeight = DesignTokens.LargeTitleWeight,
+                        color = DesignTokens.LargeTitleColor,
+                        modifier = Modifier.padding(horizontal = DesignTokens.ScreenPaddingHorizontal)
                     )
 
-                    OutlinedTextField(
-                        value = searchQuery,
-                        onValueChange = viewModel::setSearchQuery,
-                        placeholder = { Text(stringResource(R.string.databases_search_hint)) },
-                        leadingIcon = {
-                            Icon(
-                                painter = painterResource(android.R.drawable.ic_menu_search),
-                                contentDescription = null
-                            )
-                        },
-                        singleLine = true,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    IOSSearchBar(
+                        query = searchQuery,
+                        onQueryChange = viewModel::setSearchQuery,
+                        placeholder = stringResource(R.string.databases_search_hint),
+                        modifier = Modifier.padding(horizontal = DesignTokens.ScreenPaddingHorizontal)
                     )
 
                     if (databases.isEmpty()) {
@@ -112,17 +117,22 @@ fun DatabasesListScreen(
                             modifier = Modifier.weight(1f)
                         )
                     } else {
+                        Spacer(modifier = Modifier.height(DesignTokens.CardSpacing))
+                        
                         LazyColumn(modifier = Modifier.weight(1f)) {
                             items(databases, key = { it.name }) { database ->
                                 DatabaseCard(
                                     database = database,
                                     onCardClick = { onNavigateToTables(database.name) },
-                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                                    modifier = Modifier.padding(
+                                        horizontal = DesignTokens.ScreenPaddingHorizontal,
+                                        vertical = DesignTokens.CardSpacing / 2
+                                    )
                                 )
                             }
                             
                             item {
-                                Spacer(modifier = Modifier.height(16.dp))
+                                Spacer(modifier = Modifier.height(80.dp))
                             }
                         }
                     }

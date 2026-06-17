@@ -1,5 +1,6 @@
 package com.sphynxs.mydatabases.ui.screens.tables
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -9,8 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,7 +30,9 @@ import com.sphynxs.mydatabases.ui.components.AppIcons
 import com.sphynxs.mydatabases.ui.components.EmptyState
 import com.sphynxs.mydatabases.ui.components.ErrorCard
 import com.sphynxs.mydatabases.ui.components.TableCard
+import com.sphynxs.mydatabases.ui.components.ios.IOSSearchBar
 import com.sphynxs.mydatabases.ui.components.skeleton.TableListSkeleton
+import com.sphynxs.mydatabases.ui.theme.DesignTokens
 import com.sphynxs.mydatabases.ui.theme.MyDataBasesTheme
 import com.sphynxs.mydatabases.ui.workspace.WorkspaceCard
 import com.sphynxs.mydatabases.ui.workspace.WorkspaceManager
@@ -81,30 +82,45 @@ fun TablesListScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(paddingValues)
+                        .background(
+                            brush = androidx.compose.ui.graphics.Brush.verticalGradient(
+                                colors = listOf(
+                                    DesignTokens.BackgroundGradientStart,
+                                    DesignTokens.BackgroundGradientEnd
+                                )
+                            )
+                        )
                 ) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    // Título grande estilo iOS 26
                     Text(
-                        text = stringResource(R.string.tables_title, databaseName),
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = Color(0xFF8E8E93),
-                        modifier = Modifier.padding(start = 16.dp, bottom = 8.dp)
+                        text = "Tables",
+                        fontSize = DesignTokens.LargeTitleSize,
+                        fontWeight = DesignTokens.LargeTitleWeight,
+                        color = DesignTokens.LargeTitleColor,
+                        modifier = Modifier.padding(horizontal = DesignTokens.ScreenPaddingHorizontal)
+                    )
+                    
+                    // Subtítulo con nombre de la base de datos
+                    Text(
+                        text = databaseName,
+                        fontSize = DesignTokens.CardSubtitleSize,
+                        fontWeight = DesignTokens.CardSubtitleWeight,
+                        color = DesignTokens.TextSecondary,
+                        modifier = Modifier.padding(horizontal = DesignTokens.ScreenPaddingHorizontal, vertical = 4.dp)
                     )
 
-                    OutlinedTextField(
-                        value = searchQuery,
-                        onValueChange = viewModel::setSearchQuery,
-                        placeholder = { Text(stringResource(R.string.tables_search_hint)) },
-                        leadingIcon = {
-                            Icon(
-                                painter = painterResource(android.R.drawable.ic_menu_search),
-                                contentDescription = null
-                            )
-                        },
-                        singleLine = true,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    IOSSearchBar(
+                        query = searchQuery,
+                        onQueryChange = viewModel::setSearchQuery,
+                        placeholder = stringResource(R.string.tables_search_hint),
+                        modifier = Modifier.padding(horizontal = DesignTokens.ScreenPaddingHorizontal)
                     )
+
+                    Spacer(modifier = Modifier.height(DesignTokens.CardSpacing))
 
                     LazyColumn(modifier = Modifier.weight(1f)) {
                         items(tables, key = { it.name }) { table ->
@@ -121,12 +137,15 @@ fun TablesListScreen(
                                         )
                                     )
                                 },
-                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                                modifier = Modifier.padding(
+                                    horizontal = DesignTokens.ScreenPaddingHorizontal,
+                                    vertical = DesignTokens.CardSpacing / 2
+                                )
                             )
                         }
                         
                         item {
-                            Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(80.dp))
                         }
                     }
                 }

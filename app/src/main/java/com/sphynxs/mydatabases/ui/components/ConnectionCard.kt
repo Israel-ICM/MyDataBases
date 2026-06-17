@@ -1,62 +1,50 @@
 package com.sphynxs.mydatabases.ui.components
 
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.sphynxs.mydatabases.R
 import com.sphynxs.mydatabases.core.database.engine.DatabaseType
 import com.sphynxs.mydatabases.core.database.models.ConnectionConfig
+import com.sphynxs.mydatabases.ui.components.ios.IOSCard
 import com.sphynxs.mydatabases.ui.theme.DbAccents
+import com.sphynxs.mydatabases.ui.theme.DesignTokens
 import com.sphynxs.mydatabases.ui.theme.MyDataBasesTheme
-import com.sphynxs.mydatabases.ui.theme.pressAnimation
-import com.sphynxs.mydatabases.ui.theme.tokens.LocalAppShapes
-import com.sphynxs.mydatabases.ui.theme.tokens.LocalAppSpacing
 
 /**
- * Tarjeta reutilizable para mostrar una conexión en la lista.
- *
- * Muestra: nombre, host:puerto, tipo de DB, y acciones (editar/eliminar).
+ * Card de conexión con diseño iOS unificado.
  *
  * @param connection La configuración de conexión a mostrar
  * @param onEditClick Callback cuando se toca el botón editar
  * @param onDeleteClick Callback cuando se toca el botón eliminar
  * @param onCardClick Callback cuando se toca la tarjeta completa (conectar)
- * @param modifier Modificador opcional para la tarjeta
+ * @param modifier Modificador opcional
  *
  * @author israel-icm
- * @date 2026-06-12
+ * @date 2026-06-17
  */
 @Composable
 fun ConnectionCard(
@@ -66,132 +54,98 @@ fun ConnectionCard(
     onCardClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val spacing = LocalAppSpacing.current
-    val shapes = LocalAppShapes.current
     val accentColor = DbAccents.accentFor(connection.type)
-    val interactionSource = remember { MutableInteractionSource() }
 
-    // Gradient sutil: acento al 8% → surface
-    val gradient = Brush.linearGradient(
-        colors = listOf(
-            accentColor.copy(alpha = 0.08f),
-            MaterialTheme.colorScheme.surface
-        )
-    )
-
-    Card(
+    IOSCard(
         onClick = onCardClick,
         modifier = modifier
-            .fillMaxWidth()
-            .pressAnimation(interactionSource),
-        shape = shapes.large,
-        colors = CardDefaults.cardColors(
-            containerColor = Color.Transparent
-        ),
-        interactionSource = interactionSource
     ) {
-        Box(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(gradient)
+                .padding(DesignTokens.CardPadding),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(DesignTokens.InnerSpacing)
         ) {
-            Row(
+            // Ícono con gradiente vibrante
+            Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(spacing.lg)
-                    .animateContentSize(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(spacing.md)
+                    .size(56.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(
+                        brush = Brush.linearGradient(
+                            colors = listOf(
+                                accentColor.copy(alpha = 0.25f),
+                                accentColor.copy(alpha = 0.12f)
+                            )
+                        )
+                    ),
+                contentAlignment = Alignment.Center
             ) {
-                // Hero Icon 56dp con container circular tinted
-                Box(
-                    modifier = Modifier
-                        .size(56.dp)
-                        .clip(CircleShape)
-                        .background(accentColor.copy(alpha = 0.15f)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        painter = painterResource(
-                            when (connection.type) {
-                                DatabaseType.MYSQL -> AppIcons.Db.MySql
-                                DatabaseType.POSTGRESQL -> AppIcons.Db.Postgres
-                                DatabaseType.MARIADB -> AppIcons.Db.MariaDb
-                                DatabaseType.SQLITE -> AppIcons.Db.Sqlite
-                            }
-                        ),
-                        contentDescription = connection.type.displayName,
-                        tint = accentColor,
-                        modifier = Modifier.size(32.dp)
-                    )
-                }
+                Icon(
+                    painter = painterResource(
+                        when (connection.type) {
+                            DatabaseType.MYSQL -> AppIcons.Db.MySql
+                            DatabaseType.POSTGRESQL -> AppIcons.Db.Postgres
+                            DatabaseType.MARIADB -> AppIcons.Db.MariaDb
+                            DatabaseType.SQLITE -> AppIcons.Db.Sqlite
+                        }
+                    ),
+                    contentDescription = connection.type.displayName,
+                    tint = accentColor,
+                    modifier = Modifier.size(32.dp)
+                )
+            }
 
-                // Contenido principal
-                Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(spacing.xxs)
-                ) {
-                    // Nombre de la conexión (titleLarge)
-                    Text(
-                        text = connection.name,
-                        style = MaterialTheme.typography.titleLarge,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
+            // Contenido principal
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                // Nombre de la conexión
+                Text(
+                    text = connection.name,
+                    fontSize = DesignTokens.CardTitleSize,
+                    fontWeight = DesignTokens.CardTitleWeight,
+                    color = DesignTokens.CardTitleColor,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
 
-                    // Status dot con legend
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(8.dp)
-                                .background(Color(0xFF4CAF50), CircleShape)
-                        )
-                        Text(
-                            text = "Inactiva",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
+                // Host:Puerto
+                Text(
+                    text = "${connection.host}:${connection.port}",
+                    fontSize = DesignTokens.CardSubtitleSize,
+                    fontWeight = DesignTokens.CardSubtitleWeight,
+                    color = DesignTokens.CardSubtitleColor,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
 
-                    Spacer(modifier = Modifier.height(spacing.xs))
+            // Botones de acción
+            IconButton(onClick = onEditClick) {
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = stringResource(R.string.connection_action_edit),
+                    tint = DesignTokens.IconNormal,
+                    modifier = Modifier.size(DesignTokens.IconSmall)
+                )
+            }
 
-                    // Metadata en bodySmall
-                    Text(
-                        text = "${connection.host}:${connection.port} • ${connection.database}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.outline,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
-
-                // Acciones
-                IconButton(onClick = onEditClick) {
-                    Icon(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = stringResource(R.string.connection_action_edit)
-                    )
-                }
-
-                IconButton(onClick = onDeleteClick) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = stringResource(R.string.connection_action_delete),
-                        tint = MaterialTheme.colorScheme.error
-                    )
-                }
+            IconButton(onClick = onDeleteClick) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = stringResource(R.string.connection_action_delete),
+                    tint = DesignTokens.IconNormal,
+                    modifier = Modifier.size(DesignTokens.IconSmall)
+                )
             }
         }
     }
 }
 
-/**
- * Preview para ConnectionCard.
- */
-@Preview(showBackground = true)
+@Preview(showBackground = true, backgroundColor = 0xFFF2F2F7)
 @Composable
 private fun ConnectionCardPreview() {
     MyDataBasesTheme {
@@ -208,7 +162,8 @@ private fun ConnectionCardPreview() {
             ),
             onEditClick = {},
             onDeleteClick = {},
-            onCardClick = {}
+            onCardClick = {},
+            modifier = Modifier.padding(16.dp)
         )
     }
 }

@@ -53,12 +53,14 @@ import androidx.compose.runtime.collectAsState
 import com.sphynxs.mydatabases.R
 import com.sphynxs.mydatabases.core.database.engine.DatabaseType
 import com.sphynxs.mydatabases.ui.components.AppIcons
+import com.sphynxs.mydatabases.ui.components.ConnectionCard
 import com.sphynxs.mydatabases.ui.components.DatabaseTypeCard
 import com.sphynxs.mydatabases.ui.components.EmptyState
 import com.sphynxs.mydatabases.ui.components.ErrorCard
 import com.sphynxs.mydatabases.ui.components.ios.IOSGroupedCard
 import com.sphynxs.mydatabases.ui.components.ios.IOSListItem
 import com.sphynxs.mydatabases.ui.theme.DbAccents
+import com.sphynxs.mydatabases.ui.theme.DesignTokens
 import com.sphynxs.mydatabases.ui.components.skeleton.ConnectionListSkeleton
 import kotlinx.coroutines.launch
 
@@ -105,7 +107,8 @@ fun ConnectionsListScreen(
     )
 
     Scaffold(
-        modifier = modifier.background(Color(0xFFF2F2F7)),
+        modifier = modifier.background(DesignTokens.BackgroundPrimary),
+        containerColor = DesignTokens.BackgroundPrimary,
         snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButton = {
             if (uiState is ConnectionsUiState.Success) {
@@ -138,67 +141,70 @@ fun ConnectionsListScreen(
                             .padding(paddingValues)
                     )
                 } else {
-                    LazyColumn(
+                    Column(
                         modifier = Modifier
                             .fillMaxSize()
-                            .background(Color(0xFFF2F2F7))
                             .padding(paddingValues)
-                            .padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        item {
-                            Text(
-                                "CONNECTIONS",
-                                fontSize = 13.sp,
-                                color = Color(0xFF8E8E93),
-                                modifier = Modifier.padding(start = 16.dp, bottom = 8.dp)
-                            )
-                        }
-
-                        items(connections) { connection ->
-                            IOSGroupedCard {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    IOSListItem(
-                                        title = connection.name,
-                                        subtitle = "${connection.type.displayName} • ${connection.host}:${connection.port}",
-                                        leadingIcon = {
-                                            Icon(
-                                                painter = painterResource(AppIcons.Db.icon(connection.type)),
-                                                contentDescription = null,
-                                                tint = DbAccents.accentFor(connection.type),
-                                                modifier = Modifier.size(32.dp)
-                                            )
-                                        },
-                                        showChevron = false,
-                                        modifier = Modifier.weight(1f),
-                                        onClick = {
-                                            scope.launch {
-                                                val result = viewModel.connect(connection.id)
-                                                result.fold(
-                                                    onSuccess = { onConnect(connection.id) },
-                                                    onFailure = { error ->
-                                                        snackbarHostState.showSnackbar(
-                                                            message = "Error: ${error.message}",
-                                                            duration = SnackbarDuration.Long
-                                                        )
-                                                    }
-                                                )
-                                            }
-                                        }
+                            .background(
+                                brush = androidx.compose.ui.graphics.Brush.verticalGradient(
+                                    colors = listOf(
+                                        DesignTokens.BackgroundGradientStart,
+                                        DesignTokens.BackgroundGradientEnd
                                     )
-                                    
-                                    IconButton(onClick = {
+                                )
+                            )
+                    ) {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        
+                        // Título grande estilo iOS 26
+                        Text(
+                            text = "Connections",
+                            fontSize = DesignTokens.LargeTitleSize,
+                            fontWeight = DesignTokens.LargeTitleWeight,
+                            color = DesignTokens.LargeTitleColor,
+                            modifier = Modifier.padding(horizontal = DesignTokens.ScreenPaddingHorizontal)
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        LazyColumn(
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            items(connections) { connection ->
+                                ConnectionCard(
+                                    connection = connection,
+                                    onEditClick = {
                                         editingConnectionId = connection.id
                                         preselectedType = null
                                         showFormSheet = true
                                         scope.launch { formSheetState.expand() }
-                                    }) {
-                                        Icon(Icons.Default.Edit, contentDescription = "Edit")
-                                    }
-                                }
+                                    },
+                                    onDeleteClick = {
+                                        connectionToDelete = connection
+                                    },
+                                    onCardClick = {
+                                        scope.launch {
+                                            val result = viewModel.connect(connection.id)
+                                            result.fold(
+                                                onSuccess = { onConnect(connection.id) },
+                                                onFailure = { error ->
+                                                    snackbarHostState.showSnackbar(
+                                                        message = "Error: ${error.message}",
+                                                        duration = SnackbarDuration.Long
+                                                    )
+                                                }
+                                            )
+                                        }
+                                    },
+                                    modifier = Modifier.padding(
+                                        horizontal = DesignTokens.ScreenPaddingHorizontal,
+                                        vertical = DesignTokens.CardSpacing / 2
+                                    )
+                                )
+                            }
+                            
+                            item {
+                                Spacer(modifier = Modifier.height(80.dp))
                             }
                         }
                     }
