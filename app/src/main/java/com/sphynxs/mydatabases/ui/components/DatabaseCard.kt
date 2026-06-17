@@ -15,11 +15,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.sphynxs.mydatabases.R
+import com.adamglin.phosphoricons.PhosphorIcons
+import com.adamglin.phosphoricons.regular.Database
 import com.sphynxs.mydatabases.core.database.models.Database
 import com.sphynxs.mydatabases.ui.components.ios.IOSCard
 import com.sphynxs.mydatabases.ui.theme.DesignTokens
@@ -68,7 +68,7 @@ fun DatabaseCard(
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    painter = painterResource(AppIcons.Nav.Connections),
+                    imageVector = PhosphorIcons.Regular.Database,
                     contentDescription = null,
                     tint = androidx.compose.ui.graphics.Color(0xFF006B63),  // Turquesa oscuro branded
                     modifier = Modifier.size(32.dp)

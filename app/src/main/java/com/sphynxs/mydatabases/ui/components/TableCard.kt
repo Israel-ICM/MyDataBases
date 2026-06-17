@@ -15,13 +15,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.sphynxs.mydatabases.R
+import com.adamglin.phosphoricons.PhosphorIcons
+import com.adamglin.phosphoricons.regular.Table
 import com.sphynxs.mydatabases.core.database.models.Table
-import com.sphynxs.mydatabases.core.database.models.TableType
 import com.sphynxs.mydatabases.ui.components.ios.IOSCard
 import com.sphynxs.mydatabases.ui.theme.DesignTokens
 import com.sphynxs.mydatabases.ui.theme.MyDataBasesTheme
@@ -53,7 +52,7 @@ fun TableCard(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(DesignTokens.InnerSpacing)
         ) {
-            // Ícono con gradiente verde
+            // Ícono de tabla con gradiente turquesa
             Box(
                 modifier = Modifier
                     .size(56.dp)
@@ -69,7 +68,7 @@ fun TableCard(
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    painter = painterResource(R.drawable.ic_nav_tables),
+                    imageVector = PhosphorIcons.Regular.Table,
                     contentDescription = null,
                     tint = androidx.compose.ui.graphics.Color(0xFF006B63),  // Turquesa oscuro branded
                     modifier = Modifier.size(32.dp)
