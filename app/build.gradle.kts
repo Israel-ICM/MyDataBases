@@ -80,6 +80,9 @@ dependencies {
     implementation("androidx.compose.material3:material3-window-size-class")
     implementation("androidx.compose.material:material-icons-extended")
     
+    // Phosphor Icons - Modern minimal icon library
+    implementation("com.adamglin:phosphoricons:1.1.0")
+    
     // Compose Navigation
     implementation("androidx.navigation:navigation-compose:2.8.6")
     
