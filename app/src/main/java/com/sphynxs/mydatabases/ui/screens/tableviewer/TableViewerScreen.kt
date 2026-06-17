@@ -13,9 +13,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Card
@@ -48,6 +45,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.sphynxs.mydatabases.R
 import com.sphynxs.mydatabases.core.database.models.Column
 import com.sphynxs.mydatabases.core.database.models.ColumnKey
+import com.sphynxs.mydatabases.ui.components.PhosphorAppIcons
 import com.sphynxs.mydatabases.ui.components.ErrorCard
 import com.sphynxs.mydatabases.ui.components.LoadingIndicator
 import com.sphynxs.mydatabases.ui.components.skeleton.TableViewerSkeleton
@@ -129,7 +127,7 @@ fun TableViewerScreen(
                             selected = selectedTab == 1,
                             onClick = { selectedTab = 1 },
                             text = { Text(stringResource(R.string.table_viewer_tab_schema)) },
-                            icon = { Icon(Icons.Filled.Settings, contentDescription = null) }
+                            icon = { Icon(PhosphorAppIcons.Nav.settings, contentDescription = null) }
                         )
                     }
 
@@ -179,7 +177,7 @@ fun TableViewerScreen(
                             selected = selectedTab == 1,
                             onClick = { selectedTab = 1 },
                             text = { Text(stringResource(R.string.table_viewer_tab_schema)) },
-                            icon = { Icon(Icons.Filled.Settings, contentDescription = null) }
+                            icon = { Icon(PhosphorAppIcons.Nav.settings, contentDescription = null) }
                         )
                     }
 

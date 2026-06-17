@@ -53,6 +53,10 @@ class MySQLConnectionPool(private val config: ConnectionConfig) {
             
             // Timeout básico (milisegundos)
             put("connectTimeout", config.connectionTimeout.toString())
+            
+            // Tolerancia con fechas/datos inválidos (igual que Navicat)
+            put("zeroDateTimeBehavior", "convertToNull")
+            put("jdbcCompliantTruncation", "false")
         }
         
         val databaseSegment = config.database.takeIf { it.isNotBlank() } ?: ""

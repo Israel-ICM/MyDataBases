@@ -114,7 +114,9 @@ class MySQLEngine : DatabaseEngine {
                     val rows = mutableListOf<Map<String, Any?>>()
                     while (resultSet.next()) {
                         val row = columns.associateWith { column ->
-                            resultSet.getObject(column)
+                            // Usar getString para leer datos crudos sin conversión de tipo
+                            // Esto previene errores con datos corruptos o mal formateados
+                            resultSet.getString(column)
                         }
                         rows.add(row)
                     }
