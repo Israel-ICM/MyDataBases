@@ -10,11 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -32,6 +27,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.adamglin.phosphoricons.PhosphorIcons
+import com.adamglin.phosphoricons.regular.Caretdown
+import com.adamglin.phosphoricons.regular.Caretup
 import com.sphynxs.mydatabases.core.database.engine.DatabaseType
 import com.sphynxs.mydatabases.core.database.models.ConnectionConfig
 import com.sphynxs.mydatabases.ui.components.ios.IOSGroupedCard
@@ -71,8 +69,8 @@ fun DatabaseTypeCard(
             )
             
             Icon(
-                imageVector = if (expanded) Icons.Default.KeyboardArrowUp 
-                             else Icons.Default.KeyboardArrowDown,
+                imageVector = if (expanded) PhosphorIcons.Regular.Caretup 
+                             else PhosphorIcons.Regular.Caretdown,
                 contentDescription = if (expanded) "Colapsar" else "Expandir",
                 tint = Color(0xFF8E8E93)
             )
@@ -129,7 +127,7 @@ fun DatabaseTypeCard(
                                     modifier = Modifier.size(32.dp)
                                 ) {
                                     Icon(
-                                        imageVector = Icons.Default.Edit,
+                                        imageVector = PhosphorAppIcons.Action.edit,
                                         contentDescription = "Editar",
                                         tint = Color(0xFF007AFF),
                                         modifier = Modifier.size(20.dp)
@@ -150,7 +148,7 @@ fun DatabaseTypeCard(
                         .align(Alignment.End)
                         .padding(end = 16.dp, bottom = 8.dp, top = 8.dp)
                 ) {
-                    Icon(Icons.Default.Add, contentDescription = null, tint = Color(0xFF007AFF))
+                    Icon(PhosphorAppIcons.Action.add, contentDescription = null, tint = Color(0xFF007AFF))
                     Spacer(Modifier.width(4.dp))
                     Text("Agregar ${type.name}", color = Color(0xFF007AFF))
                 }
