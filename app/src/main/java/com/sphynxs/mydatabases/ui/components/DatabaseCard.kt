@@ -60,8 +60,8 @@ fun DatabaseCard(
                     .background(
                         brush = androidx.compose.ui.graphics.Brush.linearGradient(
                             colors = listOf(
-                                androidx.compose.ui.graphics.Color(0xFF06B6D4).copy(alpha = 0.20f),
-                                androidx.compose.ui.graphics.Color(0xFF0891B2).copy(alpha = 0.12f)
+                                androidx.compose.ui.graphics.Color(0xFF8EE3D3).copy(alpha = 0.20f),  // Turquesa branded
+                                androidx.compose.ui.graphics.Color(0xFF006B63).copy(alpha = 0.12f)   // Turquesa oscuro branded
                             )
                         )
                     ),
@@ -70,7 +70,7 @@ fun DatabaseCard(
                 Icon(
                     painter = painterResource(R.drawable.ic_nav_tables),
                     contentDescription = null,
-                    tint = androidx.compose.ui.graphics.Color(0xFF0891B2),
+                    tint = androidx.compose.ui.graphics.Color(0xFF006B63),  // Turquesa oscuro branded
                     modifier = Modifier.size(32.dp)
                 )
             }

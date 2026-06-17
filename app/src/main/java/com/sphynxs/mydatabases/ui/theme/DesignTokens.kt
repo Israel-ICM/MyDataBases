@@ -17,44 +17,44 @@ object DesignTokens {
     
     // ============ COLORES ============
     
-    /** Fondo principal - gradiente sutil azul/morado */
-    val BackgroundPrimary = Color(0xFFF8FAFC)  // Azul muy claro
-    val BackgroundGradientStart = Color(0xFFF1F5F9)
-    val BackgroundGradientEnd = Color(0xFFFAF5FF)  // Toque morado
+    /** Fondo principal - gradiente sutil violeta/turquesa */
+    val BackgroundPrimary = Color(0xFFF5F6FA)  // Mismo que brand_light_bg
+    val BackgroundGradientStart = Color(0xFFF0F1FF)  // Violeta muy claro
+    val BackgroundGradientEnd = Color(0xFFE8FFFB)  // Turquesa muy claro
     
-    /** Fondo de cards - blanco con borde de color */
+    /** Fondo de cards - blanco puro */
     val SurfacePrimary = Color.White
     
-    /** Texto principal - negro profundo */
-    val TextPrimary = Color(0xFF0F172A)
+    /** Texto principal - negro profundo del branded */
+    val TextPrimary = Color(0xFF1A1F2E)  // brand_light_on_bg
     
-    /** Texto secundario - slate con contraste */
-    val TextSecondary = Color(0xFF475569)
+    /** Texto secundario - gris violáceo del branded */
+    val TextSecondary = Color(0xFF5B5F7D)  // brand_outline
     
-    /** Texto terciario */
-    val TextTertiary = Color(0xFF94A3B8)
+    /** Texto terciario - violeta muy claro */
+    val TextTertiary = Color(0xFF9DA1C0)
     
-    /** Acento primario - índigo vibrante */
-    val AccentPrimary = Color(0xFF6366F1)
-    val AccentPrimaryLight = Color(0xFFEEF2FF)
-    val AccentPrimaryDark = Color(0xFF4F46E5)
+    /** Acento primario - violeta brillante branded */
+    val AccentPrimary = Color(0xFF7C80E8)  // brand_primary
+    val AccentPrimaryLight = Color(0xFFE6E7FF)  // Violeta muy claro
+    val AccentPrimaryDark = Color(0xFF5B5EC8)  // Violeta oscuro
     
-    /** Acento secundario - cyan eléctrico */
-    val AccentSecondary = Color(0xFF06B6D4)
-    val AccentSecondaryLight = Color(0xFFCFFAFE)
+    /** Acento secundario - turquesa menta branded */
+    val AccentSecondary = Color(0xFF8EE3D3)  // brand_tertiary
+    val AccentSecondaryLight = Color(0xFFB3F5EA)  // Turquesa claro
     
-    /** Acento de éxito - verde esmeralda */
-    val AccentSuccess = Color(0xFF10B981)
-    val AccentSuccessLight = Color(0xFFD1FAE5)
+    /** Acento de éxito - turquesa oscuro branded */
+    val AccentSuccess = Color(0xFF006B63)  // Turquesa oscuro
+    val AccentSuccessLight = Color(0xFFA3F2E6)  // Turquesa muy claro
     
-    /** Separadores */
-    val Separator = Color(0xFFE2E8F0)
+    /** Separadores - violeta muy claro */
+    val Separator = Color(0xFFE3E5F0)
     
-    /** Fondo de íconos - gradiente */
-    val IconBackground = Color(0xFFF1F5F9)
+    /** Fondo de íconos - violeta muy claro */
+    val IconBackground = Color(0xFFF0F1FF)
     
-    /** Color de íconos normales */
-    val IconNormal = Color(0xFF64748B)
+    /** Color de íconos normales - gris violáceo */
+    val IconNormal = Color(0xFF75788C)
     
     
     // ============ TIPOGRAFÍA ============
@@ -128,8 +128,8 @@ object DesignTokens {
     /** Elevación de sombra de cards - más pronunciada */
     val CardElevation = 4.dp
     
-    /** Sombra con color de acento */
-    val CardShadowColor = Color(0xFF2563EB).copy(alpha = 0.08f)
+    /** Sombra con color de acento - violeta branded */
+    val CardShadowColor = Color(0xFF7C80E8).copy(alpha = 0.08f)
     
     /** Radio de bordes de íconos */
     val IconCornerRadius = 12.dp

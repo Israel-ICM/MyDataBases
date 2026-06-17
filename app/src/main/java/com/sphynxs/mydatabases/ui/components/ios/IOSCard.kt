@@ -41,16 +41,16 @@ fun IOSCard(
             .shadow(
                 elevation = 8.dp,
                 shape = RoundedCornerShape(20.dp),
-                ambientColor = Color(0xFF6366F1).copy(alpha = 0.08f),
-                spotColor = Color(0xFF6366F1).copy(alpha = 0.12f)
+                ambientColor = Color(0xFF7C80E8).copy(alpha = 0.08f),  // Violeta branded
+                spotColor = Color(0xFF7C80E8).copy(alpha = 0.12f)
             )
             .clip(RoundedCornerShape(20.dp))
             .border(
                 width = 1.dp,
                 brush = Brush.verticalGradient(
                     colors = listOf(
-                        Color(0xFF6366F1).copy(alpha = 0.15f),
-                        Color(0xFF06B6D4).copy(alpha = 0.10f)
+                        Color(0xFF7C80E8).copy(alpha = 0.15f),  // Violeta branded
+                        Color(0xFF8EE3D3).copy(alpha = 0.10f)   // Turquesa branded
                     )
                 ),
                 shape = RoundedCornerShape(20.dp)
@@ -59,7 +59,7 @@ fun IOSCard(
             .clickable(
                 interactionSource = interactionSource,
                 indication = ripple(
-                    color = Color(0xFF6366F1).copy(alpha = 0.08f)
+                    color = Color(0xFF7C80E8).copy(alpha = 0.08f)  // Violeta branded
                 ),
                 onClick = onClick
             )
