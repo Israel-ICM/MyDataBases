@@ -10,6 +10,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.KeyboardArrowDown
+import androidx.compose.material.icons.rounded.KeyboardArrowUp
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -27,9 +30,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.adamglin.phosphoricons.PhosphorIcons
-import com.adamglin.phosphoricons.regular.Caretdown
-import com.adamglin.phosphoricons.regular.Caretup
 import com.sphynxs.mydatabases.core.database.engine.DatabaseType
 import com.sphynxs.mydatabases.core.database.models.ConnectionConfig
 import com.sphynxs.mydatabases.ui.components.ios.IOSGroupedCard
@@ -69,8 +69,8 @@ fun DatabaseTypeCard(
             )
             
             Icon(
-                imageVector = if (expanded) PhosphorIcons.Regular.Caretup 
-                             else PhosphorIcons.Regular.Caretdown,
+                imageVector = if (expanded) Icons.Rounded.KeyboardArrowUp 
+                             else Icons.Rounded.KeyboardArrowDown,
                 contentDescription = if (expanded) "Colapsar" else "Expandir",
                 tint = Color(0xFF8E8E93)
             )

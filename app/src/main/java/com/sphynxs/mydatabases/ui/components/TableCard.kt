@@ -18,8 +18,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.adamglin.phosphoricons.PhosphorIcons
-import com.adamglin.phosphoricons.regular.Table
 import com.sphynxs.mydatabases.core.database.models.Table
 import com.sphynxs.mydatabases.ui.components.ios.IOSCard
 import com.sphynxs.mydatabases.ui.theme.DesignTokens
@@ -68,7 +66,7 @@ fun TableCard(
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector = PhosphorIcons.Regular.Table,
+                    imageVector = PhosphorAppIcons.Nav.tables,
                     contentDescription = null,
                     tint = androidx.compose.ui.graphics.Color(0xFF006B63),  // Turquesa oscuro branded
                     modifier = Modifier.size(32.dp)
