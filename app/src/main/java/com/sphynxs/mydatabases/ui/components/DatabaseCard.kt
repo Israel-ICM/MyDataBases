@@ -66,7 +66,7 @@ fun DatabaseCard(
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector = PhosphorAppIcons.Nav.connections,
+                    imageVector = PhosphorAppIcons.Db.mysql,  // Usa Database genérico
                     contentDescription = null,
                     tint = androidx.compose.ui.graphics.Color(0xFF006B63),  // Turquesa oscuro branded
                     modifier = Modifier.size(32.dp)

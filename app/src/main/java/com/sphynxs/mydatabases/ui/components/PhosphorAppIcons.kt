@@ -42,11 +42,11 @@ object PhosphorAppIcons {
      * Íconos de tipos de base de datos.
      */
     object Db {
-        val mysql: ImageVector get() = Icons.Rounded.Storage
-        val postgres: ImageVector get() = Icons.Rounded.Storage
-        val sqlite: ImageVector get() = Icons.Rounded.Storage
-        val mariadb: ImageVector get() = Icons.Rounded.Storage
-        val sqlServer: ImageVector get() = Icons.Rounded.Storage
+        val mysql: ImageVector get() = Icons.Rounded.Database
+        val postgres: ImageVector get() = Icons.Rounded.Database
+        val sqlite: ImageVector get() = Icons.Rounded.Database
+        val mariadb: ImageVector get() = Icons.Rounded.Database
+        val sqlServer: ImageVector get() = Icons.Rounded.Database
         
         fun icon(type: DatabaseType): ImageVector = when (type) {
             DatabaseType.MYSQL -> mysql
@@ -60,7 +60,7 @@ object PhosphorAppIcons {
      * Íconos de estados (empty states, error states).
      */
     object State {
-        val emptyConnections: ImageVector get() = Icons.Rounded.Storage
+        val emptyConnections: ImageVector get() = Icons.Rounded.Database
         val emptyTables: ImageVector get() = Icons.Rounded.FolderOpen
         val error: ImageVector get() = Icons.Rounded.Warning
     }
