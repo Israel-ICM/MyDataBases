@@ -17,10 +17,10 @@ object DesignTokens {
     
     // ============ COLORES ============
     
-    /** Fondo principal - gradiente sutil violeta/turquesa */
+    /** Fondo principal - gradiente MUY sutil violeta/turquesa (casi blanco) */
     val BackgroundPrimary = Color(0xFFF5F6FA)  // Mismo que brand_light_bg
-    val BackgroundGradientStart = Color(0xFFF0F1FF)  // Violeta muy claro
-    val BackgroundGradientEnd = Color(0xFFE8FFFB)  // Turquesa muy claro
+    val BackgroundGradientStart = Color(0xFFFBFBFF)  // Casi blanco con toque violeta
+    val BackgroundGradientEnd = Color(0xFFFDFEFE)  // Casi blanco con toque turquesa
     
     /** Fondo de cards - blanco puro */
     val SurfacePrimary = Color.White
