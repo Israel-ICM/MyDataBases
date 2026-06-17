@@ -29,7 +29,7 @@ object PhosphorAppIcons {
      * Íconos de navegación (BottomBar, Rail, Drawer).
      */
     object Nav {
-        val connections: ImageVector get() = Icons.Rounded.Storage
+        val connections: ImageVector get() = Icons.Rounded.Dns  // Servidores/infraestructura
         val settings: ImageVector get() = Icons.Rounded.Settings
         val tables: ImageVector get() = Icons.Rounded.TableChart
         val views: ImageVector get() = Icons.Rounded.Visibility
