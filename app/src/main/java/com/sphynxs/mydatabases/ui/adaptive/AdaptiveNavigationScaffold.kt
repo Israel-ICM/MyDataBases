@@ -31,6 +31,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Brush
+import com.skydoves.cloudy.cloudy
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -211,75 +212,96 @@ private fun LiquidGlassBottomBar(
             .padding(start = DesignTokens.ScreenPaddingHorizontal, end = DesignTokens.ScreenPaddingHorizontal, bottom = 24.dp),
         contentAlignment = Alignment.BottomCenter
     ) {
-        // Bottom bar estilo iOS unificado
+        // Bottom bar estilo iOS unificado (GitHub mobile style - pill completo + glassmorphism REAL)
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(68.dp)
-                .shadow(
-                    elevation = DesignTokens.CardElevation,
-                    shape = RoundedCornerShape(DesignTokens.CardCornerRadius),
-                    ambientColor = Color.Black.copy(alpha = 0.04f),
-                    spotColor = Color.Black.copy(alpha = 0.06f)
-                )
-                .clip(RoundedCornerShape(DesignTokens.CardCornerRadius))
-                .background(DesignTokens.SurfacePrimary)  // Blanco sólido como los cards
+                .height(80.dp)
+                .cloudy(radius = 25)  // Blur REAL del backdrop
         ) {
-            // Separator superior sutil (divide visualmente del contenido de arriba)
+            // Capa 1: Backdrop con glassmorphism real
             Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(0.5.dp)
-                    .background(Color(0x0D000000))  // Negro 5% — línea ultra sutil
-                    .align(Alignment.TopCenter)
+                    .fillMaxSize()
+                    .shadow(
+                        elevation = 32.dp,
+                        shape = RoundedCornerShape(40.dp),
+                        ambientColor = Color.Black.copy(alpha = 0.3f),
+                        spotColor = Color.Black.copy(alpha = 0.4f)
+                    )
+                    .clip(RoundedCornerShape(40.dp))
+                    .background(Color.White.copy(alpha = 0.7f))  // Blanco semi-transparente
             )
 
-            // Contenido: botones de navegación
-            Row(
+            // Capa 2: Contenido sharp (NO blurred)
+            Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 12.dp, vertical = 6.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
+                    .clip(RoundedCornerShape(40.dp))
             ) {
-                destinations.forEach { destination ->
-                    val isSelected = selectedRoute == destination.route
+                // Separator superior sutil (divide visualmente del contenido de arriba)
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(0.5.dp)
+                        .background(Color(0x0D000000))  // Negro 5% — línea ultra sutil
+                        .align(Alignment.TopCenter)
+                )
 
-                    Column(
-                        modifier = Modifier
-                            .weight(1f)
-                            .clip(RoundedCornerShape(10.dp))
-                            .background(
-                                if (isSelected) {
-                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
-                                } else {
-                                    Color.Transparent
-                                }
-                            )
-                            .clickable { onNavigate(destination.route) }
-                            .padding(vertical = 10.dp, horizontal = 12.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(3.dp)
-                    ) {
-                        Icon(
-                            imageVector = destination.icon,
-                            contentDescription = stringResource(destination.labelRes),
-                            modifier = Modifier.size(DesignTokens.IconSmall),
-                            tint = if (isSelected)
-                                MaterialTheme.colorScheme.primary
-                            else
-                                DesignTokens.IconNormal
-                        )
-                        Text(
-                            text = stringResource(destination.labelRes),
-                            fontSize = 10.sp,
-                            fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
-                            color = if (isSelected)
-                                MaterialTheme.colorScheme.primary
-                            else
-                                DesignTokens.TextSecondary,
-                            maxLines = 1
-                        )
+                // Contenido: botones de navegación estilo GitHub mobile
+                Row(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    destinations.forEach { destination ->
+                        val isSelected = selectedRoute == destination.route
+
+                        // Item seleccionado: ícono + texto en pill
+                        // Item NO seleccionado: solo ícono
+                        if (isSelected) {
+                            // Selected: pill con ícono + texto
+                            Row(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(16.dp))
+                                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f))
+                                    .clickable { onNavigate(destination.route) }
+                                    .padding(horizontal = 16.dp, vertical = 10.dp),
+                                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = destination.icon,
+                                    contentDescription = stringResource(destination.labelRes),
+                                    modifier = Modifier.size(24.dp),
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                                Text(
+                                    text = stringResource(destination.labelRes),
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        } else {
+                            // Not selected: solo ícono
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .clickable { onNavigate(destination.route) }
+                                    .padding(12.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = destination.icon,
+                                    contentDescription = stringResource(destination.labelRes),
+                                    modifier = Modifier.size(24.dp),
+                                    tint = DesignTokens.IconNormal
+                                )
+                            }
+                        }
                     }
                 }
             }

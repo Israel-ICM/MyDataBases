@@ -83,6 +83,9 @@ dependencies {
     // Tabler Icons - Clean and minimal icon library
     implementation("br.com.devsrsouza.compose.icons:tabler-icons:1.1.0")
     
+    // Cloudy - Backdrop blur for glassmorphism
+    implementation("com.github.skydoves:cloudy:0.2.2")
+    
     // Compose Navigation
     implementation("androidx.navigation:navigation-compose:2.8.6")
     
