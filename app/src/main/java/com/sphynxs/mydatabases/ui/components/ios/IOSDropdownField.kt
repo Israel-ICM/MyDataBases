@@ -103,16 +103,15 @@ fun <T> IOSDropdownField(
             DropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
-                offset = DpOffset(x = 0.dp, y = 4.dp),
+                offset = DpOffset(x = 0.dp, y = 8.dp),
                 shape = RoundedCornerShape(20.dp),
                 containerColor = Color.White,
-                tonalElevation = 8.dp,
-                shadowElevation = 16.dp,
+                tonalElevation = 0.dp,
+                shadowElevation = 8.dp,
                 properties = PopupProperties(clippingEnabled = false),
                 modifier = Modifier
                     .fillMaxWidth(0.9f)
-                    .heightIn(max = 380.dp)
-                    .padding(bottom = 24.dp, start = 8.dp, end = 8.dp, top = 8.dp)
+                    .heightIn(max = 400.dp)
             ) {
                 items.forEach { item ->
                     DropdownMenuItem(
