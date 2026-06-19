@@ -123,4 +123,16 @@ class NavigationContextTest {
         // hasta que las rutas se refactoren para incluir connection/{id}/databases
         assertEquals(NavigationContext.OutsideConnection, context)
     }
+    
+    @Test
+    fun `from connection databases route devuelve InsideConnection con connectionId`() {
+        // GIVEN
+        val route = "connection/abc-123/databases"
+        
+        // WHEN
+        val context = NavigationContext.from(route)
+        
+        // THEN
+        assertEquals(NavigationContext.InsideConnection("abc-123"), context)
+    }
 }

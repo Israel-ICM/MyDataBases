@@ -100,4 +100,69 @@ class NavigationDestinationsTest {
         val settingsDestination = destinations.find { it.id == "settings" }
         assertEquals("settings", settingsDestination?.route)
     }
+    
+    // --- NUEVOS TESTS PARA ROUTE SUFFIX BRANCHING (Phase 2) ---
+    
+    @Test
+    fun `destinationsForContext InsideConnection con databases suffix devuelve 4 destinos`() {
+        // GIVEN
+        val context = NavigationContext.InsideConnection("test-id")
+        val currentRoute = "connection/test-id/databases"
+        
+        // WHEN
+        val destinations = destinationsForContext(context, currentRoute)
+        
+        // THEN
+        assertEquals(4, destinations.size)
+    }
+    
+    @Test
+    fun `destinationsForContext InsideConnection con databases suffix contiene destinos servidor`() {
+        // GIVEN
+        val context = NavigationContext.InsideConnection("test-id")
+        val currentRoute = "connection/test-id/databases"
+        
+        // WHEN
+        val destinations = destinationsForContext(context, currentRoute)
+        
+        // THEN
+        val ids = destinations.map { it.id }
+        assertTrue("Debe contener 'add_database'", ids.contains("add_database"))
+        assertTrue("Debe contener 'new_query'", ids.contains("new_query"))
+        assertTrue("Debe contener 'monitor'", ids.contains("monitor"))
+        assertTrue("Debe contener 'settings'", ids.contains("settings"))
+    }
+    
+    @Test
+    fun `destinationsForContext InsideConnection con tables suffix devuelve 5 destinos DB`() {
+        // GIVEN
+        val context = NavigationContext.InsideConnection("test-id")
+        val currentRoute = "connection/test-id/tables"
+        
+        // WHEN
+        val destinations = destinationsForContext(context, currentRoute)
+        
+        // THEN
+        assertEquals(5, destinations.size)
+        val ids = destinations.map { it.id }
+        assertTrue("Debe contener 'tables'", ids.contains("tables"))
+        assertTrue("Debe contener 'views'", ids.contains("views"))
+        assertTrue("Debe contener 'editor'", ids.contains("editor"))
+        assertTrue("Debe contener 'functions'", ids.contains("functions"))
+        assertTrue("Debe contener 'backup'", ids.contains("backup"))
+    }
+    
+    @Test
+    fun `destinationsForContext InsideConnection sin currentRoute devuelve 5 destinos DB (default)`() {
+        // GIVEN
+        val context = NavigationContext.InsideConnection("test-id")
+        val currentRoute: String? = null
+        
+        // WHEN
+        val destinations = destinationsForContext(context, currentRoute)
+        
+        // THEN
+        // Default behavior cuando no hay currentRoute: retornar el menú DB (5 items)
+        assertEquals(5, destinations.size)
+    }
 }

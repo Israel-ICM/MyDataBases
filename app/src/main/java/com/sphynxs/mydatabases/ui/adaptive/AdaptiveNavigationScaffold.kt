@@ -97,7 +97,7 @@ fun AdaptiveNavigationScaffold(
     onNavigate: (String) -> Unit,
     content: @Composable () -> Unit,
 ) {
-    val destinations = destinationsForContext(navigationContext)
+    val destinations = destinationsForContext(navigationContext, currentRoute)
     
     when (windowSizeClass.widthSizeClass) {
         WindowWidthSizeClass.Compact -> {
@@ -212,95 +212,81 @@ private fun LiquidGlassBottomBar(
             .padding(start = DesignTokens.ScreenPaddingHorizontal, end = DesignTokens.ScreenPaddingHorizontal, bottom = 24.dp),
         contentAlignment = Alignment.BottomCenter
     ) {
-        // Bottom bar estilo iOS unificado (GitHub mobile style - pill completo + glassmorphism REAL)
+        // Bottom bar estilo iOS unificado (GitHub mobile style - pill completo + backdrop translúcido)
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(80.dp)
-                .cloudy(radius = 25)  // Blur REAL del backdrop
+                .shadow(
+                    elevation = 32.dp,
+                    shape = RoundedCornerShape(40.dp),
+                    ambientColor = Color.Black.copy(alpha = 0.3f),
+                    spotColor = Color.Black.copy(alpha = 0.4f)
+                )
+                .clip(RoundedCornerShape(40.dp))
+                .background(Color.White.copy(alpha = 0.75f))  // Blanco semi-transparente (el contenido de atrás ya tiene blur)
         ) {
-            // Capa 1: Backdrop con glassmorphism real
+            // Separator superior sutil (divide visualmente del contenido de arriba)
             Box(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .shadow(
-                        elevation = 32.dp,
-                        shape = RoundedCornerShape(40.dp),
-                        ambientColor = Color.Black.copy(alpha = 0.3f),
-                        spotColor = Color.Black.copy(alpha = 0.4f)
-                    )
-                    .clip(RoundedCornerShape(40.dp))
-                    .background(Color.White.copy(alpha = 0.7f))  // Blanco semi-transparente
+                    .fillMaxWidth()
+                    .height(0.5.dp)
+                    .background(Color(0x0D000000))  // Negro 5% — línea ultra sutil
+                    .align(Alignment.TopCenter)
             )
 
-            // Capa 2: Contenido sharp (NO blurred)
-            Box(
+            // Contenido: botones de navegación estilo GitHub mobile
+            Row(
                 modifier = Modifier
                     .fillMaxSize()
-                    .clip(RoundedCornerShape(40.dp))
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                // Separator superior sutil (divide visualmente del contenido de arriba)
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(0.5.dp)
-                        .background(Color(0x0D000000))  // Negro 5% — línea ultra sutil
-                        .align(Alignment.TopCenter)
-                )
+                destinations.forEach { destination ->
+                    val isSelected = selectedRoute == destination.route
 
-                // Contenido: botones de navegación estilo GitHub mobile
-                Row(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    destinations.forEach { destination ->
-                        val isSelected = selectedRoute == destination.route
-
-                        // Item seleccionado: ícono + texto en pill
-                        // Item NO seleccionado: solo ícono
-                        if (isSelected) {
-                            // Selected: pill con ícono + texto
-                            Row(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(16.dp))
-                                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f))
-                                    .clickable { onNavigate(destination.route) }
-                                    .padding(horizontal = 16.dp, vertical = 10.dp),
-                                horizontalArrangement = Arrangement.spacedBy(6.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(
-                                    imageVector = destination.icon,
-                                    contentDescription = stringResource(destination.labelRes),
-                                    modifier = Modifier.size(24.dp),
-                                    tint = MaterialTheme.colorScheme.primary
-                                )
-                                Text(
-                                    text = stringResource(destination.labelRes),
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
-                            }
-                        } else {
-                            // Not selected: solo ícono
-                            Box(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(12.dp))
-                                    .clickable { onNavigate(destination.route) }
-                                    .padding(12.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    imageVector = destination.icon,
-                                    contentDescription = stringResource(destination.labelRes),
-                                    modifier = Modifier.size(24.dp),
-                                    tint = DesignTokens.IconNormal
-                                )
-                            }
+                    // Item seleccionado: ícono + texto en pill
+                    // Item NO seleccionado: solo ícono
+                    if (isSelected) {
+                        // Selected: pill con ícono + texto
+                        Row(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(16.dp))
+                                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f))
+                                .clickable { onNavigate(destination.route) }
+                                .padding(horizontal = 16.dp, vertical = 10.dp),
+                            horizontalArrangement = Arrangement.spacedBy(6.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = destination.icon,
+                                contentDescription = stringResource(destination.labelRes),
+                                modifier = Modifier.size(24.dp),
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                            Text(
+                                text = stringResource(destination.labelRes),
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    } else {
+                        // Not selected: solo ícono
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(12.dp))
+                                .clickable { onNavigate(destination.route) }
+                                .padding(12.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = destination.icon,
+                                contentDescription = stringResource(destination.labelRes),
+                                modifier = Modifier.size(24.dp),
+                                tint = DesignTokens.IconNormal
+                            )
                         }
                     }
                 }

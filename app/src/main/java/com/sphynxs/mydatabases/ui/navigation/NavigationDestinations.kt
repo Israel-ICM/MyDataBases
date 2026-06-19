@@ -27,30 +27,37 @@ data class NavigationDestination(
 )
 
 /**
- * Devuelve los destinos de navegación según el contexto actual.
+ * Devuelve los destinos de navegación según el contexto actual y el route suffix.
  *
  * **Lógica contextual**:
  * - **OutsideConnection** → 2 destinos: Conexiones, Configuración
- * - **InsideConnection** → 5 destinos: Tablas, Vistas, Editor, Funciones, Backup
+ * - **InsideConnection** → bifurca según currentRoute:
+ *   - Si `currentRoute?.endsWith("/databases")` → 4 destinos: Add Database, New Query, Monitor, Settings
+ *   - Si otro suffix o null → 5 destinos: Tablas, Vistas, Editor, Funciones, Backup
  *
  * Los destinos `InsideConnection` interpolan el `connectionId` en la ruta.
  *
  * @param context Contexto de navegación activo
+ * @param currentRoute Ruta activa (opcional) para bifurcar destinos según suffix
  * @return Lista de destinos visibles para el contexto dado
  *
  * ## Ejemplo
  *
  * ```kotlin
- * val destinations = destinationsForContext(NavigationContext.InsideConnection("abc-123"))
- * // destinations[0].route == "connection/abc-123/tables"
- * // destinations[1].route == "connection/abc-123/views"
- * // ...
+ * val destinations = destinationsForContext(
+ *     NavigationContext.InsideConnection("abc-123"),
+ *     "connection/abc-123/databases"
+ * )
+ * // destinations.size == 4 (server menu)
  * ```
  *
  * @author israel-icm
- * @date 2026-06-15
+ * @date 2026-06-19 (updated para route suffix branching)
  */
-fun destinationsForContext(context: NavigationContext): List<NavigationDestination> {
+fun destinationsForContext(
+    context: NavigationContext,
+    currentRoute: String? = null
+): List<NavigationDestination> {
     return when (context) {
         is NavigationContext.OutsideConnection -> listOf(
             NavigationDestination(
@@ -67,37 +74,90 @@ fun destinationsForContext(context: NavigationContext): List<NavigationDestinati
             ),
         )
         
-        is NavigationContext.InsideConnection -> listOf(
-            NavigationDestination(
-                id = "tables",
-                labelRes = R.string.nav_tables,
-                icon = com.sphynxs.mydatabases.ui.components.PhosphorAppIcons.Nav.tables,
-                route = Routes.Tables.createRoute(context.connectionId),
-            ),
-            NavigationDestination(
-                id = "views",
-                labelRes = R.string.nav_views,
-                icon = com.sphynxs.mydatabases.ui.components.PhosphorAppIcons.Nav.views,
-                route = Routes.Views.createRoute(context.connectionId),
-            ),
-            NavigationDestination(
-                id = "editor",
-                labelRes = R.string.nav_editor,
-                icon = com.sphynxs.mydatabases.ui.components.PhosphorAppIcons.Nav.editor,
-                route = Routes.QueryEditor.createRoute(context.connectionId),
-            ),
-            NavigationDestination(
-                id = "functions",
-                labelRes = R.string.nav_functions,
-                icon = com.sphynxs.mydatabases.ui.components.PhosphorAppIcons.Nav.functions,
-                route = Routes.Functions.createRoute(context.connectionId),
-            ),
-            NavigationDestination(
-                id = "backup",
-                labelRes = R.string.nav_backup,
-                icon = com.sphynxs.mydatabases.ui.components.PhosphorAppIcons.Nav.backup,
-                route = Routes.Backup.createRoute(context.connectionId),
-            ),
-        )
+        is NavigationContext.InsideConnection -> {
+            if (currentRoute?.endsWith("/databases") == true) {
+                // Menú servidor (4 items) cuando estamos en /databases
+                destinationsForDatabaseList(context.connectionId)
+            } else {
+                // Menú DB (5 items) para todos los demás destinos InsideConnection
+                destinationsForDatabaseContext(context.connectionId)
+            }
+        }
     }
+}
+
+/**
+ * Destinos para el menú servidor (cuando estamos en /databases).
+ *
+ * @param connectionId ID de la conexión activa
+ * @return Lista de 4 destinos: Add Database, New Query, Monitor, Settings
+ */
+private fun destinationsForDatabaseList(connectionId: String): List<NavigationDestination> {
+    return listOf(
+        NavigationDestination(
+            id = "add_database",
+            labelRes = R.string.nav_add_database,
+            icon = com.sphynxs.mydatabases.ui.components.PhosphorAppIcons.Nav.addDatabase,
+            route = Routes.AddDatabase.createRoute(connectionId),
+        ),
+        NavigationDestination(
+            id = "new_query",
+            labelRes = R.string.nav_new_query,
+            icon = com.sphynxs.mydatabases.ui.components.PhosphorAppIcons.Nav.newQuery,
+            route = Routes.NewQuery.createRoute(connectionId),
+        ),
+        NavigationDestination(
+            id = "monitor",
+            labelRes = R.string.nav_monitor,
+            icon = com.sphynxs.mydatabases.ui.components.PhosphorAppIcons.Nav.monitor,
+            route = Routes.Monitor.createRoute(connectionId),
+        ),
+        NavigationDestination(
+            id = "settings",
+            labelRes = R.string.nav_settings,
+            icon = com.sphynxs.mydatabases.ui.components.PhosphorAppIcons.Nav.settings,
+            route = Routes.Settings.route,
+        ),
+    )
+}
+
+/**
+ * Destinos para el menú DB (cuando estamos en /tables, /views, etc.).
+ *
+ * @param connectionId ID de la conexión activa
+ * @return Lista de 5 destinos: Tablas, Vistas, Editor, Funciones, Backup
+ */
+private fun destinationsForDatabaseContext(connectionId: String): List<NavigationDestination> {
+    return listOf(
+        NavigationDestination(
+            id = "tables",
+            labelRes = R.string.nav_tables,
+            icon = com.sphynxs.mydatabases.ui.components.PhosphorAppIcons.Nav.tables,
+            route = Routes.Tables.createRoute(connectionId),
+        ),
+        NavigationDestination(
+            id = "views",
+            labelRes = R.string.nav_views,
+            icon = com.sphynxs.mydatabases.ui.components.PhosphorAppIcons.Nav.views,
+            route = Routes.Views.createRoute(connectionId),
+        ),
+        NavigationDestination(
+            id = "editor",
+            labelRes = R.string.nav_editor,
+            icon = com.sphynxs.mydatabases.ui.components.PhosphorAppIcons.Nav.editor,
+            route = Routes.QueryEditor.createRoute(connectionId),
+        ),
+        NavigationDestination(
+            id = "functions",
+            labelRes = R.string.nav_functions,
+            icon = com.sphynxs.mydatabases.ui.components.PhosphorAppIcons.Nav.functions,
+            route = Routes.Functions.createRoute(connectionId),
+        ),
+        NavigationDestination(
+            id = "backup",
+            labelRes = R.string.nav_backup,
+            icon = com.sphynxs.mydatabases.ui.components.PhosphorAppIcons.Nav.backup,
+            route = Routes.Backup.createRoute(connectionId),
+        ),
+    )
 }
