@@ -66,11 +66,11 @@ This change is architecturally atomic: promoting a legacy route to contextual na
 
 ## Phase 4: DatabasesListScreen and ViewModel Refactor
 
-- [ ] 4.1 Add `connectionId: String` parameter to `DatabasesListScreen` composable signature in `ui/screens/databases/DatabasesListScreen.kt`
-- [ ] 4.2 Inject `SavedStateHandle` into `DatabasesListViewModel` constructor in `ui/screens/databases/DatabasesListViewModel.kt`
-- [ ] 4.3 Read `connectionId` from `SavedStateHandle` in `DatabasesListViewModel.init` — `private val connectionId: String = savedStateHandle["connectionId"] ?: throw IllegalStateException(...)`
-- [ ] 4.4 Refactor `loadDatabases()` in `DatabasesListViewModel` — pass `connectionId` to `GetDatabasesUseCase` instead of relying on `MySQLConnectionPool.activeConnection` singleton
-- [ ] 4.5 Add error state handling in `DatabasesListViewModel` — if `connectionId` is missing from SavedStateHandle, emit `UiState.Error` with localized message
+- [x] 4.1 Add `connectionId: String` parameter to `DatabasesListScreen` composable signature in `ui/screens/databases/DatabasesListScreen.kt`
+- [x] 4.2 Inject `SavedStateHandle` into `DatabasesListViewModel` constructor in `ui/screens/databases/DatabasesListViewModel.kt`
+- [x] 4.3 Read `connectionId` from `SavedStateHandle` in `DatabasesListViewModel.init` — `private val connectionId: String = savedStateHandle["connectionId"] ?: throw IllegalStateException(...)`
+- [x] 4.4 Refactor `loadDatabases()` in `DatabasesListViewModel` — pass `connectionId` to `GetDatabasesUseCase` instead of relying on `MySQLConnectionPool.activeConnection` singleton
+- [x] 4.5 Add error state handling in `DatabasesListViewModel` — if `connectionId` is missing from SavedStateHandle, emit `UiState.Error` with localized message
 
 **Estimated lines**: ~25 (screen signature: 2, ViewModel: 20, error handling: 3)
 
@@ -80,13 +80,13 @@ This change is architecturally atomic: promoting a legacy route to contextual na
 
 ## Phase 5: AddDatabaseScreen Implementation
 
-- [ ] 5.1 Create `AddDatabaseScreen.kt` in `ui/screens/databases/` — composable with `connectionId: String` parameter
-- [ ] 5.2 Add three input fields — name (required, `TextField`), charset (optional, `TextField`), collation (optional, `TextField`) with localized labels
-- [ ] 5.3 Implement inline validation for name field — regex `^[A-Za-z0-9_]{1,64}$`, show error on invalid input
-- [ ] 5.4 Implement optional validation for charset and collation — same regex as name, only validate if non-empty
-- [ ] 5.5 Add Create button — enabled only when name is valid and charset/collation (if present) are valid
-- [ ] 5.6 Wire Create button to ViewModel `onSubmit(name, charset?, collation?)` — show "Coming soon" toast/snackbar (no SQL execution)
-- [ ] 5.7 Add Cancel/Back affordance — system back navigates to `/databases`
+- [x] 5.1 Create `AddDatabaseScreen.kt` in `ui/screens/databases/` — composable with `connectionId: String` parameter
+- [x] 5.2 Add three input fields — name (required, `TextField`), charset (optional, `TextField`), collation (optional, `TextField`) with localized labels
+- [x] 5.3 Implement inline validation for name field — regex `^[A-Za-z0-9_]{1,64}$`, show error on invalid input
+- [x] 5.4 Implement optional validation for charset and collation — same regex as name, only validate if non-empty
+- [x] 5.5 Add Create button — enabled only when name is valid and charset/collation (if present) are valid
+- [x] 5.6 Wire Create button to ViewModel `onSubmit(name, charset?, collation?)` — show "Coming soon" toast/snackbar (no SQL execution)
+- [x] 5.7 Add Cancel/Back affordance — system back navigates to `/databases`
 
 **Estimated lines**: ~80 (screen structure: 20, fields + validation: 40, button logic: 15, back handling: 5)
 
@@ -96,11 +96,11 @@ This change is architecturally atomic: promoting a legacy route to contextual na
 
 ## Phase 6: MonitorScreen Placeholder
 
-- [ ] 6.1 Create `MonitorScreen.kt` in `ui/screens/databases/` — composable with `connectionId: String` parameter
-- [ ] 6.2 Add `TabRow` with three tabs — "Metrics" / "Métricas", "Queries" / "Consultas", "Health" / "Estado" (localized)
-- [ ] 6.3 Add tab selection state — default to Metrics (index 0), switch on tap
-- [ ] 6.4 Add placeholder content for each tab — centered icon + localized title + "Coming soon" / "Próximamente" message
-- [ ] 6.5 Wire `SavedStateHandle["connectionId"]` for future use (no consumer in this change)
+- [x] 6.1 Create `MonitorScreen.kt` in `ui/screens/databases/` — composable with `connectionId: String` parameter
+- [x] 6.2 Add `TabRow` with three tabs — "Metrics" / "Métricas", "Queries" / "Consultas", "Health" / "Estado" (localized)
+- [x] 6.3 Add tab selection state — default to Metrics (index 0), switch on tap
+- [x] 6.4 Add placeholder content for each tab — centered icon + localized title + "Coming soon" / "Próximamente" message
+- [x] 6.5 Wire `SavedStateHandle["connectionId"]` for future use (no consumer in this change)
 
 **Estimated lines**: ~60 (screen structure: 15, TabRow: 20, 3 placeholders: 20, connectionId: 5)
 
@@ -110,10 +110,10 @@ This change is architecturally atomic: promoting a legacy route to contextual na
 
 ## Phase 7: NewQueryScreen Placeholder
 
-- [ ] 7.1 Create `NewQueryScreen.kt` in `ui/screens/databases/` — composable with `connectionId: String` parameter
-- [ ] 7.2 Add centered placeholder body — icon (code/query icon), title "Query editor" / "Editor de consultas", message "Coming soon" / "Próximamente"
-- [ ] 7.3 Wire `SavedStateHandle["connectionId"]` for future use (no consumer in this change)
-- [ ] 7.4 Verify system back navigates to `/databases`
+- [x] 7.1 Create `NewQueryScreen.kt` in `ui/screens/databases/` — composable with `connectionId: String` parameter
+- [x] 7.2 Add centered placeholder body — icon (code/query icon), title "Query editor" / "Editor de consultas", message "Coming soon" / "Próximamente"
+- [x] 7.3 Wire `SavedStateHandle["connectionId"]` for future use (no consumer in this change)
+- [x] 7.4 Verify system back navigates to `/databases`
 
 **Estimated lines**: ~30 (screen structure: 10, placeholder: 15, connectionId: 5)
 
