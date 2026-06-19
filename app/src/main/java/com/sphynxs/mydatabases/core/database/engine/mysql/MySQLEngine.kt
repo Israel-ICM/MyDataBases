@@ -423,4 +423,90 @@ class MySQLEngine : DatabaseEngine {
             else -> throwable
         }
     }
+    
+    /**
+     * Obtiene todos los character sets disponibles en el servidor MySQL.
+     *
+     * Ejecuta `SHOW CHARACTER SET` y parsea los resultados.
+     *
+     * @return Result con lista de CharacterSet
+     * @throws DatabaseError.ConnectionFailed si no hay conexión activa
+     * @throws DatabaseError.QueryExecutionFailed si la query falla
+     *
+     * @author israel-icm
+     * @date 2026-06-19
+     */
+    suspend fun getCharacterSets(): Result<List<CharacterSet>> = withContext(Dispatchers.IO) {
+        runCatching {
+            val connection = connectionPool?.getConnection()
+                ?: throw DatabaseError.ConnectionFailed("No conectado")
+            
+            val statement = connection.createStatement()
+            val resultSet = statement.executeQuery("SHOW CHARACTER SET")
+            
+            val charsets = mutableListOf<CharacterSet>()
+            while (resultSet.next()) {
+                charsets.add(
+                    CharacterSet(
+                        name = resultSet.getString("Charset"),
+                        description = resultSet.getString("Description"),
+                        defaultCollation = resultSet.getString("Default collation"),
+                        maxLength = resultSet.getInt("Maxlen")
+                    )
+                )
+            }
+            
+            resultSet.close()
+            statement.close()
+            connection.close()
+            
+            charsets
+        }.recoverCatching { throwable ->
+            throw mapQueryError(throwable, "SHOW CHARACTER SET")
+        }
+    }
+    
+    /**
+     * Obtiene todas las collations disponibles para un character set específico.
+     *
+     * Ejecuta `SHOW COLLATION WHERE Charset = ?` y parsea los resultados.
+     *
+     * @param charset Nombre del character set (ej: utf8mb4)
+     * @return Result con lista de Collation
+     * @throws DatabaseError.ConnectionFailed si no hay conexión activa
+     * @throws DatabaseError.QueryExecutionFailed si la query falla
+     *
+     * @author israel-icm
+     * @date 2026-06-19
+     */
+    suspend fun getCollations(charset: String): Result<List<Collation>> = withContext(Dispatchers.IO) {
+        runCatching {
+            val connection = connectionPool?.getConnection()
+                ?: throw DatabaseError.ConnectionFailed("No conectado")
+            
+            val statement = connection.prepareStatement("SHOW COLLATION WHERE Charset = ?")
+            statement.setString(1, charset)
+            val resultSet = statement.executeQuery()
+            
+            val collations = mutableListOf<Collation>()
+            while (resultSet.next()) {
+                collations.add(
+                    Collation(
+                        name = resultSet.getString("Collation"),
+                        charset = resultSet.getString("Charset"),
+                        id = resultSet.getInt("Id"),
+                        isDefault = resultSet.getString("Default") == "Yes"
+                    )
+                )
+            }
+            
+            resultSet.close()
+            statement.close()
+            connection.close()
+            
+            collations
+        }.recoverCatching { throwable ->
+            throw mapQueryError(throwable, "SHOW COLLATION WHERE Charset = '$charset'")
+        }
+    }
 }

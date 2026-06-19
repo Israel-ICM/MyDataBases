@@ -10,12 +10,21 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -37,6 +46,7 @@ import com.sphynxs.mydatabases.ui.components.ios.IOSSearchBar
 import com.sphynxs.mydatabases.ui.components.skeleton.DatabaseListSkeleton
 import com.sphynxs.mydatabases.ui.theme.DesignTokens
 import com.sphynxs.mydatabases.ui.theme.MyDataBasesTheme
+import kotlinx.coroutines.launch
 
 /**
  * Pantalla de lista de bases de datos.
@@ -44,21 +54,33 @@ import com.sphynxs.mydatabases.ui.theme.MyDataBasesTheme
  * Muestra todas las bases de datos disponibles en el servidor conectado.
  * Al seleccionar una base de datos, navega a la lista de tablas.
  *
+ * @param connectionId ID de la conexión activa
  * @param onNavigateToTables Callback para navegar a la lista de tablas
+ * @param showAddDatabaseSheet Si se debe mostrar el sheet de agregar database (controlado externamente)
+ * @param onDismissAddDatabaseSheet Callback cuando se cierra el sheet
  * @param viewModel El ViewModel con la lógica de estado
  * @param modifier Modificador opcional
  *
  * @author israel-icm
- * @date 2026-06-12
+ * @date 2026-06-12 (updated 2026-06-19 para bottom sheet)
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DatabasesListScreen(
+    connectionId: String,
     onNavigateToTables: (databaseName: String) -> Unit,
+    showAddDatabaseSheet: Boolean = false,
+    onDismissAddDatabaseSheet: () -> Unit = {},
     viewModel: DatabasesListViewModel = hiltViewModel(),
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val searchQuery by viewModel.searchQuery.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+
+    // Estado para el bottom sheet de agregar database
+    val addDatabaseSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     // Cargar databases al montar la pantalla
     LaunchedEffect(Unit) {
@@ -66,7 +88,8 @@ fun DatabasesListScreen(
     }
 
     Scaffold(
-        modifier = modifier
+        modifier = modifier,
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
         when (uiState) {
             is DatabasesUiState.Loading -> {
@@ -156,6 +179,34 @@ fun DatabasesListScreen(
                         .padding(paddingValues)
                 )
             }
+        }
+    }
+
+    // Bottom Sheet para agregar database
+    if (showAddDatabaseSheet) {
+        ModalBottomSheet(
+            onDismissRequest = {
+                scope.launch {
+                    addDatabaseSheetState.hide()
+                    onDismissAddDatabaseSheet()
+                }
+            },
+            sheetState = addDatabaseSheetState,
+            containerColor = Color(0xFFF2F2F7),
+            sheetMaxWidth = 10000.dp,
+            scrimColor = Color.Black.copy(alpha = 0.5f)
+        ) {
+            AddDatabaseFormContent(
+                connectionId = connectionId,
+                onDismiss = {
+                    scope.launch {
+                        addDatabaseSheetState.hide()
+                        onDismissAddDatabaseSheet()
+                    }
+                },
+                snackbarHostState = snackbarHostState,
+                modifier = Modifier.fillMaxSize()
+            )
         }
     }
 }

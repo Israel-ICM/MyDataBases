@@ -7,7 +7,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -55,6 +57,9 @@ fun MyDataBasesNavHost(
         NavigationContext.from(currentBackStackEntry?.destination?.route)
     }
     
+    // Estado para controlar el sheet de agregar database
+    var showAddDatabaseSheet by remember { mutableStateOf(false) }
+    
     // Obtener WindowSizeClass desde CompositionLocal provisto por MainActivity
     val windowSizeClass = LocalWindowSizeClass.current
         ?: throw IllegalStateException("WindowSizeClass no disponible — MainActivity debe proveerlo vía LocalWindowSizeClass")
@@ -72,6 +77,12 @@ fun MyDataBasesNavHost(
                 navController.navigate(route) {
                     // Evitar múltiples copias de la misma pantalla en el back stack
                     launchSingleTop = true
+                }
+            },
+            onModalAction = { destinationId ->
+                when (destinationId) {
+                    "add_database" -> showAddDatabaseSheet = true
+                    // Futuro: otros modales aquí
                 }
             }
         ) {
@@ -120,21 +131,14 @@ fun MyDataBasesNavHost(
             ) {
                 val connectionId = it.arguments?.getString("connectionId") ?: ""
                 DatabasesListScreen(
+                    connectionId = connectionId,
                     onNavigateToTables = { databaseName ->
                         navController.navigate(Routes.TableList.createRoute(databaseName))
+                    },
+                    showAddDatabaseSheet = showAddDatabaseSheet,
+                    onDismissAddDatabaseSheet = {
+                        showAddDatabaseSheet = false
                     }
-                )
-            }
-            
-            composable(
-                route = Routes.AddDatabase.route,
-                arguments = listOf(
-                    navArgument("connectionId") { type = NavType.StringType }
-                )
-            ) {
-                val connectionId = it.arguments?.getString("connectionId") ?: ""
-                com.sphynxs.mydatabases.ui.screens.databases.AddDatabaseScreen(
-                    connectionId = connectionId
                 )
             }
             

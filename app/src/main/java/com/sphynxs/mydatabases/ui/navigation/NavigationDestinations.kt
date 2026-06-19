@@ -14,9 +14,10 @@ import com.sphynxs.mydatabases.R
  * @property labelRes Resource ID del string traducible para el label
  * @property icon ImageVector del ícono (Material Icons Rounded)
  * @property route Ruta de navegación completa (puede incluir connectionId interpolado)
+ * @property isModal Si true, el destino dispara una acción modal (sheet) en vez de navegación
  *
  * @author israel-icm
- * @date 2026-06-15
+ * @date 2026-06-15 (updated 2026-06-19 para modal actions)
  */
 @Immutable
 data class NavigationDestination(
@@ -24,6 +25,7 @@ data class NavigationDestination(
     @StringRes val labelRes: Int,
     val icon: ImageVector,
     val route: String,
+    val isModal: Boolean = false,
 )
 
 /**
@@ -99,6 +101,7 @@ private fun destinationsForDatabaseList(connectionId: String): List<NavigationDe
             labelRes = R.string.nav_add_database,
             icon = com.sphynxs.mydatabases.ui.components.PhosphorAppIcons.Nav.addDatabase,
             route = Routes.AddDatabase.createRoute(connectionId),
+            isModal = true, // Abre ModalBottomSheet en vez de navegar
         ),
         NavigationDestination(
             id = "new_query",

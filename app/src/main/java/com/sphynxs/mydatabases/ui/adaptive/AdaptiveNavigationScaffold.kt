@@ -65,6 +65,7 @@ import com.sphynxs.mydatabases.ui.theme.DesignTokens
  * @param navigationContext Contexto derivado desde NavBackStackEntry
  * @param currentRoute Ruta activa para destacar el destino seleccionado
  * @param onNavigate Callback para navegar al seleccionar un destino (recibe route completo)
+ * @param onModalAction Callback para acciones modales (ej: abrir bottom sheet) - recibe el id del destino
  * @param content Contenido principal (NavHost con las pantallas)
  *
  * ## Ejemplo
@@ -80,14 +81,15 @@ import com.sphynxs.mydatabases.ui.theme.DesignTokens
  *     windowSizeClass = windowSizeClass,
  *     navigationContext = navigationContext,
  *     currentRoute = currentBackStackEntry?.destination?.route,
- *     onNavigate = { route -> navController.navigate(route) }
+ *     onNavigate = { route -> navController.navigate(route) },
+ *     onModalAction = { id -> /* handle modal */ }
  * ) {
  *     NavHost(...) { ... }
  * }
  * ```
  *
  * @author israel-icm
- * @date 2026-06-15
+ * @date 2026-06-15 (updated 2026-06-19 para modal actions)
  */
 @Composable
 fun AdaptiveNavigationScaffold(
@@ -95,6 +97,7 @@ fun AdaptiveNavigationScaffold(
     navigationContext: NavigationContext,
     currentRoute: String?,
     onNavigate: (String) -> Unit,
+    onModalAction: (String) -> Unit = {},
     content: @Composable () -> Unit,
 ) {
     val destinations = destinationsForContext(navigationContext, currentRoute)
@@ -122,6 +125,7 @@ fun AdaptiveNavigationScaffold(
                         destinations = destinations,
                         selectedRoute = currentRoute,
                         onNavigate = onNavigate,
+                        onModalAction = onModalAction,
                     )
                 }
             }
@@ -197,13 +201,15 @@ fun AdaptiveNavigationScaffold(
  *
  * @param destinations Destinos de navegación a mostrar
  * @param selectedRoute Ruta actualmente seleccionada
- * @param onNavigate Callback al seleccionar un destino
+ * @param onNavigate Callback al seleccionar un destino (navegación normal)
+ * @param onModalAction Callback para acciones modales (ej: abrir sheet)
  */
 @Composable
 private fun LiquidGlassBottomBar(
     destinations: List<NavigationDestination>,
     selectedRoute: String?,
     onNavigate: (String) -> Unit,
+    onModalAction: (String) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -254,7 +260,13 @@ private fun LiquidGlassBottomBar(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(16.dp))
                                 .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f))
-                                .clickable { onNavigate(destination.route) }
+                                .clickable {
+                                    if (destination.isModal) {
+                                        onModalAction(destination.id)
+                                    } else {
+                                        onNavigate(destination.route)
+                                    }
+                                }
                                 .padding(horizontal = 16.dp, vertical = 10.dp),
                             horizontalArrangement = Arrangement.spacedBy(6.dp),
                             verticalAlignment = Alignment.CenterVertically
@@ -277,7 +289,13 @@ private fun LiquidGlassBottomBar(
                         Box(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(12.dp))
-                                .clickable { onNavigate(destination.route) }
+                                .clickable {
+                                    if (destination.isModal) {
+                                        onModalAction(destination.id)
+                                    } else {
+                                        onNavigate(destination.route)
+                                    }
+                                }
                                 .padding(12.dp),
                             contentAlignment = Alignment.Center
                         ) {
