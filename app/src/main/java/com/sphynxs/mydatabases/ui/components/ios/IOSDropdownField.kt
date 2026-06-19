@@ -105,6 +105,7 @@ fun <T> IOSDropdownField(
                 onDismissRequest = { expanded = false },
                 offset = DpOffset(x = 0.dp, y = 8.dp),
                 shape = RoundedCornerShape(20.dp),
+                containerColor = Color.White,
                 modifier = Modifier
                     .fillMaxWidth(0.9f)
                     .heightIn(max = 400.dp)
