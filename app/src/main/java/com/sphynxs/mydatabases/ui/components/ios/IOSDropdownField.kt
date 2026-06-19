@@ -101,13 +101,13 @@ fun <T> IOSDropdownField(
                 .heightIn(max = 400.dp)
                 .shadow(
                     elevation = 16.dp,
-                    shape = RoundedCornerShape(12.dp),
+                    shape = RoundedCornerShape(20.dp),
                     ambientColor = Color.Black.copy(alpha = 0.12f),
                     spotColor = Color.Black.copy(alpha = 0.08f)
                 )
                 .background(
                     color = DesignTokens.SurfacePrimary,
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(20.dp)
                 )
         ) {
             items.forEach { item ->
