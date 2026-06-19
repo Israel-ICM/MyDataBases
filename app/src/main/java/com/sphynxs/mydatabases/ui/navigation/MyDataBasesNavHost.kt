@@ -89,9 +89,8 @@ fun MyDataBasesNavHost(
                         }
                     },
                     onConnect = { connectionId ->
-                        // TODO: navegar a la nueva ruta contextual connection/{id}/tables
-                        // Por ahora usa la ruta legacy database_list
-                        navController.navigate(Routes.DatabaseList.route)
+                        // Navegar a la nueva ruta contextual connection/{id}/databases
+                        navController.navigate(Routes.Databases.createRoute(connectionId))
                     }
                 )
             }
@@ -113,11 +112,53 @@ fun MyDataBasesNavHost(
                 )
             }
             
-            composable(Routes.DatabaseList.route) {
+            composable(
+                route = Routes.Databases.route,
+                arguments = listOf(
+                    navArgument("connectionId") { type = NavType.StringType }
+                )
+            ) {
+                val connectionId = it.arguments?.getString("connectionId") ?: ""
                 DatabasesListScreen(
                     onNavigateToTables = { databaseName ->
                         navController.navigate(Routes.TableList.createRoute(databaseName))
                     }
+                )
+            }
+            
+            composable(
+                route = Routes.AddDatabase.route,
+                arguments = listOf(
+                    navArgument("connectionId") { type = NavType.StringType }
+                )
+            ) {
+                val connectionId = it.arguments?.getString("connectionId") ?: ""
+                com.sphynxs.mydatabases.ui.screens.databases.AddDatabaseScreen(
+                    connectionId = connectionId
+                )
+            }
+            
+            composable(
+                route = Routes.NewQuery.route,
+                arguments = listOf(
+                    navArgument("connectionId") { type = NavType.StringType }
+                )
+            ) {
+                val connectionId = it.arguments?.getString("connectionId") ?: ""
+                com.sphynxs.mydatabases.ui.screens.databases.NewQueryScreen(
+                    connectionId = connectionId
+                )
+            }
+            
+            composable(
+                route = Routes.Monitor.route,
+                arguments = listOf(
+                    navArgument("connectionId") { type = NavType.StringType }
+                )
+            ) {
+                val connectionId = it.arguments?.getString("connectionId") ?: ""
+                com.sphynxs.mydatabases.ui.screens.databases.MonitorScreen(
+                    connectionId = connectionId
                 )
             }
             

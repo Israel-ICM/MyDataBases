@@ -220,11 +220,4 @@ sealed class Routes(val route: String) {
      * Pantalla de ajustes de la aplicación (tema, idioma, etc.).
      */
     data object Settings : Routes("settings")
-    
-    /**
-     * DEPRECATED: Alias temporal para DatabaseList legacy.
-     * Será eliminado en Phase 3 cuando se complete el NavHost wiring.
-     */
-    @Deprecated("Use Routes.Databases instead", ReplaceWith("Routes.Databases"))
-    data object DatabaseList : Routes("database_list")
 }
