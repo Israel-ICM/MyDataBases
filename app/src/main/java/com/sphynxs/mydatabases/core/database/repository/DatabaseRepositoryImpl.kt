@@ -79,4 +79,18 @@ class DatabaseRepositoryImpl @Inject constructor(
     override fun getSupportedFeatures(): Set<DatabaseFeature> {
         return currentEngine?.getSupportedFeatures() ?: emptySet()
     }
+    
+    override suspend fun getCharacterSets(): Result<List<CharacterSet>> {
+        val engine = currentEngine as? com.sphynxs.mydatabases.core.database.engine.mysql.MySQLEngine
+            ?: return Result.failure(DatabaseError.ConnectionFailed("No conectado a MySQL"))
+        
+        return engine.getCharacterSets()
+    }
+    
+    override suspend fun getCollations(charset: String): Result<List<Collation>> {
+        val engine = currentEngine as? com.sphynxs.mydatabases.core.database.engine.mysql.MySQLEngine
+            ?: return Result.failure(DatabaseError.ConnectionFailed("No conectado a MySQL"))
+        
+        return engine.getCollations(charset)
+    }
 }

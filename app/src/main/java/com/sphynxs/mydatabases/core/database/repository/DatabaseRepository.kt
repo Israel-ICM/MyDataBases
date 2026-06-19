@@ -114,4 +114,25 @@ interface DatabaseRepository {
      * @return Set de DatabaseFeature (vacío si no hay motor conectado)
      */
     fun getSupportedFeatures(): Set<DatabaseFeature>
+    
+    /**
+     * Lista todos los character sets disponibles en el servidor MySQL/MariaDB.
+     *
+     * @return Result con lista de CharacterSet ordenados alfabéticamente
+     * @throws DatabaseError.ConnectionFailed si no hay motor conectado
+     * @author israel-icm
+     * @date 2026-06-19
+     */
+    suspend fun getCharacterSets(): Result<List<CharacterSet>>
+    
+    /**
+     * Lista todas las collations disponibles para un character set específico.
+     *
+     * @param charset Nombre del character set (ej: utf8mb4, latin1)
+     * @return Result con lista de Collation ordenadas: default primero, luego alfabético
+     * @throws DatabaseError.ConnectionFailed si no hay motor conectado
+     * @author israel-icm
+     * @date 2026-06-19
+     */
+    suspend fun getCollations(charset: String): Result<List<Collation>>
 }
