@@ -24,8 +24,74 @@ sealed class Routes(val route: String) {
     
     /**
      * Pantalla de lista de bases de datos disponibles en la conexión activa.
+     * 
+     * Usa el patrón contextual connection/{connectionId}/databases para ser
+     * consistente con el resto de destinos InsideConnection.
+     *
+     * @property route Template con argumento `connectionId`
      */
-    data object DatabaseList : Routes("database_list")
+    data object Databases : Routes("connection/{connectionId}/databases") {
+        /**
+         * Crea la ruta completa reemplazando el argumento connectionId.
+         *
+         * @param connectionId ID de la conexión activa
+         * @return Ruta navegable (ej: "connection/abc-123/databases")
+         */
+        fun createRoute(connectionId: String): String {
+            return "connection/$connectionId/databases"
+        }
+    }
+    
+    /**
+     * Pantalla de formulario para agregar una nueva base de datos/schema.
+     * 
+     * @property route Template con argumento `connectionId`
+     */
+    data object AddDatabase : Routes("connection/{connectionId}/add_database") {
+        /**
+         * Crea la ruta completa reemplazando el argumento connectionId.
+         *
+         * @param connectionId ID de la conexión activa
+         * @return Ruta navegable (ej: "connection/abc-123/add_database")
+         */
+        fun createRoute(connectionId: String): String {
+            return "connection/$connectionId/add_database"
+        }
+    }
+    
+    /**
+     * Pantalla del editor de consultas SQL (placeholder para nueva query).
+     * 
+     * @property route Template con argumento `connectionId`
+     */
+    data object NewQuery : Routes("connection/{connectionId}/new_query") {
+        /**
+         * Crea la ruta completa reemplazando el argumento connectionId.
+         *
+         * @param connectionId ID de la conexión activa
+         * @return Ruta navegable (ej: "connection/abc-123/new_query")
+         */
+        fun createRoute(connectionId: String): String {
+            return "connection/$connectionId/new_query"
+        }
+    }
+    
+    /**
+     * Pantalla de monitoreo del servidor (métricas, queries, salud).
+     * 
+     * @property route Template con argumento `connectionId`
+     */
+    data object Monitor : Routes("connection/{connectionId}/monitor") {
+        /**
+         * Crea la ruta completa reemplazando el argumento connectionId.
+         *
+         * @param connectionId ID de la conexión activa
+         * @return Ruta navegable (ej: "connection/abc-123/monitor")
+         */
+        fun createRoute(connectionId: String): String {
+            return "connection/$connectionId/monitor"
+        }
+    }
     
     /**
      * Pantalla de lista de tablas de una base de datos específica.

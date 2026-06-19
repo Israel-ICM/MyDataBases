@@ -5,6 +5,9 @@
     <!-- Navigation routes -->
     <string name="nav_connections">Connections</string>
     <string name="nav_database_list">Databases</string>
+    <string name="nav_add_database">Add Database</string>
+    <string name="nav_new_query">New Query</string>
+    <string name="nav_monitor">Monitor</string>
     <string name="nav_tables">Tables</string>
     <string name="nav_views">Views</string>
     <string name="nav_editor">Editor</string>
@@ -57,6 +60,28 @@
     <string name="databases_title">Databases</string>
     <string name="databases_empty">No databases available</string>
     <string name="databases_search_hint">Search databases…</string>
+    
+    <!-- Add Database screen -->
+    <string name="add_database_title">Add Database</string>
+    <string name="add_database_field_name">Database Name</string>
+    <string name="add_database_field_name_hint">my_database</string>
+    <string name="add_database_field_charset">Character Set</string>
+    <string name="add_database_field_charset_hint">utf8mb4 (optional)</string>
+    <string name="add_database_field_collation">Collation</string>
+    <string name="add_database_field_collation_hint">utf8mb4_general_ci (optional)</string>
+    <string name="add_database_button_create">Create Database</string>
+    <string name="add_database_coming_soon">Database creation — coming soon</string>
+    
+    <!-- Monitor screen -->
+    <string name="monitor_title">Server Monitor</string>
+    <string name="monitor_tab_metrics">Metrics</string>
+    <string name="monitor_tab_queries">Queries</string>
+    <string name="monitor_tab_health">Health</string>
+    <string name="monitor_placeholder">Monitor — Coming soon</string>
+    
+    <!-- Query Editor screen -->
+    <string name="query_editor_title">Query Editor</string>
+    <string name="query_editor_placeholder">Query Editor — Coming soon</string>
     
     <!-- Tables screen -->
     <string name="tables_title">Tables - %1$s</string>

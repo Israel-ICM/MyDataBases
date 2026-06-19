@@ -31,6 +31,9 @@ object PhosphorAppIcons {
     object Nav {
         val connections: ImageVector get() = TablerIcons.Server
         val settings: ImageVector get() = TablerIcons.Settings
+        val addDatabase: ImageVector get() = TablerIcons.Plus
+        val newQuery: ImageVector get() = TablerIcons.FileText
+        val monitor: ImageVector get() = TablerIcons.Activity
         val tables: ImageVector get() = TablerIcons.Table
         val views: ImageVector get() = TablerIcons.Eye
         val editor: ImageVector get() = TablerIcons.Code
