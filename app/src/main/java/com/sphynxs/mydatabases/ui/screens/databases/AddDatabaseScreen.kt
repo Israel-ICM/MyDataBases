@@ -1,27 +1,18 @@
 package com.sphynxs.mydatabases.ui.screens.databases
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MenuAnchorType
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -30,22 +21,26 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.sphynxs.mydatabases.R
+import com.sphynxs.mydatabases.ui.components.ios.IOSButton
+import com.sphynxs.mydatabases.ui.components.ios.IOSButtonStyle
+import com.sphynxs.mydatabases.ui.components.ios.IOSDropdownField
+import com.sphynxs.mydatabases.ui.components.ios.IOSGroupedCard
+import com.sphynxs.mydatabases.ui.components.ios.IOSTextField
 import kotlinx.coroutines.launch
 
 /**
  * Contenido del formulario para agregar una nueva base de datos.
  * 
  * Diseñado para usarse dentro de un ModalBottomSheet (igual que ConnectionFormScreen).
- * Form UI con tres campos: name (required), charset (dropdown), collation (dropdown).
+ * Form UI estilo iOS con tres campos: name (required), charset (dropdown), collation (dropdown).
  * Charsets y collations se cargan dinámicamente desde el servidor MySQL/MariaDB.
  * Submit muestra "Coming soon" — no SQL execution en este change.
  *
@@ -59,9 +54,8 @@ import kotlinx.coroutines.launch
  * @param modifier Modificador opcional
  *
  * @author sdd-apply
- * @date 2026-06-19 (updated para dropdowns dinámicos)
+ * @date 2026-06-19 (updated para estilo iOS)
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddDatabaseFormContent(
     connectionId: String,
@@ -78,17 +72,13 @@ fun AddDatabaseFormContent(
 
     // Form state
     var name by remember { mutableStateOf("") }
-    var selectedCharset by remember { mutableStateOf<String?>(null) }
-    var selectedCollation by remember { mutableStateOf<String?>(null) }
-    
-    // Dropdown expansion states
-    var charsetExpanded by remember { mutableStateOf(false) }
-    var collationExpanded by remember { mutableStateOf(false) }
+    var selectedCharset by remember { mutableStateOf<com.sphynxs.mydatabases.core.database.models.CharacterSet?>(null) }
+    var selectedCollation by remember { mutableStateOf<com.sphynxs.mydatabases.core.database.models.Collation?>(null) }
 
     // Cuando se selecciona un charset, cargar sus collations
     LaunchedEffect(selectedCharset) {
         if (selectedCharset != null) {
-            viewModel.loadCollations(selectedCharset!!)
+            viewModel.loadCollations(selectedCharset!!.name)
         } else {
             viewModel.clearCollations()
             selectedCollation = null
@@ -103,184 +93,141 @@ fun AddDatabaseFormContent(
 
     Column(
         modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+            .fillMaxSize()
+            .background(Color(0xFFF2F2F7))
+            .padding(vertical = 16.dp)
+            .verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
-        // Title
+        // Title (iOS style)
         Text(
             text = stringResource(R.string.add_database_title),
-            style = MaterialTheme.typography.headlineMedium
+            fontSize = 34.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.Black,
+            modifier = Modifier.padding(horizontal = 16.dp)
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Name field (required)
-        TextField(
-            value = name,
-            onValueChange = { name = it },
-            label = { Text(stringResource(R.string.add_database_field_name)) },
-            placeholder = { Text(stringResource(R.string.add_database_field_name_hint)) },
-            isError = !nameValidation.isValid && name.isNotEmpty(),
-            supportingText = {
-                if (!nameValidation.isValid && name.isNotEmpty()) {
-                    Text(nameValidation.errorMessage ?: "")
-                }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .semantics {
-                    contentDescription = "Database name field"
-                },
-            singleLine = true
-        )
-
-        // Charset dropdown (optional)
-        ExposedDropdownMenuBox(
-            expanded = charsetExpanded,
-            onExpandedChange = { charsetExpanded = it },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            TextField(
-                value = selectedCharset ?: "",
-                onValueChange = {},
-                readOnly = true,
-                label = { Text(stringResource(R.string.add_database_field_charset)) },
-                placeholder = { Text(stringResource(R.string.add_database_field_charset_hint)) },
-                trailingIcon = {
-                    if (charsetState is CharsetLoadState.Loading) {
-                        CircularProgressIndicator(modifier = Modifier.padding(12.dp))
-                    } else {
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = charsetExpanded)
-                    }
-                },
-                colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                modifier = Modifier
-                    .menuAnchor(MenuAnchorType.PrimaryNotEditable)
-                    .fillMaxWidth()
-                    .semantics {
-                        contentDescription = "Character set dropdown"
-                    }
+        // Card: Database Info
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(
+                text = "DATABASE",
+                fontSize = 13.sp,
+                color = Color(0xFF8E8E93),
+                modifier = Modifier.padding(start = 16.dp)
             )
             
-            ExposedDropdownMenu(
-                expanded = charsetExpanded,
-                onDismissRequest = { charsetExpanded = false }
-            ) {
-                when (charsetState) {
+            IOSGroupedCard {
+                // Name field (required)
+                IOSTextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    placeholder = stringResource(R.string.add_database_field_name_hint),
+                    showDivider = true
+                )
+                
+                // Charset dropdown (optional)
+                when (val state = charsetState) {
                     is CharsetLoadState.Success -> {
-                        val charsets = (charsetState as CharsetLoadState.Success).charsets
-                        charsets.forEach { charset ->
-                            DropdownMenuItem(
-                                text = { 
-                                    Column {
-                                        Text(charset.name)
-                                        Text(
-                                            text = charset.description,
-                                            style = MaterialTheme.typography.bodySmall,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                                        )
-                                    }
-                                },
-                                onClick = {
-                                    selectedCharset = charset.name
-                                    charsetExpanded = false
-                                }
-                            )
-                        }
+                        IOSDropdownField(
+                            value = selectedCharset,
+                            onValueChange = { selectedCharset = it },
+                            placeholder = stringResource(R.string.add_database_field_charset_hint),
+                            items = state.charsets,
+                            itemLabel = { it.name },
+                            itemSubtitle = { it.description },
+                            showDivider = true,
+                            isLoading = false
+                        )
+                    }
+                    is CharsetLoadState.Loading -> {
+                        IOSDropdownField(
+                            value = selectedCharset,
+                            onValueChange = {},
+                            placeholder = "Loading charsets...",
+                            items = emptyList(),
+                            itemLabel = { it.name },
+                            showDivider = true,
+                            isLoading = true,
+                            enabled = false
+                        )
                     }
                     is CharsetLoadState.Error -> {
-                        DropdownMenuItem(
-                            text = { Text((charsetState as CharsetLoadState.Error).message) },
-                            onClick = { charsetExpanded = false },
+                        IOSDropdownField(
+                            value = selectedCharset,
+                            onValueChange = {},
+                            placeholder = "Error loading charsets",
+                            items = emptyList(),
+                            itemLabel = { it.name },
+                            showDivider = true,
                             enabled = false
                         )
                     }
-                    else -> {}
                 }
-            }
-        }
-
-        // Collation dropdown (optional, habilitado solo si hay charset seleccionado)
-        ExposedDropdownMenuBox(
-            expanded = collationExpanded,
-            onExpandedChange = { 
-                if (selectedCharset != null) {
-                    collationExpanded = it
-                }
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            TextField(
-                value = selectedCollation ?: "",
-                onValueChange = {},
-                readOnly = true,
-                enabled = selectedCharset != null,
-                label = { Text(stringResource(R.string.add_database_field_collation)) },
-                placeholder = { Text(stringResource(R.string.add_database_field_collation_hint)) },
-                trailingIcon = {
-                    if (collationState is CollationLoadState.Loading) {
-                        CircularProgressIndicator(modifier = Modifier.padding(12.dp))
-                    } else if (selectedCharset != null) {
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = collationExpanded)
-                    }
-                },
-                colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                modifier = Modifier
-                    .menuAnchor(MenuAnchorType.PrimaryNotEditable)
-                    .fillMaxWidth()
-                    .semantics {
-                        contentDescription = "Collation dropdown"
-                    }
-            )
-            
-            ExposedDropdownMenu(
-                expanded = collationExpanded,
-                onDismissRequest = { collationExpanded = false }
-            ) {
-                when (collationState) {
+                
+                // Collation dropdown (optional, enabled only if charset selected)
+                when (val state = collationState) {
                     is CollationLoadState.Success -> {
-                        val collations = (collationState as CollationLoadState.Success).collations
-                        collations.forEach { collation ->
-                            DropdownMenuItem(
-                                text = { 
+                        IOSDropdownField(
+                            value = selectedCollation,
+                            onValueChange = { selectedCollation = it },
+                            placeholder = stringResource(R.string.add_database_field_collation_hint),
+                            items = state.collations,
+                            itemLabel = { it.name },
+                            showDivider = false,
+                            isLoading = false,
+                            itemTrailing = { collation ->
+                                if (collation.isDefault) {
                                     Text(
-                                        text = collation.name,
-                                        fontWeight = if (collation.isDefault) FontWeight.Bold else FontWeight.Normal
+                                        text = "Default",
+                                        fontSize = 13.sp,
+                                        color = Color(0xFF007AFF),
+                                        fontWeight = FontWeight.Medium
                                     )
-                                },
-                                onClick = {
-                                    selectedCollation = collation.name
-                                    collationExpanded = false
-                                },
-                                trailingIcon = {
-                                    if (collation.isDefault) {
-                                        Text(
-                                            text = "Default",
-                                            style = MaterialTheme.typography.labelSmall,
-                                            color = MaterialTheme.colorScheme.primary
-                                        )
-                                    }
                                 }
-                            )
-                        }
+                            }
+                        )
                     }
-                    is CollationLoadState.Error -> {
-                        DropdownMenuItem(
-                            text = { Text((collationState as CollationLoadState.Error).message) },
-                            onClick = { collationExpanded = false },
+                    is CollationLoadState.Loading -> {
+                        IOSDropdownField(
+                            value = selectedCollation,
+                            onValueChange = {},
+                            placeholder = "Loading collations...",
+                            items = emptyList(),
+                            itemLabel = { it.name },
+                            showDivider = false,
+                            isLoading = true,
                             enabled = false
                         )
                     }
-                    else -> {}
+                    is CollationLoadState.Idle, is CollationLoadState.Error -> {
+                        IOSDropdownField(
+                            value = selectedCollation,
+                            onValueChange = {},
+                            placeholder = stringResource(R.string.add_database_field_collation_hint),
+                            items = emptyList(),
+                            itemLabel = { it.name },
+                            showDivider = false,
+                            enabled = selectedCharset != null
+                        )
+                    }
                 }
+            }
+            
+            // Error message for name validation
+            if (!nameValidation.isValid && name.isNotEmpty()) {
+                Text(
+                    text = nameValidation.errorMessage ?: "",
+                    fontSize = 13.sp,
+                    color = Color(0xFFFF3B30),
+                    modifier = Modifier.padding(start = 16.dp)
+                )
             }
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Create button
-        Button(
+        // Create button (iOS style)
+        IOSButton(
+            text = stringResource(R.string.add_database_button_create),
             onClick = {
                 // Spec: "Coming soon" snackbar, no SQL execution
                 scope.launch {
@@ -290,18 +237,11 @@ fun AddDatabaseFormContent(
                 }
             },
             enabled = isFormValid,
+            style = IOSButtonStyle.PRIMARY,
             modifier = Modifier
                 .fillMaxWidth()
-                .semantics {
-                    contentDescription = if (isFormValid) {
-                        "Create database button, enabled"
-                    } else {
-                        "Create database button, disabled"
-                    }
-                }
-        ) {
-            Text(stringResource(R.string.add_database_button_create))
-        }
+                .padding(horizontal = 16.dp)
+        )
         
         Spacer(modifier = Modifier.height(32.dp))
     }

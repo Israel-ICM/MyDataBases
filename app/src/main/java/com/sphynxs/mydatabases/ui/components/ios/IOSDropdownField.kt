@@ -1,0 +1,137 @@
+package com.sphynxs.mydatabases.ui.components.ios
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+
+/**
+ * Dropdown field estilo iOS para usar dentro de IOSGroupedCard.
+ *
+ * Mantiene el mismo estilo visual que IOSTextField pero abre un menú dropdown
+ * al tocarlo.
+ *
+ * @param value Valor seleccionado actual (puede ser null)
+ * @param onValueChange Callback cuando se selecciona un item
+ * @param placeholder Texto placeholder cuando no hay selección
+ * @param items Lista de items para mostrar en el dropdown
+ * @param itemLabel Lambda para obtener el label de cada item
+ * @param showDivider Si mostrar divider inferior (default true)
+ * @param isLoading Si está cargando datos (muestra spinner)
+ * @param enabled Si el campo está habilitado (default true)
+ * @param modifier Modificador opcional
+ *
+ * @author israel-icm
+ * @date 2026-06-19
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun <T> IOSDropdownField(
+    value: T?,
+    onValueChange: (T) -> Unit,
+    placeholder: String,
+    items: List<T>,
+    itemLabel: (T) -> String,
+    modifier: Modifier = Modifier,
+    showDivider: Boolean = true,
+    isLoading: Boolean = false,
+    enabled: Boolean = true,
+    itemSubtitle: ((T) -> String)? = null,
+    itemTrailing: (@Composable (T) -> Unit)? = null
+) {
+    var expanded by remember { mutableStateOf(false) }
+    
+    Column(modifier = modifier) {
+        // Campo principal (trigger del dropdown)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(if (enabled) Color.White else Color(0xFFF2F2F7))
+                .clickable(enabled = enabled && !isLoading) { expanded = true }
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            // Texto seleccionado o placeholder
+            Text(
+                text = value?.let { itemLabel(it) } ?: placeholder,
+                color = if (value != null) Color.Black else Color(0xFFC7C7CC),
+                fontSize = 17.sp,
+                fontWeight = if (value != null) FontWeight.Normal else FontWeight.Normal,
+                modifier = Modifier.weight(1f)
+            )
+            
+            // Indicador de carga o flecha
+            if (isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(20.dp),
+                    strokeWidth = 2.dp,
+                    color = Color(0xFF8E8E93)
+                )
+            } else if (enabled) {
+                Icon(
+                    imageVector = Icons.Default.KeyboardArrowDown,
+                    contentDescription = null,
+                    tint = Color(0xFF8E8E93),
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+        }
+        
+        // Dropdown menu
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier
+                .fillMaxWidth(0.9f)
+                .heightIn(max = 400.dp)
+        ) {
+            items.forEach { item ->
+                DropdownMenuItem(
+                    text = {
+                        Column {
+                            Text(
+                                text = itemLabel(item),
+                                fontSize = 16.sp,
+                                color = Color.Black
+                            )
+                            itemSubtitle?.invoke(item)?.let { subtitle ->
+                                Spacer(modifier = Modifier.height(2.dp))
+                                Text(
+                                    text = subtitle,
+                                    fontSize = 13.sp,
+                                    color = Color(0xFF8E8E93)
+                                )
+                            }
+                        }
+                    },
+                    onClick = {
+                        onValueChange(item)
+                        expanded = false
+                    },
+                    trailingIcon = itemTrailing?.let { trailing ->
+                        { trailing(item) }
+                    }
+                )
+            }
+        }
+        
+        // Divider
+        if (showDivider) {
+            HorizontalDivider(
+                color = Color(0xFFC6C6C8),
+                thickness = 0.5.dp,
+                modifier = Modifier.padding(start = 16.dp)
+            )
+        }
+    }
+}
