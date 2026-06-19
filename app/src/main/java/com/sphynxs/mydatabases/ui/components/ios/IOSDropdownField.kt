@@ -92,54 +92,57 @@ fun <T> IOSDropdownField(
         }
         
         // Dropdown menu moderno estilo iOS
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-            offset = DpOffset(x = 0.dp, y = 8.dp),
-            modifier = Modifier
-                .fillMaxWidth(0.9f)
-                .heightIn(max = 400.dp)
-                .shadow(
-                    elevation = 16.dp,
-                    shape = RoundedCornerShape(20.dp),
-                    ambientColor = Color.Black.copy(alpha = 0.12f),
-                    spotColor = Color.Black.copy(alpha = 0.08f)
-                )
-                .background(
-                    color = DesignTokens.SurfacePrimary,
-                    shape = RoundedCornerShape(20.dp)
-                )
+        MaterialTheme(
+            shapes = MaterialTheme.shapes.copy(
+                extraSmall = RoundedCornerShape(20.dp)
+            )
         ) {
-            items.forEach { item ->
-                DropdownMenuItem(
-                    text = {
-                        Column(modifier = Modifier.padding(vertical = 4.dp)) {
-                            Text(
-                                text = itemLabel(item),
-                                fontSize = DesignTokens.CardTitleSize,
-                                color = DesignTokens.TextPrimary,
-                                fontWeight = FontWeight.Medium
-                            )
-                            itemSubtitle?.invoke(item)?.let { subtitle ->
-                                Spacer(modifier = Modifier.height(4.dp))
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                offset = DpOffset(x = 0.dp, y = 8.dp),
+                shape = RoundedCornerShape(20.dp),
+                modifier = Modifier
+                    .fillMaxWidth(0.9f)
+                    .heightIn(max = 400.dp)
+                    .shadow(
+                        elevation = 16.dp,
+                        shape = RoundedCornerShape(20.dp),
+                        ambientColor = Color.Black.copy(alpha = 0.12f),
+                        spotColor = Color.Black.copy(alpha = 0.08f)
+                    )
+            ) {
+                items.forEach { item ->
+                    DropdownMenuItem(
+                        text = {
+                            Column(modifier = Modifier.padding(vertical = 4.dp)) {
                                 Text(
-                                    text = subtitle,
-                                    fontSize = DesignTokens.LabelSize,
-                                    color = DesignTokens.TextSecondary,
-                                    lineHeight = 16.sp
+                                    text = itemLabel(item),
+                                    fontSize = DesignTokens.CardTitleSize,
+                                    color = DesignTokens.TextPrimary,
+                                    fontWeight = FontWeight.Medium
                                 )
+                                itemSubtitle?.invoke(item)?.let { subtitle ->
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Text(
+                                        text = subtitle,
+                                        fontSize = DesignTokens.LabelSize,
+                                        color = DesignTokens.TextSecondary,
+                                        lineHeight = 16.sp
+                                    )
+                                }
                             }
-                        }
-                    },
-                    onClick = {
-                        onValueChange(item)
-                        expanded = false
-                    },
-                    trailingIcon = itemTrailing?.let { trailing ->
-                        { trailing(item) }
-                    },
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
-                )
+                        },
+                        onClick = {
+                            onValueChange(item)
+                            expanded = false
+                        },
+                        trailingIcon = itemTrailing?.let { trailing ->
+                            { trailing(item) }
+                        },
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+                    )
+                }
             }
         }
         
