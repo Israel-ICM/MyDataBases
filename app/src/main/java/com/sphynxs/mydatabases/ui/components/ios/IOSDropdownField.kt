@@ -112,7 +112,7 @@ fun <T> IOSDropdownField(
                 modifier = Modifier
                     .fillMaxWidth(0.9f)
                     .heightIn(max = 400.dp)
-                    .padding(bottom = 8.dp)
+                    .padding(16.dp)
             ) {
                 items.forEach { item ->
                     DropdownMenuItem(
