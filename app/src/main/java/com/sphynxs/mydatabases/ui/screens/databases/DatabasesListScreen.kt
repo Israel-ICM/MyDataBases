@@ -192,21 +192,27 @@ fun DatabasesListScreen(
                 }
             },
             sheetState = addDatabaseSheetState,
-            containerColor = Color(0xFFF2F2F7),
+            containerColor = com.sphynxs.mydatabases.ui.theme.DesignTokens.BackgroundPrimary,
             sheetMaxWidth = 10000.dp,
             scrimColor = Color.Black.copy(alpha = 0.5f)
         ) {
-            AddDatabaseFormContent(
-                connectionId = connectionId,
-                onDismiss = {
-                    scope.launch {
-                        addDatabaseSheetState.hide()
-                        onDismissAddDatabaseSheet()
-                    }
-                },
-                snackbarHostState = snackbarHostState,
-                modifier = Modifier.fillMaxSize()
-            )
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp)
+            ) {
+                AddDatabaseFormContent(
+                    connectionId = connectionId,
+                    onDismiss = {
+                        scope.launch {
+                            addDatabaseSheetState.hide()
+                            onDismissAddDatabaseSheet()
+                        }
+                    },
+                    snackbarHostState = snackbarHostState,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
         }
     }
 }

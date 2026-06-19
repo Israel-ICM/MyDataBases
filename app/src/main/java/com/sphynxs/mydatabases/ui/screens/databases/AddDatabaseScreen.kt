@@ -94,7 +94,7 @@ fun AddDatabaseFormContent(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(Color(0xFFF2F2F7))
+            .background(com.sphynxs.mydatabases.ui.theme.DesignTokens.BackgroundPrimary)
             .padding(vertical = 16.dp)
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(24.dp)
@@ -102,9 +102,9 @@ fun AddDatabaseFormContent(
         // Title (iOS style)
         Text(
             text = stringResource(R.string.add_database_title),
-            fontSize = 34.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black,
+            fontSize = com.sphynxs.mydatabases.ui.theme.DesignTokens.LargeTitleSize,
+            fontWeight = com.sphynxs.mydatabases.ui.theme.DesignTokens.LargeTitleWeight,
+            color = com.sphynxs.mydatabases.ui.theme.DesignTokens.LargeTitleColor,
             modifier = Modifier.padding(horizontal = 16.dp)
         )
 
@@ -112,8 +112,8 @@ fun AddDatabaseFormContent(
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(
                 text = "DATABASE",
-                fontSize = 13.sp,
-                color = Color(0xFF8E8E93),
+                fontSize = com.sphynxs.mydatabases.ui.theme.DesignTokens.LabelSize,
+                color = com.sphynxs.mydatabases.ui.theme.DesignTokens.TextSecondary,
                 modifier = Modifier.padding(start = 16.dp)
             )
             
@@ -180,9 +180,9 @@ fun AddDatabaseFormContent(
                                 if (collation.isDefault) {
                                     Text(
                                         text = "Default",
-                                        fontSize = 13.sp,
-                                        color = Color(0xFF007AFF),
-                                        fontWeight = FontWeight.Medium
+                                        fontSize = com.sphynxs.mydatabases.ui.theme.DesignTokens.LabelSize,
+                                        color = com.sphynxs.mydatabases.ui.theme.DesignTokens.AccentPrimary,
+                                        fontWeight = com.sphynxs.mydatabases.ui.theme.DesignTokens.LabelWeight
                                     )
                                 }
                             }
@@ -218,8 +218,8 @@ fun AddDatabaseFormContent(
             if (!nameValidation.isValid && name.isNotEmpty()) {
                 Text(
                     text = nameValidation.errorMessage ?: "",
-                    fontSize = 13.sp,
-                    color = Color(0xFFFF3B30),
+                    fontSize = com.sphynxs.mydatabases.ui.theme.DesignTokens.LabelSize,
+                    color = MaterialTheme.colorScheme.error,
                     modifier = Modifier.padding(start = 16.dp)
                 )
             }
@@ -237,7 +237,7 @@ fun AddDatabaseFormContent(
                 }
             },
             enabled = isFormValid,
-            style = IOSButtonStyle.PRIMARY,
+            style = IOSButtonStyle.Primary,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)

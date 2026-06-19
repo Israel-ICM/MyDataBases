@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.sphynxs.mydatabases.ui.theme.DesignTokens
 
 /**
  * Dropdown field estilo iOS para usar dentro de IOSGroupedCard.
@@ -55,7 +56,7 @@ fun <T> IOSDropdownField(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(if (enabled) Color.White else Color(0xFFF2F2F7))
+                .background(if (enabled) DesignTokens.SurfacePrimary else DesignTokens.BackgroundPrimary)
                 .clickable(enabled = enabled && !isLoading) { expanded = true }
                 .padding(horizontal = 16.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -64,9 +65,9 @@ fun <T> IOSDropdownField(
             // Texto seleccionado o placeholder
             Text(
                 text = value?.let { itemLabel(it) } ?: placeholder,
-                color = if (value != null) Color.Black else Color(0xFFC7C7CC),
-                fontSize = 17.sp,
-                fontWeight = if (value != null) FontWeight.Normal else FontWeight.Normal,
+                color = if (value != null) DesignTokens.TextPrimary else DesignTokens.TextTertiary,
+                fontSize = DesignTokens.CardTitleSize,
+                fontWeight = if (value != null) DesignTokens.CardTitleWeight else FontWeight.Normal,
                 modifier = Modifier.weight(1f)
             )
             
@@ -75,13 +76,13 @@ fun <T> IOSDropdownField(
                 CircularProgressIndicator(
                     modifier = Modifier.size(20.dp),
                     strokeWidth = 2.dp,
-                    color = Color(0xFF8E8E93)
+                    color = DesignTokens.IconNormal
                 )
             } else if (enabled) {
                 Icon(
                     imageVector = Icons.Default.KeyboardArrowDown,
                     contentDescription = null,
-                    tint = Color(0xFF8E8E93),
+                    tint = DesignTokens.IconNormal,
                     modifier = Modifier.size(20.dp)
                 )
             }
@@ -101,15 +102,15 @@ fun <T> IOSDropdownField(
                         Column {
                             Text(
                                 text = itemLabel(item),
-                                fontSize = 16.sp,
-                                color = Color.Black
+                                fontSize = DesignTokens.CardTitleSize,
+                                color = DesignTokens.TextPrimary
                             )
                             itemSubtitle?.invoke(item)?.let { subtitle ->
                                 Spacer(modifier = Modifier.height(2.dp))
                                 Text(
                                     text = subtitle,
-                                    fontSize = 13.sp,
-                                    color = Color(0xFF8E8E93)
+                                    fontSize = DesignTokens.LabelSize,
+                                    color = DesignTokens.TextSecondary
                                 )
                             }
                         }
@@ -128,7 +129,7 @@ fun <T> IOSDropdownField(
         // Divider
         if (showDivider) {
             HorizontalDivider(
-                color = Color(0xFFC6C6C8),
+                color = DesignTokens.Separator,
                 thickness = 0.5.dp,
                 modifier = Modifier.padding(start = 16.dp)
             )
