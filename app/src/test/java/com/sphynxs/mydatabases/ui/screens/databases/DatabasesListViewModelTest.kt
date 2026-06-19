@@ -1,9 +1,11 @@
 package com.sphynxs.mydatabases.ui.screens.databases
 
+import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.sphynxs.mydatabases.core.database.models.Database
 import com.sphynxs.mydatabases.domain.usecases.GetDatabasesUseCase
 import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -30,6 +32,7 @@ import org.junit.Test
 class DatabasesListViewModelTest {
 
     private lateinit var getDatabasesUseCase: GetDatabasesUseCase
+    private lateinit var savedStateHandle: SavedStateHandle
     private lateinit var viewModel: DatabasesListViewModel
 
     private val testDispatcher = StandardTestDispatcher()
@@ -38,6 +41,9 @@ class DatabasesListViewModelTest {
     fun setup() {
         Dispatchers.setMain(testDispatcher)
         getDatabasesUseCase = mockk()
+        savedStateHandle = mockk()
+        // Default: provide valid connectionId for all tests
+        every { savedStateHandle.get<String>("connectionId") } returns "test-connection-id"
     }
 
     @After
@@ -57,7 +63,7 @@ class DatabasesListViewModelTest {
         coEvery { getDatabasesUseCase() } returns Result.success(listOf(database1, database2))
 
         // WHEN: se crea el ViewModel y se dispara loadDatabases
-        viewModel = DatabasesListViewModel(getDatabasesUseCase)
+        viewModel = DatabasesListViewModel(getDatabasesUseCase, savedStateHandle)
         viewModel.loadDatabases()
         testDispatcher.scheduler.advanceUntilIdle()
 
@@ -82,7 +88,7 @@ class DatabasesListViewModelTest {
         coEvery { getDatabasesUseCase() } returns Result.failure(Exception(errorMessage))
 
         // WHEN: se crea el ViewModel y se dispara loadDatabases
-        viewModel = DatabasesListViewModel(getDatabasesUseCase)
+        viewModel = DatabasesListViewModel(getDatabasesUseCase, savedStateHandle)
         viewModel.loadDatabases()
         testDispatcher.scheduler.advanceUntilIdle()
 
@@ -100,7 +106,7 @@ class DatabasesListViewModelTest {
     @Test
     fun `estado inicial es Loading`() = runTest {
         // GIVEN: un ViewModel recién creado
-        viewModel = DatabasesListViewModel(getDatabasesUseCase)
+        viewModel = DatabasesListViewModel(getDatabasesUseCase, savedStateHandle)
 
         // WHEN: se observa el estado inicial
         viewModel.uiState.test {
@@ -120,7 +126,7 @@ class DatabasesListViewModelTest {
         coEvery { getDatabasesUseCase() } returns Result.success(emptyList())
 
         // WHEN: se crea el ViewModel y se dispara loadDatabases
-        viewModel = DatabasesListViewModel(getDatabasesUseCase)
+        viewModel = DatabasesListViewModel(getDatabasesUseCase, savedStateHandle)
         viewModel.loadDatabases()
         testDispatcher.scheduler.advanceUntilIdle()
 
@@ -130,5 +136,43 @@ class DatabasesListViewModelTest {
             assertTrue(state is DatabasesUiState.Success)
             assertEquals(0, (state as DatabasesUiState.Success).databases.size)
         }
+    }
+
+    /**
+     * RED Test #5: ViewModel debe leer connectionId desde SavedStateHandle.
+     * Spec: database-list-navigation "ViewModel loads databases for the navArg connectionId"
+     */
+    @Test
+    fun `ViewModel lee connectionId desde SavedStateHandle`() = runTest {
+        // GIVEN: SavedStateHandle con connectionId = "c-42"
+        val savedStateHandle = mockk<SavedStateHandle>()
+        every { savedStateHandle.get<String>("connectionId") } returns "c-42"
+        coEvery { getDatabasesUseCase() } returns Result.success(emptyList())
+
+        // WHEN: se crea el ViewModel con SavedStateHandle
+        viewModel = DatabasesListViewModel(getDatabasesUseCase, savedStateHandle)
+
+        // THEN: el ViewModel se inicializa sin error
+        // (la implementación debe leer connectionId y no lanzar excepción)
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertTrue(state is DatabasesUiState.Loading)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    /**
+     * RED Test #6 (TRIANGULATE): Missing connectionId debe fallar con IllegalStateException.
+     * Spec: database-list-navigation "Missing connectionId fails loudly"
+     */
+    @Test(expected = IllegalStateException::class)
+    fun `Missing connectionId en SavedStateHandle lanza IllegalStateException`() {
+        // GIVEN: SavedStateHandle sin connectionId
+        val savedStateHandle = mockk<SavedStateHandle>()
+        every { savedStateHandle.get<String>("connectionId") } returns null
+
+        // WHEN: se crea el ViewModel
+        // THEN: debe lanzar IllegalStateException
+        DatabasesListViewModel(getDatabasesUseCase, savedStateHandle)
     }
 }

@@ -1,5 +1,6 @@
 package com.sphynxs.mydatabases.ui.screens.databases
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sphynxs.mydatabases.core.database.models.Database
@@ -18,14 +19,19 @@ import javax.inject.Inject
  * en el servidor conectado.
  *
  * @property getDatabasesUseCase Use case para obtener todas las bases de datos
+ * @property savedStateHandle Saved state handle para acceder a navArgs
  *
  * @author israel-icm
  * @date 2026-06-12
  */
 @HiltViewModel
 class DatabasesListViewModel @Inject constructor(
-    private val getDatabasesUseCase: GetDatabasesUseCase
+    private val getDatabasesUseCase: GetDatabasesUseCase,
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+
+    private val connectionId: String = savedStateHandle["connectionId"]
+        ?: throw IllegalStateException("connectionId navArg missing")
 
     private val _uiState = MutableStateFlow<DatabasesUiState>(DatabasesUiState.Loading)
     
