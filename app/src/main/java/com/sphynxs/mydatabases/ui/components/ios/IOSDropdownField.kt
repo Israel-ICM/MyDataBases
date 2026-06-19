@@ -95,6 +95,9 @@ fun <T> IOSDropdownField(
         MaterialTheme(
             shapes = MaterialTheme.shapes.copy(
                 extraSmall = RoundedCornerShape(20.dp)
+            ),
+            colorScheme = MaterialTheme.colorScheme.copy(
+                surface = DesignTokens.SurfacePrimary
             )
         ) {
             DropdownMenu(
@@ -106,10 +109,10 @@ fun <T> IOSDropdownField(
                     .fillMaxWidth(0.9f)
                     .heightIn(max = 400.dp)
                     .shadow(
-                        elevation = 16.dp,
+                        elevation = 24.dp,
                         shape = RoundedCornerShape(20.dp),
-                        ambientColor = Color.Black.copy(alpha = 0.12f),
-                        spotColor = Color.Black.copy(alpha = 0.08f)
+                        ambientColor = Color.Black.copy(alpha = 0.15f),
+                        spotColor = Color.Black.copy(alpha = 0.25f)
                     )
             ) {
                 items.forEach { item ->
