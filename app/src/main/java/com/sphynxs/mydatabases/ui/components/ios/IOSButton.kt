@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -14,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.sphynxs.mydatabases.ui.theme.DesignTokens
 
 @Composable
 fun IOSButton(
@@ -24,14 +26,14 @@ fun IOSButton(
     style: IOSButtonStyle = IOSButtonStyle.Primary
 ) {
     val backgroundColor = when (style) {
-        IOSButtonStyle.Primary -> if (enabled) Color(0xFF007AFF) else Color(0xFF007AFF).copy(alpha = 0.3f)
+        IOSButtonStyle.Primary -> if (enabled) DesignTokens.AccentPrimary else DesignTokens.AccentPrimary.copy(alpha = 0.3f)
         IOSButtonStyle.Secondary -> Color.Transparent
-        IOSButtonStyle.Destructive -> if (enabled) Color(0xFFFF3B30) else Color(0xFFFF3B30).copy(alpha = 0.3f)
+        IOSButtonStyle.Destructive -> if (enabled) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.error.copy(alpha = 0.3f)
     }
     
     val textColor = when (style) {
         IOSButtonStyle.Primary -> Color.White
-        IOSButtonStyle.Secondary -> Color(0xFF007AFF)
+        IOSButtonStyle.Secondary -> DesignTokens.AccentPrimary
         IOSButtonStyle.Destructive -> Color.White
     }
     
@@ -42,7 +44,7 @@ fun IOSButton(
         shape = RoundedCornerShape(12.dp),
         color = backgroundColor,
         border = if (style == IOSButtonStyle.Secondary) 
-            BorderStroke(1.dp, Color(0xFF007AFF)) else null
+            BorderStroke(1.dp, DesignTokens.AccentPrimary) else null
     ) {
         Box(
             modifier = Modifier.padding(vertical = 14.dp),
