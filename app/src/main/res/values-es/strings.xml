@@ -77,7 +77,10 @@
     <string name="monitor_tab_metrics">Métricas</string>
     <string name="monitor_tab_queries">Consultas</string>
     <string name="monitor_tab_health">Estado</string>
-    <string name="monitor_placeholder">Monitor — Próximamente</string>
+    <string name="monitor_metrics_title">Métricas del servidor</string>
+    <string name="monitor_queries_title">Registro de consultas</string>
+    <string name="monitor_health_title">Estado del servidor</string>
+    <string name="monitor_placeholder">Próximamente</string>
     
     <!-- Query Editor screen -->
     <string name="query_editor_title">Editor de consultas</string>

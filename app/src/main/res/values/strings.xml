@@ -77,7 +77,10 @@
     <string name="monitor_tab_metrics">Metrics</string>
     <string name="monitor_tab_queries">Queries</string>
     <string name="monitor_tab_health">Health</string>
-    <string name="monitor_placeholder">Monitor — Coming soon</string>
+    <string name="monitor_metrics_title">Server Metrics</string>
+    <string name="monitor_queries_title">Query Log</string>
+    <string name="monitor_health_title">Health Check</string>
+    <string name="monitor_placeholder">Coming soon</string>
     
     <!-- Query Editor screen -->
     <string name="query_editor_title">Query Editor</string>
