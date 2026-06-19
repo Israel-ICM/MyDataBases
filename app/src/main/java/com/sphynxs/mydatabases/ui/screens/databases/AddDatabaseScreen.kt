@@ -137,7 +137,9 @@ fun AddDatabaseFormContent(
                             itemLabel = { it.name },
                             itemSubtitle = { it.description },
                             showDivider = true,
-                            isLoading = false
+                            isLoading = false,
+                            showFilter = true,
+                            filterPlaceholder = "Search charset..."
                         )
                     }
                     is CharsetLoadState.Loading -> {
@@ -176,6 +178,8 @@ fun AddDatabaseFormContent(
                             itemLabel = { it.name },
                             showDivider = false,
                             isLoading = false,
+                            showFilter = true,
+                            filterPlaceholder = "Search collation...",
                             itemTrailing = { collation ->
                                 if (collation.isDefault) {
                                     Text(

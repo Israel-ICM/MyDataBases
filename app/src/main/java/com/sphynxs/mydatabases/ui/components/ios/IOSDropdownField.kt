@@ -2,19 +2,29 @@ package com.sphynxs.mydatabases.ui.components.ios
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -53,9 +63,36 @@ fun <T> IOSDropdownField(
     isLoading: Boolean = false,
     enabled: Boolean = true,
     itemSubtitle: ((T) -> String)? = null,
-    itemTrailing: (@Composable (T) -> Unit)? = null
+    itemTrailing: (@Composable (T) -> Unit)? = null,
+    showFilter: Boolean = false,
+    filterPlaceholder: String = "Search..."
 ) {
     var expanded by remember { mutableStateOf(false) }
+    var searchQuery by remember { mutableStateOf("") }
+    val focusRequester = remember { FocusRequester() }
+    
+    // Reset search when menu closes, request focus when opens
+    LaunchedEffect(expanded) {
+        if (!expanded) {
+            searchQuery = ""
+        } else if (showFilter) {
+            // Small delay to ensure popup is fully rendered
+            kotlinx.coroutines.delay(100)
+            focusRequester.requestFocus()
+        }
+    }
+    
+    // Filter items based on search query
+    val filteredItems = remember(items, searchQuery) {
+        if (searchQuery.isEmpty()) {
+            items
+        } else {
+            items.filter { item ->
+                itemLabel(item).contains(searchQuery, ignoreCase = true) ||
+                itemSubtitle?.invoke(item)?.contains(searchQuery, ignoreCase = true) == true
+            }
+        }
+    }
     
     Column(modifier = modifier) {
         // Campo principal (trigger del dropdown)
@@ -113,7 +150,59 @@ fun <T> IOSDropdownField(
                     .fillMaxWidth(0.9f)
                     .heightIn(max = 400.dp)
             ) {
-                items.forEach { item ->
+                // Search filter (optional)
+                if (showFilter) {
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        OutlinedTextField(
+                            value = searchQuery,
+                            onValueChange = { searchQuery = it },
+                            placeholder = {
+                                Text(
+                                    text = filterPlaceholder,
+                                    fontSize = 15.sp
+                                )
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.Search,
+                                    contentDescription = null,
+                                    tint = DesignTokens.IconNormal,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp)
+                                .focusRequester(focusRequester),
+                            textStyle = TextStyle(
+                                fontSize = 15.sp,
+                                color = DesignTokens.TextPrimary
+                            ),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = DesignTokens.AccentPrimary,
+                                unfocusedBorderColor = DesignTokens.Separator,
+                                cursorColor = DesignTokens.AccentPrimary,
+                                focusedContainerColor = Color.White,
+                                unfocusedContainerColor = Color.White
+                            ),
+                            shape = RoundedCornerShape(12.dp),
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(
+                                imeAction = ImeAction.Done
+                            ),
+                            keyboardActions = KeyboardActions(
+                                onDone = { /* Keep dropdown open */ }
+                            )
+                        )
+                        HorizontalDivider(
+                            color = DesignTokens.Separator,
+                            thickness = 0.5.dp
+                        )
+                    }
+                }
+                
+                // Items list
+                filteredItems.forEach { item ->
                     DropdownMenuItem(
                         text = {
                             Column(modifier = Modifier.padding(vertical = 4.dp)) {
