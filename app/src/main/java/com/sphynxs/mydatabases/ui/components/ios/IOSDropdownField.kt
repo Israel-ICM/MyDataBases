@@ -2,11 +2,9 @@ package com.sphynxs.mydatabases.ui.components.ios
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -21,14 +19,14 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.PopupProperties
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.sphynxs.mydatabases.ui.theme.DesignTokens
 
 /**
@@ -71,14 +69,18 @@ fun <T> IOSDropdownField(
     var searchQuery by remember { mutableStateOf("") }
     val focusRequester = remember { FocusRequester() }
     
+    val keyboardController = LocalSoftwareKeyboardController.current
+
     // Reset search when menu closes, request focus when opens
     LaunchedEffect(expanded) {
         if (!expanded) {
             searchQuery = ""
         } else if (showFilter) {
-            // Small delay to ensure popup is fully rendered
-            kotlinx.coroutines.delay(100)
+            // Delay para que el Dialog se renderice antes de pedir foco
+            kotlinx.coroutines.delay(300)
             focusRequester.requestFocus()
+            kotlinx.coroutines.delay(100)
+            keyboardController?.show()
         }
     }
     
@@ -131,118 +133,134 @@ fun <T> IOSDropdownField(
             }
         }
         
-        // Dropdown menu moderno estilo iOS
-        MaterialTheme(
-            shapes = MaterialTheme.shapes.copy(
-                extraSmall = RoundedCornerShape(20.dp)
-            )
-        ) {
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
-                offset = DpOffset(x = 0.dp, y = 8.dp),
-                shape = RoundedCornerShape(20.dp),
-                containerColor = Color.White,
-                tonalElevation = 0.dp,
-                shadowElevation = 8.dp,
-                properties = PopupProperties(clippingEnabled = false),
-                modifier = Modifier
-                    .fillMaxWidth(0.9f)
-                    .heightIn(max = 400.dp)
-            ) {
-                // Search filter (optional)
-                if (showFilter) {
-                    Column(modifier = Modifier.fillMaxWidth()) {
-                        OutlinedTextField(
-                            value = searchQuery,
-                            onValueChange = { searchQuery = it },
-                            placeholder = {
-                                Text(
-                                    text = filterPlaceholder,
-                                    fontSize = 15.sp
-                                )
-                            },
-                            leadingIcon = {
-                                Icon(
-                                    imageVector = Icons.Default.Search,
-                                    contentDescription = null,
-                                    tint = DesignTokens.IconNormal,
-                                    modifier = Modifier.size(20.dp)
-                                )
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(12.dp)
-                                .focusRequester(focusRequester),
-                            textStyle = TextStyle(
-                                fontSize = 15.sp,
-                                color = DesignTokens.TextPrimary
-                            ),
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = DesignTokens.AccentPrimary,
-                                unfocusedBorderColor = DesignTokens.Separator,
-                                cursorColor = DesignTokens.AccentPrimary,
-                                focusedContainerColor = Color.White,
-                                unfocusedContainerColor = Color.White
-                            ),
-                            shape = RoundedCornerShape(12.dp),
-                            singleLine = true,
-                            keyboardOptions = KeyboardOptions(
-                                imeAction = ImeAction.Done
-                            ),
-                            keyboardActions = KeyboardActions(
-                                onDone = { /* Keep dropdown open */ }
-                            )
-                        )
-                        HorizontalDivider(
-                            color = DesignTokens.Separator,
-                            thickness = 0.5.dp
-                        )
-                    }
-                }
-                
-                // Items list
-                filteredItems.forEach { item ->
-                    DropdownMenuItem(
-                        text = {
-                            Column(modifier = Modifier.padding(vertical = 4.dp)) {
-                                Text(
-                                    text = itemLabel(item),
-                                    fontSize = DesignTokens.CardTitleSize,
-                                    color = DesignTokens.TextPrimary,
-                                    fontWeight = FontWeight.Medium
-                                )
-                                itemSubtitle?.invoke(item)?.let { subtitle ->
-                                    Spacer(modifier = Modifier.height(4.dp))
-                                    Text(
-                                        text = subtitle,
-                                        fontSize = DesignTokens.LabelSize,
-                                        color = DesignTokens.TextSecondary,
-                                        lineHeight = 16.sp
-                                    )
-                                }
-                            }
-                        },
-                        onClick = {
-                            onValueChange(item)
-                            expanded = false
-                        },
-                        trailingIcon = itemTrailing?.let { trailing ->
-                            { trailing(item) }
-                        },
-                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
-                    )
-                }
-            }
-        }
-        
-        // Divider
+        // Divider — lo movemos antes del Dialog para mantener el layout del trigger
         if (showDivider) {
             HorizontalDivider(
                 color = DesignTokens.Separator,
                 thickness = 0.5.dp,
                 modifier = Modifier.padding(start = 16.dp)
             )
+        }
+    }
+
+    // Dialog modal en vez de DropdownMenu para evitar problemas de foco/IME
+    // DropdownMenu usa un Popup internamente y no enruta bien el teclado virtual
+    if (expanded) {
+        Dialog(
+            onDismissRequest = { expanded = false },
+            properties = DialogProperties(usePlatformDefaultWidth = false)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth(0.9f)
+                    .heightIn(max = 400.dp)
+                    .shadow(8.dp, RoundedCornerShape(20.dp))
+                    .background(Color.White, RoundedCornerShape(20.dp))
+                    .padding(top = 8.dp)
+            ) {
+                // Search filter (optional)
+                if (showFilter) {
+                    OutlinedTextField(
+                        value = searchQuery,
+                        onValueChange = { searchQuery = it },
+                        placeholder = {
+                            Text(
+                                text = filterPlaceholder,
+                                fontSize = 15.sp
+                            )
+                        },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Search,
+                                contentDescription = null,
+                                tint = DesignTokens.IconNormal,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp)
+                            .focusRequester(focusRequester),
+                        textStyle = TextStyle(
+                            fontSize = 15.sp,
+                            color = DesignTokens.TextPrimary
+                        ),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = DesignTokens.AccentPrimary,
+                            unfocusedBorderColor = DesignTokens.Separator,
+                            cursorColor = DesignTokens.AccentPrimary,
+                            focusedContainerColor = Color.White,
+                            unfocusedContainerColor = Color.White
+                        ),
+                        shape = RoundedCornerShape(12.dp),
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(
+                            imeAction = ImeAction.Done
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onDone = { /* Keep dialog open */ }
+                        )
+                    )
+                    HorizontalDivider(
+                        color = DesignTokens.Separator,
+                        thickness = 0.5.dp
+                    )
+                }
+
+                // Items list (scrollable)
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    if (filteredItems.isEmpty()) {
+                        Text(
+                            text = "No results",
+                            fontSize = DesignTokens.LabelSize,
+                            color = DesignTokens.TextSecondary,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    } else {
+                        filteredItems.forEach { item ->
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        onValueChange(item)
+                                        expanded = false
+                                    }
+                                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = itemLabel(item),
+                                        fontSize = DesignTokens.CardTitleSize,
+                                        color = DesignTokens.TextPrimary,
+                                        fontWeight = FontWeight.Medium
+                                    )
+                                    itemSubtitle?.invoke(item)?.let { subtitle ->
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Text(
+                                            text = subtitle,
+                                            fontSize = DesignTokens.LabelSize,
+                                            color = DesignTokens.TextSecondary,
+                                            lineHeight = 16.sp
+                                        )
+                                    }
+                                }
+                                itemTrailing?.invoke(item)
+                            }
+                            HorizontalDivider(
+                                color = DesignTokens.Separator.copy(alpha = 0.5f),
+                                thickness = 0.5.dp,
+                                modifier = Modifier.padding(start = 16.dp)
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 }
