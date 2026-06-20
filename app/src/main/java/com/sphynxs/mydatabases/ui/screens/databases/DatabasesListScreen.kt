@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -81,6 +83,16 @@ fun DatabasesListScreen(
 
     // Estado para el bottom sheet de agregar database
     val addDatabaseSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    
+    // Altura real del status bar (incluye notch/cutout)
+    val statusBarHeightDp = with(LocalDensity.current) {
+        LocalContext.current.resources
+            .getIdentifier("status_bar_height", "dimen", "android")
+            .takeIf { it > 0 }
+            ?.let { resourceId ->
+                LocalContext.current.resources.getDimensionPixelSize(resourceId).toDp()
+            } ?: 24.dp
+    }
 
     // Cargar databases al montar la pantalla
     LaunchedEffect(Unit) {
@@ -199,7 +211,7 @@ fun DatabasesListScreen(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 16.dp)
+                    .padding(start = 16.dp, end = 16.dp, top = statusBarHeightDp)
             ) {
                 AddDatabaseFormContent(
                     connectionId = connectionId,
