@@ -92,6 +92,13 @@
     <!-- Query Editor screen -->
     <string name="query_editor_title">Query Editor</string>
     <string name="query_editor_placeholder">Query Editor — Coming soon</string>
+    <string name="execute_button">Execute</string>
+    <string name="cancel_button">Cancel</string>
+    <string name="clear_button">Clear</string>
+    <string name="query_editor_empty_state">Run a query to see results here</string>
+    <string name="query_editor_error_prefix">Query Error</string>
+    <string name="rows_affected">Rows affected</string>
+    <string name="execution_time_ms">Execution time</string>
     
     <!-- Tables screen -->
     <string name="tables_title">Tables - %1$s</string>
