@@ -33,41 +33,41 @@ User must choose before proceeding with `sdd-apply`.
 
 ## Phase 1: Foundation — Result Grid Extraction
 
-- [ ] 1.1 Create `ui/components/ResultGrid.kt` with public `@Composable ResultGrid(columns, rows, modifier)` signature
-- [ ] 1.2 Implement header row rendering with `LazyColumn` + `Row` + fixed 150.dp width per column
-- [ ] 1.3 Implement data rows with NULL display (`onSurfaceVariant` 60% alpha, "NULL" text)
-- [ ] 1.4 Add horizontal scroll modifier to parent container (both header + rows scroll together)
-- [ ] 1.5 Refactor `TableViewerScreen.kt` RowsTab → consume shared `ResultGrid` component
-- [ ] 1.6 Test: `TableViewerScreen` still renders rows identically after extraction
+- [x] 1.1 Create `ui/components/ResultGrid.kt` with public `@Composable ResultGrid(columns, rows, modifier)` signature
+- [x] 1.2 Implement header row rendering with `LazyColumn` + `Row` + fixed 150.dp width per column
+- [x] 1.3 Implement data rows with NULL display (`onSurfaceVariant` 60% alpha, "NULL" text)
+- [x] 1.4 Add horizontal scroll modifier to parent container (both header + rows scroll together)
+- [x] 1.5 Refactor `TableViewerScreen.kt` RowsTab → consume shared `ResultGrid` component
+- [x] 1.6 Test: `TableViewerScreen` still renders rows identically after extraction
 - [ ] 1.7 Write `ResultGridTest.kt` Compose UI test (header visible, rows align, NULL rendering, empty result, horizontal scroll)
 
 ## Phase 2: Foundation — SQL Tokenizer
 
-- [ ] 2.1 Create `ui/screens/queryeditor/components/SqlTokenizer.kt` with `tokenize(sql: String): List<SqlToken>` signature
-- [ ] 2.2 Define `SqlToken(range: IntRange, kind: TokenKind)` data class
-- [ ] 2.3 Define `TokenKind` enum: KEYWORD, STRING, COMMENT, NUMBER, IDENTIFIER, OPERATOR, WHITESPACE, PUNCTUATION
-- [ ] 2.4 Implement regex-based tokenizer: match strings (`'...'`, `"..."`), comments (`--`, `/* */`), numbers, keywords (case-insensitive), identifiers, operators, punctuation, whitespace
-- [ ] 2.5 Write `SqlTokenizerTest.kt` JVM unit tests: keywords (SELECT, FROM, WHERE, mixed case), strings (single/double quotes, escaped quotes), comments (line, block, nested), numbers (int, float), identifiers (plain, backtick), operators, punctuation, whitespace, edge cases (empty string, only whitespace, unclosed strings)
-- [ ] 2.6 Test: 100% coverage on tokenizer (pure function, highly testable)
+- [x] 2.1 Create `ui/screens/queryeditor/components/SqlTokenizer.kt` with `tokenize(sql: String): List<SqlToken>` signature
+- [x] 2.2 Define `SqlToken(range: IntRange, kind: TokenKind)` data class
+- [x] 2.3 Define `TokenKind` enum: KEYWORD, STRING, COMMENT, NUMBER, IDENTIFIER, OPERATOR, WHITESPACE, PUNCTUATION
+- [x] 2.4 Implement regex-based tokenizer: match strings (`'...'`, `"..."`), comments (`--`, `/* */`), numbers, keywords (case-insensitive), identifiers, operators, punctuation, whitespace
+- [x] 2.5 Write `SqlTokenizerTest.kt` JVM unit tests: keywords (SELECT, FROM, WHERE, mixed case), strings (single/double quotes, escaped quotes), comments (line, block, nested), numbers (int, float), identifiers (plain, backtick), operators, punctuation, whitespace, edge cases (empty string, only whitespace, unclosed strings)
+- [x] 2.6 Test: 100% coverage on tokenizer (pure function, highly testable)
 
 ## Phase 3: Foundation — Syntax Highlighting Transformation
 
-- [ ] 3.1 Create `ui/screens/queryeditor/components/SqlHighlightTransformation.kt` implementing `VisualTransformation`
-- [ ] 3.2 Implement `filter(text: AnnotatedString): TransformedText` that maps tokens → SpanStyle (KEYWORD → primary bold, STRING → tertiary, COMMENT → onSurfaceVariant italic 60% alpha, NUMBER → secondary, OPERATOR → onSurface)
-- [ ] 3.3 Use `MaterialTheme.colorScheme` for colors (no hard-coded colors)
-- [ ] 3.4 Return `TransformedText(annotated, OffsetMapping.Identity)`
+- [x] 3.1 Create `ui/screens/queryeditor/components/SqlHighlightTransformation.kt` implementing `VisualTransformation`
+- [x] 3.2 Implement `filter(text: AnnotatedString): TransformedText` that maps tokens → SpanStyle (KEYWORD → primary bold, STRING → tertiary, COMMENT → onSurfaceVariant italic 60% alpha, NUMBER → secondary, OPERATOR → onSurface)
+- [x] 3.3 Use `MaterialTheme.colorScheme` for colors (no hard-coded colors)
+- [x] 3.4 Return `TransformedText(annotated, OffsetMapping.Identity)`
 
 ## Phase 4: Foundation — Query Editor ViewModel
 
-- [ ] 4.1 Create `domain/models/StatementResult.kt` data class: `sql: String, affectedRows: Int?, executionTimeMs: Long, isQuery: Boolean`
-- [ ] 4.2 Create `ui/screens/queryeditor/QueryEditorUiState.kt` sealed class: `Idle | Running | SelectResult(QueryResult, executionTimeMs) | UpdateSummary(List<StatementResult>) | Error(message, failedStatement?)`
-- [ ] 4.3 Create `ui/screens/queryeditor/QueryEditorViewModel.kt` annotated `@HiltViewModel` with `ExecuteQueryUseCase`, `ExecuteUpdateUseCase` injected
-- [ ] 4.4 Add `StateFlow<QueryEditorUiState>` starting at `Idle`
-- [ ] 4.5 Implement `executeStatements(sql: String)`: split by `;`, trim, skip empty, detect SELECT vs non-SELECT (first keyword: SELECT/SHOW/DESCRIBE/EXPLAIN/WITH → query, else → update)
-- [ ] 4.6 Execute statements sequentially in `viewModelScope.launch`, track results in `List<StatementResult>`
-- [ ] 4.7 Aggregate results: if all queries → `SelectResult(last result)`, else → `UpdateSummary(all results)`, on error → `Error(message, statement)`
-- [ ] 4.8 Implement `cancel()`: cancel `executionJob`, set state to `Idle`
-- [ ] 4.9 Write `QueryEditorViewModelTest.kt` with mockk + Turbine: test single SELECT, single UPDATE, multi-SELECT (last shown), mixed (UPDATE + SELECT), error on first/middle/last statement, cancel during execution, state transitions `Idle → Running → Result/Error`
+- [x] 4.1 Create `domain/models/StatementResult.kt` data class: `sql: String, affectedRows: Int?, executionTimeMs: Long, isQuery: Boolean`
+- [x] 4.2 Create `ui/screens/queryeditor/QueryEditorUiState.kt` sealed class: `Idle | Running | SelectResult(QueryResult, executionTimeMs) | UpdateSummary(List<StatementResult>) | Error(message, failedStatement?)`
+- [x] 4.3 Create `ui/screens/queryeditor/QueryEditorViewModel.kt` annotated `@HiltViewModel` with `ExecuteQueryUseCase`, `ExecuteUpdateUseCase` injected
+- [x] 4.4 Add `StateFlow<QueryEditorUiState>` starting at `Idle`
+- [x] 4.5 Implement `executeStatements(sql: String)`: split by `;`, trim, skip empty, detect SELECT vs non-SELECT (first keyword: SELECT/SHOW/DESCRIBE/EXPLAIN/WITH → query, else → update)
+- [x] 4.6 Execute statements sequentially in `viewModelScope.launch`, track results in `List<StatementResult>`
+- [x] 4.7 Aggregate results: if all queries → `SelectResult(last result)`, else → `UpdateSummary(all results)`, on error → `Error(message, statement)`
+- [x] 4.8 Implement `cancel()`: cancel `executionJob`, set state to `Idle`
+- [x] 4.9 Write `QueryEditorViewModelTest.kt` with mockk + Turbine: test single SELECT, single UPDATE, multi-SELECT (last shown), mixed (UPDATE + SELECT), error on first/middle/last statement, cancel during execution, state transitions `Idle → Running → Result/Error`
 
 ## Phase 5: Integration — SQL Code Editor Component
 
