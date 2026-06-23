@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sphynxs.mydatabases.core.database.models.CharacterSet
 import com.sphynxs.mydatabases.core.database.models.Collation
+import com.sphynxs.mydatabases.core.database.models.DatabaseError
+import com.sphynxs.mydatabases.domain.usecases.CreateDatabaseUseCase
 import com.sphynxs.mydatabases.domain.usecases.GetCharacterSetsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,7 +27,8 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class AddDatabaseViewModel @Inject constructor(
-    private val getCharacterSetsUseCase: GetCharacterSetsUseCase
+    private val getCharacterSetsUseCase: GetCharacterSetsUseCase,
+    private val createDatabaseUseCase: CreateDatabaseUseCase
 ) : ViewModel() {
     
     // UI State para character sets
@@ -35,6 +38,10 @@ class AddDatabaseViewModel @Inject constructor(
     // UI State para collations
     private val _collationState = MutableStateFlow<CollationLoadState>(CollationLoadState.Idle)
     val collationState: StateFlow<CollationLoadState> = _collationState.asStateFlow()
+    
+    // UI State para submit (database creation)
+    private val _submitState = MutableStateFlow<CreateDatabaseState>(CreateDatabaseState.Idle)
+    val submitState: StateFlow<CreateDatabaseState> = _submitState.asStateFlow()
     
     // Cache de collations por charset para evitar queries repetidas
     private val collationCache = mutableMapOf<String, List<Collation>>()
@@ -103,6 +110,67 @@ class AddDatabaseViewModel @Inject constructor(
     fun clearCollations() {
         _collationState.value = CollationLoadState.Idle
     }
+    
+    /**
+     * Creates a new database with the specified name and optional charset/collation.
+     *
+     * Transitions submitState through: Idle → Submitting → (Success | Error)
+     * Error mapping handles:
+     * - "database exists" → specific user-friendly message
+     * - "Access denied" / "command denied" → permission message
+     * - ConnectionFailed → connection-lost message
+     * - InvalidConfiguration → invalid-name message
+     * - Generic → generic failure message
+     *
+     * @param name Database name
+     * @param charset Character set (optional)
+     * @param collation Collation (optional)
+     */
+    fun createDatabase(name: String, charset: String?, collation: String?) {
+        viewModelScope.launch {
+            _submitState.value = CreateDatabaseState.Submitting
+            
+            createDatabaseUseCase(name, charset, collation)
+                .onSuccess {
+                    _submitState.value = CreateDatabaseState.Success
+                }
+                .onFailure { error ->
+                    val message = mapErrorToMessage(error)
+                    _submitState.value = CreateDatabaseState.Error(message)
+                }
+        }
+    }
+    
+    /**
+     * Maps DatabaseError to user-friendly message keys.
+     *
+     * Returns string resource keys that the UI layer will resolve to localized strings.
+     */
+    private fun mapErrorToMessage(error: Throwable): String {
+        return when (error) {
+            is DatabaseError.QueryExecutionFailed -> {
+                when {
+                    error.reason.contains("database exists", ignoreCase = true) ||
+                    error.reason.contains("1007") -> "error_database_exists"
+                    
+                    error.reason.contains("Access denied", ignoreCase = true) ||
+                    error.reason.contains("command denied", ignoreCase = true) -> "error_permission_denied"
+                    
+                    else -> "error_create_database_failed"
+                }
+            }
+            is DatabaseError.ConnectionFailed -> "error_connection_lost"
+            is DatabaseError.InvalidConfiguration -> "error_invalid_database_name"
+            else -> "error_create_database_failed"
+        }
+    }
+    
+    /**
+     * Resets submitState back to Idle (for retries or after success side effects complete).
+     */
+    fun resetSubmitState() {
+        _submitState.value = CreateDatabaseState.Idle
+    }
 }
 
 /**
@@ -122,4 +190,14 @@ sealed class CollationLoadState {
     data object Loading : CollationLoadState()
     data class Success(val collations: List<Collation>) : CollationLoadState()
     data class Error(val message: String) : CollationLoadState()
+}
+
+/**
+ * Estados de submit para database creation.
+ */
+sealed class CreateDatabaseState {
+    data object Idle : CreateDatabaseState()
+    data object Submitting : CreateDatabaseState()
+    data object Success : CreateDatabaseState()
+    data class Error(val message: String) : CreateDatabaseState()
 }

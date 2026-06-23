@@ -1,6 +1,7 @@
 package com.sphynxs.mydatabases.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -54,7 +55,7 @@ fun ConnectionCard(
     val accentColor = DbAccents.accentFor(connection.type)
 
     IOSCard(
-        onClick = onCardClick,
+        onClick = {},
         modifier = modifier
     ) {
         Row(
@@ -94,9 +95,11 @@ fun ConnectionCard(
                 )
             }
 
-            // Contenido principal
+            // Contenido principal (clickable para conectar)
             Column(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable(onClick = onCardClick),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 // Nombre de la conexión

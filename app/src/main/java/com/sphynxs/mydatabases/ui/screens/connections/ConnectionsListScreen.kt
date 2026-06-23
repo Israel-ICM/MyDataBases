@@ -36,6 +36,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -104,9 +105,19 @@ fun ConnectionsListScreen(
     var showFormSheet by remember { mutableStateOf(false) }
     var editingConnectionId by remember { mutableStateOf<String?>(null) }
     var preselectedType by remember { mutableStateOf<DatabaseType?>(null) }
+    
+    // Resetear el sheet state cada vez que se abre/cierra
     val formSheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = true
+        skipPartiallyExpanded = true,
+        confirmValueChange = { true }
     )
+    
+    // Reset sheet state when closing
+    LaunchedEffect(showFormSheet) {
+        if (!showFormSheet) {
+            formSheetState.hide()
+        }
+    }
 
     Scaffold(
         modifier = modifier.background(DesignTokens.BackgroundPrimary),
@@ -174,7 +185,9 @@ fun ConnectionsListScreen(
                                         editingConnectionId = connection.id
                                         preselectedType = null
                                         showFormSheet = true
-                                        scope.launch { formSheetState.expand() }
+                                        scope.launch { 
+                                            formSheetState.expand() 
+                                        }
                                     },
                                     onDeleteClick = {
                                         connectionToDelete = connection

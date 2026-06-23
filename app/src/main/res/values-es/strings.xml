@@ -71,6 +71,13 @@
     <string name="add_database_field_collation_hint">utf8mb4_general_ci (opcional)</string>
     <string name="add_database_button_create">Crear base de datos</string>
     <string name="add_database_coming_soon">Creación de base de datos — próximamente</string>
+    <string name="add_database_creating">Creando base de datos...</string>
+    <string name="create_database_success">Base de datos creada</string>
+    <string name="error_database_exists">Ya existe una base de datos con ese nombre</string>
+    <string name="error_permission_denied">No tenés permisos para crear bases de datos</string>
+    <string name="error_create_database_failed">No se pudo crear la base de datos. Intentá de nuevo.</string>
+    <string name="error_invalid_database_name">Nombre de base de datos inválido. Usá solo letras, números y guiones bajos (máx 64 caracteres).</string>
+    <string name="error_connection_lost">Conexión perdida. Reconectá e intentá de nuevo.</string>
     
     <!-- Monitor screen -->
     <string name="monitor_title">Monitor del servidor</string>

@@ -208,22 +208,34 @@ fun DatabasesListScreen(
             sheetMaxWidth = 10000.dp,
             scrimColor = Color.Black.copy(alpha = 0.5f)
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(start = 16.dp, end = 16.dp, top = statusBarHeightDp)
-            ) {
-                AddDatabaseFormContent(
-                    connectionId = connectionId,
-                    onDismiss = {
-                        scope.launch {
-                            addDatabaseSheetState.hide()
-                            onDismissAddDatabaseSheet()
-                        }
-                    },
-                    snackbarHostState = snackbarHostState,
-                    modifier = Modifier.fillMaxSize()
-                )
+            Scaffold(
+                snackbarHost = { SnackbarHost(snackbarHostState) },
+                containerColor = Color.Transparent
+            ) { innerPadding ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                        .padding(start = 16.dp, end = 16.dp, top = statusBarHeightDp)
+                ) {
+                    AddDatabaseFormContent(
+                        connectionId = connectionId,
+                        onDismiss = {
+                            scope.launch {
+                                addDatabaseSheetState.hide()
+                                onDismissAddDatabaseSheet()
+                            }
+                        },
+                        onDatabaseCreated = { databaseName ->
+                            // Refresh the database list
+                            viewModel.loadDatabases()
+                            // Navigate directly to the newly created database's tables
+                            onNavigateToTables(databaseName)
+                        },
+                        snackbarHostState = snackbarHostState,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
             }
         }
     }

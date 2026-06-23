@@ -91,13 +91,14 @@ fun ConnectionFormScreen(
     // Load existing connection if editing
     LaunchedEffect(connectionId) {
         connectionId?.let { id ->
-            viewModel.loadConnection(id)?.let { config ->
-                name = config.name
+            val loadedConfig = viewModel.loadConnection(id)
+            loadedConfig?.let { config ->
+                name = config.name.trim()
                 selectedType = config.type
-                host = config.host
+                host = config.host.trim()
                 port = config.port.toString()
-                username = config.username
-                password = config.password
+                username = config.username.trim()
+                password = config.password.trim()
                 useSSL = config.useSSL
             }
         }

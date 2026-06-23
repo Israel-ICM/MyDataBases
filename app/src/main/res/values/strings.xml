@@ -71,6 +71,13 @@
     <string name="add_database_field_collation_hint">utf8mb4_general_ci (optional)</string>
     <string name="add_database_button_create">Create Database</string>
     <string name="add_database_coming_soon">Database creation — coming soon</string>
+    <string name="add_database_creating">Creating database...</string>
+    <string name="create_database_success">Database created</string>
+    <string name="error_database_exists">A database with that name already exists</string>
+    <string name="error_permission_denied">You don\'t have permission to create databases</string>
+    <string name="error_create_database_failed">Could not create the database. Please try again.</string>
+    <string name="error_invalid_database_name">Invalid database name. Use only letters, numbers, and underscores (max 64 characters).</string>
+    <string name="error_connection_lost">Connection lost. Please reconnect and try again.</string>
     
     <!-- Monitor screen -->
     <string name="monitor_title">Server Monitor</string>

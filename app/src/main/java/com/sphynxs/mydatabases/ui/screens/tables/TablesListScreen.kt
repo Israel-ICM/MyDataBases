@@ -72,102 +72,100 @@ fun TablesListScreen(
     Scaffold(
         modifier = modifier
     ) { paddingValues ->
-        when (uiState) {
-            is TablesUiState.Loading -> {
-                TableListSkeleton(modifier = Modifier.padding(paddingValues))
-            }
-
-            is TablesUiState.Success -> {
-                val tables = (uiState as TablesUiState.Success).tables
+        BreathingBackground(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
+            Column(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Spacer(modifier = Modifier.height(16.dp))
                 
-                BreathingBackground(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues)
-                ) {
-                    Column(
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    
-                    // Título grande estilo iOS 26
-                    Text(
-                        text = "Tables",
-                        fontSize = DesignTokens.LargeTitleSize,
-                        fontWeight = DesignTokens.LargeTitleWeight,
-                        color = DesignTokens.LargeTitleColor,
-                        modifier = Modifier.padding(horizontal = DesignTokens.ScreenPaddingHorizontal)
-                    )
-                    
-                    // Subtítulo con nombre de la base de datos
-                    Text(
-                        text = databaseName,
-                        fontSize = DesignTokens.CardSubtitleSize,
-                        fontWeight = DesignTokens.CardSubtitleWeight,
-                        color = DesignTokens.TextSecondary,
-                        modifier = Modifier.padding(horizontal = DesignTokens.ScreenPaddingHorizontal, vertical = 4.dp)
-                    )
+                // Título grande estilo iOS 26 (siempre visible)
+                Text(
+                    text = "Tables",
+                    fontSize = DesignTokens.LargeTitleSize,
+                    fontWeight = DesignTokens.LargeTitleWeight,
+                    color = DesignTokens.LargeTitleColor,
+                    modifier = Modifier.padding(horizontal = DesignTokens.ScreenPaddingHorizontal)
+                )
+                
+                // Subtítulo con nombre de la base de datos (siempre visible)
+                Text(
+                    text = databaseName,
+                    fontSize = DesignTokens.CardSubtitleSize,
+                    fontWeight = DesignTokens.CardSubtitleWeight,
+                    color = DesignTokens.TextSecondary,
+                    modifier = Modifier.padding(horizontal = DesignTokens.ScreenPaddingHorizontal, vertical = 4.dp)
+                )
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-                    IOSSearchBar(
-                        query = searchQuery,
-                        onQueryChange = viewModel::setSearchQuery,
-                        placeholder = stringResource(R.string.tables_search_hint),
-                        modifier = Modifier.padding(horizontal = DesignTokens.ScreenPaddingHorizontal)
-                    )
+                when (uiState) {
+                    is TablesUiState.Loading -> {
+                        TableListSkeleton(modifier = Modifier.weight(1f))
+                    }
 
-                    Spacer(modifier = Modifier.height(DesignTokens.CardSpacing))
+                    is TablesUiState.Success -> {
+                        val tables = (uiState as TablesUiState.Success).tables
 
-                    LazyColumn(modifier = Modifier.weight(1f)) {
-                        items(tables, key = { it.name }) { table ->
-                            TableCard(
-                                table = table,
-                                onCardClick = {
-                                    workspaceManager.openCard(
-                                        WorkspaceCard.Table(
-                                            id = "table:${databaseName}:${table.name}",
-                                            title = table.name,
-                                            connectionId = "current",
-                                            databaseName = databaseName,
-                                            tableName = table.name
+                        IOSSearchBar(
+                            query = searchQuery,
+                            onQueryChange = viewModel::setSearchQuery,
+                            placeholder = stringResource(R.string.tables_search_hint),
+                            modifier = Modifier.padding(horizontal = DesignTokens.ScreenPaddingHorizontal)
+                        )
+
+                        Spacer(modifier = Modifier.height(DesignTokens.CardSpacing))
+
+                        LazyColumn(modifier = Modifier.weight(1f)) {
+                            items(tables, key = { it.name }) { table ->
+                                TableCard(
+                                    table = table,
+                                    onCardClick = {
+                                        workspaceManager.openCard(
+                                            WorkspaceCard.Table(
+                                                id = "table:${databaseName}:${table.name}",
+                                                title = table.name,
+                                                connectionId = "current",
+                                                databaseName = databaseName,
+                                                tableName = table.name
+                                            )
                                         )
+                                    },
+                                    modifier = Modifier.padding(
+                                        horizontal = DesignTokens.ScreenPaddingHorizontal,
+                                        vertical = DesignTokens.CardSpacing / 2
                                     )
-                                },
-                                modifier = Modifier.padding(
-                                    horizontal = DesignTokens.ScreenPaddingHorizontal,
-                                    vertical = DesignTokens.CardSpacing / 2
                                 )
-                            )
-                        }
-                        
-                        item {
-                            Spacer(modifier = Modifier.height(80.dp))
+                            }
+                            
+                            item {
+                                Spacer(modifier = Modifier.height(80.dp))
+                            }
                         }
                     }
+
+                    is TablesUiState.Empty -> {
+                        EmptyState(
+                            icon = painterResource(AppIcons.State.EmptyTables),
+                            title = stringResource(R.string.empty_tables_title),
+                            description = stringResource(R.string.empty_tables_description),
+                            action = null,  // No action para empty tables (se crean desde Editor)
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+
+                    is TablesUiState.Error -> {
+                        val errorMessage = (uiState as TablesUiState.Error).message
+                        ErrorCard(
+                            message = errorMessage,
+                            onRetry = { viewModel.loadTables(databaseName) },
+                            modifier = Modifier.weight(1f)
+                        )
                     }
                 }
-            }
-
-            is TablesUiState.Empty -> {
-                EmptyState(
-                    icon = painterResource(AppIcons.State.EmptyTables),
-                    title = stringResource(R.string.empty_tables_title),
-                    description = stringResource(R.string.empty_tables_description),
-                    action = null,  // No action para empty tables (se crean desde Editor)
-                    modifier = Modifier.padding(paddingValues)
-                )
-            }
-
-            is TablesUiState.Error -> {
-                val errorMessage = (uiState as TablesUiState.Error).message
-                ErrorCard(
-                    message = errorMessage,
-                    onRetry = { viewModel.loadTables(databaseName) },
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues)
-                )
             }
         }
     } // Cierre del Scaffold
