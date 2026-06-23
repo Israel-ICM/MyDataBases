@@ -65,6 +65,15 @@ class MariaDBEngine : DatabaseEngine {
         delegate.executeUpdate(query, params)
     
     /**
+     * Ejecuta múltiples statements SQL en la MISMA conexión.
+     * 
+     * @param statements Lista de SQL statements a ejecutar
+     * @return Result con lista de BatchStatementResult
+     */
+    override suspend fun executeBatch(statements: List<String>): Result<List<com.sphynxs.mydatabases.domain.usecases.BatchStatementResult>> =
+        delegate.executeBatch(statements)
+    
+    /**
      * Lista todas las bases de datos disponibles en el servidor MariaDB.
      * Excluye system databases (information_schema, mysql, performance_schema, sys).
      * 

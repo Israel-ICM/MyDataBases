@@ -169,6 +169,98 @@ class MySQLEngine : DatabaseEngine {
     }
     
     /**
+     * Ejecuta múltiples statements SQL en la MISMA conexión.
+     * 
+     * Permite que statements como USE DATABASE afecten a los siguientes.
+     * Cada statement se ejecuta en secuencia usando la misma conexión del pool.
+     * 
+     * @param statements Lista de SQL statements a ejecutar
+     * @return Result con lista de BatchStatementResult
+     * @throws DatabaseError.QueryExecutionFailed si algún statement falla
+     */
+    override suspend fun executeBatch(
+        statements: List<String>
+    ): Result<List<com.sphynxs.mydatabases.domain.usecases.BatchStatementResult>> = withContext(Dispatchers.IO) {
+        try {
+            val connection = connectionPool?.getConnection() 
+                ?: throw DatabaseError.ConnectionFailed("No conectado")
+            
+            val results = mutableListOf<com.sphynxs.mydatabases.domain.usecases.BatchStatementResult>()
+            
+            // Ejecutar todos los statements en la MISMA conexión
+            connection.use { conn ->
+                for (statement in statements) {
+                    val startTime = System.currentTimeMillis()
+                    val trimmed = statement.trim()
+                    
+                    if (trimmed.isEmpty()) continue
+                    
+                    // Detectar si es query o update
+                    val isQuery = trimmed.uppercase().startsWith("SELECT") ||
+                                  trimmed.uppercase().startsWith("SHOW") ||
+                                  trimmed.uppercase().startsWith("DESCRIBE") ||
+                                  trimmed.uppercase().startsWith("EXPLAIN")
+                    
+                    if (isQuery) {
+                        // SELECT-like: retorna QueryResult
+                        val resultSet = conn.createStatement().executeQuery(trimmed)
+                        
+                        // Leer metadata de columnas
+                        val metaData = resultSet.metaData
+                        val columnCount = metaData.columnCount
+                        val columns = (1..columnCount).map { i ->
+                            metaData.getColumnName(i)
+                        }
+                        
+                        // Leer filas
+                        val rows = mutableListOf<Map<String, Any?>>()
+                        while (resultSet.next()) {
+                            val row = columns.associateWith { columnName ->
+                                resultSet.getObject(columnName)
+                            }
+                            rows.add(row)
+                        }
+                        
+                        val queryResult = QueryResult(
+                            columns = columns,
+                            rows = rows,
+                            rowCount = rows.size,
+                            executionTimeMs = System.currentTimeMillis() - startTime
+                        )
+                        
+                        results.add(
+                            com.sphynxs.mydatabases.domain.usecases.BatchStatementResult(
+                                sql = trimmed,
+                                queryResult = queryResult,
+                                affectedRows = null,
+                                executionTimeMs = System.currentTimeMillis() - startTime,
+                                isQuery = true
+                            )
+                        )
+                    } else {
+                        // INSERT/UPDATE/DELETE/DDL: retorna affected rows
+                        val affectedRows = conn.createStatement().executeUpdate(trimmed)
+                        
+                        results.add(
+                            com.sphynxs.mydatabases.domain.usecases.BatchStatementResult(
+                                sql = trimmed,
+                                queryResult = null,
+                                affectedRows = affectedRows,
+                                executionTimeMs = System.currentTimeMillis() - startTime,
+                                isQuery = false
+                            )
+                        )
+                    }
+                }
+            }
+            
+            Result.success(results)
+        } catch (e: Exception) {
+            Result.failure(mapQueryError(e, "executeBatch"))
+        }
+    }
+    
+    /**
      * Lista todas las bases de datos disponibles en el servidor MySQL.
      * Excluye system databases (information_schema, mysql, performance_schema, sys).
      * 

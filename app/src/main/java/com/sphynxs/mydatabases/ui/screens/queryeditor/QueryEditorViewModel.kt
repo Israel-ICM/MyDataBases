@@ -3,8 +3,7 @@ package com.sphynxs.mydatabases.ui.screens.queryeditor
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sphynxs.mydatabases.domain.models.StatementResult
-import com.sphynxs.mydatabases.domain.usecases.ExecuteQueryUseCase
-import com.sphynxs.mydatabases.domain.usecases.ExecuteUpdateUseCase
+import com.sphynxs.mydatabases.domain.usecases.ExecuteBatchStatementsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Job
@@ -18,7 +17,7 @@ import javax.inject.Inject
  * ViewModel para el editor de queries SQL.
  *
  * Responsabilidades:
- * - Ejecutar multi-statement SQL (split por `;`, secuencial)
+ * - Ejecutar multi-statement SQL (split por `;`, secuencial en la MISMA conexión)
  * - Detectar SELECT vs non-SELECT (primer keyword)
  * - Agregar resultados (SelectResult si todos queries, UpdateSummary si algún update)
  * - Manejar errores (stop on first failure)
@@ -28,16 +27,14 @@ import javax.inject.Inject
  * Idle → Running → SelectResult/UpdateSummary/Error
  *      → cancel() → Idle
  *
- * @param executeQueryUseCase Use case para SELECT-like statements
- * @param executeUpdateUseCase Use case para INSERT/UPDATE/DELETE/DDL
+ * @param executeBatchStatementsUseCase Use case para ejecutar múltiples statements en la misma conexión
  *
  * @author israel-icm
  * @date 2026-06-23
  */
 @HiltViewModel
 class QueryEditorViewModel @Inject constructor(
-    private val executeQueryUseCase: ExecuteQueryUseCase,
-    private val executeUpdateUseCase: ExecuteUpdateUseCase
+    private val executeBatchStatementsUseCase: ExecuteBatchStatementsUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<QueryEditorUiState>(QueryEditorUiState.Idle)
@@ -54,10 +51,10 @@ class QueryEditorViewModel @Inject constructor(
     }
 
     /**
-     * Ejecuta uno o más statements SQL.
+     * Ejecuta uno o más SQL statements en la MISMA conexión.
      *
      * Split naive por `;` (sin parsing — `;` dentro de strings puede romper).
-     * Ejecuta secuencialmente, para en el primer error.
+     * Ejecuta secuencialmente en la misma conexión (permite USE DATABASE + SELECT).
      * Agrega resultados:
      * - Si todos son queries → SelectResult (muestra última)
      * - Si alguno es update → UpdateSummary (tabla de resultados)
@@ -79,55 +76,41 @@ class QueryEditorViewModel @Inject constructor(
                 return@launch
             }
 
-            val results = mutableListOf<StatementResult>()
-            var lastQueryResult: com.sphynxs.mydatabases.core.database.models.QueryResult? = null
-
-            for (statement in statements) {
-                val startTime = System.currentTimeMillis()
-                val isQuery = detectQueryType(statement)
-
-                try {
-                    if (isQuery) {
-                        val result = executeQueryUseCase(statement, emptyList()).getOrThrow()
-                        lastQueryResult = result
-                        results.add(
-                            StatementResult(
-                                sql = statement,
-                                affectedRows = null,
-                                executionTimeMs = System.currentTimeMillis() - startTime,
-                                isQuery = true
-                            )
-                        )
-                    } else {
-                        val affectedRows = executeUpdateUseCase(statement, emptyList()).getOrThrow()
-                        results.add(
-                            StatementResult(
-                                sql = statement,
-                                affectedRows = affectedRows,
-                                executionTimeMs = System.currentTimeMillis() - startTime,
-                                isQuery = false
-                            )
-                        )
-                    }
-                } catch (e: Exception) {
-                    _uiState.value = QueryEditorUiState.Error(
-                        message = e.message ?: "Unknown error",
-                        failedStatement = statement
+            try {
+                // Ejecutar TODOS los statements en la MISMA conexión
+                val batchResults = executeBatchStatementsUseCase(statements).getOrThrow()
+                
+                // Convertir BatchStatementResult a StatementResult
+                val results = batchResults.map { batchResult ->
+                    StatementResult(
+                        sql = batchResult.sql,
+                        affectedRows = batchResult.affectedRows,
+                        executionTimeMs = batchResult.executionTimeMs,
+                        isQuery = batchResult.isQuery
                     )
-                    return@launch
                 }
-            }
+                
+                // Obtener último QueryResult (si existe)
+                val lastQueryResult = batchResults
+                    .lastOrNull { it.isQuery }
+                    ?.queryResult
 
-            // Agregar resultados:
-            // Si todos son queries Y hay lastQueryResult → SelectResult
-            // Caso contrario → UpdateSummary
-            _uiState.value = if (results.all { it.isQuery } && lastQueryResult != null) {
-                QueryEditorUiState.SelectResult(
-                    result = lastQueryResult,
-                    executionTimeMs = results.sumOf { it.executionTimeMs }
+                // Agregar resultados:
+                // Si todos son queries Y hay lastQueryResult → SelectResult
+                // Caso contrario → UpdateSummary
+                _uiState.value = if (results.all { it.isQuery } && lastQueryResult != null) {
+                    QueryEditorUiState.SelectResult(
+                        result = lastQueryResult,
+                        executionTimeMs = results.sumOf { it.executionTimeMs }
+                    )
+                } else {
+                    QueryEditorUiState.UpdateSummary(results)
+                }
+            } catch (e: Exception) {
+                _uiState.value = QueryEditorUiState.Error(
+                    message = e.message ?: "Unknown error",
+                    failedStatement = statements.firstOrNull() ?: ""
                 )
-            } else {
-                QueryEditorUiState.UpdateSummary(results)
             }
         }
     }
@@ -138,20 +121,5 @@ class QueryEditorViewModel @Inject constructor(
     fun cancel() {
         executionJob?.cancel()
         _uiState.value = QueryEditorUiState.Idle
-    }
-
-    /**
-     * Detecta si un statement es SELECT-like o INSERT/UPDATE/DELETE/DDL.
-     *
-     * @param sql Statement SQL trimmed
-     * @return true si SELECT/SHOW/DESCRIBE/EXPLAIN/WITH, false caso contrario
-     */
-    private fun detectQueryType(sql: String): Boolean {
-        val trimmed = sql.trim().uppercase()
-        return trimmed.startsWith("SELECT") ||
-                trimmed.startsWith("SHOW") ||
-                trimmed.startsWith("DESCRIBE") ||
-                trimmed.startsWith("EXPLAIN") ||
-                trimmed.startsWith("WITH")
     }
 }

@@ -57,6 +57,19 @@ interface DatabaseEngine {
     ): Result<Int>
 
     /**
+     * Ejecuta múltiples statements SQL en la MISMA conexión.
+     *
+     * Permite que statements como USE DATABASE afecten a los siguientes.
+     * Cada statement se ejecuta en secuencia usando la misma conexión del pool.
+     *
+     * @param statements Lista de SQL statements a ejecutar
+     * @return Result con lista de BatchStatementResult
+     */
+    suspend fun executeBatch(
+        statements: List<String>
+    ): Result<List<com.sphynxs.mydatabases.domain.usecases.BatchStatementResult>>
+
+    /**
      * Lista todas las bases de datos disponibles en el servidor.
      *
      * Excluye system databases (information_schema, mysql, performance_schema, sys).

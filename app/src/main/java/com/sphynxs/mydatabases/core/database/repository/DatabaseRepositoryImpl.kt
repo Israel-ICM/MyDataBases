@@ -41,6 +41,11 @@ class DatabaseRepositoryImpl @Inject constructor(
             ?: Result.failure(DatabaseError.ConnectionFailed("No conectado"))
     }
     
+    override suspend fun executeBatch(statements: List<String>): Result<List<com.sphynxs.mydatabases.domain.usecases.BatchStatementResult>> {
+        return currentEngine?.executeBatch(statements)
+            ?: Result.failure(DatabaseError.ConnectionFailed("No conectado"))
+    }
+    
     override suspend fun getDatabases(): Result<List<Database>> {
         return currentEngine?.getDatabases()
             ?: Result.failure(DatabaseError.ConnectionFailed("No conectado"))

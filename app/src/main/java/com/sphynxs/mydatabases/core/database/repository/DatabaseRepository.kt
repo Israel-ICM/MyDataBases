@@ -49,6 +49,17 @@ interface DatabaseRepository {
     suspend fun executeUpdate(query: String, params: List<Any> = emptyList()): Result<Int>
     
     /**
+     * Ejecuta múltiples statements SQL en la MISMA conexión.
+     * 
+     * Permite que statements como USE DATABASE afecten a los siguientes.
+     * 
+     * @param statements Lista de SQL statements a ejecutar en secuencia
+     * @return Result con lista de BatchStatementResult
+     * @throws DatabaseError.ConnectionFailed si no hay motor conectado
+     */
+    suspend fun executeBatch(statements: List<String>): Result<List<com.sphynxs.mydatabases.domain.usecases.BatchStatementResult>>
+    
+    /**
      * Lista todas las bases de datos disponibles en el servidor.
      * 
      * @return Result con lista de Database ordenada alfabéticamente
