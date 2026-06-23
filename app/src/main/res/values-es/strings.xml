@@ -92,6 +92,13 @@
     <!-- Query Editor screen -->
     <string name="query_editor_title">Editor de consultas</string>
     <string name="query_editor_placeholder">Editor de consultas — Próximamente</string>
+    <string name="execute_button">Ejecutar</string>
+    <string name="cancel_button">Cancelar</string>
+    <string name="clear_button">Limpiar</string>
+    <string name="query_editor_empty_state">Ejecutá una consulta para ver los resultados acá</string>
+    <string name="query_editor_error_prefix">Error de consulta</string>
+    <string name="rows_affected">Filas afectadas</string>
+    <string name="execution_time_ms">Tiempo de ejecución</string>
     
     <!-- Tables screen -->
     <string name="tables_title">Tablas - %1$s</string>

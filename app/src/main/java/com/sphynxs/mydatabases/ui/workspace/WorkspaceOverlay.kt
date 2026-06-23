@@ -180,6 +180,15 @@ internal fun WorkspaceCardContent(
                             .padding(top = 12.dp)
                     )
                 }
+                is WorkspaceCard.Query -> {
+                    com.sphynxs.mydatabases.ui.screens.queryeditor.QueryEditorScreen(
+                        connectionId = card.connectionId,
+                        initialSql = card.initialSql,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(top = 12.dp)
+                    )
+                }
             }
         }
     }
