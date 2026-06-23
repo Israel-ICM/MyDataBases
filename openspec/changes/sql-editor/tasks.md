@@ -91,11 +91,11 @@ User must choose before proceeding with `sdd-apply`.
 ## Phase 7: Integration — Workspace Card Integration
 
 - [x] 7.1 Modify `ui/workspace/WorkspaceCard.kt`: add `Query(id: String, connectionId: String, initialSql: String?)` sealed variant
-- [ ] 7.2 Modify `ui/workspace/WorkspaceManager.kt`: handle `openQueryCard(connectionId, initialSql?)` → append `WorkspaceCard.Query` with unique id, focus it
-- [ ] 7.3 Modify `ui/workspace/WorkspaceManager.kt`: handle close/focus for Query cards (same logic as Table cards)
+- [x] 7.2 Modify `ui/workspace/WorkspaceManager.kt`: handle `openQueryCard(connectionId, initialSql?)` → append `WorkspaceCard.Query` with unique id, focus it
+- [x] 7.3 Modify `ui/workspace/WorkspaceManager.kt`: handle close/focus for Query cards (same logic as Table cards)
 - [x] 7.4 Modify workspace renderer to pattern-match `WorkspaceCard.Query` → render `QueryEditorScreen(connectionId, initialSql)`
-- [ ] 7.5 Modify `ui/screens/databases/NewQueryScreen.kt`: replace placeholder body with `WorkspaceManager.openQueryCard(connectionId, initialSql = "")`
-- [ ] 7.6 Test: open New Query from bottom-nav → WorkspaceCard.Query opens with empty editor, type SQL → state isolated, open second query card → both coexist with independent state
+- [x] 7.5 Modify `ui/screens/databases/NewQueryScreen.kt`: replace placeholder body with `WorkspaceManager.openQueryCard(connectionId, initialSql = "")`
+- [x] 7.6 Test: open New Query from bottom-nav → WorkspaceCard.Query opens with empty editor, type SQL → state isolated, open second query card → both coexist with independent state
 
 ## Phase 8: Integration — Strings
 
