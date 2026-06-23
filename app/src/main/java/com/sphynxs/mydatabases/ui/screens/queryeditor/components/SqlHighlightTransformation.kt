@@ -43,6 +43,13 @@ class SqlHighlightTransformation(
         val builder = AnnotatedString.Builder(text.text)
 
         tokens.forEach { token ->
+            // Validar que el token range no exceda el tamaño del texto actual
+            // (puede pasar si tokens se calcularon con texto anterior y el usuario está borrando)
+            val start = token.range.first.coerceAtMost(text.text.length)
+            val end = (token.range.last + 1).coerceAtMost(text.text.length)
+            
+            if (start >= end) return@forEach // Token inválido, skip
+
             val style = when (token.kind) {
                 TokenKind.KEYWORD -> SpanStyle(
                     color = keywordColor,
@@ -66,7 +73,7 @@ class SqlHighlightTransformation(
             }
 
             style?.let {
-                builder.addStyle(it, token.range.first, token.range.last + 1)
+                builder.addStyle(it, start, end)
             }
         }
 
