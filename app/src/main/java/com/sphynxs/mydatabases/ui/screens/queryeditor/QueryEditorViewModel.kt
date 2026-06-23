@@ -6,6 +6,7 @@ import com.sphynxs.mydatabases.domain.models.StatementResult
 import com.sphynxs.mydatabases.domain.usecases.ExecuteQueryUseCase
 import com.sphynxs.mydatabases.domain.usecases.ExecuteUpdateUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -44,6 +45,14 @@ class QueryEditorViewModel @Inject constructor(
 
     private var executionJob: Job? = null
 
+    // Exception handler para catchear TODAS las excepciones no manejadas
+    private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
+        _uiState.value = QueryEditorUiState.Error(
+            message = throwable.message ?: "Unknown error",
+            failedStatement = ""
+        )
+    }
+
     /**
      * Ejecuta uno o más statements SQL.
      *
@@ -57,7 +66,7 @@ class QueryEditorViewModel @Inject constructor(
      */
     fun executeStatements(sql: String) {
         executionJob?.cancel()
-        executionJob = viewModelScope.launch {
+        executionJob = viewModelScope.launch(exceptionHandler) {
             _uiState.value = QueryEditorUiState.Running
 
             // Split por ; y limpiar

@@ -42,7 +42,7 @@ class MySQLEngine : DatabaseEngine {
      * @throws DatabaseError.TimeoutError si excede el timeout configurado
      */
     override suspend fun connect(config: ConnectionConfig): Result<Connection> = withContext(Dispatchers.IO) {
-        runCatching {
+        try {
             // Validar configuración
             validateConfig(config)
             
@@ -54,7 +54,7 @@ class MySQLEngine : DatabaseEngine {
             val version = testConnection.metaData.databaseProductVersion
             testConnection.close()
             
-            Connection(
+            Result.success(Connection(
                 id = config.id,
                 type = DatabaseType.MYSQL,
                 database = config.database,
@@ -63,9 +63,9 @@ class MySQLEngine : DatabaseEngine {
                 username = config.username,
                 version = version,
                 connectedAt = System.currentTimeMillis()
-            )
-        }.recoverCatching { throwable ->
-            throw mapConnectionError(throwable, config.host)
+            ))
+        } catch (e: Exception) {
+            Result.failure(mapConnectionError(e, config.host))
         }
     }
     
@@ -94,13 +94,13 @@ class MySQLEngine : DatabaseEngine {
         query: String,
         params: List<Any>
     ): Result<QueryResult> = withContext(Dispatchers.IO) {
-        runCatching {
+        try {
             val connection = connectionPool?.getConnection() 
                 ?: throw DatabaseError.ConnectionFailed("No conectado")
             
             val startTime = System.currentTimeMillis()
             
-            connection.prepareStatement(query).use { statement ->
+            val queryResult = connection.prepareStatement(query).use { statement ->
                 // Bindear parámetros
                 params.forEachIndexed { index, param ->
                     statement.setObject(index + 1, param)
@@ -131,8 +131,10 @@ class MySQLEngine : DatabaseEngine {
                     )
                 }
             }
-        }.recoverCatching { throwable ->
-            throw mapQueryError(throwable, query)
+            
+            Result.success(queryResult)
+        } catch (e: Exception) {
+            Result.failure(mapQueryError(e, query))
         }
     }
     
@@ -148,19 +150,21 @@ class MySQLEngine : DatabaseEngine {
         query: String,
         params: List<Any>
     ): Result<Int> = withContext(Dispatchers.IO) {
-        runCatching {
+        try {
             val connection = connectionPool?.getConnection() 
                 ?: throw DatabaseError.ConnectionFailed("No conectado")
             
-            connection.prepareStatement(query).use { statement ->
+            val affectedRows = connection.prepareStatement(query).use { statement ->
                 params.forEachIndexed { index, param ->
                     statement.setObject(index + 1, param)
                 }
                 
                 statement.executeUpdate()
             }
-        }.recoverCatching { throwable ->
-            throw mapQueryError(throwable, query)
+            
+            Result.success(affectedRows)
+        } catch (e: Exception) {
+            Result.failure(mapQueryError(e, query))
         }
     }
     
@@ -172,7 +176,7 @@ class MySQLEngine : DatabaseEngine {
      * @throws DatabaseError.QueryExecutionFailed si falla la query
      */
     override suspend fun getDatabases(): Result<List<Database>> = withContext(Dispatchers.IO) {
-        runCatching {
+        try {
             val query = """
                 SELECT 
                     SCHEMA_NAME as name,
@@ -183,9 +187,10 @@ class MySQLEngine : DatabaseEngine {
                 ORDER BY SCHEMA_NAME
             """.trimIndent()
             
-            metadataReader.readDatabases(connectionPool!!.getConnection(), query)
-        }.recoverCatching { throwable ->
-            throw mapQueryError(throwable, "getDatabases")
+            val databases = metadataReader.readDatabases(connectionPool!!.getConnection(), query)
+            Result.success(databases)
+        } catch (e: Exception) {
+            Result.failure(mapQueryError(e, "getDatabases"))
         }
     }
     
@@ -197,7 +202,7 @@ class MySQLEngine : DatabaseEngine {
      * @throws DatabaseError.QueryExecutionFailed si la database no existe
      */
     override suspend fun getTables(database: String): Result<List<Table>> = withContext(Dispatchers.IO) {
-        runCatching {
+        try {
             val query = """
                 SELECT 
                     TABLE_NAME as name,
@@ -212,9 +217,10 @@ class MySQLEngine : DatabaseEngine {
                 ORDER BY TABLE_NAME
             """.trimIndent()
             
-            metadataReader.readTables(connectionPool!!.getConnection(), query, database)
-        }.recoverCatching { throwable ->
-            throw mapQueryError(throwable, "getTables")
+            val tables = metadataReader.readTables(connectionPool!!.getConnection(), query, database)
+            Result.success(tables)
+        } catch (e: Exception) {
+            Result.failure(mapQueryError(e, "getTables"))
         }
     }
     
@@ -226,7 +232,7 @@ class MySQLEngine : DatabaseEngine {
      * @throws DatabaseError.QueryExecutionFailed si la tabla no existe
      */
     override suspend fun getColumns(table: String): Result<List<Column>> = withContext(Dispatchers.IO) {
-        runCatching {
+        try {
             val query = """
                 SELECT 
                     COLUMN_NAME as name,
@@ -241,9 +247,10 @@ class MySQLEngine : DatabaseEngine {
                 ORDER BY ORDINAL_POSITION
             """.trimIndent()
             
-            metadataReader.readColumns(connectionPool!!.getConnection(), query, table)
-        }.recoverCatching { throwable ->
-            throw mapQueryError(throwable, "getColumns")
+            val columns = metadataReader.readColumns(connectionPool!!.getConnection(), query, table)
+            Result.success(columns)
+        } catch (e: Exception) {
+            Result.failure(mapQueryError(e, "getColumns"))
         }
     }
     
@@ -255,7 +262,7 @@ class MySQLEngine : DatabaseEngine {
      * @throws DatabaseError.QueryExecutionFailed si la tabla no existe
      */
     override suspend fun getIndexes(table: String): Result<List<Index>> = withContext(Dispatchers.IO) {
-        runCatching {
+        try {
             val query = """
                 SELECT 
                     INDEX_NAME as name,
@@ -268,9 +275,10 @@ class MySQLEngine : DatabaseEngine {
                 ORDER BY INDEX_NAME, SEQ_IN_INDEX
             """.trimIndent()
             
-            metadataReader.readIndexes(connectionPool!!.getConnection(), query, table)
-        }.recoverCatching { throwable ->
-            throw mapQueryError(throwable, "getIndexes")
+            val indexes = metadataReader.readIndexes(connectionPool!!.getConnection(), query, table)
+            Result.success(indexes)
+        } catch (e: Exception) {
+            Result.failure(mapQueryError(e, "getIndexes"))
         }
     }
     
@@ -282,7 +290,7 @@ class MySQLEngine : DatabaseEngine {
      * @throws DatabaseError.QueryExecutionFailed si la tabla no existe
      */
     override suspend fun getForeignKeys(table: String): Result<List<ForeignKey>> = withContext(Dispatchers.IO) {
-        runCatching {
+        try {
             val query = """
                 SELECT 
                     CONSTRAINT_NAME as name,
@@ -297,9 +305,10 @@ class MySQLEngine : DatabaseEngine {
                   AND REFERENCED_TABLE_NAME IS NOT NULL
             """.trimIndent()
             
-            metadataReader.readForeignKeys(connectionPool!!.getConnection(), query, table)
-        }.recoverCatching { throwable ->
-            throw mapQueryError(throwable, "getForeignKeys")
+            val foreignKeys = metadataReader.readForeignKeys(connectionPool!!.getConnection(), query, table)
+            Result.success(foreignKeys)
+        } catch (e: Exception) {
+            Result.failure(mapQueryError(e, "getForeignKeys"))
         }
     }
     
@@ -348,11 +357,11 @@ class MySQLEngine : DatabaseEngine {
      * @throws DatabaseError.ConnectionFailed si no hay conexión activa
      */
     override suspend fun getVersion(): Result<String> = withContext(Dispatchers.IO) {
-        runCatching {
+        try {
             val connection = connectionPool?.getConnection() 
                 ?: throw DatabaseError.ConnectionFailed("No conectado")
             
-            connection.createStatement().use { statement ->
+            val version = connection.createStatement().use { statement ->
                 statement.executeQuery("SELECT VERSION()").use { resultSet ->
                     if (resultSet.next()) {
                         resultSet.getString(1)
@@ -361,8 +370,10 @@ class MySQLEngine : DatabaseEngine {
                     }
                 }
             }
-        }.recoverCatching { throwable ->
-            throw mapQueryError(throwable, "getVersion")
+            
+            Result.success(version)
+        } catch (e: Exception) {
+            Result.failure(mapQueryError(e, "getVersion"))
         }
     }
     
@@ -437,7 +448,7 @@ class MySQLEngine : DatabaseEngine {
      * @date 2026-06-19
      */
     suspend fun getCharacterSets(): Result<List<CharacterSet>> = withContext(Dispatchers.IO) {
-        runCatching {
+        try {
             val connection = connectionPool?.getConnection()
                 ?: throw DatabaseError.ConnectionFailed("No conectado")
             
@@ -460,9 +471,9 @@ class MySQLEngine : DatabaseEngine {
             statement.close()
             connection.close()
             
-            charsets
-        }.recoverCatching { throwable ->
-            throw mapQueryError(throwable, "SHOW CHARACTER SET")
+            Result.success(charsets)
+        } catch (e: Exception) {
+            Result.failure(mapQueryError(e, "SHOW CHARACTER SET"))
         }
     }
     
@@ -480,7 +491,7 @@ class MySQLEngine : DatabaseEngine {
      * @date 2026-06-19
      */
     suspend fun getCollations(charset: String): Result<List<Collation>> = withContext(Dispatchers.IO) {
-        runCatching {
+        try {
             val connection = connectionPool?.getConnection()
                 ?: throw DatabaseError.ConnectionFailed("No conectado")
             
@@ -504,9 +515,9 @@ class MySQLEngine : DatabaseEngine {
             statement.close()
             connection.close()
             
-            collations
-        }.recoverCatching { throwable ->
-            throw mapQueryError(throwable, "SHOW COLLATION WHERE Charset = '$charset'")
+            Result.success(collations)
+        } catch (e: Exception) {
+            Result.failure(mapQueryError(e, "SHOW COLLATION WHERE Charset = '$charset'"))
         }
     }
 }
