@@ -82,6 +82,56 @@ class WorkspaceManager @Inject constructor() {
     }
 
     /**
+     * Abre una Table card en el workspace.
+     *
+     * Helper method que construye el WorkspaceCard.Table con formato de ID estándar.
+     * Si la card ya existe, navega a ella.
+     *
+     * @param connectionId ID de la conexión
+     * @param databaseName Nombre de la base de datos
+     * @param tableName Nombre de la tabla
+     */
+    fun openTableCard(
+        connectionId: String,
+        databaseName: String,
+        tableName: String
+    ) {
+        openCard(
+            WorkspaceCard.Table(
+                id = "table:$connectionId:$databaseName:$tableName",
+                title = tableName,
+                connectionId = connectionId,
+                databaseName = databaseName,
+                tableName = tableName
+            )
+        )
+    }
+
+    /**
+     * Abre una Query card en el workspace.
+     *
+     * Helper method que construye el WorkspaceCard.Query con ID único generado.
+     * Cada invocación crea una nueva card (no reutiliza existentes).
+     *
+     * @param connectionId ID de la conexión
+     * @param initialSql SQL inicial (null = editor vacío)
+     */
+    fun openQueryCard(
+        connectionId: String,
+        initialSql: String? = null
+    ) {
+        val queryId = java.util.UUID.randomUUID().toString().take(8)
+        openCard(
+            WorkspaceCard.Query(
+                id = "query:$connectionId:$queryId",
+                title = "New Query",
+                connectionId = connectionId,
+                initialSql = initialSql
+            )
+        )
+    }
+
+    /**
      * Cierra una card por índice.
      *
      * Si se cierra la última card, colapsa el workspace.

@@ -150,7 +150,8 @@ fun MyDataBasesNavHost(
             ) {
                 val connectionId = it.arguments?.getString("connectionId") ?: ""
                 com.sphynxs.mydatabases.ui.screens.databases.NewQueryScreen(
-                    connectionId = connectionId
+                    connectionId = connectionId,
+                    workspaceManager = workspaceManager
                 )
             }
             
