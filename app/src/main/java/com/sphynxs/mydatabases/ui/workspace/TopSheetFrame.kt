@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.TableChart
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -189,7 +190,7 @@ private fun StepIcon(
 ) {
     val icon = when (card) {
         is WorkspaceCard.Table -> Icons.Default.TableChart
-        // Future: Query -> Icons.Default.Code
+        is WorkspaceCard.Query -> Icons.Default.Description
         // Future: Editor -> Icons.Default.Edit
     }
     
