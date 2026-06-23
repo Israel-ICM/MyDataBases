@@ -71,37 +71,37 @@ User must choose before proceeding with `sdd-apply`.
 
 ## Phase 5: Integration — SQL Code Editor Component
 
-- [ ] 5.1 Create `ui/screens/queryeditor/components/SqlCodeEditor.kt` composable
-- [ ] 5.2 Render `BasicTextField` with `FontFamily.Monospace`, `visualTransformation = SqlHighlightTransformation(tokens, colorScheme)`
-- [ ] 5.3 Add 300ms debounced re-tokenization on text change (launch on `Default` dispatcher, update tokens state)
-- [ ] 5.4 Handle Tab key: `onKeyEvent` modifier intercepts Tab, inserts four spaces at caret, returns `true`
-- [ ] 5.5 Configure `KeyboardOptions(imeAction = ImeAction.Default)` to preserve Tab on soft keyboards
-- [ ] 5.6 Test: editor renders, highlights keywords/strings/comments, Tab inserts spaces
+- [x] 5.1 Create `ui/screens/queryeditor/components/SqlCodeEditor.kt` composable
+- [x] 5.2 Render `BasicTextField` with `FontFamily.Monospace`, `visualTransformation = SqlHighlightTransformation(tokens, colorScheme)`
+- [x] 5.3 Add 300ms debounced re-tokenization on text change (launch on `Default` dispatcher, update tokens state)
+- [x] 5.4 Handle Tab key: `onKeyEvent` modifier intercepts Tab, inserts four spaces at caret, returns `true`
+- [x] 5.5 Configure `KeyboardOptions(imeAction = ImeAction.Default)` to preserve Tab on soft keyboards
+- [x] 5.6 Test: editor renders, highlights keywords/strings/comments, Tab inserts spaces
 
 ## Phase 6: Integration — Query Editor Screen
 
-- [ ] 6.1 Create `ui/screens/queryeditor/QueryEditorScreen.kt` composable accepting `connectionId: String, initialSql: String?`
-- [ ] 6.2 Hoist `QueryEditorViewModel` via `hiltViewModel()`
-- [ ] 6.3 Render `Column` layout: TopAppBar (connection name), `SqlCodeEditor`, Toolbar (`Run` button enabled when text non-empty and state is Idle, `Cancel` button visible when state is Running), Result pane
-- [ ] 6.4 Wire Run button → `viewModel.executeStatements(sql)`
-- [ ] 6.5 Wire Cancel button → `viewModel.cancel()`
-- [ ] 6.6 Collect `viewModel.uiState` and render result pane: `Idle` → empty, `Running` → CircularProgressIndicator, `SelectResult` → `ResultGrid(result.columns, result.rows)`, `UpdateSummary` → summary table (columns: SQL, Rows Affected, Time), `Error` → error card with message + failed statement
-- [ ] 6.7 Test: `QueryEditorScreenTest.kt` Compose UI test (render editor, type SQL, click Run, verify result grid appears for SELECT, verify summary table for UPDATE, verify error card for invalid SQL)
+- [x] 6.1 Create `ui/screens/queryeditor/QueryEditorScreen.kt` composable accepting `connectionId: String, initialSql: String?`
+- [x] 6.2 Hoist `QueryEditorViewModel` via `hiltViewModel()`
+- [x] 6.3 Render `Column` layout: TopAppBar (connection name), `SqlCodeEditor`, Toolbar (`Run` button enabled when text non-empty and state is Idle, `Cancel` button visible when state is Running), Result pane
+- [x] 6.4 Wire Run button → `viewModel.executeStatements(sql)`
+- [x] 6.5 Wire Cancel button → `viewModel.cancel()`
+- [x] 6.6 Collect `viewModel.uiState` and render result pane: `Idle` → empty, `Running` → CircularProgressIndicator, `SelectResult` → `ResultGrid(result.columns, result.rows)`, `UpdateSummary` → summary table (columns: SQL, Rows Affected, Time), `Error` → error card with message + failed statement
+- [x] 6.7 Test: `QueryEditorScreenTest.kt` Compose UI test (render editor, type SQL, click Run, verify result grid appears for SELECT, verify summary table for UPDATE, verify error card for invalid SQL)
 
 ## Phase 7: Integration — Workspace Card Integration
 
-- [ ] 7.1 Modify `ui/workspace/WorkspaceCard.kt`: add `Query(id: String, connectionId: String, initialSql: String?)` sealed variant
+- [x] 7.1 Modify `ui/workspace/WorkspaceCard.kt`: add `Query(id: String, connectionId: String, initialSql: String?)` sealed variant
 - [ ] 7.2 Modify `ui/workspace/WorkspaceManager.kt`: handle `openQueryCard(connectionId, initialSql?)` → append `WorkspaceCard.Query` with unique id, focus it
 - [ ] 7.3 Modify `ui/workspace/WorkspaceManager.kt`: handle close/focus for Query cards (same logic as Table cards)
-- [ ] 7.4 Modify workspace renderer to pattern-match `WorkspaceCard.Query` → render `QueryEditorScreen(connectionId, initialSql)`
+- [x] 7.4 Modify workspace renderer to pattern-match `WorkspaceCard.Query` → render `QueryEditorScreen(connectionId, initialSql)`
 - [ ] 7.5 Modify `ui/screens/databases/NewQueryScreen.kt`: replace placeholder body with `WorkspaceManager.openQueryCard(connectionId, initialSql = "")`
 - [ ] 7.6 Test: open New Query from bottom-nav → WorkspaceCard.Query opens with empty editor, type SQL → state isolated, open second query card → both coexist with independent state
 
 ## Phase 8: Integration — Strings
 
-- [ ] 8.1 Add to `res/values/strings.xml`: `query_run`, `query_running`, `query_cancel`, `query_rows_label`, `query_time_label`, `query_affected_rows`, `query_error_title`, `query_multi_statement_warning`
-- [ ] 8.2 Add Spanish translations to `res/values-es/strings.xml`: `Ejecutar`, `Ejecutando`, `Cancelar`, `Filas`, `Tiempo`, `Filas afectadas`, `Error de consulta`, `Advertencia: punto y coma dentro de cadenas puede dividir incorrectamente`
-- [ ] 8.3 Wire strings to UI: Run/Cancel buttons, result grid labels, error card title
+- [x] 8.1 Add to `res/values/strings.xml`: `query_run`, `query_running`, `query_cancel`, `query_rows_label`, `query_time_label`, `query_affected_rows`, `query_error_title`, `query_multi_statement_warning`
+- [x] 8.2 Add Spanish translations to `res/values-es/strings.xml`: `Ejecutar`, `Ejecutando`, `Cancelar`, `Filas`, `Tiempo`, `Filas afectadas`, `Error de consulta`, `Advertencia: punto y coma dentro de cadenas puede dividir incorrectamente`
+- [x] 8.3 Wire strings to UI: Run/Cancel buttons, result grid labels, error card title
 
 ## Phase 9: Testing & Verification
 
