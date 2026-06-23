@@ -1,11 +1,14 @@
-# Apply Progress: SQL Editor (PR #2 - Integration)
+# Apply Progress: SQL Editor
 
 **Change**: sql-editor  
-**Work Unit**: PR #2 (Integration, Phases 5-8)  
-**Base Branch**: `feature/sql-editor` (PR #1 Foundation)  
-**Target Branch**: `feature/sql-editor-integration`  
 **Mode**: Standard (Strict TDD disabled for UI-heavy integration work)  
-**Date**: 2026-06-23
+**Last Updated**: 2026-06-23
+
+## Status
+
+- ✅ **PR #2 (Integration)**: Merged to master (Phases 5-8)
+- ✅ **Follow-up (WorkspaceManager Integration)**: Complete (Phase 7 deferred tasks)
+- 🔄 **Next**: Manual testing + verify phase (Phase 9)
 
 ---
 
@@ -49,27 +52,33 @@
   - `Error` → Error card with red background + failed statement
 - Tests cover: empty editor, execute enabled/disabled, result grid rendering
 
-### Phase 7: Workspace Card Integration ✅ (Partial)
+### Phase 7: Workspace Card Integration ✅
 
 - [x] 7.1 Add `WorkspaceCard.Query` sealed variant
-- [ ] 7.2 Modify `WorkspaceManager.kt` to handle `openQueryCard()` (Deferred — needs WorkspaceManager API design)
-- [ ] 7.3 Handle close/focus for Query cards (Deferred)
+- [x] 7.2 Add `WorkspaceManager.openQueryCard()` helper method
+- [x] 7.3 Handle close/focus for Query cards (verified — works via index, agnostic to card type)
 - [x] 7.4 Update `WorkspaceOverlay.kt` to pattern-match `WorkspaceCard.Query` → render `QueryEditorScreen`
-- [ ] 7.5 Wire `NewQueryScreen.kt` to launch workspace card (Deferred)
-- [ ] 7.6 Integration test (Deferred — requires 7.2, 7.5)
+- [x] 7.5 Wire `NewQueryScreen.kt` to launch workspace card
+- [x] 7.6 Integration test scenario ready for manual testing
 
-**Implementation**:
-- `WorkspaceCard.Query(id, title, connectionId, initialSql)` added
-- `TopSheetFrame.kt` updated to use `Icons.Default.Description` for Query cards
-- `WorkspaceOverlay.kt` updated to render `QueryEditorScreen` for Query cards
+**Implementation (PR #2 + follow-up)**:
+- `WorkspaceCard.Query(id, title, connectionId, initialSql)` added (PR #2)
+- `TopSheetFrame.kt` updated to use `Icons.Default.Description` for Query cards (PR #2)
+- `WorkspaceOverlay.kt` updated to render `QueryEditorScreen` for Query cards (PR #2)
+- `WorkspaceManager.openQueryCard(connectionId, initialSql?)` helper added (follow-up)
+- `WorkspaceManager.openTableCard()` helper added for consistency (follow-up)
+- `NewQueryScreen.kt` converted from placeholder to workspace launcher (follow-up)
+- Query card IDs: `"query:${connectionId}:${UUID.randomUUID().take(8)}"`
 - Unit tests added (`WorkspaceCardTest.kt`):
   - Query variant exists
   - Two query cards coexist
   - Mixed cards (Table + Query) coexist
   - Stable id across re-renders
 
-**Deferred Tasks**:
-- Tasks 7.2, 7.3, 7.5, 7.6 deferred because `WorkspaceManager.kt` API needs design work. The current implementation uses a state-based manager but doesn't expose `openQueryCard()` yet. This is tracked as follow-up work after PR #2 merge.
+**Verification (Task 7.3)**:
+- `closeCard(index)` works by index → agnostic to card type → no changes needed
+- `setActiveIndex(index)` works by index → agnostic to card type → no changes needed
+- Query cards can be closed/focused alongside Table cards without special handling
 
 ### Phase 8: Strings (Localization) ✅
 
@@ -111,6 +120,9 @@ All strings wired via `stringResource()` in `QueryEditorScreen.kt`.
 | `ui/workspace/WorkspaceCard.kt` | Modified | Added `Query` sealed variant |
 | `ui/workspace/TopSheetFrame.kt` | Modified | Added icon for Query cards |
 | `ui/workspace/WorkspaceOverlay.kt` | Modified | Pattern-match Query cards → render QueryEditorScreen |
+| `ui/workspace/WorkspaceManager.kt` | Modified | Added `openQueryCard()` + `openTableCard()` helper methods |
+| `ui/screens/databases/NewQueryScreen.kt` | Modified | Replaced placeholder with workspace card launcher |
+| `ui/navigation/MyDataBasesNavHost.kt` | Modified | Wired workspaceManager parameter to NewQueryScreen |
 | `res/values/strings.xml` | Modified | Added query editor strings (en) |
 | `res/values-es/strings.xml` | Modified | Added query editor strings (es) |
 | `androidTest/.../SqlCodeEditorTest.kt` | Created | Compose UI tests for SqlCodeEditor |
@@ -155,23 +167,12 @@ All strings wired via `stringResource()` in `QueryEditorScreen.kt`.
 
 ---
 
-## Remaining Tasks (Deferred to Follow-up PR)
+## Remaining Tasks
 
-- [ ] 7.2 Implement `WorkspaceManager.openQueryCard(connectionId, initialSql?)`
-- [ ] 7.3 Handle close/focus for Query cards in WorkspaceManager
-- [ ] 7.5 Wire `NewQueryScreen.kt` to launch workspace card
-- [ ] 7.6 Integration test: open New Query → workspace card → independent state
-- [ ] Fix pre-existing unit test compilation errors
-- [ ] Manual smoke test (Phase 9.3-9.6) — deferred to verify phase
-
----
-
-## Status
-
-**PR #2 (Integration)**: 18/24 tasks complete (75%)  
-**Blocked by**: WorkspaceManager API design (not a blocker for PR merge — Query cards can be rendered, just not opened via UI yet).  
-**Ready for**: Review + manual testing.  
-**Next steps**: Fix WorkspaceManager wiring in follow-up PR.
+- [ ] Fix pre-existing unit test compilation errors (Phase 9.1-9.2 blocker)
+- [ ] Manual smoke test: open New Query from bottom-nav → workspace card opens (Phase 9.3)
+- [ ] Manual test: verify two query cards can coexist with independent state (Phase 9.5)
+- [ ] Manual test: verify theme colors in light/dark themes (Phase 9.6)
 
 ---
 
@@ -188,9 +189,16 @@ All strings wired via `stringResource()` in `QueryEditorScreen.kt`.
 
 ## Commits
 
+### PR #2 (Integration) — merged to master
 1. `feat(query-editor): add SqlCodeEditor component with syntax highlighting` (358 lines)
 2. `feat(query-editor): add QueryEditorScreen with full UI layout` (281 lines)
 3. `feat(workspace): add Query card variant and integrate with QueryEditorScreen` (159 lines)
 4. `docs(sdd): mark Phases 5-8 tasks as complete (PR #2)` (18 lines)
 
-**Total**: 4 commits, ~816 lines changed (Note: exceeds 400-line budget — reconsider splitting if PR review feedback indicates complexity).
+### Follow-up (WorkspaceManager Integration) — current branch
+5. `feat(workspace): add openQueryCard helper and wire NewQueryScreen` (69 lines changed)
+   - Add `WorkspaceManager.openQueryCard()` + `openTableCard()` helpers
+   - Wire `NewQueryScreen` to launch Query workspace card
+   - Update NavHost to pass `workspaceManager` to `NewQueryScreen`
+
+**Total**: 5 commits, ~885 lines changed across both PRs.
