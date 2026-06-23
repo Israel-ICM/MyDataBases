@@ -8,6 +8,7 @@
 
 - ✅ **PR #2 (Integration)**: Merged to master (Phases 5-8)
 - ✅ **Follow-up (WorkspaceManager Integration)**: Complete (Phase 7 deferred tasks)
+- ✅ **Bug Fixes**: SQL error crashes + multi-statement context loss (commits 9af0899, 480fdb7)
 - 🔄 **Next**: Manual testing + verify phase (Phase 9)
 
 ---
@@ -151,7 +152,7 @@ All strings wired via `stringResource()` in `QueryEditorScreen.kt`.
 
 ---
 
-## Issues Found
+## Issues Found & Fixed
 
 1. **Pre-existing Test Failures**:
    - Several test files have compilation errors unrelated to this change:
@@ -164,6 +165,19 @@ All strings wired via `stringResource()` in `QueryEditorScreen.kt`.
 2. **Icons Import**:
    - `Icons.Default.Code` not available in Material Icons.
    - **Resolution**: Used `Icons.Default.Description` for Query card icon. Future: consider Phosphor icons (already in use elsewhere in app).
+
+3. **SQL Error Crashes** ✅ FIXED:
+   - **Problem**: App crashed when executing queries with syntax errors (e.g., `USE DATABASE foo`)
+   - **Root Cause**: `.recoverCatching { throw }` anti-pattern in `MySQLEngine` launched exceptions OUTSIDE the Result monad
+   - **Solution**: Added `CoroutineExceptionHandler` to `QueryEditorViewModel` + rewrote error handling to direct `try-catch` pattern
+   - **Commit**: `9af0899`
+
+4. **Multi-Statement Context Loss** ✅ FIXED:
+   - **Problem**: `USE database; SELECT * FROM table;` failed with "no database selected"
+   - **Root Cause**: Each statement executed in a SEPARATE connection from the pool → `USE` affected one connection, `SELECT` used a different one
+   - **Solution**: Created `ExecuteBatchStatementsUseCase` that executes all statements in the SAME connection
+   - **Impact**: Database context (selected database, session variables, temp tables) now persists across statements
+   - **Commit**: `480fdb7`
 
 ---
 
@@ -195,10 +209,25 @@ All strings wired via `stringResource()` in `QueryEditorScreen.kt`.
 3. `feat(workspace): add Query card variant and integrate with QueryEditorScreen` (159 lines)
 4. `docs(sdd): mark Phases 5-8 tasks as complete (PR #2)` (18 lines)
 
-### Follow-up (WorkspaceManager Integration) — current branch
+### Follow-up (WorkspaceManager Integration) — merged to master
 5. `feat(workspace): add openQueryCard helper and wire NewQueryScreen` (69 lines changed)
    - Add `WorkspaceManager.openQueryCard()` + `openTableCard()` helpers
    - Wire `NewQueryScreen` to launch Query workspace card
    - Update NavHost to pass `workspaceManager` to `NewQueryScreen`
 
-**Total**: 5 commits, ~885 lines changed across both PRs.
+### Bug Fixes (post-implementation) — merged to master
+6. `fix(query-editor): prevent crashes on SQL errors with CoroutineExceptionHandler` (66 lines changed)
+   - Add `CoroutineExceptionHandler` to `QueryEditorViewModel` to catch all unhandled exceptions
+   - Rewrite `MySQLEngine` error handling from `.recoverCatching/.fold` to direct `try-catch` pattern
+   - Exceptions now show error UI instead of crashing the app
+   - Fixes crash when executing queries with syntax errors (e.g., `USE DATABASE foo`)
+
+7. `feat(query-editor): execute multi-statement SQL in same connection` (217 lines added, 69 removed)
+   - Add `ExecuteBatchStatementsUseCase` to execute multiple statements in the SAME connection
+   - Add `executeBatch()` method to `DatabaseEngine`, `DatabaseRepository`, `MySQLEngine`, `MariaDBEngine`
+   - Update `QueryEditorViewModel` to use batch execution instead of separate calls
+   - Fixes multi-statement execution with `USE DATABASE` context persistence
+   - **Problem**: Each statement was getting a NEW connection from pool → `USE database` affected one connection, but `SELECT` used a different one without database selected
+   - **Solution**: `executeBatch()` keeps connection open for all statements in the list
+
+**Total**: 7 commits, ~1,237 lines changed across PRs + bug fixes.
