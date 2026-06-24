@@ -3,10 +3,14 @@ package com.sphynxs.mydatabases.ui.screens.queryeditor
 import androidx.compose.ui.text.TextRange
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.sphynxs.mydatabases.domain.completion.CompletionSuggestion
+import com.sphynxs.mydatabases.domain.completion.SchemaSnapshot
+import com.sphynxs.mydatabases.domain.completion.SqlCompletionProvider
 import com.sphynxs.mydatabases.domain.editor.EditorHistory
 import com.sphynxs.mydatabases.domain.editor.EditorSnapshot
 import com.sphynxs.mydatabases.domain.models.StatementResult
 import com.sphynxs.mydatabases.domain.usecases.ExecuteBatchStatementsUseCase
+import com.sphynxs.mydatabases.domain.usecases.LoadSchemaSnapshotUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Job
@@ -37,7 +41,8 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class QueryEditorViewModel @Inject constructor(
-    private val executeBatchStatementsUseCase: ExecuteBatchStatementsUseCase
+    private val executeBatchStatementsUseCase: ExecuteBatchStatementsUseCase,
+    private val loadSchemaSnapshotUseCase: LoadSchemaSnapshotUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<QueryEditorUiState>(QueryEditorUiState.Idle)
@@ -53,6 +58,10 @@ class QueryEditorViewModel @Inject constructor(
     
     private val _canRedo = MutableStateFlow(false)
     val canRedo: StateFlow<Boolean> = _canRedo.asStateFlow()
+    
+    // Schema snapshot for completion
+    private val _schemaSnapshot = MutableStateFlow<SchemaSnapshot?>(null)
+    val schemaSnapshot: StateFlow<SchemaSnapshot?> = _schemaSnapshot.asStateFlow()
 
     // Exception handler para catchear TODAS las excepciones no manejadas
     private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
@@ -205,5 +214,53 @@ class QueryEditorViewModel @Inject constructor(
      */
     suspend fun formatSql(currentText: String): String = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Default) {
         com.sphynxs.mydatabases.domain.editor.SqlFormatter.format(currentText)
+    }
+    
+    /**
+     * Load schema snapshot for the current database.
+     *
+     * Triggers LoadSchemaSnapshotUseCase to fetch tables (eager) and columns (lazy per-table).
+     * Updates _schemaSnapshot StateFlow for completion provider.
+     *
+     * Spec: openspec/changes/editor-completion-and-format/spec.md (scenarios 19-20)
+     * Design: ADR 5 — Lazy-load schema (tables eager, columns on-demand)
+     *
+     * @param databaseName Target database (nullable - if null, completion shows keywords only)
+     */
+    fun loadSchema(databaseName: String?) {
+        viewModelScope.launch {
+            if (databaseName == null) {
+                _schemaSnapshot.value = null
+                return@launch
+            }
+            
+            val result = loadSchemaSnapshotUseCase(databaseName)
+            result.fold(
+                onSuccess = { snapshot ->
+                    _schemaSnapshot.value = snapshot
+                },
+                onFailure = {
+                    // Graceful degradation: keep previous snapshot or null
+                    // Completion will show keywords only
+                }
+            )
+        }
+    }
+    
+    /**
+     * Get completion suggestions for the current editor state.
+     *
+     * Delegates to SqlCompletionProvider.getSuggestions() with prefix, context, and schema.
+     * Pure function call - no side effects.
+     *
+     * Spec: openspec/changes/editor-completion-and-format/spec.md (scenarios 13-28)
+     * Design: ADR 3 — Completion provider is pure function
+     *
+     * @param prefix Text before cursor (e.g., "SEL", "users")
+     * @param context Full text before cursor for context detection (e.g., "SELECT * FROM ")
+     * @return List of suggestions sorted by relevance (top 20, ranked by context)
+     */
+    fun getSuggestions(prefix: String, context: String): List<CompletionSuggestion> {
+        return SqlCompletionProvider.getSuggestions(prefix, context, _schemaSnapshot.value)
     }
 }

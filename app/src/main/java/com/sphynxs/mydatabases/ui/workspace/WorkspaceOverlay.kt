@@ -183,6 +183,7 @@ internal fun WorkspaceCardContent(
                 is WorkspaceCard.Query -> {
                     com.sphynxs.mydatabases.ui.screens.queryeditor.QueryEditorScreen(
                         connectionId = card.connectionId,
+                        databaseName = card.databaseName,
                         initialSql = card.initialSql,
                         modifier = Modifier
                             .fillMaxSize()

@@ -77,6 +77,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun QueryEditorScreen(
     connectionId: String,
+    databaseName: String? = null,
     initialSql: String? = null,
     viewModel: QueryEditorViewModel = hiltViewModel(),
     modifier: Modifier = Modifier
@@ -86,6 +87,11 @@ fun QueryEditorScreen(
     val canUndo by viewModel.canUndo.collectAsState()
     val canRedo by viewModel.canRedo.collectAsState()
     val cursorPositions = remember { mutableStateListOf<Int>() }
+    
+    // Load schema snapshot when databaseName changes
+    LaunchedEffect(databaseName) {
+        viewModel.loadSchema(databaseName)
+    }
     val scrollState = rememberScrollState()
     val context = LocalContext.current
     var showSaveDialog by remember { mutableStateOf(false) }

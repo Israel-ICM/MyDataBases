@@ -47,12 +47,14 @@ sealed class WorkspaceCard(
      * @param id Identificador único (formato: "query:{connectionId}:{queryId}")
      * @param title Título de la tab (usualmente "New Query" o nombre guardado)
      * @param connectionId ID de la conexión
+     * @param databaseName Nombre de la base de datos activa (null = sin DB seleccionada, completion solo keywords)
      * @param initialSql SQL inicial (null = editor vacío)
      */
     data class Query(
         override val id: String,
         override val title: String,
         val connectionId: String,
+        val databaseName: String?,
         val initialSql: String?
     ) : WorkspaceCard(id, title)
 

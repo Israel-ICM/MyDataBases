@@ -126,6 +126,7 @@ class WorkspaceManager @Inject constructor() {
                 id = "query:$connectionId:$queryId",
                 title = "New Query",
                 connectionId = connectionId,
+                databaseName = null,
                 initialSql = initialSql
             )
         )
