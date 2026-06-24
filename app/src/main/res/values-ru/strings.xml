@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MyDataBases</string>
+    
+    <!-- Navigation routes -->
+    <string name="nav_connections">Подключения</string>
+    <string name="nav_database_list">Базы данных</string>
+    <string name="nav_add_database">Добавить базу данных</string>
+    <string name="nav_new_query">Новый запрос</string>
+    <string name="nav_monitor">Монитор</string>
+    <string name="nav_tables">Таблицы</string>
+    <string name="nav_views">Представления</string>
+    <string name="nav_editor">Редактор</string>
+    <string name="nav_functions">Функции</string>
+    <string name="nav_backup">Резервная копия</string>
+    <string name="nav_settings">Настройки</string>
+    
+    <!-- Common actions -->
+    <string name="action_add">Добавить</string>
+    <string name="action_edit">Редактировать</string>
+    <string name="action_delete">Удалить</string>
+    <string name="action_retry">Повторить</string>
+    <string name="action_save">Сохранить</string>
+    <string name="action_test">Проверить</string>
+    <string name="action_cancel">Отмена</string>
+    <string name="action_connect">Подключить</string>
+    
+    <!-- Connections screen -->
+    <string name="connections_title">Подключения</string>
+    <string name="connections_empty_title">Подключений пока нет</string>
+    <string name="connections_empty_message">Добавьте первое подключение к базе данных для начала работы</string>
+    <string name="connections_add_new">Новое подключение</string>
+    <string name="connection_action_edit">Редактировать подключение</string>
+    <string name="connection_action_delete">Удалить подключение</string>
+    <string name="connection_delete_confirm_title">Удалить подключение?</string>
+    <string name="connection_delete_confirm_message">Подключение "%1$s" будет удалено безвозвратно</string>
+    
+    <!-- Connection form -->
+    <string name="connection_form_title_new">Новое подключение</string>
+    <string name="connection_form_title_edit">Редактировать подключение</string>
+    <string name="connection_field_name">Имя</string>
+    <string name="connection_field_name_hint">Моя база данных</string>
+    <string name="connection_field_type">Тип базы данных</string>
+    <string name="connection_field_host">Хост</string>
+    <string name="connection_field_host_hint">localhost</string>
+    <string name="connection_field_port">Порт</string>
+    <string name="connection_field_port_hint">3306</string>
+    <string name="connection_field_database">База данных</string>
+    <string name="connection_field_database_hint">mydb</string>
+    <string name="connection_field_username">Имя пользователя</string>
+    <string name="connection_field_username_hint">admin</string>
+    <string name="connection_field_password">Пароль</string>
+    <string name="connection_field_password_hint">••••••••</string>
+    <string name="connection_test_success">Подключение успешно!</string>
+    <string name="connection_test_failed">Подключение не удалось: %1$s</string>
+    <string name="connection_save_success">Подключение сохранено</string>
+    <string name="connection_save_failed">Не удалось сохранить: %1$s</string>
+    
+    <!-- Databases screen -->
+    <string name="databases_title">Базы данных</string>
+    <string name="databases_empty">Нет доступных баз данных</string>
+    <string name="databases_search_hint">Поиск баз данных…</string>
+    
+    <!-- Add Database screen -->
+    <string name="add_database_title">Добавить базу данных</string>
+    <string name="add_database_field_name">Имя базы данных</string>
+    <string name="add_database_field_name_hint">my_database</string>
+    <string name="add_database_field_charset">Кодировка</string>
+    <string name="add_database_field_charset_hint">utf8mb4 (необязательно)</string>
+    <string name="add_database_field_collation">Сортировка</string>
+    <string name="add_database_field_collation_hint">utf8mb4_general_ci (необязательно)</string>
+    <string name="add_database_button_create">Создать базу данных</string>
+    <string name="add_database_coming_soon">Создание базы данных — скоро</string>
+    <string name="add_database_creating">Создание базы данных...</string>
+    <string name="create_database_success">База данных создана</string>
+    <string name="error_database_exists">База данных с таким именем уже существует</string>
+    <string name="error_permission_denied">У вас нет прав для создания баз данных</string>
+    <string name="error_create_database_failed">Не удалось создать базу данных. Попробуйте снова.</string>
+    <string name="error_invalid_database_name">Недопустимое имя базы данных. Используйте только буквы, цифры и подчёркивания (макс. 64 символа).</string>
+    <string name="error_connection_lost">Подключение потеряно. Переподключитесь и попробуйте снова.</string>
+    
+    <!-- Monitor screen -->
+    <string name="monitor_title">Монитор сервера</string>
+    <string name="monitor_tab_metrics">Метрики</string>
+    <string name="monitor_tab_queries">Запросы</string>
+    <string name="monitor_tab_health">Состояние</string>
+    <string name="monitor_metrics_title">Метрики сервера</string>
+    <string name="monitor_queries_title">Журнал запросов</string>
+    <string name="monitor_health_title">Проверка состояния</string>
+    <string name="monitor_placeholder">Скоро</string>
+    
+    <!-- Query Editor screen -->
+    <string name="query_editor_title">Редактор запросов</string>
+    <string name="query_editor_placeholder">Редактор запросов — Скоро</string>
+    <string name="execute_button">Выполнить</string>
+    <string name="cancel_button">Отмена</string>
+    <string name="clear_button">Очистить</string>
+    <string name="query_editor_empty_state">Выполните запрос, чтобы увидеть результаты здесь</string>
+    <string name="query_editor_error_prefix">Ошибка запроса</string>
+    <string name="rows_affected">Затронуто строк</string>
+    <string name="execution_time_ms">Время выполнения</string>
+    
+    <!-- Tables screen -->
+    <string name="tables_title">Таблицы - %1$s</string>
+    <string name="tables_empty">В этой базе данных нет таблиц</string>
+    <string name="tables_search_hint">Поиск таблиц…</string>
+    
+    <!-- Table viewer screen -->
+    <string name="table_viewer_title">Таблица: %1$s</string>
+    <string name="table_viewer_tab_rows">Строки</string>
+    <string name="table_viewer_tab_schema">Схема</string>
+    <string name="table_viewer_empty">В этой таблице нет строк</string>
+    
+    <!-- Errors -->
+    <string name="error_generic">Произошла ошибка</string>
+    <string name="error_loading">Не удалось загрузить данные</string>
+    
+    <!-- Settings screen -->
+    <string name="settings_title">Настройки</string>
+    <string name="settings_branded_palette_title">Фирменная палитра</string>
+    <string name="settings_branded_palette_description">Использовать пользовательские фирменные цвета вместо динамической темы</string>
+    
+    <!-- Loading states -->
+    <string name="loading">Загрузка…</string>
+    
+    <!-- Empty states -->
+    <string name="empty_connections_title">Нет подключений</string>
+    <string name="empty_connections_description">Добавьте подключение для начала работы</string>
+    <string name="empty_tables_title">Нет таблиц</string>
+    <string name="empty_tables_description">В этой базе данных нет таблиц</string>
+    <string name="empty_databases_title">Нет баз данных</string>
+    <string name="empty_databases_description">В этом подключении нет баз данных</string>
+</resources>

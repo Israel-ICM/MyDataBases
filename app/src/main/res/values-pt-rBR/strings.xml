@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MyDataBases</string>
+    
+    <!-- Navigation routes -->
+    <string name="nav_connections">Conexões</string>
+    <string name="nav_database_list">Bancos de Dados</string>
+    <string name="nav_add_database">Adicionar banco de dados</string>
+    <string name="nav_new_query">Nova consulta</string>
+    <string name="nav_monitor">Monitor</string>
+    <string name="nav_tables">Tabelas</string>
+    <string name="nav_views">Visualizações</string>
+    <string name="nav_editor">Editor</string>
+    <string name="nav_functions">Funções</string>
+    <string name="nav_backup">Backup</string>
+    <string name="nav_settings">Configurações</string>
+    
+    <!-- Common actions -->
+    <string name="action_add">Adicionar</string>
+    <string name="action_edit">Editar</string>
+    <string name="action_delete">Excluir</string>
+    <string name="action_retry">Tentar novamente</string>
+    <string name="action_save">Salvar</string>
+    <string name="action_test">Testar</string>
+    <string name="action_cancel">Cancelar</string>
+    <string name="action_connect">Conectar</string>
+    
+    <!-- Connections screen -->
+    <string name="connections_title">Conexões</string>
+    <string name="connections_empty_title">Nenhuma conexão ainda</string>
+    <string name="connections_empty_message">Adicione sua primeira conexão de banco de dados para começar</string>
+    <string name="connections_add_new">Nova conexão</string>
+    <string name="connection_action_edit">Editar conexão</string>
+    <string name="connection_action_delete">Excluir conexão</string>
+    <string name="connection_delete_confirm_title">Excluir conexão?</string>
+    <string name="connection_delete_confirm_message">Isso excluirá permanentemente a conexão "%1$s"</string>
+    
+    <!-- Connection form -->
+    <string name="connection_form_title_new">Nova Conexão</string>
+    <string name="connection_form_title_edit">Editar Conexão</string>
+    <string name="connection_field_name">Nome</string>
+    <string name="connection_field_name_hint">Meu Banco de Dados</string>
+    <string name="connection_field_type">Tipo de Banco de Dados</string>
+    <string name="connection_field_host">Host</string>
+    <string name="connection_field_host_hint">localhost</string>
+    <string name="connection_field_port">Porta</string>
+    <string name="connection_field_port_hint">3306</string>
+    <string name="connection_field_database">Banco de Dados</string>
+    <string name="connection_field_database_hint">meubd</string>
+    <string name="connection_field_username">Usuário</string>
+    <string name="connection_field_username_hint">admin</string>
+    <string name="connection_field_password">Senha</string>
+    <string name="connection_field_password_hint">••••••••</string>
+    <string name="connection_test_success">Conexão bem-sucedida!</string>
+    <string name="connection_test_failed">Falha na conexão: %1$s</string>
+    <string name="connection_save_success">Conexão salva</string>
+    <string name="connection_save_failed">Falha ao salvar: %1$s</string>
+    
+    <!-- Databases screen -->
+    <string name="databases_title">Bancos de Dados</string>
+    <string name="databases_empty">Nenhum banco de dados disponível</string>
+    <string name="databases_search_hint">Pesquisar bancos de dados…</string>
+    
+    <!-- Add Database screen -->
+    <string name="add_database_title">Adicionar banco de dados</string>
+    <string name="add_database_field_name">Nome do banco de dados</string>
+    <string name="add_database_field_name_hint">meu_banco</string>
+    <string name="add_database_field_charset">Conjunto de caracteres</string>
+    <string name="add_database_field_charset_hint">utf8mb4 (opcional)</string>
+    <string name="add_database_field_collation">Collation</string>
+    <string name="add_database_field_collation_hint">utf8mb4_general_ci (opcional)</string>
+    <string name="add_database_button_create">Criar banco de dados</string>
+    <string name="add_database_coming_soon">Criação de banco de dados — em breve</string>
+    <string name="add_database_creating">Criando banco de dados...</string>
+    <string name="create_database_success">Banco de dados criado</string>
+    <string name="error_database_exists">Já existe um banco de dados com esse nome</string>
+    <string name="error_permission_denied">Você não tem permissão para criar bancos de dados</string>
+    <string name="error_create_database_failed">Não foi possível criar o banco de dados. Tente novamente.</string>
+    <string name="error_invalid_database_name">Nome de banco de dados inválido. Use apenas letras, números e sublinhados (máx. 64 caracteres).</string>
+    <string name="error_connection_lost">Conexão perdida. Reconecte e tente novamente.</string>
+    
+    <!-- Monitor screen -->
+    <string name="monitor_title">Monitor do servidor</string>
+    <string name="monitor_tab_metrics">Métricas</string>
+    <string name="monitor_tab_queries">Consultas</string>
+    <string name="monitor_tab_health">Saúde</string>
+    <string name="monitor_metrics_title">Métricas do servidor</string>
+    <string name="monitor_queries_title">Registro de consultas</string>
+    <string name="monitor_health_title">Verificação de saúde</string>
+    <string name="monitor_placeholder">Em breve</string>
+    
+    <!-- Query Editor screen -->
+    <string name="query_editor_title">Editor de consultas</string>
+    <string name="query_editor_placeholder">Editor de consultas — Em breve</string>
+    <string name="execute_button">Executar</string>
+    <string name="cancel_button">Cancelar</string>
+    <string name="clear_button">Limpar</string>
+    <string name="query_editor_empty_state">Execute uma consulta para ver os resultados aqui</string>
+    <string name="query_editor_error_prefix">Erro de consulta</string>
+    <string name="rows_affected">Linhas afetadas</string>
+    <string name="execution_time_ms">Tempo de execução</string>
+    
+    <!-- Tables screen -->
+    <string name="tables_title">Tabelas - %1$s</string>
+    <string name="tables_empty">Nenhuma tabela neste banco de dados</string>
+    <string name="tables_search_hint">Pesquisar tabelas…</string>
+    
+    <!-- Table viewer screen -->
+    <string name="table_viewer_title">Tabela: %1$s</string>
+    <string name="table_viewer_tab_rows">Linhas</string>
+    <string name="table_viewer_tab_schema">Esquema</string>
+    <string name="table_viewer_empty">Esta tabela não tem linhas</string>
+    
+    <!-- Errors -->
+    <string name="error_generic">Ocorreu um erro</string>
+    <string name="error_loading">Falha ao carregar dados</string>
+    
+    <!-- Settings screen -->
+    <string name="settings_title">Configurações</string>
+    <string name="settings_branded_palette_title">Paleta de marca</string>
+    <string name="settings_branded_palette_description">Usar cores de marca personalizadas em vez do tema dinâmico</string>
+    
+    <!-- Loading states -->
+    <string name="loading">Carregando…</string>
+    
+    <!-- Empty states -->
+    <string name="empty_connections_title">Nenhuma conexão</string>
+    <string name="empty_connections_description">Adicione uma conexão para começar</string>
+    <string name="empty_tables_title">Nenhuma tabela</string>
+    <string name="empty_tables_description">Este banco de dados não tem tabelas</string>
+    <string name="empty_databases_title">Nenhum banco de dados</string>
+    <string name="empty_databases_description">Esta conexão não tem bancos de dados</string>
+</resources>

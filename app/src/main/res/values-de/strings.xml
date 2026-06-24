@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MyDataBases</string>
+    
+    <!-- Navigation routes -->
+    <string name="nav_connections">Verbindungen</string>
+    <string name="nav_database_list">Datenbanken</string>
+    <string name="nav_add_database">Datenbank hinzufügen</string>
+    <string name="nav_new_query">Neue Abfrage</string>
+    <string name="nav_monitor">Monitor</string>
+    <string name="nav_tables">Tabellen</string>
+    <string name="nav_views">Ansichten</string>
+    <string name="nav_editor">Editor</string>
+    <string name="nav_functions">Funktionen</string>
+    <string name="nav_backup">Sicherung</string>
+    <string name="nav_settings">Einstellungen</string>
+    
+    <!-- Common actions -->
+    <string name="action_add">Hinzufügen</string>
+    <string name="action_edit">Bearbeiten</string>
+    <string name="action_delete">Löschen</string>
+    <string name="action_retry">Wiederholen</string>
+    <string name="action_save">Speichern</string>
+    <string name="action_test">Testen</string>
+    <string name="action_cancel">Abbrechen</string>
+    <string name="action_connect">Verbinden</string>
+    
+    <!-- Connections screen -->
+    <string name="connections_title">Verbindungen</string>
+    <string name="connections_empty_title">Noch keine Verbindungen</string>
+    <string name="connections_empty_message">Fügen Sie Ihre erste Datenbankverbindung hinzu, um zu beginnen</string>
+    <string name="connections_add_new">Neue Verbindung</string>
+    <string name="connection_action_edit">Verbindung bearbeiten</string>
+    <string name="connection_action_delete">Verbindung löschen</string>
+    <string name="connection_delete_confirm_title">Verbindung löschen?</string>
+    <string name="connection_delete_confirm_message">Dies löscht die Verbindung "%1$s" dauerhaft</string>
+    
+    <!-- Connection form -->
+    <string name="connection_form_title_new">Neue Verbindung</string>
+    <string name="connection_form_title_edit">Verbindung bearbeiten</string>
+    <string name="connection_field_name">Name</string>
+    <string name="connection_field_name_hint">Meine Datenbank</string>
+    <string name="connection_field_type">Datenbanktyp</string>
+    <string name="connection_field_host">Host</string>
+    <string name="connection_field_host_hint">localhost</string>
+    <string name="connection_field_port">Port</string>
+    <string name="connection_field_port_hint">3306</string>
+    <string name="connection_field_database">Datenbank</string>
+    <string name="connection_field_database_hint">meinedb</string>
+    <string name="connection_field_username">Benutzername</string>
+    <string name="connection_field_username_hint">admin</string>
+    <string name="connection_field_password">Passwort</string>
+    <string name="connection_field_password_hint">••••••••</string>
+    <string name="connection_test_success">Verbindung erfolgreich!</string>
+    <string name="connection_test_failed">Verbindung fehlgeschlagen: %1$s</string>
+    <string name="connection_save_success">Verbindung gespeichert</string>
+    <string name="connection_save_failed">Speichern fehlgeschlagen: %1$s</string>
+    
+    <!-- Databases screen -->
+    <string name="databases_title">Datenbanken</string>
+    <string name="databases_empty">Keine Datenbanken verfügbar</string>
+    <string name="databases_search_hint">Datenbanken durchsuchen…</string>
+    
+    <!-- Add Database screen -->
+    <string name="add_database_title">Datenbank hinzufügen</string>
+    <string name="add_database_field_name">Datenbankname</string>
+    <string name="add_database_field_name_hint">meine_datenbank</string>
+    <string name="add_database_field_charset">Zeichensatz</string>
+    <string name="add_database_field_charset_hint">utf8mb4 (optional)</string>
+    <string name="add_database_field_collation">Kollation</string>
+    <string name="add_database_field_collation_hint">utf8mb4_general_ci (optional)</string>
+    <string name="add_database_button_create">Datenbank erstellen</string>
+    <string name="add_database_coming_soon">Datenbankerstellung — demnächst verfügbar</string>
+    <string name="add_database_creating">Datenbank wird erstellt...</string>
+    <string name="create_database_success">Datenbank erstellt</string>
+    <string name="error_database_exists">Eine Datenbank mit diesem Namen existiert bereits</string>
+    <string name="error_permission_denied">Sie haben keine Berechtigung, Datenbanken zu erstellen</string>
+    <string name="error_create_database_failed">Datenbank konnte nicht erstellt werden. Bitte versuchen Sie es erneut.</string>
+    <string name="error_invalid_database_name">Ungültiger Datenbankname. Verwenden Sie nur Buchstaben, Zahlen und Unterstriche (max. 64 Zeichen).</string>
+    <string name="error_connection_lost">Verbindung verloren. Bitte erneut verbinden und wiederholen.</string>
+    
+    <!-- Monitor screen -->
+    <string name="monitor_title">Server-Monitor</string>
+    <string name="monitor_tab_metrics">Metriken</string>
+    <string name="monitor_tab_queries">Abfragen</string>
+    <string name="monitor_tab_health">Zustand</string>
+    <string name="monitor_metrics_title">Server-Metriken</string>
+    <string name="monitor_queries_title">Abfrageprotokoll</string>
+    <string name="monitor_health_title">Zustandsprüfung</string>
+    <string name="monitor_placeholder">Demnächst verfügbar</string>
+    
+    <!-- Query Editor screen -->
+    <string name="query_editor_title">Abfrage-Editor</string>
+    <string name="query_editor_placeholder">Abfrage-Editor — Demnächst verfügbar</string>
+    <string name="execute_button">Ausführen</string>
+    <string name="cancel_button">Abbrechen</string>
+    <string name="clear_button">Löschen</string>
+    <string name="query_editor_empty_state">Führen Sie eine Abfrage aus, um hier Ergebnisse zu sehen</string>
+    <string name="query_editor_error_prefix">Abfragefehler</string>
+    <string name="rows_affected">Betroffene Zeilen</string>
+    <string name="execution_time_ms">Ausführungszeit</string>
+    
+    <!-- Tables screen -->
+    <string name="tables_title">Tabellen - %1$s</string>
+    <string name="tables_empty">Keine Tabellen in dieser Datenbank</string>
+    <string name="tables_search_hint">Tabellen durchsuchen…</string>
+    
+    <!-- Table viewer screen -->
+    <string name="table_viewer_title">Tabelle: %1$s</string>
+    <string name="table_viewer_tab_rows">Zeilen</string>
+    <string name="table_viewer_tab_schema">Schema</string>
+    <string name="table_viewer_empty">Diese Tabelle hat keine Zeilen</string>
+    
+    <!-- Errors -->
+    <string name="error_generic">Ein Fehler ist aufgetreten</string>
+    <string name="error_loading">Fehler beim Laden der Daten</string>
+    
+    <!-- Settings screen -->
+    <string name="settings_title">Einstellungen</string>
+    <string name="settings_branded_palette_title">Markenpalette</string>
+    <string name="settings_branded_palette_description">Benutzerdefinierte Markenfarben anstelle des dynamischen Designs verwenden</string>
+    
+    <!-- Loading states -->
+    <string name="loading">Laden…</string>
+    
+    <!-- Empty states -->
+    <string name="empty_connections_title">Keine Verbindungen</string>
+    <string name="empty_connections_description">Fügen Sie eine Verbindung hinzu, um zu beginnen</string>
+    <string name="empty_tables_title">Keine Tabellen</string>
+    <string name="empty_tables_description">Diese Datenbank hat keine Tabellen</string>
+    <string name="empty_databases_title">Keine Datenbanken</string>
+    <string name="empty_databases_description">Diese Verbindung hat keine Datenbanken</string>
+</resources>

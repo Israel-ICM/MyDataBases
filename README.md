@@ -105,6 +105,14 @@ Este proyecto usa **SDD (Spec-Driven Development)**. Ver `.atl/standards/sdd-wor
 Soportado desde v1.0:
 - 🇪🇸 Español
 - 🇺🇸 Inglés
+- 🇨🇳 简体中文 (Chino Simplificado)
+- 🇮🇳 हिन्दी (Hindi)
+- 🇫🇷 Français (Francés)
+- 🇩🇪 Deutsch (Alemán)
+- 🇧🇷 Português (Portugués)
+- 🇯🇵 日本語 (Japonés)
+- 🇸🇦 العربية (Árabe)
+- 🇷🇺 Русский (Ruso)
 
 ## 📱 Soporte de Dispositivos
 

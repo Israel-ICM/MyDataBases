@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MyDataBases</string>
+    
+    <!-- Navigation routes -->
+    <string name="nav_connections">连接</string>
+    <string name="nav_database_list">数据库</string>
+    <string name="nav_add_database">添加数据库</string>
+    <string name="nav_new_query">新建查询</string>
+    <string name="nav_monitor">监控</string>
+    <string name="nav_tables">表</string>
+    <string name="nav_views">视图</string>
+    <string name="nav_editor">编辑器</string>
+    <string name="nav_functions">函数</string>
+    <string name="nav_backup">备份</string>
+    <string name="nav_settings">设置</string>
+    
+    <!-- Common actions -->
+    <string name="action_add">添加</string>
+    <string name="action_edit">编辑</string>
+    <string name="action_delete">删除</string>
+    <string name="action_retry">重试</string>
+    <string name="action_save">保存</string>
+    <string name="action_test">测试</string>
+    <string name="action_cancel">取消</string>
+    <string name="action_connect">连接</string>
+    
+    <!-- Connections screen -->
+    <string name="connections_title">连接</string>
+    <string name="connections_empty_title">暂无连接</string>
+    <string name="connections_empty_message">添加您的第一个数据库连接以开始使用</string>
+    <string name="connections_add_new">新建连接</string>
+    <string name="connection_action_edit">编辑连接</string>
+    <string name="connection_action_delete">删除连接</string>
+    <string name="connection_delete_confirm_title">删除连接？</string>
+    <string name="connection_delete_confirm_message">这将永久删除连接"%1$s"</string>
+    
+    <!-- Connection form -->
+    <string name="connection_form_title_new">新建连接</string>
+    <string name="connection_form_title_edit">编辑连接</string>
+    <string name="connection_field_name">名称</string>
+    <string name="connection_field_name_hint">我的数据库</string>
+    <string name="connection_field_type">数据库类型</string>
+    <string name="connection_field_host">主机</string>
+    <string name="connection_field_host_hint">localhost</string>
+    <string name="connection_field_port">端口</string>
+    <string name="connection_field_port_hint">3306</string>
+    <string name="connection_field_database">数据库</string>
+    <string name="connection_field_database_hint">mydb</string>
+    <string name="connection_field_username">用户名</string>
+    <string name="connection_field_username_hint">admin</string>
+    <string name="connection_field_password">密码</string>
+    <string name="connection_field_password_hint">••••••••</string>
+    <string name="connection_test_success">连接成功！</string>
+    <string name="connection_test_failed">连接失败：%1$s</string>
+    <string name="connection_save_success">连接已保存</string>
+    <string name="connection_save_failed">保存失败：%1$s</string>
+    
+    <!-- Databases screen -->
+    <string name="databases_title">数据库</string>
+    <string name="databases_empty">没有可用的数据库</string>
+    <string name="databases_search_hint">搜索数据库…</string>
+    
+    <!-- Add Database screen -->
+    <string name="add_database_title">添加数据库</string>
+    <string name="add_database_field_name">数据库名称</string>
+    <string name="add_database_field_name_hint">my_database</string>
+    <string name="add_database_field_charset">字符集</string>
+    <string name="add_database_field_charset_hint">utf8mb4（可选）</string>
+    <string name="add_database_field_collation">排序规则</string>
+    <string name="add_database_field_collation_hint">utf8mb4_general_ci（可选）</string>
+    <string name="add_database_button_create">创建数据库</string>
+    <string name="add_database_coming_soon">数据库创建功能 — 即将推出</string>
+    <string name="add_database_creating">正在创建数据库...</string>
+    <string name="create_database_success">数据库已创建</string>
+    <string name="error_database_exists">该名称的数据库已存在</string>
+    <string name="error_permission_denied">您没有创建数据库的权限</string>
+    <string name="error_create_database_failed">无法创建数据库。请重试。</string>
+    <string name="error_invalid_database_name">数据库名称无效。仅使用字母、数字和下划线（最多64个字符）。</string>
+    <string name="error_connection_lost">连接丢失。请重新连接并重试。</string>
+    
+    <!-- Monitor screen -->
+    <string name="monitor_title">服务器监控</string>
+    <string name="monitor_tab_metrics">指标</string>
+    <string name="monitor_tab_queries">查询</string>
+    <string name="monitor_tab_health">健康状态</string>
+    <string name="monitor_metrics_title">服务器指标</string>
+    <string name="monitor_queries_title">查询日志</string>
+    <string name="monitor_health_title">健康检查</string>
+    <string name="monitor_placeholder">即将推出</string>
+    
+    <!-- Query Editor screen -->
+    <string name="query_editor_title">查询编辑器</string>
+    <string name="query_editor_placeholder">查询编辑器 — 即将推出</string>
+    <string name="execute_button">执行</string>
+    <string name="cancel_button">取消</string>
+    <string name="clear_button">清除</string>
+    <string name="query_editor_empty_state">运行查询以在此处查看结果</string>
+    <string name="query_editor_error_prefix">查询错误</string>
+    <string name="rows_affected">受影响的行数</string>
+    <string name="execution_time_ms">执行时间</string>
+    
+    <!-- Tables screen -->
+    <string name="tables_title">表 - %1$s</string>
+    <string name="tables_empty">此数据库中没有表</string>
+    <string name="tables_search_hint">搜索表…</string>
+    
+    <!-- Table viewer screen -->
+    <string name="table_viewer_title">表：%1$s</string>
+    <string name="table_viewer_tab_rows">行</string>
+    <string name="table_viewer_tab_schema">架构</string>
+    <string name="table_viewer_empty">此表没有行</string>
+    
+    <!-- Errors -->
+    <string name="error_generic">发生错误</string>
+    <string name="error_loading">加载数据失败</string>
+    
+    <!-- Settings screen -->
+    <string name="settings_title">设置</string>
+    <string name="settings_branded_palette_title">品牌调色板</string>
+    <string name="settings_branded_palette_description">使用自定义品牌颜色而不是动态主题</string>
+    
+    <!-- Loading states -->
+    <string name="loading">加载中…</string>
+    
+    <!-- Empty states -->
+    <string name="empty_connections_title">没有连接</string>
+    <string name="empty_connections_description">添加连接以开始使用</string>
+    <string name="empty_tables_title">没有表</string>
+    <string name="empty_tables_description">此数据库没有表</string>
+    <string name="empty_databases_title">没有数据库</string>
+    <string name="empty_databases_description">此连接没有数据库</string>
+</resources>

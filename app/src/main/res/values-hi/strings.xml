@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MyDataBases</string>
+    
+    <!-- Navigation routes -->
+    <string name="nav_connections">कनेक्शन</string>
+    <string name="nav_database_list">डेटाबेस</string>
+    <string name="nav_add_database">डेटाबेस जोड़ें</string>
+    <string name="nav_new_query">नई क्वेरी</string>
+    <string name="nav_monitor">मॉनिटर</string>
+    <string name="nav_tables">टेबल</string>
+    <string name="nav_views">व्यू</string>
+    <string name="nav_editor">एडिटर</string>
+    <string name="nav_functions">फ़ंक्शन</string>
+    <string name="nav_backup">बैकअप</string>
+    <string name="nav_settings">सेटिंग्स</string>
+    
+    <!-- Common actions -->
+    <string name="action_add">जोड़ें</string>
+    <string name="action_edit">संपादित करें</string>
+    <string name="action_delete">हटाएं</string>
+    <string name="action_retry">पुनः प्रयास करें</string>
+    <string name="action_save">सेव करें</string>
+    <string name="action_test">टेस्ट करें</string>
+    <string name="action_cancel">रद्द करें</string>
+    <string name="action_connect">कनेक्ट करें</string>
+    
+    <!-- Connections screen -->
+    <string name="connections_title">कनेक्शन</string>
+    <string name="connections_empty_title">अभी तक कोई कनेक्शन नहीं</string>
+    <string name="connections_empty_message">शुरू करने के लिए अपना पहला डेटाबेस कनेक्शन जोड़ें</string>
+    <string name="connections_add_new">नया कनेक्शन</string>
+    <string name="connection_action_edit">कनेक्शन संपादित करें</string>
+    <string name="connection_action_delete">कनेक्शन हटाएं</string>
+    <string name="connection_delete_confirm_title">कनेक्शन हटाएं?</string>
+    <string name="connection_delete_confirm_message">यह कनेक्शन "%1$s" को स्थायी रूप से हटा देगा</string>
+    
+    <!-- Connection form -->
+    <string name="connection_form_title_new">नया कनेक्शन</string>
+    <string name="connection_form_title_edit">कनेक्शन संपादित करें</string>
+    <string name="connection_field_name">नाम</string>
+    <string name="connection_field_name_hint">मेरा डेटाबेस</string>
+    <string name="connection_field_type">डेटाबेस प्रकार</string>
+    <string name="connection_field_host">होस्ट</string>
+    <string name="connection_field_host_hint">localhost</string>
+    <string name="connection_field_port">पोर्ट</string>
+    <string name="connection_field_port_hint">3306</string>
+    <string name="connection_field_database">डेटाबेस</string>
+    <string name="connection_field_database_hint">mydb</string>
+    <string name="connection_field_username">यूज़रनेम</string>
+    <string name="connection_field_username_hint">admin</string>
+    <string name="connection_field_password">पासवर्ड</string>
+    <string name="connection_field_password_hint">••••••••</string>
+    <string name="connection_test_success">कनेक्शन सफल!</string>
+    <string name="connection_test_failed">कनेक्शन विफल: %1$s</string>
+    <string name="connection_save_success">कनेक्शन सेव हो गया</string>
+    <string name="connection_save_failed">सेव विफल: %1$s</string>
+    
+    <!-- Databases screen -->
+    <string name="databases_title">डेटाबेस</string>
+    <string name="databases_empty">कोई डेटाबेस उपलब्ध नहीं</string>
+    <string name="databases_search_hint">डेटाबेस खोजें…</string>
+    
+    <!-- Add Database screen -->
+    <string name="add_database_title">डेटाबेस जोड़ें</string>
+    <string name="add_database_field_name">डेटाबेस का नाम</string>
+    <string name="add_database_field_name_hint">my_database</string>
+    <string name="add_database_field_charset">कैरेक्टर सेट</string>
+    <string name="add_database_field_charset_hint">utf8mb4 (वैकल्पिक)</string>
+    <string name="add_database_field_collation">कोलेशन</string>
+    <string name="add_database_field_collation_hint">utf8mb4_general_ci (वैकल्पिक)</string>
+    <string name="add_database_button_create">डेटाबेस बनाएं</string>
+    <string name="add_database_coming_soon">डेटाबेस निर्माण — जल्द आ रहा है</string>
+    <string name="add_database_creating">डेटाबेस बनाया जा रहा है...</string>
+    <string name="create_database_success">डेटाबेस बन गया</string>
+    <string name="error_database_exists">इस नाम का डेटाबेस पहले से मौजूद है</string>
+    <string name="error_permission_denied">आपके पास डेटाबेस बनाने की अनुमति नहीं है</string>
+    <string name="error_create_database_failed">डेटाबेस नहीं बनाया जा सका। कृपया पुनः प्रयास करें।</string>
+    <string name="error_invalid_database_name">अमान्य डेटाबेस नाम। केवल अक्षर, संख्या और अंडरस्कोर का उपयोग करें (अधिकतम 64 वर्ण)।</string>
+    <string name="error_connection_lost">कनेक्शन टूट गया। कृपया पुनः कनेक्ट करें और पुनः प्रयास करें।</string>
+    
+    <!-- Monitor screen -->
+    <string name="monitor_title">सर्वर मॉनिटर</string>
+    <string name="monitor_tab_metrics">मेट्रिक्स</string>
+    <string name="monitor_tab_queries">क्वेरी</string>
+    <string name="monitor_tab_health">स्वास्थ्य</string>
+    <string name="monitor_metrics_title">सर्वर मेट्रिक्स</string>
+    <string name="monitor_queries_title">क्वेरी लॉग</string>
+    <string name="monitor_health_title">हेल्थ चेक</string>
+    <string name="monitor_placeholder">जल्द आ रहा है</string>
+    
+    <!-- Query Editor screen -->
+    <string name="query_editor_title">क्वेरी एडिटर</string>
+    <string name="query_editor_placeholder">क्वेरी एडिटर — जल्द आ रहा है</string>
+    <string name="execute_button">निष्पादित करें</string>
+    <string name="cancel_button">रद्द करें</string>
+    <string name="clear_button">साफ़ करें</string>
+    <string name="query_editor_empty_state">परिणाम देखने के लिए क्वेरी रन करें</string>
+    <string name="query_editor_error_prefix">क्वेरी त्रुटि</string>
+    <string name="rows_affected">प्रभावित पंक्तियां</string>
+    <string name="execution_time_ms">निष्पादन समय</string>
+    
+    <!-- Tables screen -->
+    <string name="tables_title">टेबल - %1$s</string>
+    <string name="tables_empty">इस डेटाबेस में कोई टेबल नहीं</string>
+    <string name="tables_search_hint">टेबल खोजें…</string>
+    
+    <!-- Table viewer screen -->
+    <string name="table_viewer_title">टेबल: %1$s</string>
+    <string name="table_viewer_tab_rows">पंक्तियां</string>
+    <string name="table_viewer_tab_schema">स्कीमा</string>
+    <string name="table_viewer_empty">इस टेबल में कोई पंक्ति नहीं</string>
+    
+    <!-- Errors -->
+    <string name="error_generic">एक त्रुटि हुई</string>
+    <string name="error_loading">डेटा लोड करने में विफल</string>
+    
+    <!-- Settings screen -->
+    <string name="settings_title">सेटिंग्स</string>
+    <string name="settings_branded_palette_title">ब्रांडेड पैलेट</string>
+    <string name="settings_branded_palette_description">डायनामिक थीम के बजाय कस्टम ब्रांडेड रंगों का उपयोग करें</string>
+    
+    <!-- Loading states -->
+    <string name="loading">लोड हो रहा है…</string>
+    
+    <!-- Empty states -->
+    <string name="empty_connections_title">कोई कनेक्शन नहीं</string>
+    <string name="empty_connections_description">शुरू करने के लिए एक कनेक्शन जोड़ें</string>
+    <string name="empty_tables_title">कोई टेबल नहीं</string>
+    <string name="empty_tables_description">इस डेटाबेस में कोई टेबल नहीं</string>
+    <string name="empty_databases_title">कोई डेटाबेस नहीं</string>
+    <string name="empty_databases_description">इस कनेक्शन में कोई डेटाबेस नहीं</string>
+</resources>

@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MyDataBases</string>
+    
+    <!-- Navigation routes -->
+    <string name="nav_connections">الاتصالات</string>
+    <string name="nav_database_list">قواعد البيانات</string>
+    <string name="nav_add_database">إضافة قاعدة بيانات</string>
+    <string name="nav_new_query">استعلام جديد</string>
+    <string name="nav_monitor">المراقب</string>
+    <string name="nav_tables">الجداول</string>
+    <string name="nav_views">طرق العرض</string>
+    <string name="nav_editor">المحرر</string>
+    <string name="nav_functions">الدوال</string>
+    <string name="nav_backup">النسخ الاحتياطي</string>
+    <string name="nav_settings">الإعدادات</string>
+    
+    <!-- Common actions -->
+    <string name="action_add">إضافة</string>
+    <string name="action_edit">تحرير</string>
+    <string name="action_delete">حذف</string>
+    <string name="action_retry">إعادة المحاولة</string>
+    <string name="action_save">حفظ</string>
+    <string name="action_test">اختبار</string>
+    <string name="action_cancel">إلغاء</string>
+    <string name="action_connect">اتصال</string>
+    
+    <!-- Connections screen -->
+    <string name="connections_title">الاتصالات</string>
+    <string name="connections_empty_title">لا توجد اتصالات بعد</string>
+    <string name="connections_empty_message">أضف اتصال قاعدة البيانات الأول للبدء</string>
+    <string name="connections_add_new">اتصال جديد</string>
+    <string name="connection_action_edit">تحرير الاتصال</string>
+    <string name="connection_action_delete">حذف الاتصال</string>
+    <string name="connection_delete_confirm_title">حذف الاتصال؟</string>
+    <string name="connection_delete_confirm_message">سيؤدي هذا إلى حذف الاتصال "%1$s" بشكل دائم</string>
+    
+    <!-- Connection form -->
+    <string name="connection_form_title_new">اتصال جديد</string>
+    <string name="connection_form_title_edit">تحرير الاتصال</string>
+    <string name="connection_field_name">الاسم</string>
+    <string name="connection_field_name_hint">قاعدة بياناتي</string>
+    <string name="connection_field_type">نوع قاعدة البيانات</string>
+    <string name="connection_field_host">المضيف</string>
+    <string name="connection_field_host_hint">localhost</string>
+    <string name="connection_field_port">المنفذ</string>
+    <string name="connection_field_port_hint">3306</string>
+    <string name="connection_field_database">قاعدة البيانات</string>
+    <string name="connection_field_database_hint">mydb</string>
+    <string name="connection_field_username">اسم المستخدم</string>
+    <string name="connection_field_username_hint">admin</string>
+    <string name="connection_field_password">كلمة المرور</string>
+    <string name="connection_field_password_hint">••••••••</string>
+    <string name="connection_test_success">نجح الاتصال!</string>
+    <string name="connection_test_failed">فشل الاتصال: %1$s</string>
+    <string name="connection_save_success">تم حفظ الاتصال</string>
+    <string name="connection_save_failed">فشل الحفظ: %1$s</string>
+    
+    <!-- Databases screen -->
+    <string name="databases_title">قواعد البيانات</string>
+    <string name="databases_empty">لا توجد قواعد بيانات متاحة</string>
+    <string name="databases_search_hint">البحث عن قواعد البيانات…</string>
+    
+    <!-- Add Database screen -->
+    <string name="add_database_title">إضافة قاعدة بيانات</string>
+    <string name="add_database_field_name">اسم قاعدة البيانات</string>
+    <string name="add_database_field_name_hint">my_database</string>
+    <string name="add_database_field_charset">مجموعة الأحرف</string>
+    <string name="add_database_field_charset_hint">utf8mb4 (اختياري)</string>
+    <string name="add_database_field_collation">الترتيب</string>
+    <string name="add_database_field_collation_hint">utf8mb4_general_ci (اختياري)</string>
+    <string name="add_database_button_create">إنشاء قاعدة البيانات</string>
+    <string name="add_database_coming_soon">إنشاء قاعدة البيانات — قريبًا</string>
+    <string name="add_database_creating">جارٍ إنشاء قاعدة البيانات...</string>
+    <string name="create_database_success">تم إنشاء قاعدة البيانات</string>
+    <string name="error_database_exists">توجد قاعدة بيانات بهذا الاسم بالفعل</string>
+    <string name="error_permission_denied">ليس لديك إذن لإنشاء قواعد البيانات</string>
+    <string name="error_create_database_failed">تعذر إنشاء قاعدة البيانات. يرجى المحاولة مرة أخرى.</string>
+    <string name="error_invalid_database_name">اسم قاعدة بيانات غير صالح. استخدم الحروف والأرقام والشرطات السفلية فقط (بحد أقصى 64 حرفًا).</string>
+    <string name="error_connection_lost">فقد الاتصال. يرجى إعادة الاتصال والمحاولة مرة أخرى.</string>
+    
+    <!-- Monitor screen -->
+    <string name="monitor_title">مراقب الخادم</string>
+    <string name="monitor_tab_metrics">المقاييس</string>
+    <string name="monitor_tab_queries">الاستعلامات</string>
+    <string name="monitor_tab_health">الصحة</string>
+    <string name="monitor_metrics_title">مقاييس الخادم</string>
+    <string name="monitor_queries_title">سجل الاستعلامات</string>
+    <string name="monitor_health_title">فحص الصحة</string>
+    <string name="monitor_placeholder">قريبًا</string>
+    
+    <!-- Query Editor screen -->
+    <string name="query_editor_title">محرر الاستعلامات</string>
+    <string name="query_editor_placeholder">محرر الاستعلامات — قريبًا</string>
+    <string name="execute_button">تنفيذ</string>
+    <string name="cancel_button">إلغاء</string>
+    <string name="clear_button">مسح</string>
+    <string name="query_editor_empty_state">قم بتشغيل استعلام لرؤية النتائج هنا</string>
+    <string name="query_editor_error_prefix">خطأ في الاستعلام</string>
+    <string name="rows_affected">الصفوف المتأثرة</string>
+    <string name="execution_time_ms">وقت التنفيذ</string>
+    
+    <!-- Tables screen -->
+    <string name="tables_title">الجداول - %1$s</string>
+    <string name="tables_empty">لا توجد جداول في قاعدة البيانات هذه</string>
+    <string name="tables_search_hint">البحث عن الجداول…</string>
+    
+    <!-- Table viewer screen -->
+    <string name="table_viewer_title">الجدول: %1$s</string>
+    <string name="table_viewer_tab_rows">الصفوف</string>
+    <string name="table_viewer_tab_schema">المخطط</string>
+    <string name="table_viewer_empty">هذا الجدول ليس به صفوف</string>
+    
+    <!-- Errors -->
+    <string name="error_generic">حدث خطأ</string>
+    <string name="error_loading">فشل تحميل البيانات</string>
+    
+    <!-- Settings screen -->
+    <string name="settings_title">الإعدادات</string>
+    <string name="settings_branded_palette_title">لوحة العلامة التجارية</string>
+    <string name="settings_branded_palette_description">استخدام ألوان العلامة التجارية المخصصة بدلاً من المظهر الديناميكي</string>
+    
+    <!-- Loading states -->
+    <string name="loading">جارٍ التحميل…</string>
+    
+    <!-- Empty states -->
+    <string name="empty_connections_title">لا توجد اتصالات</string>
+    <string name="empty_connections_description">أضف اتصالاً للبدء</string>
+    <string name="empty_tables_title">لا توجد جداول</string>
+    <string name="empty_tables_description">قاعدة البيانات هذه ليس بها جداول</string>
+    <string name="empty_databases_title">لا توجد قواعد بيانات</string>
+    <string name="empty_databases_description">هذا الاتصال ليس به قواعد بيانات</string>
+</resources>
