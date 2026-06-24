@@ -47,6 +47,7 @@ class ShortcutActionTest {
             is ShortcutAction.Save -> "save"
             is ShortcutAction.Undo -> "undo"
             is ShortcutAction.Redo -> "redo"
+            is ShortcutAction.Format -> "format"
         }
 
         assertEquals("run", result)
