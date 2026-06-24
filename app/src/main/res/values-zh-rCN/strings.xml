@@ -157,4 +157,10 @@
     <string name="empty_tables_description">此数据库没有表</string>
     <string name="empty_databases_title">没有数据库</string>
     <string name="empty_databases_description">此连接没有数据库</string>
+
+    <!-- Completion popup -->
+    <string name="completion_popup_aria_label">Code completion popup</string>
+    <string name="completion_empty">No suggestions</string>
+    <string name="completion_loading_schema">Loading schema…</string>
+    <string name="completion_keywords_only">Keywords only (no database selected)</string>
 </resources>

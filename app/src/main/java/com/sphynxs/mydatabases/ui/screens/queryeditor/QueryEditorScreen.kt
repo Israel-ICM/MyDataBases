@@ -97,6 +97,11 @@ fun QueryEditorScreen(
     var showSaveDialog by remember { mutableStateOf(false) }
     var savedFileName by remember { mutableStateOf("") }
     
+    // Completion state
+    var showCompletionPopup by remember { mutableStateOf(false) }
+    var completionSuggestions by remember { mutableStateOf<List<com.sphynxs.mydatabases.domain.completion.CompletionSuggestion>>(emptyList()) }
+    var selectedSuggestionIndex by remember { mutableStateOf(0) }
+    
     // Launcher para abrir archivo SQL
     val openFileLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -140,17 +145,20 @@ fun QueryEditorScreen(
             .fillMaxSize()
             .padding(16.dp)
     ) {
-            // SQL Editor (estilo VS Code - modo claro)
-            Card(
+            // SQL Editor (estilo VS Code - modo claro) + Completion Popup
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f), // Ocupa todo el espacio disponible (100% si Idle, 50% si hay resultados)
-                colors = CardDefaults.cardColors(
-                    containerColor = Color.White
-                ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+                    .weight(1f)
             ) {
-                SqlCodeEditor(
+                Card(
+                    modifier = Modifier.fillMaxSize(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color.White
+                    ),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+                ) {
+                    SqlCodeEditor(
                     value = sqlText,
                     onValueChange = { newValue ->
                         sqlText = newValue
@@ -263,6 +271,26 @@ fun QueryEditorScreen(
                                     }
                                 }
                             }
+                            com.sphynxs.mydatabases.ui.screens.queryeditor.domain.ShortcutAction.TriggerCompletion -> {
+                                // Disable if multi-cursor active
+                                if (cursorPositions.isNotEmpty()) {
+                                    return@SqlCodeEditor
+                                }
+                                
+                                // Extract prefix (word before cursor)
+                                val cursorPos = sqlText.selection.start
+                                val textBeforeCursor = sqlText.text.substring(0, cursorPos)
+                                val lastWord = textBeforeCursor.split(Regex("\\s+")).lastOrNull() ?: ""
+                                
+                                if (lastWord.isNotBlank()) {
+                                    completionSuggestions = viewModel.getSuggestions(
+                                        prefix = lastWord,
+                                        context = textBeforeCursor
+                                    )
+                                    selectedSuggestionIndex = 0
+                                    showCompletionPopup = completionSuggestions.isNotEmpty()
+                                }
+                            }
                         }
                     },
                     modifier = Modifier
@@ -270,6 +298,37 @@ fun QueryEditorScreen(
                         .verticalScroll(scrollState)
                 )
             }
+            
+            // Completion popup
+            if (showCompletionPopup && completionSuggestions.isNotEmpty()) {
+                com.sphynxs.mydatabases.ui.screens.queryeditor.components.CompletionPopup(
+                    suggestions = completionSuggestions,
+                    selectedIndex = selectedSuggestionIndex,
+                    anchorOffset = androidx.compose.ui.unit.IntOffset(100, 100), // Simple fixed offset for now
+                    onSuggestionClick = { suggestion ->
+                        // Insert suggestion at cursor
+                        val cursorPos = sqlText.selection.start
+                        val textBeforeCursor = sqlText.text.substring(0, cursorPos)
+                        val lastWord = textBeforeCursor.split(Regex("\\s+")).lastOrNull() ?: ""
+                        val textBeforeWord = textBeforeCursor.dropLast(lastWord.length)
+                        val textAfterCursor = sqlText.text.substring(cursorPos)
+                        
+                        val newText = textBeforeWord + suggestion.text + textAfterCursor
+                        val newCursorPos = (textBeforeWord + suggestion.text).length
+                        
+                        sqlText = TextFieldValue(
+                            text = newText,
+                            selection = TextRange(newCursorPos)
+                        )
+                        
+                        showCompletionPopup = false
+                    },
+                    onDismiss = {
+                        showCompletionPopup = false
+                    }
+                )
+            }
+        }
 
             Spacer(modifier = Modifier.height(16.dp))
 

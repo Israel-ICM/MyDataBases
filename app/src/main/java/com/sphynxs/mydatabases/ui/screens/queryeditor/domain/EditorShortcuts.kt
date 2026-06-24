@@ -18,6 +18,7 @@ import androidx.compose.ui.input.key.Key
  * - Ctrl+Y → Redo (reapply undone change)
  * - Ctrl+Shift+Z → Redo (alternative binding)
  * - Ctrl+Shift+F → Format (format SQL text)
+ * - Ctrl+Space → TriggerCompletion (show completion popup)
  *
  * @author israel-icm
  * @date 2026-06-24
@@ -42,6 +43,7 @@ object EditorShortcuts {
         isCtrlPressed && !isShiftPressed && key == Key.Y -> ShortcutAction.Redo
         isCtrlPressed && isShiftPressed && key == Key.Z -> ShortcutAction.Redo
         isCtrlPressed && isShiftPressed && key == Key.F -> ShortcutAction.Format
+        isCtrlPressed && !isShiftPressed && key == Key.Spacebar -> ShortcutAction.TriggerCompletion
         else -> null
     }
 }

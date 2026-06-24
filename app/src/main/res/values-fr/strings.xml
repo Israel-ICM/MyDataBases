@@ -157,4 +157,10 @@
     <string name="empty_tables_description">Cette base de données n\'a pas de tables</string>
     <string name="empty_databases_title">Aucune base de données</string>
     <string name="empty_databases_description">Cette connexion n\'a pas de bases de données</string>
+
+    <!-- Completion popup -->
+    <string name="completion_popup_aria_label">Code completion popup</string>
+    <string name="completion_empty">No suggestions</string>
+    <string name="completion_loading_schema">Loading schema…</string>
+    <string name="completion_keywords_only">Keywords only (no database selected)</string>
 </resources>
