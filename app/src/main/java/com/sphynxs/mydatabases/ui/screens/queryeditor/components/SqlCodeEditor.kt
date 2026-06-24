@@ -84,6 +84,7 @@ fun SqlCodeEditor(
     cursorPositions: MutableList<Int> = mutableListOf(),
     onAddCursor: ((Int) -> Unit)? = null,
     scrollState: androidx.compose.foundation.ScrollState? = null,
+    onShortcut: ((com.sphynxs.mydatabases.domain.editor.ShortcutAction) -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     // Detectar si hay teclado físico conectado
@@ -313,7 +314,16 @@ fun SqlCodeEditor(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(end = 20.dp, top = 16.dp, bottom = 16.dp)
-                        .onKeyEvent { keyEvent ->
+                        .onPreviewKeyEvent { keyEvent ->
+                            // Interceptar shortcuts ANTES del input
+                            if (keyEvent.type == KeyEventType.KeyDown) {
+                                val shortcut = com.sphynxs.mydatabases.domain.editor.EditorShortcuts.mapKeyEvent(keyEvent)
+                                if (shortcut != null) {
+                                    onShortcut?.invoke(shortcut)
+                                    return@onPreviewKeyEvent true // Consumir evento
+                                }
+                            }
+                            
                             // Detectar Ctrl presionado/soltado
                             when {
                                 keyEvent.key == Key.CtrlLeft || keyEvent.key == Key.CtrlRight -> {

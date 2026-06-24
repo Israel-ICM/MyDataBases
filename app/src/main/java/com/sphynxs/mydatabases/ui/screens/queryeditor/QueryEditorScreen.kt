@@ -8,8 +8,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Redo
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Stop
+import androidx.compose.material.icons.filled.Undo
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
@@ -77,6 +79,8 @@ fun QueryEditorScreen(
 ) {
     var sqlText by remember { mutableStateOf(TextFieldValue(initialSql ?: "")) }
     val uiState by viewModel.uiState.collectAsState()
+    val canUndo by viewModel.canUndo.collectAsState()
+    val canRedo by viewModel.canRedo.collectAsState()
     val cursorPositions = remember { mutableStateListOf<Int>() }
     val scrollState = rememberScrollState()
     val context = LocalContext.current
@@ -138,10 +142,92 @@ fun QueryEditorScreen(
             ) {
                 SqlCodeEditor(
                     value = sqlText,
-                    onValueChange = { sqlText = it },
+                    onValueChange = { newValue ->
+                        sqlText = newValue
+                        // Push to history
+                        viewModel.pushHistory(
+                            text = newValue.text,
+                            selection = newValue.selection,
+                            cursorPositions = cursorPositions.toList()
+                        )
+                    },
                     placeholder = "-- Enter SQL query...",
                     cursorPositions = cursorPositions,
                     scrollState = scrollState,
+                    onShortcut = { shortcut ->
+                        when (shortcut) {
+                            com.sphynxs.mydatabases.domain.editor.ShortcutAction.Run -> {
+                                if (sqlText.text.isNotBlank()) {
+                                    viewModel.executeStatements(sql = sqlText.text)
+                                }
+                            }
+                            com.sphynxs.mydatabases.domain.editor.ShortcutAction.Save -> {
+                                if (sqlText.text.isNotBlank()) {
+                                    // Trigger save (same as Save button click)
+                                    try {
+                                        val timestamp = java.text.SimpleDateFormat("yyyyMMdd_HHmmss", java.util.Locale.getDefault()).format(java.util.Date())
+                                        val fileName = "query_$timestamp.sql"
+                                        
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                            val resolver = context.contentResolver
+                                            val contentValues = ContentValues().apply {
+                                                put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
+                                                put(MediaStore.MediaColumns.MIME_TYPE, "text/plain")
+                                                put(MediaStore.MediaColumns.RELATIVE_PATH, "Documents/MyDatabase/query")
+                                            }
+                                            
+                                            val uri = resolver.insert(MediaStore.Files.getContentUri("external"), contentValues)
+                                            uri?.let {
+                                                resolver.openOutputStream(it)?.use { outputStream ->
+                                                    outputStream.write(sqlText.text.toByteArray())
+                                                }
+                                                savedFileName = fileName
+                                                showSaveDialog = true
+                                            }
+                                        } else {
+                                            val storageDir = android.os.Environment.getExternalStorageDirectory()
+                                            val myDatabaseDir = File(storageDir, "MyDatabase")
+                                            val queryDir = File(myDatabaseDir, "query")
+                                            
+                                            if (!queryDir.exists()) {
+                                                queryDir.mkdirs()
+                                            }
+                                            
+                                            val file = File(queryDir, fileName)
+                                            FileOutputStream(file).use { outputStream ->
+                                                outputStream.write(sqlText.text.toByteArray())
+                                            }
+                                            
+                                            savedFileName = fileName
+                                            showSaveDialog = true
+                                        }
+                                    } catch (e: Exception) {
+                                        android.util.Log.e("QueryEditorScreen", "❌ Error saving file", e)
+                                    }
+                                }
+                            }
+                            com.sphynxs.mydatabases.domain.editor.ShortcutAction.Undo -> {
+                                viewModel.undo()?.let { snapshot ->
+                                    sqlText = TextFieldValue(
+                                        text = snapshot.text,
+                                        selection = snapshot.selection
+                                    )
+                                    cursorPositions.clear()
+                                    cursorPositions.addAll(snapshot.cursorPositions)
+                                }
+                            }
+                            com.sphynxs.mydatabases.domain.editor.ShortcutAction.Redo -> {
+                                viewModel.redo()?.let { snapshot ->
+                                    sqlText = TextFieldValue(
+                                        text = snapshot.text,
+                                        selection = snapshot.selection
+                                    )
+                                    cursorPositions.clear()
+                                    cursorPositions.addAll(snapshot.cursorPositions)
+                                }
+                            }
+                        }
+                    },
                     modifier = Modifier
                         .fillMaxSize()
                         .verticalScroll(scrollState)
@@ -262,6 +348,48 @@ fun QueryEditorScreen(
                                     tint = MaterialTheme.colorScheme.onSurface
                                 )
                             }
+                        }
+                        
+                        // Undo button
+                        IconButton(
+                            onClick = {
+                                viewModel.undo()?.let { snapshot ->
+                                    sqlText = TextFieldValue(
+                                        text = snapshot.text,
+                                        selection = snapshot.selection
+                                    )
+                                    cursorPositions.clear()
+                                    cursorPositions.addAll(snapshot.cursorPositions)
+                                }
+                            },
+                            enabled = canUndo
+                        ) {
+                            Icon(
+                                Icons.Default.Undo,
+                                contentDescription = "Undo",
+                                tint = if (canUndo) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+                            )
+                        }
+                        
+                        // Redo button
+                        IconButton(
+                            onClick = {
+                                viewModel.redo()?.let { snapshot ->
+                                    sqlText = TextFieldValue(
+                                        text = snapshot.text,
+                                        selection = snapshot.selection
+                                    )
+                                    cursorPositions.clear()
+                                    cursorPositions.addAll(snapshot.cursorPositions)
+                                }
+                            },
+                            enabled = canRedo
+                        ) {
+                            Icon(
+                                Icons.Default.Redo,
+                                contentDescription = "Redo",
+                                tint = if (canRedo) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+                            )
                         }
                         
                         // Add cursor button with badge
