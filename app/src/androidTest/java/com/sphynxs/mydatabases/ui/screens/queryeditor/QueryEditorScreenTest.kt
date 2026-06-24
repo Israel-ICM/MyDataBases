@@ -15,14 +15,17 @@ import org.junit.Test
  *
  * TDD: RED → GREEN → TRIANGULATE → REFACTOR
  * Spec: openspec/changes/sql-editor/specs/query-editor/spec.md
+ *       openspec/changes/editor-shortcuts-and-history/spec.md
  *
  * Scenarios tested:
  * - Editor renders con placeholder
  * - Execute button enabled cuando hay texto
  * - Result grid muestra SELECT results
+ * - Undo button restores previous text
+ * - Redo button restores undone text
  *
  * @author israel-icm
- * @date 2026-06-23
+ * @date 2026-06-23, 2026-06-24
  */
 class QueryEditorScreenTest {
 
@@ -137,6 +140,103 @@ class QueryEditorScreenTest {
 
         composeTestRule
             .onNodeWithText("Linus")
+            .assertIsDisplayed()
+    }
+
+    /**
+     * Scenario: Undo button restores previous text
+     * GIVEN the user types text in the editor
+     * WHEN the user clicks the Undo button
+     * THEN the text is restored to the previous state
+     */
+    @Test
+    fun undoButtonRestoresPreviousText() {
+        composeTestRule.setContent {
+            QueryEditorScreen(
+                connectionId = "test-conn",
+                initialSql = null
+            )
+        }
+
+        // Type initial text
+        composeTestRule
+            .onNodeWithContentDescription("SQL Code Editor")
+            .performTextInput("SELECT * FROM users")
+
+        // Wait for history to coalesce (500ms window)
+        Thread.sleep(600)
+
+        // Type additional text
+        composeTestRule
+            .onNodeWithContentDescription("SQL Code Editor")
+            .performTextClearance()
+        
+        composeTestRule
+            .onNodeWithContentDescription("SQL Code Editor")
+            .performTextInput("SELECT * FROM orders")
+
+        // Wait for history to coalesce
+        Thread.sleep(600)
+
+        // Click Undo button
+        composeTestRule
+            .onNodeWithContentDescription("Undo")
+            .performClick()
+
+        // ASSERT: Text is restored to previous state
+        composeTestRule
+            .onNodeWithText("SELECT * FROM users")
+            .assertIsDisplayed()
+    }
+
+    /**
+     * Scenario: Redo button restores undone text
+     * GIVEN the user types text and then undoes it
+     * WHEN the user clicks the Redo button
+     * THEN the text is restored to the state before undo
+     */
+    @Test
+    fun redoButtonRestoresUndoneText() {
+        composeTestRule.setContent {
+            QueryEditorScreen(
+                connectionId = "test-conn",
+                initialSql = null
+            )
+        }
+
+        // Type initial text
+        composeTestRule
+            .onNodeWithContentDescription("SQL Code Editor")
+            .performTextInput("SELECT * FROM users")
+
+        // Wait for history
+        Thread.sleep(600)
+
+        // Type additional text
+        composeTestRule
+            .onNodeWithContentDescription("SQL Code Editor")
+            .performTextClearance()
+        
+        composeTestRule
+            .onNodeWithContentDescription("SQL Code Editor")
+            .performTextInput("SELECT * FROM orders")
+
+        // Wait for history
+        Thread.sleep(600)
+
+        // Click Undo button
+        composeTestRule
+            .onNodeWithContentDescription("Undo")
+            .performClick()
+
+        // Click Redo button
+        composeTestRule
+            .onNodeWithContentDescription("Redo")
+            .performClick()
+
+        // ASSERT: Text is restored to the full state
+        composeTestRule
+            .onNodeWithText("SELECT * FROM orders")
             .assertIsDisplayed()
     }
 }
