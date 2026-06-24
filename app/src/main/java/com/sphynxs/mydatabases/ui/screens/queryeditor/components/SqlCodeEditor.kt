@@ -239,30 +239,46 @@ fun SqlCodeEditor(
 
     Box(modifier = modifier.fillMaxWidth()) {
         Row {
-            // Números de línea (clickeables para seleccionar toda la línea)
-            Column(
+            // Números de línea con overlay clickeable
+            Box(
                 modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 16.dp, bottom = 16.dp)
             ) {
-                val lines = remember(value.text) {
-                    if (value.text.isEmpty()) listOf("") else value.text.lines()
-                }
+                // Números (un solo Text para alineación perfecta)
+                Text(
+                    text = (1..lineCount).joinToString("\n") { it.toString() },
+                    style = textStyle.copy(
+                        color = Color(0xFF858585)
+                    ),
+                    onTextLayout = { layoutResult ->
+                        textLayoutResult = layoutResult
+                    }
+                )
                 
-                repeat(lineCount) { index ->
-                    Text(
-                        text = "${index + 1}",
-                        style = textStyle.copy(
-                            color = Color(0xFF858585)
-                        ),
-                        modifier = Modifier.clickable {
-                            // Calcular start/end de la línea
-                            val start = lines.take(index).sumOf { it.length + 1 }
-                            val lineLength = lines.getOrNull(index)?.length ?: 0
-                            val end = start + lineLength
-                            
-                            // Seleccionar toda la línea
-                            onValueChange(value.copy(selection = TextRange(start, end)))
+                // Overlay clickeable invisible
+                Canvas(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .pointerInput(value.text) {
+                            detectTapGestures { offset ->
+                                // Calcular en qué línea se hizo click
+                                textLayoutResult?.let { layout ->
+                                    val lineIndex = layout.getLineForVerticalPosition(offset.y)
+                                    if (lineIndex >= 0 && lineIndex < lineCount) {
+                                        // Calcular start/end de esa línea en el texto
+                                        val lines = value.text.lines()
+                                        val start = lines.take(lineIndex).sumOf { it.length + 1 }
+                                        val lineLength = lines.getOrNull(lineIndex)?.length ?: 0
+                                        val end = start + lineLength
+                                        
+                                        // Seleccionar toda la línea
+                                        onValueChange(value.copy(selection = TextRange(start, end)))
+                                        android.util.Log.d("SqlCodeEditor", "Line $lineIndex selected: $start-$end")
+                                    }
+                                }
+                            }
                         }
-                    )
+                ) {
+                    // Canvas invisible - solo para capturar clicks
                 }
             }
             
