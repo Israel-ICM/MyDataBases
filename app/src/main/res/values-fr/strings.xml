@@ -95,6 +95,8 @@
     <string name="execute_button">Exécuter</string>
     <string name="cancel_button">Annuler</string>
     <string name="clear_button">Effacer</string>
+    <string name="undo_button">Annuler</string>
+    <string name="redo_button">Rétablir</string>
     <string name="query_editor_empty_state">Exécutez une requête pour voir les résultats ici</string>
     <string name="query_editor_error_prefix">Erreur de requête</string>
     <string name="rows_affected">Lignes affectées</string>

@@ -95,6 +95,8 @@
     <string name="execute_button">実行</string>
     <string name="cancel_button">キャンセル</string>
     <string name="clear_button">クリア</string>
+    <string name="undo_button">元に戻す</string>
+    <string name="redo_button">やり直す</string>
     <string name="query_editor_empty_state">クエリを実行すると、ここに結果が表示されます</string>
     <string name="query_editor_error_prefix">クエリエラー</string>
     <string name="rows_affected">影響を受けた行</string>

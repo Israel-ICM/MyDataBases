@@ -95,6 +95,8 @@
     <string name="execute_button">निष्पादित करें</string>
     <string name="cancel_button">रद्द करें</string>
     <string name="clear_button">साफ़ करें</string>
+    <string name="undo_button">पूर्ववत करें</string>
+    <string name="redo_button">फिर से करें</string>
     <string name="query_editor_empty_state">परिणाम देखने के लिए क्वेरी रन करें</string>
     <string name="query_editor_error_prefix">क्वेरी त्रुटि</string>
     <string name="rows_affected">प्रभावित पंक्तियां</string>

@@ -366,7 +366,7 @@ fun QueryEditorScreen(
                         ) {
                             Icon(
                                 Icons.Default.Undo,
-                                contentDescription = "Undo",
+                                contentDescription = stringResource(R.string.undo_button),
                                 tint = if (canUndo) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
                             )
                         }
@@ -387,7 +387,7 @@ fun QueryEditorScreen(
                         ) {
                             Icon(
                                 Icons.Default.Redo,
-                                contentDescription = "Redo",
+                                contentDescription = stringResource(R.string.redo_button),
                                 tint = if (canRedo) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
                             )
                         }

@@ -95,6 +95,8 @@
     <string name="execute_button">Выполнить</string>
     <string name="cancel_button">Отмена</string>
     <string name="clear_button">Очистить</string>
+    <string name="undo_button">Отменить</string>
+    <string name="redo_button">Повторить</string>
     <string name="query_editor_empty_state">Выполните запрос, чтобы увидеть результаты здесь</string>
     <string name="query_editor_error_prefix">Ошибка запроса</string>
     <string name="rows_affected">Затронуто строк</string>
