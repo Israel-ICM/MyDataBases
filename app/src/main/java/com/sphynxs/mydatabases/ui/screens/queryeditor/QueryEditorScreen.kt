@@ -2,12 +2,15 @@ package com.sphynxs.mydatabases.ui.screens.queryeditor
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Stop
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Button
@@ -19,6 +22,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,6 +34,16 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.sphynxs.mydatabases.R
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.ui.platform.LocalContext
+import android.content.ContentValues
+import android.os.Build
+import android.provider.MediaStore
+import java.io.BufferedReader
+import java.io.File
+import java.io.FileOutputStream
+import java.io.InputStreamReader
 import com.sphynxs.mydatabases.ui.components.ResultGrid
 import com.sphynxs.mydatabases.ui.screens.queryeditor.components.SqlCodeEditor
 
@@ -62,6 +76,48 @@ fun QueryEditorScreen(
     var sqlText by remember { mutableStateOf(TextFieldValue(initialSql ?: "")) }
     val uiState by viewModel.uiState.collectAsState()
     val cursorPositions = remember { mutableStateListOf<Int>() }
+    val scrollState = rememberScrollState()
+    val context = LocalContext.current
+    var showSaveDialog by remember { mutableStateOf(false) }
+    var savedFileName by remember { mutableStateOf("") }
+    
+    // Launcher para abrir archivo SQL
+    val openFileLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri ->
+        uri?.let {
+            try {
+                val inputStream = context.contentResolver.openInputStream(it)
+                val reader = BufferedReader(InputStreamReader(inputStream))
+                val fileContent = reader.use { it.readText() }
+                sqlText = TextFieldValue(fileContent)
+                cursorPositions.clear() // Limpiar cursores al cargar archivo
+                android.util.Log.d("QueryEditorScreen", "File loaded: ${fileContent.length} characters")
+            } catch (e: Exception) {
+                android.util.Log.e("QueryEditorScreen", "Error loading file", e)
+                // TODO: Mostrar error al usuario
+            }
+        }
+    }
+    
+    // Launcher para guardar archivo SQL
+    val saveFileLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument("text/plain")
+    ) { uri ->
+        uri?.let {
+            try {
+                val outputStream = context.contentResolver.openOutputStream(it)
+                outputStream?.use { stream ->
+                    stream.write(sqlText.text.toByteArray())
+                }
+                android.util.Log.d("QueryEditorScreen", "File saved: ${sqlText.text.length} characters to $uri")
+                // TODO: Mostrar mensaje de éxito al usuario
+            } catch (e: Exception) {
+                android.util.Log.e("QueryEditorScreen", "Error saving file", e)
+                // TODO: Mostrar error al usuario
+            }
+        }
+    }
 
     Column(
         modifier = modifier
@@ -83,9 +139,10 @@ fun QueryEditorScreen(
                     onValueChange = { sqlText = it },
                     placeholder = "-- Enter SQL query...",
                     cursorPositions = cursorPositions,
+                    scrollState = scrollState,
                     modifier = Modifier
                         .fillMaxSize()
-                        .verticalScroll(rememberScrollState())
+                        .verticalScroll(scrollState)
                 )
             }
 
@@ -98,13 +155,16 @@ fun QueryEditorScreen(
             ) {
                 // Execute/Cancel button (toggle based on running state)
                 if (uiState is QueryEditorUiState.Running) {
-                    // Cancel button (red, stop icon)
+                    // Cancel button (red, stop icon, circular)
                     Button(
                         onClick = { viewModel.cancel() },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color(0xFFF44336), // Rojo
                             contentColor = Color.White
-                        )
+                        ),
+                        shape = CircleShape,
+                        modifier = Modifier.size(48.dp),
+                        contentPadding = PaddingValues(0.dp)
                     ) {
                         Icon(
                             Icons.Default.Stop,
@@ -112,7 +172,7 @@ fun QueryEditorScreen(
                         )
                     }
                 } else {
-                    // Execute button (green, play icon)
+                    // Execute button (green, play icon, circular)
                     Button(
                         onClick = {
                             viewModel.executeStatements(sql = sqlText.text)
@@ -122,9 +182,13 @@ fun QueryEditorScreen(
                             containerColor = Color(0xFF4CAF50), // Verde
                             contentColor = Color.White
                         ),
-                        modifier = Modifier.semantics {
-                            contentDescription = "Execute query"
-                        }
+                        shape = CircleShape,
+                        modifier = Modifier
+                            .size(48.dp)
+                            .semantics {
+                                contentDescription = "Execute query"
+                            },
+                        contentPadding = PaddingValues(0.dp)
                     ) {
                         Icon(
                             Icons.Default.PlayArrow,
@@ -133,13 +197,77 @@ fun QueryEditorScreen(
                     }
                 }
 
-                // Save button (icon only, no action yet)
+                // Open file button (icon only, circular)
                 OutlinedButton(
                     onClick = { 
-                        // TODO: Implementar guardar query
-                        android.util.Log.d("QueryEditorScreen", "Save clicked (not implemented yet)")
+                        openFileLauncher.launch("*/*") // Acepta todos los archivos
                     },
-                    enabled = sqlText.text.isNotBlank()
+                    shape = CircleShape,
+                    modifier = Modifier.size(48.dp),
+                    contentPadding = PaddingValues(0.dp)
+                ) {
+                    Icon(
+                        Icons.Default.FolderOpen,
+                        contentDescription = "Open SQL file"
+                    )
+                }
+                
+                // Save button (icon only, circular)
+                OutlinedButton(
+                    onClick = { 
+                        try {
+                            // Generar nombre de archivo con timestamp
+                            val timestamp = java.text.SimpleDateFormat("yyyyMMdd_HHmmss", java.util.Locale.getDefault()).format(java.util.Date())
+                            val fileName = "query_$timestamp.sql"
+                            
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                // Android 10+ (API 29+): Usar MediaStore
+                                // Ruta: /storage/emulated/0/Documents/MyDatabase/query/
+                                val resolver = context.contentResolver
+                                val contentValues = ContentValues().apply {
+                                    put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
+                                    put(MediaStore.MediaColumns.MIME_TYPE, "text/plain")
+                                    put(MediaStore.MediaColumns.RELATIVE_PATH, "Documents/MyDatabase/query")
+                                }
+                                
+                                val uri = resolver.insert(MediaStore.Files.getContentUri("external"), contentValues)
+                                uri?.let {
+                                    resolver.openOutputStream(it)?.use { outputStream ->
+                                        outputStream.write(sqlText.text.toByteArray())
+                                    }
+                                    android.util.Log.d("QueryEditorScreen", "✅ File saved (MediaStore): Documents/MyDatabase/query/$fileName")
+                                    savedFileName = fileName
+                                    showSaveDialog = true
+                                }
+                            } else {
+                                // Android 9 y anteriores: Acceso directo
+                                // Ruta: /storage/emulated/0/MyDatabase/query/
+                                val storageDir = android.os.Environment.getExternalStorageDirectory()
+                                val myDatabaseDir = File(storageDir, "MyDatabase")
+                                val queryDir = File(myDatabaseDir, "query")
+                                
+                                if (!queryDir.exists()) {
+                                    queryDir.mkdirs()
+                                }
+                                
+                                val file = File(queryDir, fileName)
+                                FileOutputStream(file).use { outputStream ->
+                                    outputStream.write(sqlText.text.toByteArray())
+                                }
+                                
+                                android.util.Log.d("QueryEditorScreen", "✅ File saved: ${file.absolutePath}")
+                                savedFileName = fileName
+                                showSaveDialog = true
+                            }
+                        } catch (e: Exception) {
+                            android.util.Log.e("QueryEditorScreen", "❌ Error saving file", e)
+                            // TODO: Mostrar error al usuario
+                        }
+                    },
+                    enabled = sqlText.text.isNotBlank(),
+                    shape = CircleShape,
+                    modifier = Modifier.size(48.dp),
+                    contentPadding = PaddingValues(0.dp)
                 ) {
                     Icon(
                         Icons.Default.Save,
@@ -147,7 +275,7 @@ fun QueryEditorScreen(
                     )
                 }
                 
-                // Clear button (adaptive: clear cursors or clear text)
+                // Clear button (adaptive: clear cursors or clear text, circular)
                 OutlinedButton(
                     onClick = { 
                         if (cursorPositions.isNotEmpty()) {
@@ -159,7 +287,10 @@ fun QueryEditorScreen(
                             sqlText = TextFieldValue("")
                             android.util.Log.d("QueryEditorScreen", "Text cleared")
                         }
-                    }
+                    },
+                    shape = CircleShape,
+                    modifier = Modifier.size(48.dp),
+                    contentPadding = PaddingValues(0.dp)
                 ) {
                     if (cursorPositions.size >= 1) {
                         // Mostrar "|×" cuando hay 1+ cursores (badge visible)
@@ -200,7 +331,10 @@ fun QueryEditorScreen(
                                 cursorPositions.remove(currentPos)
                                 android.util.Log.d("QueryEditorScreen", "❌ Cursor removed from $currentPos")
                             }
-                        }
+                        },
+                        shape = CircleShape,
+                        modifier = Modifier.size(48.dp),
+                        contentPadding = PaddingValues(0.dp)
                     ) {
                         Text(
                             text = "|+",
@@ -261,10 +395,49 @@ fun QueryEditorScreen(
                                 message = state.message,
                                 failedStatement = state.failedStatement
                             )
+                        }
+                    }
                 }
             }
         }
-    }
+    
+    // Diálogo de confirmación después de guardar
+    if (showSaveDialog) {
+        AlertDialog(
+            onDismissRequest = { showSaveDialog = false },
+            title = {
+                Text("Archivo guardado")
+            },
+            text = {
+                Column {
+                    Text("El archivo '$savedFileName' se guardó correctamente.")
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text("¿Desea cerrar el editor o continuar modificando?")
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showSaveDialog = false
+                        sqlText = TextFieldValue("")
+                        cursorPositions.clear()
+                        android.util.Log.d("QueryEditorScreen", "Editor closed after save")
+                    }
+                ) {
+                    Text("Cerrar editor")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showSaveDialog = false
+                        android.util.Log.d("QueryEditorScreen", "Continue editing after save")
+                    }
+                ) {
+                    Text("Continuar editando")
+                }
+            }
+        )
     }
 }
 

@@ -1,10 +1,12 @@
 package com.sphynxs.mydatabases.ui.screens.queryeditor.components
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -45,6 +47,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.runtime.LaunchedEffect
 import kotlinx.coroutines.delay
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.gestures.animateScrollBy
 import android.content.res.Configuration
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -80,6 +83,7 @@ fun SqlCodeEditor(
     placeholder: String = "",
     cursorPositions: MutableList<Int> = mutableListOf(),
     onAddCursor: ((Int) -> Unit)? = null,
+    scrollState: androidx.compose.foundation.ScrollState? = null,
     modifier: Modifier = Modifier
 ) {
     // Detectar si hay teclado físico conectado
@@ -108,6 +112,25 @@ fun SqlCodeEditor(
         ),
         label = "cursor-alpha"
     )
+    
+    // Auto-scroll cuando el cursor cambia de posición
+    LaunchedEffect(value.selection.start, textLayoutResult) {
+        scrollState?.let { scroll ->
+            textLayoutResult?.let { layout ->
+                try {
+                    val cursorLine = layout.getLineForOffset(value.selection.start)
+                    val cursorTop = layout.getLineTop(cursorLine)
+                    val cursorBottom = layout.getLineBottom(cursorLine)
+                    
+                    // Scroll para mantener el cursor visible
+                    val targetScroll = (cursorBottom - 200).coerceAtLeast(0f)
+                    scroll.animateScrollTo(targetScroll.toInt())
+                } catch (e: Exception) {
+                    // Ignorar si el offset está fuera de rango
+                }
+            }
+        }
+    }
     
     // Handler para cambios de texto con multi-cursor
     val handleValueChange: (TextFieldValue) -> Unit = { newValue ->
