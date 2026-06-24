@@ -99,6 +99,10 @@
     <string name="query_editor_error_prefix">Erreur de requête</string>
     <string name="rows_affected">Lignes affectées</string>
     <string name="execution_time_ms">Temps d\'exécution</string>
+    <string name="save_dialog_title">Fichier enregistré</string>
+    <string name="save_dialog_message">Le fichier \'%1$s\' a été enregistré avec succès.\n\nVoulez-vous fermer l\'éditeur ou continuer à modifier?</string>
+    <string name="save_dialog_close">Fermer l\'éditeur</string>
+    <string name="save_dialog_continue">Continuer à modifier</string>
     
     <!-- Tables screen -->
     <string name="tables_title">Tables - %1$s</string>

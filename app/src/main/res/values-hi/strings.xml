@@ -99,6 +99,10 @@
     <string name="query_editor_error_prefix">क्वेरी त्रुटि</string>
     <string name="rows_affected">प्रभावित पंक्तियां</string>
     <string name="execution_time_ms">निष्पादन समय</string>
+    <string name="save_dialog_title">फ़ाइल सहेजी गई</string>
+    <string name="save_dialog_message">फ़ाइल \'%1$s\' सफलतापूर्वक सहेजी गई।\n\nक्या आप संपादक बंद करना चाहते हैं या संपादन जारी रखना चाहते हैं?</string>
+    <string name="save_dialog_close">संपादक बंद करें</string>
+    <string name="save_dialog_continue">संपादन जारी रखें</string>
     
     <!-- Tables screen -->
     <string name="tables_title">टेबल - %1$s</string>

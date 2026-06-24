@@ -99,6 +99,10 @@
     <string name="query_editor_error_prefix">خطأ في الاستعلام</string>
     <string name="rows_affected">الصفوف المتأثرة</string>
     <string name="execution_time_ms">وقت التنفيذ</string>
+    <string name="save_dialog_title">تم حفظ الملف</string>
+    <string name="save_dialog_message">تم حفظ الملف \'%1$s\' بنجاح.\n\nهل تريد إغلاق المحرر أو متابعة التحرير؟</string>
+    <string name="save_dialog_close">إغلاق المحرر</string>
+    <string name="save_dialog_continue">متابعة التحرير</string>
     
     <!-- Tables screen -->
     <string name="tables_title">الجداول - %1$s</string>

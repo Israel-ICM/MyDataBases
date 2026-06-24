@@ -99,6 +99,10 @@
     <string name="query_editor_error_prefix">查询错误</string>
     <string name="rows_affected">受影响的行数</string>
     <string name="execution_time_ms">执行时间</string>
+    <string name="save_dialog_title">文件已保存</string>
+    <string name="save_dialog_message">文件\'%1$s\'已成功保存。\n\n您想关闭编辑器还是继续编辑？</string>
+    <string name="save_dialog_close">关闭编辑器</string>
+    <string name="save_dialog_continue">继续编辑</string>
     
     <!-- Tables screen -->
     <string name="tables_title">表 - %1$s</string>

@@ -99,6 +99,10 @@
     <string name="query_editor_error_prefix">クエリエラー</string>
     <string name="rows_affected">影響を受けた行</string>
     <string name="execution_time_ms">実行時間</string>
+    <string name="save_dialog_title">ファイルが保存されました</string>
+    <string name="save_dialog_message">ファイル\'%1$s\'が正常に保存されました。\n\nエディタを閉じますか、それとも編集を続けますか？</string>
+    <string name="save_dialog_close">エディタを閉じる</string>
+    <string name="save_dialog_continue">編集を続ける</string>
     
     <!-- Tables screen -->
     <string name="tables_title">テーブル - %1$s</string>

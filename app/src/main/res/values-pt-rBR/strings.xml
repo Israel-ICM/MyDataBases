@@ -99,6 +99,10 @@
     <string name="query_editor_error_prefix">Erro de consulta</string>
     <string name="rows_affected">Linhas afetadas</string>
     <string name="execution_time_ms">Tempo de execução</string>
+    <string name="save_dialog_title">Arquivo salvo</string>
+    <string name="save_dialog_message">O arquivo \'%1$s\' foi salvo com sucesso.\n\nDeseja fechar o editor ou continuar editando?</string>
+    <string name="save_dialog_close">Fechar editor</string>
+    <string name="save_dialog_continue">Continuar editando</string>
     
     <!-- Tables screen -->
     <string name="tables_title">Tabelas - %1$s</string>

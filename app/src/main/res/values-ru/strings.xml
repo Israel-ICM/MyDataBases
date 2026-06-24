@@ -99,6 +99,10 @@
     <string name="query_editor_error_prefix">Ошибка запроса</string>
     <string name="rows_affected">Затронуто строк</string>
     <string name="execution_time_ms">Время выполнения</string>
+    <string name="save_dialog_title">Файл сохранен</string>
+    <string name="save_dialog_message">Файл \'%1$s\' успешно сохранен.\n\nХотите закрыть редактор или продолжить редактирование?</string>
+    <string name="save_dialog_close">Закрыть редактор</string>
+    <string name="save_dialog_continue">Продолжить редактирование</string>
     
     <!-- Tables screen -->
     <string name="tables_title">Таблицы - %1$s</string>

@@ -99,6 +99,10 @@
     <string name="query_editor_error_prefix">Abfragefehler</string>
     <string name="rows_affected">Betroffene Zeilen</string>
     <string name="execution_time_ms">Ausführungszeit</string>
+    <string name="save_dialog_title">Datei gespeichert</string>
+    <string name="save_dialog_message">Die Datei \'%1$s\' wurde erfolgreich gespeichert.\n\nMöchten Sie den Editor schließen oder weiter bearbeiten?</string>
+    <string name="save_dialog_close">Editor schließen</string>
+    <string name="save_dialog_continue">Weiter bearbeiten</string>
     
     <!-- Tables screen -->
     <string name="tables_title">Tabellen - %1$s</string>
