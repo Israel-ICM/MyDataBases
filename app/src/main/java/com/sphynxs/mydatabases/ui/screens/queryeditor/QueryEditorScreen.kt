@@ -230,7 +230,7 @@ fun QueryEditorScreen(
                                     cursorPositions.addAll(snapshot.cursorPositions)
                                 }
                             }
-                            com.sphynxs.mydatabases.domain.editor.ShortcutAction.Format -> {
+                            com.sphynxs.mydatabases.ui.screens.queryeditor.domain.ShortcutAction.Format -> {
                                 if (sqlText.text.isNotBlank()) {
                                     // Push current state to history before formatting
                                     viewModel.pushHistory(
