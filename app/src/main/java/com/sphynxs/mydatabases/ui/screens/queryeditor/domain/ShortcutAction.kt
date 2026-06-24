@@ -14,6 +14,7 @@ package com.sphynxs.mydatabases.ui.screens.queryeditor.domain
  * - Save: Save query to file (Ctrl+S)
  * - Undo: Revert to previous editor state (Ctrl+Z)
  * - Redo: Reapply undone change (Ctrl+Y / Ctrl+Shift+Z)
+ * - Format: Format SQL text (Ctrl+Shift+F)
  *
  * @author israel-icm
  * @date 2026-06-24
@@ -23,4 +24,5 @@ sealed interface ShortcutAction {
     data object Save : ShortcutAction
     data object Undo : ShortcutAction
     data object Redo : ShortcutAction
+    data object Format : ShortcutAction
 }

@@ -17,6 +17,7 @@ import androidx.compose.ui.input.key.Key
  * - Ctrl+Z → Undo (revert to previous state)
  * - Ctrl+Y → Redo (reapply undone change)
  * - Ctrl+Shift+Z → Redo (alternative binding)
+ * - Ctrl+Shift+F → Format (format SQL text)
  *
  * @author israel-icm
  * @date 2026-06-24
@@ -40,6 +41,7 @@ object EditorShortcuts {
         isCtrlPressed && !isShiftPressed && key == Key.Z -> ShortcutAction.Undo
         isCtrlPressed && !isShiftPressed && key == Key.Y -> ShortcutAction.Redo
         isCtrlPressed && isShiftPressed && key == Key.Z -> ShortcutAction.Redo
+        isCtrlPressed && isShiftPressed && key == Key.F -> ShortcutAction.Format
         else -> null
     }
 }

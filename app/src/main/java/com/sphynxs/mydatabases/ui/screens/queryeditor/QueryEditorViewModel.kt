@@ -190,4 +190,20 @@ class QueryEditorViewModel @Inject constructor(
         _canUndo.value = editorHistory.canUndo()
         _canRedo.value = editorHistory.canRedo()
     }
+    
+    /**
+     * Format SQL text to normalized form (UPPERCASE keywords, newlines before major clauses).
+     *
+     * Runs on Dispatchers.Default to avoid blocking the main thread for large SQL texts.
+     * Pure transformation via SqlFormatter.format() — no side effects.
+     *
+     * Spec: openspec/changes/editor-completion-and-format/spec.md (scenarios 9-12)
+     * Design: ADR 2 — Formatter is pure function, runs off main thread
+     *
+     * @param currentText Input SQL text (any case, any whitespace)
+     * @return Formatted SQL (UPPERCASE keywords, major clause newlines, idempotent)
+     */
+    suspend fun formatSql(currentText: String): String = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Default) {
+        com.sphynxs.mydatabases.domain.editor.SqlFormatter.format(currentText)
+    }
 }
