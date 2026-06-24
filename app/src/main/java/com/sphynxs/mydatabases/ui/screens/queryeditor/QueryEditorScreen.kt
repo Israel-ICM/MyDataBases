@@ -7,6 +7,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.FolderOpen
+import androidx.compose.material.icons.filled.FormatAlignLeft
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Redo
 import androidx.compose.material.icons.filled.Save
@@ -35,6 +36,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.sphynxs.mydatabases.R
@@ -48,8 +50,10 @@ import java.io.BufferedReader
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStreamReader
+import com.sphynxs.mydatabases.domain.editor.EditorSnapshot
 import com.sphynxs.mydatabases.ui.components.ResultGrid
 import com.sphynxs.mydatabases.ui.screens.queryeditor.components.SqlCodeEditor
+import kotlinx.coroutines.launch
 
 /**
  * Pantalla del editor de queries SQL.
@@ -226,6 +230,37 @@ fun QueryEditorScreen(
                                     cursorPositions.addAll(snapshot.cursorPositions)
                                 }
                             }
+                            com.sphynxs.mydatabases.domain.editor.ShortcutAction.Format -> {
+                                if (sqlText.text.isNotBlank()) {
+                                    // Push current state to history before formatting
+                                    viewModel.pushHistory(
+                                        EditorSnapshot(
+                                            text = sqlText.text,
+                                            selection = sqlText.selection,
+                                            cursorPositions = cursorPositions.toList()
+                                        )
+                                    )
+                                    
+                                    // Format SQL
+                                    kotlinx.coroutines.MainScope().launch {
+                                        val formatted = viewModel.formatSql(sqlText.text)
+                                        sqlText = TextFieldValue(
+                                            text = formatted,
+                                            selection = TextRange(0)
+                                        )
+                                        cursorPositions.clear()
+                                        
+                                        // Push formatted state to history
+                                        viewModel.pushHistory(
+                                            EditorSnapshot(
+                                                text = formatted,
+                                                selection = TextRange(0),
+                                                cursorPositions = emptyList()
+                                            )
+                                        )
+                                    }
+                                }
+                            }
                         }
                     },
                     modifier = Modifier
@@ -389,6 +424,46 @@ fun QueryEditorScreen(
                                 Icons.Default.Redo,
                                 contentDescription = stringResource(R.string.redo_button),
                                 tint = if (canRedo) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+                            )
+                        }
+                        
+                        // Format button
+                        IconButton(
+                            onClick = {
+                                // Push current state to history before formatting
+                                viewModel.pushHistory(
+                                    EditorSnapshot(
+                                        text = sqlText.text,
+                                        selection = sqlText.selection,
+                                        cursorPositions = cursorPositions.toList()
+                                    )
+                                )
+                                
+                                // Format SQL
+                                kotlinx.coroutines.MainScope().launch {
+                                    val formatted = viewModel.formatSql(sqlText.text)
+                                    sqlText = TextFieldValue(
+                                        text = formatted,
+                                        selection = TextRange(0) // Reset cursor to start
+                                    )
+                                    cursorPositions.clear() // Clear multi-cursors when formatting
+                                    
+                                    // Push formatted state to history (enables undo)
+                                    viewModel.pushHistory(
+                                        EditorSnapshot(
+                                            text = formatted,
+                                            selection = TextRange(0),
+                                            cursorPositions = emptyList()
+                                        )
+                                    )
+                                }
+                            },
+                            enabled = sqlText.text.isNotBlank()
+                        ) {
+                            Icon(
+                                Icons.Default.FormatAlignLeft,
+                                contentDescription = stringResource(R.string.format_button),
+                                tint = if (sqlText.text.isNotBlank()) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
                             )
                         }
                         

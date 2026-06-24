@@ -97,6 +97,7 @@
     <string name="clear_button">清除</string>
     <string name="undo_button">撤销</string>
     <string name="redo_button">重做</string>
+    <string name="format_button">格式化 SQL</string>
     <string name="query_editor_empty_state">运行查询以在此处查看结果</string>
     <string name="query_editor_error_prefix">查询错误</string>
     <string name="rows_affected">受影响的行数</string>

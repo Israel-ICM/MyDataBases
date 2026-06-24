@@ -97,6 +97,7 @@
     <string name="clear_button">مسح</string>
     <string name="undo_button">تراجع</string>
     <string name="redo_button">إعادة</string>
+    <string name="format_button">تنسيق SQL</string>
     <string name="query_editor_empty_state">قم بتشغيل استعلام لرؤية النتائج هنا</string>
     <string name="query_editor_error_prefix">خطأ في الاستعلام</string>
     <string name="rows_affected">الصفوف المتأثرة</string>

@@ -97,6 +97,7 @@
     <string name="clear_button">Löschen</string>
     <string name="undo_button">Rückgängig</string>
     <string name="redo_button">Wiederherstellen</string>
+    <string name="format_button">SQL formatieren</string>
     <string name="query_editor_empty_state">Führen Sie eine Abfrage aus, um hier Ergebnisse zu sehen</string>
     <string name="query_editor_error_prefix">Abfragefehler</string>
     <string name="rows_affected">Betroffene Zeilen</string>
