@@ -27,9 +27,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.sphynxs.mydatabases.R
 import com.sphynxs.mydatabases.core.database.engine.DatabaseType
 import com.sphynxs.mydatabases.core.database.models.ConnectionConfig
 import com.sphynxs.mydatabases.ui.components.ios.IOSGroupedCard
@@ -150,7 +152,7 @@ fun DatabaseTypeCard(
                 ) {
                     Icon(PhosphorAppIcons.Action.add, contentDescription = null, tint = Color(0xFF007AFF))
                     Spacer(Modifier.width(4.dp))
-                    Text("Agregar ${type.name}", color = Color(0xFF007AFF))
+                    Text(stringResource(R.string.add_connection, type.name), color = Color(0xFF007AFF))
                 }
             }
         }

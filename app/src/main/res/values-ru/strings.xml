@@ -103,6 +103,26 @@
     <string name="save_dialog_message">Файл \'%1$s\' успешно сохранен.\n\nХотите закрыть редактор или продолжить редактирование?</string>
     <string name="save_dialog_close">Закрыть редактор</string>
     <string name="save_dialog_continue">Продолжить редактирование</string>
+    <string name="update_summary">Сводка обновлений</string>
+    <string name="rows_affected_label">Затронуто строк: %1$d</string>
+    <string name="execution_time_label">Время: %1$dms</string>
+    <string name="success_prefix">✓ Успех</string>
+    <string name="execution_time_full">Время выполнения: %1$dms</string>
+    <string name="failed_statement">Неудачный оператор:</string>
+    <string name="add_connection">Добавить %1$s</string>
+    <string name="inactive_status">Неактивна</string>
+    <string name="no_results">Нет результатов</string>
+    <string name="field_value">Значение</string>
+    <string name="select_database_type">Выберите тип базы данных</string>
+    <string name="database_header">БАЗА ДАННЫХ</string>
+    <string name="default_option">По умолчанию</string>
+    <string name="column_type">Тип: %1$s</string>
+    <string name="column_nullable">Nullable: %1$s</string>
+    <string name="column_key">Ключ: %1$s</string>
+    <string name="column_default">По умолчанию: %1$s</string>
+    <string name="column_extra">Дополнительно: %1$s</string>
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
     
     <!-- Tables screen -->
     <string name="tables_title">Таблицы - %1$s</string>

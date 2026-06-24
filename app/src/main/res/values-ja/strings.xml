@@ -103,6 +103,26 @@
     <string name="save_dialog_message">ファイル\'%1$s\'が正常に保存されました。\n\nエディタを閉じますか、それとも編集を続けますか？</string>
     <string name="save_dialog_close">エディタを閉じる</string>
     <string name="save_dialog_continue">編集を続ける</string>
+    <string name="update_summary">更新の概要</string>
+    <string name="rows_affected_label">影響を受けた行: %1$d</string>
+    <string name="execution_time_label">時間: %1$dms</string>
+    <string name="success_prefix">✓ 成功</string>
+    <string name="execution_time_full">実行時間: %1$dms</string>
+    <string name="failed_statement">失敗したステートメント:</string>
+    <string name="add_connection">%1$sを追加</string>
+    <string name="inactive_status">非アクティブ</string>
+    <string name="no_results">結果がありません</string>
+    <string name="field_value">値</string>
+    <string name="select_database_type">データベースタイプを選択</string>
+    <string name="database_header">データベース</string>
+    <string name="default_option">デフォルト</string>
+    <string name="column_type">型: %1$s</string>
+    <string name="column_nullable">NULL許可: %1$s</string>
+    <string name="column_key">キー: %1$s</string>
+    <string name="column_default">デフォルト: %1$s</string>
+    <string name="column_extra">追加: %1$s</string>
+    <string name="yes">はい</string>
+    <string name="no">いいえ</string>
     
     <!-- Tables screen -->
     <string name="tables_title">テーブル - %1$s</string>

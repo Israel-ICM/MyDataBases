@@ -352,7 +352,7 @@ private fun CellEditor(
                 value = editedValue,
                 onValueChange = { editedValue = it },
                 modifier = Modifier.fillMaxWidth(),
-                label = { Text("Value") },
+                label = { Text(stringResource(R.string.field_value)) },
                 singleLine = false,
                 minLines = 3,
                 maxLines = 6
@@ -365,13 +365,13 @@ private fun CellEditor(
                 horizontalArrangement = androidx.compose.foundation.layout.Arrangement.End
             ) {
                 OutlinedButton(onClick = onCancel) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.action_cancel))
                 }
                 
                 Spacer(modifier = Modifier.width(8.dp))
                 
                 Button(onClick = { onSave(editedValue) }) {
-                    Text("Save")
+                    Text(stringResource(R.string.action_save))
                 }
             }
         }

@@ -103,6 +103,26 @@
     <string name="save_dialog_message">फ़ाइल \'%1$s\' सफलतापूर्वक सहेजी गई।\n\nक्या आप संपादक बंद करना चाहते हैं या संपादन जारी रखना चाहते हैं?</string>
     <string name="save_dialog_close">संपादक बंद करें</string>
     <string name="save_dialog_continue">संपादन जारी रखें</string>
+    <string name="update_summary">अपडेट सारांश</string>
+    <string name="rows_affected_label">प्रभावित पंक्तियां: %1$d</string>
+    <string name="execution_time_label">समय: %1$dms</string>
+    <string name="success_prefix">✓ सफलता</string>
+    <string name="execution_time_full">निष्पादन समय: %1$dms</string>
+    <string name="failed_statement">विफल कथन:</string>
+    <string name="add_connection">%1$s जोड़ें</string>
+    <string name="inactive_status">निष्क्रिय</string>
+    <string name="no_results">कोई परिणाम नहीं</string>
+    <string name="field_value">मान</string>
+    <string name="select_database_type">डेटाबेस प्रकार चुनें</string>
+    <string name="database_header">डेटाबेस</string>
+    <string name="default_option">डिफ़ॉल्ट</string>
+    <string name="column_type">प्रकार: %1$s</string>
+    <string name="column_nullable">Nullable: %1$s</string>
+    <string name="column_key">कुंजी: %1$s</string>
+    <string name="column_default">डिफ़ॉल्ट: %1$s</string>
+    <string name="column_extra">अतिरिक्त: %1$s</string>
+    <string name="yes">हाँ</string>
+    <string name="no">नहीं</string>
     
     <!-- Tables screen -->
     <string name="tables_title">टेबल - %1$s</string>

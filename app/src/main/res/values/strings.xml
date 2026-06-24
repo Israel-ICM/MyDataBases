@@ -103,6 +103,28 @@
     <string name="save_dialog_message">The file \'%1$s\' was saved successfully.\n\nDo you want to close the editor or continue editing?</string>
     <string name="save_dialog_close">Close editor</string>
     <string name="save_dialog_continue">Continue editing</string>
+    <string name="update_summary">Update Summary</string>
+    <string name="rows_affected_label">Rows affected: %1$d</string>
+    <string name="execution_time_label">Time: %1$dms</string>
+    <string name="success_prefix">✓ Success</string>
+    <string name="execution_time_full">Execution time: %1$dms</string>
+    <string name="failed_statement">Failed statement:</string>
+    <string name="add_connection">Add %1$s</string>
+    <string name="inactive_status">Inactive</string>
+    <string name="no_results">No results</string>
+    <string name="field_value">Value</string>
+    <string name="select_database_type">Select Database Type</string>
+    <string name="database_header">DATABASE</string>
+    <string name="default_option">Default</string>
+    
+    <!-- Table viewer details -->
+    <string name="column_type">Type: %1$s</string>
+    <string name="column_nullable">Nullable: %1$s</string>
+    <string name="column_key">Key: %1$s</string>
+    <string name="column_default">Default: %1$s</string>
+    <string name="column_extra">Extra: %1$s</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
     
     <!-- Tables screen -->
     <string name="tables_title">Tables - %1$s</string>

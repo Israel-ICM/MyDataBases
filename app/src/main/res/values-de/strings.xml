@@ -103,6 +103,26 @@
     <string name="save_dialog_message">Die Datei \'%1$s\' wurde erfolgreich gespeichert.\n\nMöchten Sie den Editor schließen oder weiter bearbeiten?</string>
     <string name="save_dialog_close">Editor schließen</string>
     <string name="save_dialog_continue">Weiter bearbeiten</string>
+    <string name="update_summary">Aktualisierungszusammenfassung</string>
+    <string name="rows_affected_label">Betroffene Zeilen: %1$d</string>
+    <string name="execution_time_label">Zeit: %1$dms</string>
+    <string name="success_prefix">✓ Erfolg</string>
+    <string name="execution_time_full">Ausführungszeit: %1$dms</string>
+    <string name="failed_statement">Fehlerhafte Anweisung:</string>
+    <string name="add_connection">%1$s hinzufügen</string>
+    <string name="inactive_status">Inaktiv</string>
+    <string name="no_results">Keine Ergebnisse</string>
+    <string name="field_value">Wert</string>
+    <string name="select_database_type">Datenbanktyp auswählen</string>
+    <string name="database_header">DATENBANK</string>
+    <string name="default_option">Standard</string>
+    <string name="column_type">Typ: %1$s</string>
+    <string name="column_nullable">Nullable: %1$s</string>
+    <string name="column_key">Schlüssel: %1$s</string>
+    <string name="column_default">Standard: %1$s</string>
+    <string name="column_extra">Extra: %1$s</string>
+    <string name="yes">Ja</string>
+    <string name="no">Nein</string>
     
     <!-- Tables screen -->
     <string name="tables_title">Tabellen - %1$s</string>

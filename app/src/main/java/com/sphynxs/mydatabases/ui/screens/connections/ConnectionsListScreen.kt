@@ -166,7 +166,7 @@ fun ConnectionsListScreen(
                         
                         // Título grande estilo iOS 26
                         Text(
-                            text = "Connections",
+                            text = stringResource(R.string.connections_title),
                             fontSize = DesignTokens.LargeTitleSize,
                             fontWeight = DesignTokens.LargeTitleWeight,
                             color = DesignTokens.LargeTitleColor,
@@ -308,7 +308,7 @@ fun ConnectionsListScreen(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Text(
-                    text = "Select Database Type",
+                    text = stringResource(R.string.select_database_type),
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(bottom = 8.dp)

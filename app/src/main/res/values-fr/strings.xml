@@ -103,6 +103,26 @@
     <string name="save_dialog_message">Le fichier \'%1$s\' a été enregistré avec succès.\n\nVoulez-vous fermer l\'éditeur ou continuer à modifier?</string>
     <string name="save_dialog_close">Fermer l\'éditeur</string>
     <string name="save_dialog_continue">Continuer à modifier</string>
+    <string name="update_summary">Résumé de la mise à jour</string>
+    <string name="rows_affected_label">Lignes affectées: %1$d</string>
+    <string name="execution_time_label">Temps: %1$dms</string>
+    <string name="success_prefix">✓ Succès</string>
+    <string name="execution_time_full">Temps d\'exécution: %1$dms</string>
+    <string name="failed_statement">Déclaration échouée:</string>
+    <string name="add_connection">Ajouter %1$s</string>
+    <string name="inactive_status">Inactive</string>
+    <string name="no_results">Aucun résultat</string>
+    <string name="field_value">Valeur</string>
+    <string name="select_database_type">Sélectionner le type de base de données</string>
+    <string name="database_header">BASE DE DONNÉES</string>
+    <string name="default_option">Par défaut</string>
+    <string name="column_type">Type: %1$s</string>
+    <string name="column_nullable">Nullable: %1$s</string>
+    <string name="column_key">Clé: %1$s</string>
+    <string name="column_default">Défaut: %1$s</string>
+    <string name="column_extra">Extra: %1$s</string>
+    <string name="yes">Oui</string>
+    <string name="no">Non</string>
     
     <!-- Tables screen -->
     <string name="tables_title">Tables - %1$s</string>

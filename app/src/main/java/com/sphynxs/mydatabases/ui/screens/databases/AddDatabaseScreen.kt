@@ -172,7 +172,7 @@ fun AddDatabaseFormContent(
         // Card: Información de la Database
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(
-                text = "DATABASE",
+                text = stringResource(R.string.database_header),
                 fontSize = com.sphynxs.mydatabases.ui.theme.DesignTokens.LabelSize,
                 color = com.sphynxs.mydatabases.ui.theme.DesignTokens.TextSecondary,
                 modifier = Modifier.padding(start = 16.dp)
@@ -244,7 +244,7 @@ fun AddDatabaseFormContent(
                             itemTrailing = { collation ->
                                 if (collation.isDefault) {
                                     Text(
-                                        text = "Default",
+                                        text = stringResource(R.string.default_option),
                                         fontSize = com.sphynxs.mydatabases.ui.theme.DesignTokens.LabelSize,
                                         color = com.sphynxs.mydatabases.ui.theme.DesignTokens.AccentPrimary,
                                         fontWeight = com.sphynxs.mydatabases.ui.theme.DesignTokens.LabelWeight

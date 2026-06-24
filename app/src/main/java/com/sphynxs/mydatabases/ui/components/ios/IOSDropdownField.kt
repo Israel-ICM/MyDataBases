@@ -23,10 +23,12 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.sphynxs.mydatabases.R
 import com.sphynxs.mydatabases.ui.theme.DesignTokens
 
 /**
@@ -215,7 +217,7 @@ fun <T> IOSDropdownField(
                 ) {
                     if (filteredItems.isEmpty()) {
                         Text(
-                            text = "No results",
+                            text = stringResource(R.string.no_results),
                             fontSize = DesignTokens.LabelSize,
                             color = DesignTokens.TextSecondary,
                             modifier = Modifier.padding(16.dp)

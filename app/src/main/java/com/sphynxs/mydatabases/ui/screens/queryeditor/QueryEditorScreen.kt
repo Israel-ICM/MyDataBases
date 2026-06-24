@@ -446,7 +446,7 @@ fun QueryEditorScreen(
 private fun UpdateSummaryTable(results: List<com.sphynxs.mydatabases.domain.models.StatementResult>) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
-            text = "Update Summary",
+            text = stringResource(R.string.update_summary),
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(bottom = 8.dp)
         )
@@ -469,11 +469,11 @@ private fun UpdateSummaryTable(results: List<com.sphynxs.mydatabases.domain.mode
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = "Rows affected: ${result.affectedRows ?: 0}",
+                            text = stringResource(R.string.rows_affected_label, result.affectedRows ?: 0),
                             style = MaterialTheme.typography.bodySmall
                         )
                         Text(
-                            text = "Time: ${result.executionTimeMs}ms",
+                            text = stringResource(R.string.execution_time_label, result.executionTimeMs),
                             style = MaterialTheme.typography.bodySmall
                         )
                     }
@@ -499,7 +499,7 @@ private fun SuccessDisplay(
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                text = "✓ Success",
+                text = stringResource(R.string.success_prefix),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onPrimaryContainer
             )
@@ -511,7 +511,7 @@ private fun SuccessDisplay(
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = "Execution time: ${executionTimeMs}ms",
+                text = stringResource(R.string.execution_time_full, executionTimeMs),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onPrimaryContainer
             )
@@ -549,7 +549,7 @@ private fun ErrorDisplay(
             failedStatement?.let {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "Failed statement:",
+                    text = stringResource(R.string.failed_statement),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onErrorContainer
                 )

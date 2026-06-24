@@ -229,29 +229,32 @@ private fun SchemaTab(
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "Tipo: ${column.type}",
+                        text = stringResource(R.string.column_type, column.type),
                         style = MaterialTheme.typography.bodySmall
                     )
                     Text(
-                        text = "Nullable: ${if (column.nullable) "Sí" else "No"}",
+                        text = stringResource(
+                            R.string.column_nullable,
+                            stringResource(if (column.nullable) R.string.yes else R.string.no)
+                        ),
                         style = MaterialTheme.typography.bodySmall
                     )
                     if (column.key != ColumnKey.NONE) {
                         Text(
-                            text = "Clave: ${column.key}",
+                            text = stringResource(R.string.column_key, column.key.toString()),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.primary
                         )
                     }
                     column.default?.let {
                         Text(
-                            text = "Default: $it",
+                            text = stringResource(R.string.column_default, it),
                             style = MaterialTheme.typography.bodySmall
                         )
                     }
                     column.extra?.let {
                         Text(
-                            text = "Extra: $it",
+                            text = stringResource(R.string.column_extra, it),
                             style = MaterialTheme.typography.bodySmall
                         )
                     }

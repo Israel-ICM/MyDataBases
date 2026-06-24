@@ -103,6 +103,28 @@
     <string name="save_dialog_message">El archivo \'%1$s\' se guardó correctamente.\n\n¿Querés cerrar el editor o seguir editando?</string>
     <string name="save_dialog_close">Cerrar editor</string>
     <string name="save_dialog_continue">Seguir editando</string>
+    <string name="update_summary">Resumen de actualización</string>
+    <string name="rows_affected_label">Filas afectadas: %1$d</string>
+    <string name="execution_time_label">Tiempo: %1$dms</string>
+    <string name="success_prefix">✓ Éxito</string>
+    <string name="execution_time_full">Tiempo de ejecución: %1$dms</string>
+    <string name="failed_statement">Statement que falló:</string>
+    <string name="add_connection">Agregar %1$s</string>
+    <string name="inactive_status">Inactiva</string>
+    <string name="no_results">Sin resultados</string>
+    <string name="field_value">Valor</string>
+    <string name="select_database_type">Seleccionar tipo de base de datos</string>
+    <string name="database_header">BASE DE DATOS</string>
+    <string name="default_option">Por defecto</string>
+    
+    <!-- Table viewer details -->
+    <string name="column_type">Tipo: %1$s</string>
+    <string name="column_nullable">Nullable: %1$s</string>
+    <string name="column_key">Clave: %1$s</string>
+    <string name="column_default">Default: %1$s</string>
+    <string name="column_extra">Extra: %1$s</string>
+    <string name="yes">Sí</string>
+    <string name="no">No</string>
     
     <!-- Tables screen -->
     <string name="tables_title">Tablas - %1$s</string>

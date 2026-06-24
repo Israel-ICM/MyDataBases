@@ -103,6 +103,26 @@
     <string name="save_dialog_message">تم حفظ الملف \'%1$s\' بنجاح.\n\nهل تريد إغلاق المحرر أو متابعة التحرير؟</string>
     <string name="save_dialog_close">إغلاق المحرر</string>
     <string name="save_dialog_continue">متابعة التحرير</string>
+    <string name="update_summary">ملخص التحديث</string>
+    <string name="rows_affected_label">الصفوف المتأثرة: %1$d</string>
+    <string name="execution_time_label">الوقت: %1$dms</string>
+    <string name="success_prefix">✓ نجح</string>
+    <string name="execution_time_full">وقت التنفيذ: %1$dms</string>
+    <string name="failed_statement">العبارة الفاشلة:</string>
+    <string name="add_connection">إضافة %1$s</string>
+    <string name="inactive_status">غير نشط</string>
+    <string name="no_results">لا توجد نتائج</string>
+    <string name="field_value">القيمة</string>
+    <string name="select_database_type">حدد نوع قاعدة البيانات</string>
+    <string name="database_header">قاعدة البيانات</string>
+    <string name="default_option">افتراضي</string>
+    <string name="column_type">النوع: %1$s</string>
+    <string name="column_nullable">قابل للقيمة الخالية: %1$s</string>
+    <string name="column_key">المفتاح: %1$s</string>
+    <string name="column_default">الافتراضي: %1$s</string>
+    <string name="column_extra">إضافي: %1$s</string>
+    <string name="yes">نعم</string>
+    <string name="no">لا</string>
     
     <!-- Tables screen -->
     <string name="tables_title">الجداول - %1$s</string>

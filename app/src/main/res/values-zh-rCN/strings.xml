@@ -103,6 +103,26 @@
     <string name="save_dialog_message">文件\'%1$s\'已成功保存。\n\n您想关闭编辑器还是继续编辑？</string>
     <string name="save_dialog_close">关闭编辑器</string>
     <string name="save_dialog_continue">继续编辑</string>
+    <string name="update_summary">更新摘要</string>
+    <string name="rows_affected_label">受影响的行数: %1$d</string>
+    <string name="execution_time_label">时间: %1$dms</string>
+    <string name="success_prefix">✓ 成功</string>
+    <string name="execution_time_full">执行时间: %1$dms</string>
+    <string name="failed_statement">失败的语句:</string>
+    <string name="add_connection">添加 %1$s</string>
+    <string name="inactive_status">未激活</string>
+    <string name="no_results">无结果</string>
+    <string name="field_value">值</string>
+    <string name="select_database_type">选择数据库类型</string>
+    <string name="database_header">数据库</string>
+    <string name="default_option">默认</string>
+    <string name="column_type">类型: %1$s</string>
+    <string name="column_nullable">可为空: %1$s</string>
+    <string name="column_key">键: %1$s</string>
+    <string name="column_default">默认值: %1$s</string>
+    <string name="column_extra">额外: %1$s</string>
+    <string name="yes">是</string>
+    <string name="no">否</string>
     
     <!-- Tables screen -->
     <string name="tables_title">表 - %1$s</string>
