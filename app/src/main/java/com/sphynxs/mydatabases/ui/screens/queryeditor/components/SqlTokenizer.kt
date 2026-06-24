@@ -1,10 +1,14 @@
 package com.sphynxs.mydatabases.ui.screens.queryeditor.components
 
+import com.sphynxs.mydatabases.domain.editor.SqlKeywords
+
 /**
  * Tokenizer puro para SQL (MySQL/MariaDB).
  *
  * Función pura, 100% testable en JVM unit tests sin Compose/Robolectric.
  * Basado en regex para detectar keywords, strings, comments, números, etc.
+ *
+ * Uses SqlKeywords.KEYWORDS as single source of truth (prevents drift with formatter/completion).
  *
  * @author israel-icm
  * @date 2026-06-23
@@ -53,9 +57,9 @@ object SqlTokenizer {
             // 6. Numbers: int o decimal (45.67, 123)
             Regex("""\d+(\.\d+)?""") to TokenKind.NUMBER,
 
-            // 7. Keywords (case-insensitive, MySQL/MariaDB reserved words subset)
+            // 7. Keywords (case-insensitive, from SqlKeywords single source of truth)
             Regex(
-                """\b(?:SELECT|FROM|WHERE|INSERT|UPDATE|DELETE|CREATE|DROP|ALTER|TABLE|INDEX|VIEW|DATABASE|SCHEMA|INTO|VALUES|SET|AND|OR|NOT|NULL|IS|IN|LIKE|BETWEEN|ORDER|BY|GROUP|HAVING|JOIN|INNER|LEFT|RIGHT|OUTER|ON|AS|DISTINCT|LIMIT|OFFSET|ASC|DESC|SHOW|DESCRIBE|EXPLAIN|WITH|UNION|ALL|EXISTS|CASE|WHEN|THEN|ELSE|END|IF|PRIMARY|KEY|FOREIGN|UNIQUE|DEFAULT|AUTO_INCREMENT|CASCADE|RESTRICT|CHECK|CONSTRAINT|REFERENCES|TRANSACTION|COMMIT|ROLLBACK|START|BEGIN|USE)\b""",
+                """\b(?:${SqlKeywords.KEYWORDS.joinToString("|")})\b""",
                 RegexOption.IGNORE_CASE
             ) to TokenKind.KEYWORD,
 
