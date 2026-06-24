@@ -4,8 +4,14 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.filled.Stop
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -55,6 +61,7 @@ fun QueryEditorScreen(
 ) {
     var sqlText by remember { mutableStateOf(TextFieldValue(initialSql ?: "")) }
     val uiState by viewModel.uiState.collectAsState()
+    val cursorPositions = remember { mutableStateListOf<Int>() }
 
     Column(
         modifier = modifier
@@ -75,6 +82,7 @@ fun QueryEditorScreen(
                     value = sqlText,
                     onValueChange = { sqlText = it },
                     placeholder = "-- Enter SQL query...",
+                    cursorPositions = cursorPositions,
                     modifier = Modifier
                         .fillMaxSize()
                         .verticalScroll(rememberScrollState())
@@ -88,35 +96,117 @@ fun QueryEditorScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                // Execute button
-                Button(
-                    onClick = {
-                        viewModel.executeStatements(sql = sqlText.text)
-                    },
-                    enabled = sqlText.text.isNotBlank() && uiState !is QueryEditorUiState.Running,
-                    modifier = Modifier.semantics {
-                        contentDescription = "Execute query"
-                    }
-                ) {
-                    Icon(Icons.Default.PlayArrow, contentDescription = null)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(stringResource(R.string.execute_button))
-                }
-
-                // Cancel button (visible solo cuando está Running)
+                // Execute/Cancel button (toggle based on running state)
                 if (uiState is QueryEditorUiState.Running) {
-                    OutlinedButton(
-                        onClick = { viewModel.cancel() }
+                    // Cancel button (red, stop icon)
+                    Button(
+                        onClick = { viewModel.cancel() },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFFF44336), // Rojo
+                            contentColor = Color.White
+                        )
                     ) {
-                        Text(stringResource(R.string.cancel_button))
+                        Icon(
+                            Icons.Default.Stop,
+                            contentDescription = stringResource(R.string.cancel_button)
+                        )
+                    }
+                } else {
+                    // Execute button (green, play icon)
+                    Button(
+                        onClick = {
+                            viewModel.executeStatements(sql = sqlText.text)
+                        },
+                        enabled = sqlText.text.isNotBlank(),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF4CAF50), // Verde
+                            contentColor = Color.White
+                        ),
+                        modifier = Modifier.semantics {
+                            contentDescription = "Execute query"
+                        }
+                    ) {
+                        Icon(
+                            Icons.Default.PlayArrow,
+                            contentDescription = stringResource(R.string.execute_button)
+                        )
                     }
                 }
 
-                // Clear button
+                // Save button (icon only, no action yet)
                 OutlinedButton(
-                    onClick = { sqlText = TextFieldValue("") }
+                    onClick = { 
+                        // TODO: Implementar guardar query
+                        android.util.Log.d("QueryEditorScreen", "Save clicked (not implemented yet)")
+                    },
+                    enabled = sqlText.text.isNotBlank()
                 ) {
-                    Text(stringResource(R.string.clear_button))
+                    Icon(
+                        Icons.Default.Save,
+                        contentDescription = "Save query"
+                    )
+                }
+                
+                // Clear button (adaptive: clear cursors or clear text)
+                OutlinedButton(
+                    onClick = { 
+                        if (cursorPositions.isNotEmpty()) {
+                            // Si hay cursores (badge >= 1), limpiar solo cursores
+                            cursorPositions.clear()
+                            android.util.Log.d("QueryEditorScreen", "Cursors cleared")
+                        } else {
+                            // Si no hay cursores (badge vacío), limpiar texto
+                            sqlText = TextFieldValue("")
+                            android.util.Log.d("QueryEditorScreen", "Text cleared")
+                        }
+                    }
+                ) {
+                    if (cursorPositions.size >= 1) {
+                        // Mostrar "|×" cuando hay 1+ cursores (badge visible)
+                        Text(
+                            text = "|×",
+                            fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
+                        )
+                    } else {
+                        // Mostrar ícono X cuando badge está vacío
+                        Icon(
+                            Icons.Default.Clear,
+                            contentDescription = stringResource(R.string.clear_button)
+                        )
+                    }
+                }
+                
+                // Add cursor button with badge
+                BadgedBox(
+                    badge = {
+                        if (cursorPositions.isNotEmpty()) {
+                            Badge {
+                                Text(
+                                    text = "${cursorPositions.size}",
+                                    style = MaterialTheme.typography.labelSmall
+                                )
+                            }
+                        }
+                    }
+                ) {
+                    OutlinedButton(
+                        onClick = {
+                            val currentPos = sqlText.selection.start
+                            android.util.Log.d("QueryEditorScreen", "Click |+ at position $currentPos, cursorPositions: $cursorPositions, contains: ${cursorPositions.contains(currentPos)}")
+                            if (!cursorPositions.contains(currentPos)) {
+                                cursorPositions.add(currentPos)
+                                android.util.Log.d("QueryEditorScreen", "✅ Cursor added at $currentPos")
+                            } else {
+                                cursorPositions.remove(currentPos)
+                                android.util.Log.d("QueryEditorScreen", "❌ Cursor removed from $currentPos")
+                            }
+                        }
+                    ) {
+                        Text(
+                            text = "|+",
+                            fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
+                        )
+                    }
                 }
             }
 
