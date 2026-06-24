@@ -99,6 +99,10 @@
     <string name="query_editor_error_prefix">Query Error</string>
     <string name="rows_affected">Rows affected</string>
     <string name="execution_time_ms">Execution time</string>
+    <string name="save_dialog_title">File saved</string>
+    <string name="save_dialog_message">The file \'%1$s\' was saved successfully.\n\nDo you want to close the editor or continue editing?</string>
+    <string name="save_dialog_close">Close editor</string>
+    <string name="save_dialog_continue">Continue editing</string>
     
     <!-- Tables screen -->
     <string name="tables_title">Tables - %1$s</string>

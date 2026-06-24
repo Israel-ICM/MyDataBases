@@ -406,14 +406,10 @@ fun QueryEditorScreen(
         AlertDialog(
             onDismissRequest = { showSaveDialog = false },
             title = {
-                Text("Archivo guardado")
+                Text(stringResource(R.string.save_dialog_title))
             },
             text = {
-                Column {
-                    Text("El archivo '$savedFileName' se guardó correctamente.")
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text("¿Desea cerrar el editor o continuar modificando?")
-                }
+                Text(stringResource(R.string.save_dialog_message, savedFileName))
             },
             confirmButton = {
                 TextButton(
@@ -424,7 +420,7 @@ fun QueryEditorScreen(
                         android.util.Log.d("QueryEditorScreen", "Editor closed after save")
                     }
                 ) {
-                    Text("Cerrar editor")
+                    Text(stringResource(R.string.save_dialog_close))
                 }
             },
             dismissButton = {
@@ -434,7 +430,7 @@ fun QueryEditorScreen(
                         android.util.Log.d("QueryEditorScreen", "Continue editing after save")
                     }
                 ) {
-                    Text("Continuar editando")
+                    Text(stringResource(R.string.save_dialog_continue))
                 }
             }
         )
