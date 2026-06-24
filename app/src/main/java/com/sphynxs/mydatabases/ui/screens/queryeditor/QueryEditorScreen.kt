@@ -130,7 +130,7 @@ fun QueryEditorScreen(
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f),
+                    .weight(1f), // Ocupa todo el espacio disponible (100% si Idle, 50% si hay resultados)
                 colors = CardDefaults.cardColors(
                     containerColor = Color.White
                 ),
@@ -344,57 +344,55 @@ fun QueryEditorScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Result pane
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-            ) {
-                Box(
+            // Result pane (solo visible cuando NO está Idle)
+            if (uiState !is QueryEditorUiState.Idle) {
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                Card(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp),
-                    contentAlignment = Alignment.Center
+                        .fillMaxWidth()
+                        .weight(1f)
                 ) {
-                    when (val state = uiState) {
-                        is QueryEditorUiState.Idle -> {
-                            Text(
-                                text = stringResource(R.string.query_editor_empty_state),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        when (val state = uiState) {
+                            is QueryEditorUiState.Running -> {
+                                CircularProgressIndicator()
+                            }
 
-                        is QueryEditorUiState.Running -> {
-                            CircularProgressIndicator()
-                        }
+                            is QueryEditorUiState.SelectResult -> {
+                                ResultGrid(
+                                    columns = state.result.columns,
+                                    rows = state.result.rows,
+                                    modifier = Modifier.fillMaxSize()
+                                )
+                            }
 
-                        is QueryEditorUiState.SelectResult -> {
-                            ResultGrid(
-                                columns = state.result.columns,
-                                rows = state.result.rows,
-                                modifier = Modifier.fillMaxSize()
-                            )
-                        }
+                            is QueryEditorUiState.UpdateSummary -> {
+                                UpdateSummaryTable(results = state.results)
+                            }
 
-                        is QueryEditorUiState.UpdateSummary -> {
-                            UpdateSummaryTable(results = state.results)
-                        }
+                            is QueryEditorUiState.Success -> {
+                                SuccessDisplay(
+                                    message = state.message,
+                                    executionTimeMs = state.executionTimeMs
+                                )
+                            }
 
-                        is QueryEditorUiState.Success -> {
-                            SuccessDisplay(
-                                message = state.message,
-                                executionTimeMs = state.executionTimeMs
-                            )
-                        }
+                            is QueryEditorUiState.Error -> {
+                                ErrorDisplay(
+                                    message = state.message,
+                                    failedStatement = state.failedStatement
+                                )
+                            }
 
-                        is QueryEditorUiState.Error -> {
-                            ErrorDisplay(
-                                message = state.message,
-                                failedStatement = state.failedStatement
-                            )
+                            is QueryEditorUiState.Idle -> {
+                                // No mostrar nada (ya está filtrado arriba)
+                            }
                         }
                     }
                 }
