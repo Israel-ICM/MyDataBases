@@ -96,15 +96,25 @@ class QueryEditorViewModel @Inject constructor(
                     ?.queryResult
 
                 // Agregar resultados:
-                // Si todos son queries Y hay lastQueryResult → SelectResult
-                // Caso contrario → UpdateSummary
-                _uiState.value = if (results.all { it.isQuery } && lastQueryResult != null) {
-                    QueryEditorUiState.SelectResult(
-                        result = lastQueryResult,
-                        executionTimeMs = results.sumOf { it.executionTimeMs }
-                    )
-                } else {
-                    QueryEditorUiState.UpdateSummary(results)
+                // 1. Si todos son queries Y hay lastQueryResult → SelectResult
+                // 2. Si ninguno es query Y todos tienen affectedRows = 0 → Success (ej: USE DATABASE)
+                // 3. Caso contrario → UpdateSummary
+                _uiState.value = when {
+                    results.all { it.isQuery } && lastQueryResult != null -> {
+                        QueryEditorUiState.SelectResult(
+                            result = lastQueryResult,
+                            executionTimeMs = results.sumOf { it.executionTimeMs }
+                        )
+                    }
+                    results.none { it.isQuery } && results.all { (it.affectedRows ?: 0) == 0 } -> {
+                        QueryEditorUiState.Success(
+                            message = "Query executed successfully (${results.size} statement${if (results.size > 1) "s" else ""})",
+                            executionTimeMs = results.sumOf { it.executionTimeMs }
+                        )
+                    }
+                    else -> {
+                        QueryEditorUiState.UpdateSummary(results)
+                    }
                 }
             } catch (e: Exception) {
                 _uiState.value = QueryEditorUiState.Error(

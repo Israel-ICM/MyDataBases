@@ -11,6 +11,7 @@ import com.sphynxs.mydatabases.domain.models.StatementResult
  * - Running: Query en ejecución, loading indicator visible, Execute disabled, Cancel enabled
  * - SelectResult: Última query fue SELECT-like, mostrar ResultGrid
  * - UpdateSummary: Última query fue INSERT/UPDATE/DELETE o mix, mostrar tabla de summary
+ * - Success: Statements ejecutados correctamente (verde), sin resultados para mostrar
  * - Error: Query falló, mostrar error card con mensaje
  *
  * @author israel-icm
@@ -42,6 +43,17 @@ sealed class QueryEditorUiState {
      */
     data class UpdateSummary(
         val results: List<StatementResult>
+    ) : QueryEditorUiState()
+
+    /**
+     * Statements ejecutados exitosamente sin resultados para mostrar (ej: USE DATABASE).
+     *
+     * @property message Mensaje de éxito
+     * @property executionTimeMs Tiempo total de ejecución
+     */
+    data class Success(
+        val message: String,
+        val executionTimeMs: Long
     ) : QueryEditorUiState()
 
     /**

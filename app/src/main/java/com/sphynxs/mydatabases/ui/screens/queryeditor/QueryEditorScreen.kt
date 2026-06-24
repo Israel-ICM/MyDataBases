@@ -5,10 +5,18 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -38,7 +46,6 @@ import com.sphynxs.mydatabases.ui.screens.queryeditor.components.SqlCodeEditor
  * @author israel-icm
  * @date 2026-06-23
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun QueryEditorScreen(
     connectionId: String,
@@ -49,37 +56,27 @@ fun QueryEditorScreen(
     var sqlText by remember { mutableStateOf(TextFieldValue(initialSql ?: "")) }
     val uiState by viewModel.uiState.collectAsState()
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("SQL Editor") },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                )
-            )
-        },
+    Column(
         modifier = modifier
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp)
-        ) {
-            // SQL Editor
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+            // SQL Editor (estilo VS Code - modo claro)
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)
+                    .weight(1f),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color.White
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
             ) {
                 SqlCodeEditor(
                     value = sqlText,
                     onValueChange = { sqlText = it },
-                    placeholder = "Enter SQL query...",
+                    placeholder = "-- Enter SQL query...",
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(16.dp)
                         .verticalScroll(rememberScrollState())
                 )
             }
@@ -162,16 +159,22 @@ fun QueryEditorScreen(
                             UpdateSummaryTable(results = state.results)
                         }
 
+                        is QueryEditorUiState.Success -> {
+                            SuccessDisplay(
+                                message = state.message,
+                                executionTimeMs = state.executionTimeMs
+                            )
+                        }
+
                         is QueryEditorUiState.Error -> {
                             ErrorDisplay(
                                 message = state.message,
                                 failedStatement = state.failedStatement
                             )
-                        }
-                    }
                 }
             }
         }
+    }
     }
 }
 
@@ -217,6 +220,42 @@ private fun UpdateSummaryTable(results: List<com.sphynxs.mydatabases.domain.mode
                     }
                 }
             }
+        }
+    }
+}
+
+/**
+ * Display de éxito con mensaje verde.
+ */
+@Composable
+private fun SuccessDisplay(
+    message: String,
+    executionTimeMs: Long
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer
+        )
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = "✓ Success",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onPrimaryContainer
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = message,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onPrimaryContainer
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = "Execution time: ${executionTimeMs}ms",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onPrimaryContainer
+            )
         }
     }
 }
