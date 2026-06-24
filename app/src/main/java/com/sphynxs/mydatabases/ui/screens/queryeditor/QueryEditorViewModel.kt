@@ -1,7 +1,10 @@
 package com.sphynxs.mydatabases.ui.screens.queryeditor
 
+import androidx.compose.ui.text.TextRange
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.sphynxs.mydatabases.domain.editor.EditorHistory
+import com.sphynxs.mydatabases.domain.editor.EditorSnapshot
 import com.sphynxs.mydatabases.domain.models.StatementResult
 import com.sphynxs.mydatabases.domain.usecases.ExecuteBatchStatementsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -41,6 +44,15 @@ class QueryEditorViewModel @Inject constructor(
     val uiState: StateFlow<QueryEditorUiState> = _uiState.asStateFlow()
 
     private var executionJob: Job? = null
+    
+    // Editor history for undo/redo
+    private val editorHistory = EditorHistory(maxSnapshots = 100, coalescingWindowMs = 500)
+    
+    private val _canUndo = MutableStateFlow(false)
+    val canUndo: StateFlow<Boolean> = _canUndo.asStateFlow()
+    
+    private val _canRedo = MutableStateFlow(false)
+    val canRedo: StateFlow<Boolean> = _canRedo.asStateFlow()
 
     // Exception handler para catchear TODAS las excepciones no manejadas
     private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
@@ -131,5 +143,51 @@ class QueryEditorViewModel @Inject constructor(
     fun cancel() {
         executionJob?.cancel()
         _uiState.value = QueryEditorUiState.Idle
+    }
+    
+    /**
+     * Push a snapshot to history when text changes.
+     * 
+     * Coalescing is handled by EditorHistory automatically.
+     *
+     * @param text Current text
+     * @param selection Current selection
+     * @param cursorPositions Multi-cursor positions
+     */
+    fun pushHistory(text: String, selection: TextRange, cursorPositions: List<Int>) {
+        val snapshot = EditorSnapshot(
+            text = text,
+            selection = selection,
+            cursorPositions = cursorPositions
+        )
+        editorHistory.push(snapshot)
+        updateHistoryState()
+    }
+    
+    /**
+     * Undo the last change.
+     * 
+     * @return Snapshot to restore, or null if nothing to undo
+     */
+    fun undo(): EditorSnapshot? {
+        val snapshot = editorHistory.undo()
+        updateHistoryState()
+        return snapshot
+    }
+    
+    /**
+     * Redo the last undone change.
+     * 
+     * @return Snapshot to restore, or null if nothing to redo
+     */
+    fun redo(): EditorSnapshot? {
+        val snapshot = editorHistory.redo()
+        updateHistoryState()
+        return snapshot
+    }
+    
+    private fun updateHistoryState() {
+        _canUndo.value = editorHistory.canUndo()
+        _canRedo.value = editorHistory.canRedo()
     }
 }
