@@ -19,8 +19,10 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
@@ -148,198 +150,196 @@ fun QueryEditorScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Toolbar
+            // Toolbar (dos grupos: izquierda y derecha)
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                // Execute/Cancel button (toggle based on running state)
-                if (uiState is QueryEditorUiState.Running) {
-                    // Cancel button (red, stop icon, circular)
-                    Button(
-                        onClick = { viewModel.cancel() },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFFF44336), // Rojo
-                            contentColor = Color.White
-                        ),
-                        shape = CircleShape,
-                        modifier = Modifier.size(48.dp),
-                        contentPadding = PaddingValues(0.dp)
-                    ) {
-                        Icon(
-                            Icons.Default.Stop,
-                            contentDescription = stringResource(R.string.cancel_button)
-                        )
-                    }
-                } else {
-                    // Execute button (green, play icon, circular)
-                    Button(
-                        onClick = {
-                            viewModel.executeStatements(sql = sqlText.text)
-                        },
-                        enabled = sqlText.text.isNotBlank(),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF4CAF50), // Verde
-                            contentColor = Color.White
-                        ),
-                        shape = CircleShape,
-                        modifier = Modifier
-                            .size(48.dp)
-                            .semantics {
-                                contentDescription = "Execute query"
-                            },
-                        contentPadding = PaddingValues(0.dp)
-                    ) {
-                        Icon(
-                            Icons.Default.PlayArrow,
-                            contentDescription = stringResource(R.string.execute_button)
-                        )
-                    }
-                }
-
-                // Open file button (icon only, circular)
-                OutlinedButton(
-                    onClick = { 
-                        openFileLauncher.launch("*/*") // Acepta todos los archivos
-                    },
+                // Grupo izquierdo: Open, Save, Clear, Add Cursor (pill shape)
+                Surface(
                     shape = CircleShape,
-                    modifier = Modifier.size(48.dp),
-                    contentPadding = PaddingValues(0.dp)
+                    color = MaterialTheme.colorScheme.surface,
+                    shadowElevation = 2.dp,
+                    modifier = Modifier.height(48.dp)
                 ) {
-                    Icon(
-                        Icons.Default.FolderOpen,
-                        contentDescription = "Open SQL file"
-                    )
-                }
-                
-                // Save button (icon only, circular)
-                OutlinedButton(
-                    onClick = { 
-                        try {
-                            // Generar nombre de archivo con timestamp
-                            val timestamp = java.text.SimpleDateFormat("yyyyMMdd_HHmmss", java.util.Locale.getDefault()).format(java.util.Date())
-                            val fileName = "query_$timestamp.sql"
-                            
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                                // Android 10+ (API 29+): Usar MediaStore
-                                // Ruta: /storage/emulated/0/Documents/MyDatabase/query/
-                                val resolver = context.contentResolver
-                                val contentValues = ContentValues().apply {
-                                    put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
-                                    put(MediaStore.MediaColumns.MIME_TYPE, "text/plain")
-                                    put(MediaStore.MediaColumns.RELATIVE_PATH, "Documents/MyDatabase/query")
-                                }
-                                
-                                val uri = resolver.insert(MediaStore.Files.getContentUri("external"), contentValues)
-                                uri?.let {
-                                    resolver.openOutputStream(it)?.use { outputStream ->
-                                        outputStream.write(sqlText.text.toByteArray())
-                                    }
-                                    android.util.Log.d("QueryEditorScreen", "✅ File saved (MediaStore): Documents/MyDatabase/query/$fileName")
-                                    savedFileName = fileName
-                                    showSaveDialog = true
-                                }
-                            } else {
-                                // Android 9 y anteriores: Acceso directo
-                                // Ruta: /storage/emulated/0/MyDatabase/query/
-                                val storageDir = android.os.Environment.getExternalStorageDirectory()
-                                val myDatabaseDir = File(storageDir, "MyDatabase")
-                                val queryDir = File(myDatabaseDir, "query")
-                                
-                                if (!queryDir.exists()) {
-                                    queryDir.mkdirs()
-                                }
-                                
-                                val file = File(queryDir, fileName)
-                                FileOutputStream(file).use { outputStream ->
-                                    outputStream.write(sqlText.text.toByteArray())
-                                }
-                                
-                                android.util.Log.d("QueryEditorScreen", "✅ File saved: ${file.absolutePath}")
-                                savedFileName = fileName
-                                showSaveDialog = true
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(0.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(horizontal = 4.dp)
+                    ) {
+                        // Open file button
+                        IconButton(
+                            onClick = { 
+                                openFileLauncher.launch("*/*")
                             }
-                        } catch (e: Exception) {
-                            android.util.Log.e("QueryEditorScreen", "❌ Error saving file", e)
-                            // TODO: Mostrar error al usuario
+                        ) {
+                            Icon(
+                                Icons.Default.FolderOpen,
+                                contentDescription = "Open SQL file",
+                                tint = MaterialTheme.colorScheme.onSurface
+                            )
                         }
-                    },
-                    enabled = sqlText.text.isNotBlank(),
-                    shape = CircleShape,
-                    modifier = Modifier.size(48.dp),
-                    contentPadding = PaddingValues(0.dp)
-                ) {
-                    Icon(
-                        Icons.Default.Save,
-                        contentDescription = "Save query"
-                    )
-                }
-                
-                // Clear button (adaptive: clear cursors or clear text, circular)
-                OutlinedButton(
-                    onClick = { 
-                        if (cursorPositions.isNotEmpty()) {
-                            // Si hay cursores (badge >= 1), limpiar solo cursores
-                            cursorPositions.clear()
-                            android.util.Log.d("QueryEditorScreen", "Cursors cleared")
-                        } else {
-                            // Si no hay cursores (badge vacío), limpiar texto
-                            sqlText = TextFieldValue("")
-                            android.util.Log.d("QueryEditorScreen", "Text cleared")
+                        
+                        // Save button
+                        IconButton(
+                            onClick = { 
+                                try {
+                                    val timestamp = java.text.SimpleDateFormat("yyyyMMdd_HHmmss", java.util.Locale.getDefault()).format(java.util.Date())
+                                    val fileName = "query_$timestamp.sql"
+                                    
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                        val resolver = context.contentResolver
+                                        val contentValues = ContentValues().apply {
+                                            put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
+                                            put(MediaStore.MediaColumns.MIME_TYPE, "text/plain")
+                                            put(MediaStore.MediaColumns.RELATIVE_PATH, "Documents/MyDatabase/query")
+                                        }
+                                        
+                                        val uri = resolver.insert(MediaStore.Files.getContentUri("external"), contentValues)
+                                        uri?.let {
+                                            resolver.openOutputStream(it)?.use { outputStream ->
+                                                outputStream.write(sqlText.text.toByteArray())
+                                            }
+                                            android.util.Log.d("QueryEditorScreen", "✅ File saved (MediaStore): Documents/MyDatabase/query/$fileName")
+                                            savedFileName = fileName
+                                            showSaveDialog = true
+                                        }
+                                    } else {
+                                        val storageDir = android.os.Environment.getExternalStorageDirectory()
+                                        val myDatabaseDir = File(storageDir, "MyDatabase")
+                                        val queryDir = File(myDatabaseDir, "query")
+                                        
+                                        if (!queryDir.exists()) {
+                                            queryDir.mkdirs()
+                                        }
+                                        
+                                        val file = File(queryDir, fileName)
+                                        FileOutputStream(file).use { outputStream ->
+                                            outputStream.write(sqlText.text.toByteArray())
+                                        }
+                                        
+                                        android.util.Log.d("QueryEditorScreen", "✅ File saved: ${file.absolutePath}")
+                                        savedFileName = fileName
+                                        showSaveDialog = true
+                                    }
+                                } catch (e: Exception) {
+                                    android.util.Log.e("QueryEditorScreen", "❌ Error saving file", e)
+                                }
+                            },
+                            enabled = sqlText.text.isNotBlank()
+                        ) {
+                            Icon(
+                                Icons.Default.Save,
+                                contentDescription = "Save query",
+                                tint = if (sqlText.text.isNotBlank()) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+                            )
                         }
-                    },
-                    shape = CircleShape,
-                    modifier = Modifier.size(48.dp),
-                    contentPadding = PaddingValues(0.dp)
-                ) {
-                    if (cursorPositions.size >= 1) {
-                        // Mostrar "|×" cuando hay 1+ cursores (badge visible)
-                        Text(
-                            text = "|×",
-                            fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
-                        )
-                    } else {
-                        // Mostrar ícono X cuando badge está vacío
-                        Icon(
-                            Icons.Default.Clear,
-                            contentDescription = stringResource(R.string.clear_button)
-                        )
-                    }
-                }
-                
-                // Add cursor button with badge
-                BadgedBox(
-                    badge = {
-                        if (cursorPositions.isNotEmpty()) {
-                            Badge {
+                        
+                        // Clear button (adaptive)
+                        IconButton(
+                            onClick = { 
+                                if (cursorPositions.isNotEmpty()) {
+                                    cursorPositions.clear()
+                                    android.util.Log.d("QueryEditorScreen", "Cursors cleared")
+                                } else {
+                                    sqlText = TextFieldValue("")
+                                    android.util.Log.d("QueryEditorScreen", "Text cleared")
+                                }
+                            }
+                        ) {
+                            if (cursorPositions.size >= 1) {
                                 Text(
-                                    text = "${cursorPositions.size}",
-                                    style = MaterialTheme.typography.labelSmall
+                                    text = "|×",
+                                    fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                            } else {
+                                Icon(
+                                    Icons.Default.Clear,
+                                    contentDescription = stringResource(R.string.clear_button),
+                                    tint = MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                        }
+                        
+                        // Add cursor button with badge
+                        BadgedBox(
+                            badge = {
+                                if (cursorPositions.isNotEmpty()) {
+                                    Badge {
+                                        Text(
+                                            text = "${cursorPositions.size}",
+                                            style = MaterialTheme.typography.labelSmall
+                                        )
+                                    }
+                                }
+                            }
+                        ) {
+                            IconButton(
+                                onClick = {
+                                    val currentPos = sqlText.selection.start
+                                    android.util.Log.d("QueryEditorScreen", "Click |+ at position $currentPos")
+                                    if (!cursorPositions.contains(currentPos)) {
+                                        cursorPositions.add(currentPos)
+                                        android.util.Log.d("QueryEditorScreen", "✅ Cursor added at $currentPos")
+                                    } else {
+                                        cursorPositions.remove(currentPos)
+                                        android.util.Log.d("QueryEditorScreen", "❌ Cursor removed from $currentPos")
+                                    }
+                                }
+                            ) {
+                                Text(
+                                    text = "|+",
+                                    fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = MaterialTheme.colorScheme.onSurface
                                 )
                             }
                         }
                     }
+                }
+                
+                // Grupo derecho: Run/Stop (pill shape)
+                Surface(
+                    shape = CircleShape,
+                    color = MaterialTheme.colorScheme.surface,
+                    shadowElevation = 2.dp,
+                    modifier = Modifier.height(48.dp)
                 ) {
-                    OutlinedButton(
-                        onClick = {
-                            val currentPos = sqlText.selection.start
-                            android.util.Log.d("QueryEditorScreen", "Click |+ at position $currentPos, cursorPositions: $cursorPositions, contains: ${cursorPositions.contains(currentPos)}")
-                            if (!cursorPositions.contains(currentPos)) {
-                                cursorPositions.add(currentPos)
-                                android.util.Log.d("QueryEditorScreen", "✅ Cursor added at $currentPos")
-                            } else {
-                                cursorPositions.remove(currentPos)
-                                android.util.Log.d("QueryEditorScreen", "❌ Cursor removed from $currentPos")
-                            }
-                        },
-                        shape = CircleShape,
-                        modifier = Modifier.size(48.dp),
-                        contentPadding = PaddingValues(0.dp)
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(0.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(horizontal = 4.dp)
                     ) {
-                        Text(
-                            text = "|+",
-                            fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
-                        )
+                        // Execute/Cancel button (toggle based on running state)
+                        if (uiState is QueryEditorUiState.Running) {
+                            // Cancel button (red stop icon)
+                            IconButton(
+                                onClick = { viewModel.cancel() }
+                            ) {
+                                Icon(
+                                    Icons.Default.Stop,
+                                    contentDescription = stringResource(R.string.cancel_button),
+                                    tint = Color(0xFFF44336) // Rojo
+                                )
+                            }
+                        } else {
+                            // Execute button (green play icon)
+                            IconButton(
+                                onClick = {
+                                    viewModel.executeStatements(sql = sqlText.text)
+                                },
+                                enabled = sqlText.text.isNotBlank()
+                            ) {
+                                Icon(
+                                    Icons.Default.PlayArrow,
+                                    contentDescription = stringResource(R.string.execute_button),
+                                    tint = if (sqlText.text.isNotBlank()) Color(0xFF4CAF50) else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+                                )
+                            }
+                        }
                     }
                 }
             }

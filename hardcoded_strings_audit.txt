@@ -1,0 +1,45 @@
+## Textos Hardcoded que necesitan traducción
+
+### QueryEditorScreen.kt (CRÍTICO - usuario visible)
+- "Update Summary" → Línea 449
+- "Rows affected: " → Línea 472
+- "Time: " → Línea 476
+- "✓ Success" → Línea 502
+- "Execution time: " → Línea 514
+- "Failed statement:" → Línea 552
+- "|×" y "|+" → Líneas 298, 340 (símbolos, OK)
+
+### TableViewerScreen.kt (CRÍTICO - usuario visible)
+- "Tipo: " → Línea 232
+- "Nullable: " → Línea 236
+- "Sí" / "No" → Línea 236
+- "Clave: " → Línea 241
+- "Default: " → Línea 248
+- "Extra: " → Línea 254
+
+### TableCardContent.kt (CRÍTICO - usuario visible)
+- "Value" → Línea 355 (label)
+- "Cancel" → Línea 368 (ya existe action_cancel)
+- "Save" → Línea 374 (ya existe action_save)
+
+### DatabaseTypeCard.kt
+- "Agregar \" → Línea 153
+
+### HeroConnectionCard.kt
+- "Inactiva" → Línea 156
+
+### IOSDropdownField.kt
+- "No results" → Línea 218
+
+### EmptyState.kt (Preview solamente)
+- "Nueva conexión" → Línea 122 (preview)
+
+### ConnectionsListScreen.kt (Preview/Headers)
+- "Connections" → Línea 169
+- "Select Database Type" → Línea 311
+
+### AddDatabaseScreen.kt (Headers)
+- "DATABASE" → Línea 175
+- "Default" → Línea 247
+
+Total: ~20 strings hardcoded que necesitan ir a strings.xml
