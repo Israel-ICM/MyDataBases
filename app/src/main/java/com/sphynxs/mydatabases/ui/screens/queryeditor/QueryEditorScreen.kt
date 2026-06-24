@@ -234,11 +234,9 @@ fun QueryEditorScreen(
                                 if (sqlText.text.isNotBlank()) {
                                     // Push current state to history before formatting
                                     viewModel.pushHistory(
-                                        EditorSnapshot(
-                                            text = sqlText.text,
-                                            selection = sqlText.selection,
-                                            cursorPositions = cursorPositions.toList()
-                                        )
+                                        text = sqlText.text,
+                                        selection = sqlText.selection,
+                                        cursorPositions = cursorPositions.toList()
                                     )
                                     
                                     // Format SQL
@@ -252,11 +250,9 @@ fun QueryEditorScreen(
                                         
                                         // Push formatted state to history
                                         viewModel.pushHistory(
-                                            EditorSnapshot(
-                                                text = formatted,
-                                                selection = TextRange(0),
-                                                cursorPositions = emptyList()
-                                            )
+                                            text = formatted,
+                                            selection = TextRange(0),
+                                            cursorPositions = emptyList()
                                         )
                                     }
                                 }
@@ -432,11 +428,9 @@ fun QueryEditorScreen(
                             onClick = {
                                 // Push current state to history before formatting
                                 viewModel.pushHistory(
-                                    EditorSnapshot(
-                                        text = sqlText.text,
-                                        selection = sqlText.selection,
-                                        cursorPositions = cursorPositions.toList()
-                                    )
+                                    text = sqlText.text,
+                                    selection = sqlText.selection,
+                                    cursorPositions = cursorPositions.toList()
                                 )
                                 
                                 // Format SQL
@@ -450,11 +444,9 @@ fun QueryEditorScreen(
                                     
                                     // Push formatted state to history (enables undo)
                                     viewModel.pushHistory(
-                                        EditorSnapshot(
-                                            text = formatted,
-                                            selection = TextRange(0),
-                                            cursorPositions = emptyList()
-                                        )
+                                        text = formatted,
+                                        selection = TextRange(0),
+                                        cursorPositions = emptyList()
                                     )
                                 }
                             },
