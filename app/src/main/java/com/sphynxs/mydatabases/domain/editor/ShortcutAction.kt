@@ -15,4 +15,10 @@ sealed interface ShortcutAction {
     
     /** Redo last undone change (Ctrl+Y or Ctrl+Shift+Z) */
     data object Redo : ShortcutAction
+    
+    /** Format SQL (Ctrl+Shift+F) */
+    data object Format : ShortcutAction
+    
+    /** Trigger code completion (Ctrl+Space) */
+    data object TriggerCompletion : ShortcutAction
 }
