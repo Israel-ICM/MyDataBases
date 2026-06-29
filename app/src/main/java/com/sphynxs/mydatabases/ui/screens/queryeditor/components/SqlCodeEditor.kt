@@ -354,7 +354,10 @@ fun SqlCodeEditor(
                         .focusProperties {
                             // Deshabilitar navegación de foco con flechas
                             // Las flechas solo deben mover el cursor dentro del editor
-                            canFocus = true
+                            up = androidx.compose.ui.focus.FocusRequester.Cancel
+                            down = androidx.compose.ui.focus.FocusRequester.Cancel
+                            left = androidx.compose.ui.focus.FocusRequester.Cancel
+                            right = androidx.compose.ui.focus.FocusRequester.Cancel
                         }
                         .onPreviewKeyEvent { keyEvent ->
                             // Completion navigation (highest priority)
@@ -399,17 +402,13 @@ fun SqlCodeEditor(
                             }
                         }
                         .onKeyEvent { keyEvent ->
-                            // IMPORTANTE: Consumir TODOS los eventos de teclado después de procesarlos
-                            // para que NO se propaguen al sistema de navegación de foco
-                            // Esto previene que las flechas cambien el foco entre componentes
-                            
                             // Bloquear Enter/Tab si popup está visible
                             if (showCompletionPopup && (keyEvent.key == Key.Enter || keyEvent.key == Key.Tab)) {
                                 return@onKeyEvent true
                             }
                             
-                            // Consumir TODOS los eventos para evitar navegación de foco
-                            true
+                            // NO consumir eventos - dejar que BasicTextField los maneje
+                            false
                         }
                         .pointerInput(multiCursorMode, isCtrlPressed) {
                             detectTapGestures { offset ->
