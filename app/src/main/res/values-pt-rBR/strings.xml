@@ -180,4 +180,9 @@
     <string name="replace_label">Substituir</string>
     <string name="replace_one">Substituir</string>
     <string name="replace_all">Substituir tudo</string>
+    
+    <!-- Multi-cursor (MC-1, MC-2, MC-5) -->
+    <string name="add_cursor_below">Adicionar cursor abaixo</string>
+    <string name="add_cursor_above">Adicionar cursor acima</string>
+    <string name="no_more_occurrences">Sem mais ocorrências</string>
 </resources>

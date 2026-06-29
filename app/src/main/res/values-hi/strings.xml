@@ -180,4 +180,9 @@
     <string name="replace_label">बदलें</string>
     <string name="replace_one">बदलें</string>
     <string name="replace_all">सभी बदलें</string>
+    
+    <!-- Multi-cursor (MC-1, MC-2, MC-5) -->
+    <string name="add_cursor_below">नीचे कर्सर जोड़ें</string>
+    <string name="add_cursor_above">ऊपर कर्सर जोड़ें</string>
+    <string name="no_more_occurrences">कोई और मिलान नहीं</string>
 </resources>

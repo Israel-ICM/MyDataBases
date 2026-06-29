@@ -184,4 +184,9 @@
     <string name="replace_label">Reemplazar</string>
     <string name="replace_one">Reemplazar</string>
     <string name="replace_all">Reemplazar todo</string>
+    
+    <!-- Multi-cursor (MC-1, MC-2, MC-5) -->
+    <string name="add_cursor_below">Agregar cursor abajo</string>
+    <string name="add_cursor_above">Agregar cursor arriba</string>
+    <string name="no_more_occurrences">No hay más coincidencias</string>
 </resources>

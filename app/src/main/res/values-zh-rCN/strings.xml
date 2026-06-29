@@ -180,4 +180,9 @@
     <string name="replace_label">替换</string>
     <string name="replace_one">替换</string>
     <string name="replace_all">全部替换</string>
+    
+    <!-- Multi-cursor (MC-1, MC-2, MC-5) -->
+    <string name="add_cursor_below">在下方添加光标</string>
+    <string name="add_cursor_above">在上方添加光标</string>
+    <string name="no_more_occurrences">没有更多匹配项</string>
 </resources>

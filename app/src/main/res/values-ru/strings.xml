@@ -180,4 +180,9 @@
     <string name="replace_label">Заменить</string>
     <string name="replace_one">Заменить</string>
     <string name="replace_all">Заменить все</string>
+    
+    <!-- Multi-cursor (MC-1, MC-2, MC-5) -->
+    <string name="add_cursor_below">Добавить курсор ниже</string>
+    <string name="add_cursor_above">Добавить курсор выше</string>
+    <string name="no_more_occurrences">Больше нет совпадений</string>
 </resources>

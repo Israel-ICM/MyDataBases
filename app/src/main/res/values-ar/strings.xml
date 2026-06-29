@@ -180,4 +180,9 @@
     <string name="replace_label">استبدال</string>
     <string name="replace_one">استبدال</string>
     <string name="replace_all">استبدال الكل</string>
+    
+    <!-- Multi-cursor (MC-1, MC-2, MC-5) -->
+    <string name="add_cursor_below">إضافة مؤشر أسفل</string>
+    <string name="add_cursor_above">إضافة مؤشر أعلى</string>
+    <string name="no_more_occurrences">لا مزيد من التطابقات</string>
 </resources>
