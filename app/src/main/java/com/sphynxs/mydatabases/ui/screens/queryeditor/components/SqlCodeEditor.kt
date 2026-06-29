@@ -141,10 +141,25 @@ fun SqlCodeEditor(
     val handleValueChange: (TextFieldValue) -> Unit = { newValue ->
         android.util.Log.d("SqlCodeEditor", "handleValueChange called. Cursors: ${cursorPositions.size}, oldText.length: ${value.text.length}, newText.length: ${newValue.text.length}")
         
+        // Task 4.4.2 — TDD GREEN: Auto-close brackets (BR-3, BR-4, BR-5)
+        val valueAfterAutoClose = if (cursorPositions.isEmpty()) {
+            // For BR-5 check, we need full tokenization to detect if cursor is inside string/comment
+            // Performance: only tokenize on single-char insert (auto-close candidates)
+            val fullTokens = if (newValue.text.length == value.text.length + 1) {
+                SqlTokenizer.tokenize(newValue.text)
+            } else {
+                emptyList()
+            }
+            
+            applyAutoCloseBrackets(value, newValue, fullTokens)
+        } else {
+            newValue // Skip auto-close when multi-cursor active
+        }
+        
         if (cursorPositions.isEmpty()) {
             // Sin multi-cursor, comportamiento normal
             android.util.Log.d("SqlCodeEditor", "No cursors, normal behavior")
-            onValueChange(newValue)
+            onValueChange(valueAfterAutoClose)
         } else {
             android.util.Log.d("SqlCodeEditor", "Multi-cursor active with ${cursorPositions.size} cursors at positions: $cursorPositions")
             // Con multi-cursor, aplicar cambios en todas las posiciones
@@ -427,4 +442,61 @@ fun SqlCodeEditor(
             }
         }
     }
+}
+
+/**
+ * Auto-close brackets helper function (BR-3, BR-4, BR-5).
+ *
+ * Task 4.4.3 — TDD GREEN implementation.
+ *
+ * Handles six pairs: (), [], {}, '', "", ``
+ * Does NOT trigger inside STRING or COMMENT tokens (BR-5).
+ *
+ * @param oldValue Previous TextFieldValue
+ * @param newValue New TextFieldValue after user input
+ * @param tokens Current tokenization result (full text tokens)
+ * @return Modified TextFieldValue with closing bracket inserted, or unchanged if no auto-close
+ */
+internal fun applyAutoCloseBrackets(
+    oldValue: TextFieldValue,
+    newValue: TextFieldValue,
+    tokens: List<SqlToken>
+): TextFieldValue {
+    // Only auto-close on single-character insertion
+    if (newValue.text.length != oldValue.text.length + 1) {
+        return newValue
+    }
+    
+    // Check if inserted character is an opening bracket
+    val insertedChar = newValue.text[newValue.selection.start - 1]
+    val closingChar = when (insertedChar) {
+        '(' -> ')'
+        '[' -> ']'
+        '{' -> '}'
+        '\'' -> '\''
+        '"' -> '"'
+        '`' -> '`'
+        else -> return newValue // Not a bracket
+    }
+    
+    // BR-5: Check if cursor is inside STRING or COMMENT token
+    val cursorOffset = newValue.selection.start
+    val tokenAtCursor = tokens.find { cursorOffset - 1 in it.range }
+    
+    if (tokenAtCursor != null && 
+        (tokenAtCursor.kind == TokenKind.STRING || tokenAtCursor.kind == TokenKind.COMMENT)) {
+        // Inside string/comment, do NOT auto-close
+        return newValue
+    }
+    
+    // Insert closing bracket
+    val textWithClose = newValue.text.substring(0, cursorOffset) + 
+                       closingChar + 
+                       newValue.text.substring(cursorOffset)
+    
+    // Keep cursor between the pair
+    return TextFieldValue(
+        text = textWithClose,
+        selection = TextRange(cursorOffset)
+    )
 }
