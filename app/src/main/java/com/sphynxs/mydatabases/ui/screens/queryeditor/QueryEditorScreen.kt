@@ -259,10 +259,20 @@ fun QueryEditorScreen(
                                     // TODO: Scroll to previous match
                                 },
                                 onReplaceOne = {
-                                    // TODO: Implement replace one
+                                    // FR-10: Replace current match
+                                    val result = viewModel.replaceCurrentMatch(sqlText.text)
+                                    if (result != null) {
+                                        val (newText, newCursorPos) = result
+                                        sqlText = sqlText.copy(
+                                            text = newText,
+                                            selection = androidx.compose.ui.text.TextRange(newCursorPos)
+                                        )
+                                    }
                                 },
                                 onReplaceAll = {
-                                    // TODO: Implement replace all
+                                    // FR-11: Replace all matches (single undo entry)
+                                    val newText = viewModel.replaceAllMatches(sqlText.text)
+                                    sqlText = sqlText.copy(text = newText)
                                 },
                                 onClose = {
                                     viewModel.closeFind()

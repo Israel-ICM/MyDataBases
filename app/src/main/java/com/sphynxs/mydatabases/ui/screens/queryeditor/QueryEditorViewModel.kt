@@ -410,6 +410,56 @@ class QueryEditorViewModel @Inject constructor(
         val newIndex = _currentMatchIndex.value - 1
         _currentMatchIndex.value = if (newIndex < 0) matches.size - 1 else newIndex
     }
+
+    /**
+     * Replace current match (FR-10).
+     * Returns new text and updated cursor position.
+     */
+    fun replaceCurrentMatch(text: String): Pair<String, Int>? {
+        val matches = _findMatches.value
+        val currentIndex = _currentMatchIndex.value
+        
+        if (matches.isEmpty() || currentIndex < 0 || currentIndex >= matches.size) {
+            return null
+        }
+        
+        val currentMatch = matches[currentIndex]
+        val newText = com.sphynxs.mydatabases.domain.editor.FindReplaceEngine.replaceOne(
+            text = text,
+            matchRange = currentMatch,
+            replaceText = _replaceText.value
+        )
+        
+        // Update cursor position to after replacement
+        val newCursorPos = currentMatch.start + _replaceText.value.length
+        
+        // Refresh matches with new text
+        updateFindQuery(_findQuery.value, newText)
+        
+        return Pair(newText, newCursorPos)
+    }
+
+    /**
+     * Replace all matches (FR-11: atomic operation for single undo).
+     * Returns new text.
+     */
+    fun replaceAllMatches(text: String): String {
+        if (_findMatches.value.isEmpty()) return text
+        
+        val newText = com.sphynxs.mydatabases.domain.editor.FindReplaceEngine.replaceAll(
+            text = text,
+            query = _findQuery.value,
+            replaceText = _replaceText.value,
+            matchCase = _matchCase.value,
+            wholeWord = _wholeWord.value,
+            useRegex = _useRegex.value
+        )
+        
+        // Refresh matches (will be empty after replace all)
+        updateFindQuery(_findQuery.value, newText)
+        
+        return newText
+    }
 }
 
 enum class FindReplaceMode {
