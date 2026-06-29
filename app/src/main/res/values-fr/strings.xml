@@ -163,4 +163,10 @@
     <string name="completion_empty">No suggestions</string>
     <string name="completion_loading_schema">Loading schema…</string>
     <string name="completion_keywords_only">Keywords only (no database selected)</string>
+    
+    <!-- Bracket matching (BR-1, BR-2) -->
+    <string name="bracket_matching_aria_label">Parenthèse correspondante mise en surbrillance</string>
+    <string name="bracket_jump_shortcut">Aller à la parenthèse correspondante</string>
+    <string name="bracket_no_match">Aucune parenthèse correspondante trouvée</string>
+    <string name="bracket_auto_close_enabled">Fermeture automatique des parenthèses activée</string>
 </resources>

@@ -167,4 +167,10 @@
     <string name="completion_keywords_only">Solo palabras clave (sin base de datos seleccionada)</string>
     <string name="completion_column_type_separator"> : </string>
     <string name="completion_popup_title">Autocompletado</string>
+    
+    <!-- Bracket matching (BR-1, BR-2) -->
+    <string name="bracket_matching_aria_label">Paréntesis coincidente resaltado</string>
+    <string name="bracket_jump_shortcut">Saltar al paréntesis coincidente</string>
+    <string name="bracket_no_match">No se encontró paréntesis coincidente</string>
+    <string name="bracket_auto_close_enabled">Cierre automático de paréntesis activado</string>
 </resources>

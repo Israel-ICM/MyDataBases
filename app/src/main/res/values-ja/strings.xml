@@ -163,4 +163,10 @@
     <string name="completion_empty">No suggestions</string>
     <string name="completion_loading_schema">Loading schema…</string>
     <string name="completion_keywords_only">Keywords only (no database selected)</string>
+    
+    <!-- Bracket matching (BR-1, BR-2) -->
+    <string name="bracket_matching_aria_label">一致する括弧がハイライト表示されました</string>
+    <string name="bracket_jump_shortcut">一致する括弧にジャンプ</string>
+    <string name="bracket_no_match">一致する括弧が見つかりません</string>
+    <string name="bracket_auto_close_enabled">括弧の自動閉じが有効</string>
 </resources>

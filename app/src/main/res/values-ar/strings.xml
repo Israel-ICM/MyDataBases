@@ -163,4 +163,10 @@
     <string name="completion_empty">No suggestions</string>
     <string name="completion_loading_schema">Loading schema…</string>
     <string name="completion_keywords_only">Keywords only (no database selected)</string>
+    
+    <!-- Bracket matching (BR-1, BR-2) -->
+    <string name="bracket_matching_aria_label">تم تمييز القوس المطابق</string>
+    <string name="bracket_jump_shortcut">الانتقال إلى القوس المطابق</string>
+    <string name="bracket_no_match">لم يتم العثور على قوس مطابق</string>
+    <string name="bracket_auto_close_enabled">إغلاق الأقواس التلقائي مفعّل</string>
 </resources>

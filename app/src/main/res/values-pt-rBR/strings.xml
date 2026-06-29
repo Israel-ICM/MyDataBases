@@ -163,4 +163,10 @@
     <string name="completion_empty">No suggestions</string>
     <string name="completion_loading_schema">Loading schema…</string>
     <string name="completion_keywords_only">Keywords only (no database selected)</string>
+    
+    <!-- Bracket matching (BR-1, BR-2) -->
+    <string name="bracket_matching_aria_label">Colchete correspondente destacado</string>
+    <string name="bracket_jump_shortcut">Pular para o colchete correspondente</string>
+    <string name="bracket_no_match">Nenhum colchete correspondente encontrado</string>
+    <string name="bracket_auto_close_enabled">Fechamento automático de colchetes ativado</string>
 </resources>

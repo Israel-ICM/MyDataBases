@@ -163,4 +163,10 @@
     <string name="completion_empty">No suggestions</string>
     <string name="completion_loading_schema">Loading schema…</string>
     <string name="completion_keywords_only">Keywords only (no database selected)</string>
+    
+    <!-- Bracket matching (BR-1, BR-2) -->
+    <string name="bracket_matching_aria_label">मिलान ब्रैकेट हाइलाइट किया गया</string>
+    <string name="bracket_jump_shortcut">मिलान ब्रैकेट पर जाएं</string>
+    <string name="bracket_no_match">कोई मिलान ब्रैकेट नहीं मिला</string>
+    <string name="bracket_auto_close_enabled">ऑटो-क्लोज़ ब्रैकेट सक्षम</string>
 </resources>
