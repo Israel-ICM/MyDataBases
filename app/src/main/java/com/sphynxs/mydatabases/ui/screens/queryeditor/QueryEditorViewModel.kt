@@ -6,11 +6,13 @@ import androidx.lifecycle.viewModelScope
 import com.sphynxs.mydatabases.domain.completion.CompletionSuggestion
 import com.sphynxs.mydatabases.domain.completion.SchemaSnapshot
 import com.sphynxs.mydatabases.domain.completion.SqlCompletionProvider
+import com.sphynxs.mydatabases.domain.editor.BracketMatcher
 import com.sphynxs.mydatabases.domain.editor.EditorHistory
 import com.sphynxs.mydatabases.domain.editor.EditorSnapshot
 import com.sphynxs.mydatabases.domain.models.StatementResult
 import com.sphynxs.mydatabases.domain.usecases.ExecuteBatchStatementsUseCase
 import com.sphynxs.mydatabases.domain.usecases.LoadSchemaSnapshotUseCase
+import com.sphynxs.mydatabases.ui.screens.queryeditor.components.SqlTokenizer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Job
@@ -262,5 +264,49 @@ class QueryEditorViewModel @Inject constructor(
      */
     fun getSuggestions(prefix: String, context: String): List<CompletionSuggestion> {
         return SqlCompletionProvider.getSuggestions(prefix, context, _schemaSnapshot.value)
+    }
+    
+    companion object {
+        /**
+         * Compute bracket pair at cursor position.
+         *
+         * Task 4.2.2 — TDD GREEN: Pure function to compute bracket pair from text and cursor offset.
+         *
+         * @param text SQL text
+         * @param cursorOffset Cursor position
+         * @return Pair of (openBracketOffset, closeBracketOffset) or null if not adjacent to bracket
+         */
+        fun computeBracketPairAtCursor(text: String, cursorOffset: Int): Pair<Int, Int>? {
+            val tokens = SqlTokenizer.tokenize(text)
+            val matchingOffset = BracketMatcher.findMatchingBracket(text, tokens, cursorOffset)
+                ?: return null
+            
+            // Determine which offset is the bracket we're adjacent to
+            // BracketMatcher checks both charBeforeCursor and charAtCursor
+            val charBeforeCursor = if (cursorOffset - 1 in text.indices) text[cursorOffset - 1] else null
+            val charAtCursor = if (cursorOffset in text.indices) text[cursorOffset] else null
+            
+            val openBrackets = setOf('(', '[', '{')
+            val closeBrackets = setOf(')', ']', '}')
+            val quoteBrackets = setOf('\'', '"', '`')
+            
+            // Find which bracket we're adjacent to and its offset
+            val (bracketOffset, isOpen) = when {
+                charBeforeCursor in openBrackets -> (cursorOffset - 1) to true
+                charBeforeCursor in closeBrackets -> (cursorOffset - 1) to false
+                charBeforeCursor in quoteBrackets -> (cursorOffset - 1) to true // quotes are both open and close
+                charAtCursor in openBrackets -> cursorOffset to true
+                charAtCursor in closeBrackets -> cursorOffset to false
+                charAtCursor in quoteBrackets -> cursorOffset to true
+                else -> return null
+            }
+            
+            // Return pair with open bracket first, close bracket second
+            return if (isOpen) {
+                Pair(bracketOffset, matchingOffset)
+            } else {
+                Pair(matchingOffset, bracketOffset)
+            }
+        }
     }
 }

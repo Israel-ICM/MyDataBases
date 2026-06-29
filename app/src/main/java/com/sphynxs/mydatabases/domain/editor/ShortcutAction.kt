@@ -21,4 +21,7 @@ sealed interface ShortcutAction {
     
     /** Trigger code completion (Ctrl+Space) */
     data object TriggerCompletion : ShortcutAction
+    
+    /** Jump to matching bracket (Ctrl+Shift+\) - BR-2 */
+    data object JumpToMatchingBracket : ShortcutAction
 }

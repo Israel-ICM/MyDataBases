@@ -67,7 +67,7 @@ object SqlTokenizer {
             Regex("""<>|!=|<=|>=|&&|\|\||<<|>>|<|>|=|\+|-|\*|/|%""") to TokenKind.OPERATOR,
 
             // 9. Punctuation
-            Regex("""[(),;.]""") to TokenKind.PUNCTUATION,
+            Regex("""[(),;.\[\]{}]""") to TokenKind.PUNCTUATION,
 
             // 10. Identifiers (nombres de tablas/columnas: letras, números, underscore)
             Regex("""[a-zA-Z_][a-zA-Z0-9_]*""") to TokenKind.IDENTIFIER,

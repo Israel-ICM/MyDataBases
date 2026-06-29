@@ -419,6 +419,26 @@ fun QueryEditorScreen(
                                     showCompletionPopup = completionSuggestions.isNotEmpty()
                                 }
                             }
+                            com.sphynxs.mydatabases.domain.editor.ShortcutAction.JumpToMatchingBracket -> {
+                                // BR-2: Jump to matching bracket (Ctrl+Shift+\)
+                                // Disable if multi-cursor active
+                                if (cursorPositions.isNotEmpty()) {
+                                    return@SqlCodeEditor
+                                }
+                                
+                                // Tokenize current text
+                                val tokens = com.sphynxs.mydatabases.ui.screens.queryeditor.components.SqlTokenizer.tokenize(sqlText.text)
+                                val matchingOffset = com.sphynxs.mydatabases.domain.editor.BracketMatcher.findMatchingBracket(
+                                    text = sqlText.text,
+                                    tokens = tokens,
+                                    cursorOffset = sqlText.selection.start
+                                )
+                                
+                                // Jump cursor to matching bracket (BR-7: graceful if no match)
+                                if (matchingOffset != null) {
+                                    sqlText = sqlText.copy(selection = androidx.compose.ui.text.TextRange(matchingOffset))
+                                }
+                            }
                         }
                     },
                     modifier = Modifier
