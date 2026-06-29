@@ -169,4 +169,15 @@
     <string name="bracket_jump_shortcut">Перейти к соответствующей скобке</string>
     <string name="bracket_no_match">Соответствующая скобка не найдена</string>
     <string name="bracket_auto_close_enabled">Автозакрытие скобок включено</string>
+    
+    <!-- Find & Replace (FR-1 through FR-15) -->
+    <string name="find_label">Найти</string>
+    <string name="find_no_matches">Нет совпадений</string>
+    <string name="find_close">Закрыть поиск</string>
+    <string name="find_match_case">Учитывать регистр</string>
+    <string name="find_whole_word">Целое слово</string>
+    <string name="find_regex">Regex</string>
+    <string name="replace_label">Заменить</string>
+    <string name="replace_one">Заменить</string>
+    <string name="replace_all">Заменить все</string>
 </resources>

@@ -169,4 +169,15 @@
     <string name="bracket_jump_shortcut">Aller à la parenthèse correspondante</string>
     <string name="bracket_no_match">Aucune parenthèse correspondante trouvée</string>
     <string name="bracket_auto_close_enabled">Fermeture automatique des parenthèses activée</string>
+    
+    <!-- Find & Replace (FR-1 through FR-15) -->
+    <string name="find_label">Rechercher</string>
+    <string name="find_no_matches">Aucune correspondance</string>
+    <string name="find_close">Fermer la recherche</string>
+    <string name="find_match_case">Respecter la casse</string>
+    <string name="find_whole_word">Mot entier</string>
+    <string name="find_regex">Regex</string>
+    <string name="replace_label">Remplacer</string>
+    <string name="replace_one">Remplacer</string>
+    <string name="replace_all">Tout remplacer</string>
 </resources>

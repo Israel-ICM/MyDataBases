@@ -169,4 +169,15 @@
     <string name="bracket_jump_shortcut">मिलान ब्रैकेट पर जाएं</string>
     <string name="bracket_no_match">कोई मिलान ब्रैकेट नहीं मिला</string>
     <string name="bracket_auto_close_enabled">ऑटो-क्लोज़ ब्रैकेट सक्षम</string>
+    
+    <!-- Find & Replace (FR-1 through FR-15) -->
+    <string name="find_label">खोजें</string>
+    <string name="find_no_matches">कोई मिलान नहीं</string>
+    <string name="find_close">खोज बंद करें</string>
+    <string name="find_match_case">केस मिलान</string>
+    <string name="find_whole_word">पूरा शब्द</string>
+    <string name="find_regex">Regex</string>
+    <string name="replace_label">बदलें</string>
+    <string name="replace_one">बदलें</string>
+    <string name="replace_all">सभी बदलें</string>
 </resources>

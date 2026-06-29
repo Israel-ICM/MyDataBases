@@ -169,4 +169,15 @@
     <string name="bracket_jump_shortcut">Zur übereinstimmenden Klammer springen</string>
     <string name="bracket_no_match">Keine übereinstimmende Klammer gefunden</string>
     <string name="bracket_auto_close_enabled">Automatisches Schließen von Klammern aktiviert</string>
+    
+    <!-- Find & Replace (FR-1 through FR-15) -->
+    <string name="find_label">Suchen</string>
+    <string name="find_no_matches">Keine Treffer</string>
+    <string name="find_close">Suche schließen</string>
+    <string name="find_match_case">Groß-/Kleinschreibung</string>
+    <string name="find_whole_word">Ganzes Wort</string>
+    <string name="find_regex">Regex</string>
+    <string name="replace_label">Ersetzen</string>
+    <string name="replace_one">Ersetzen</string>
+    <string name="replace_all">Alle ersetzen</string>
 </resources>

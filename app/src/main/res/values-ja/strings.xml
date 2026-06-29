@@ -169,4 +169,15 @@
     <string name="bracket_jump_shortcut">一致する括弧にジャンプ</string>
     <string name="bracket_no_match">一致する括弧が見つかりません</string>
     <string name="bracket_auto_close_enabled">括弧の自動閉じが有効</string>
+    
+    <!-- Find & Replace (FR-1 through FR-15) -->
+    <string name="find_label">検索</string>
+    <string name="find_no_matches">一致なし</string>
+    <string name="find_close">検索を閉じる</string>
+    <string name="find_match_case">大文字小文字を区別</string>
+    <string name="find_whole_word">単語全体</string>
+    <string name="find_regex">正規表現</string>
+    <string name="replace_label">置換</string>
+    <string name="replace_one">置換</string>
+    <string name="replace_all">すべて置換</string>
 </resources>

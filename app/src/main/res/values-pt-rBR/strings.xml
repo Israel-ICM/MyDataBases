@@ -169,4 +169,15 @@
     <string name="bracket_jump_shortcut">Pular para o colchete correspondente</string>
     <string name="bracket_no_match">Nenhum colchete correspondente encontrado</string>
     <string name="bracket_auto_close_enabled">Fechamento automático de colchetes ativado</string>
+    
+    <!-- Find & Replace (FR-1 through FR-15) -->
+    <string name="find_label">Buscar</string>
+    <string name="find_no_matches">Sem correspondências</string>
+    <string name="find_close">Fechar busca</string>
+    <string name="find_match_case">Diferenciar maiúsculas</string>
+    <string name="find_whole_word">Palavra inteira</string>
+    <string name="find_regex">Regex</string>
+    <string name="replace_label">Substituir</string>
+    <string name="replace_one">Substituir</string>
+    <string name="replace_all">Substituir tudo</string>
 </resources>

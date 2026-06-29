@@ -169,4 +169,15 @@
     <string name="bracket_jump_shortcut">الانتقال إلى القوس المطابق</string>
     <string name="bracket_no_match">لم يتم العثور على قوس مطابق</string>
     <string name="bracket_auto_close_enabled">إغلاق الأقواس التلقائي مفعّل</string>
+    
+    <!-- Find & Replace (FR-1 through FR-15) -->
+    <string name="find_label">بحث</string>
+    <string name="find_no_matches">لا توجد تطابقات</string>
+    <string name="find_close">إغلاق البحث</string>
+    <string name="find_match_case">تطابق الحالة</string>
+    <string name="find_whole_word">كلمة كاملة</string>
+    <string name="find_regex">Regex</string>
+    <string name="replace_label">استبدال</string>
+    <string name="replace_one">استبدال</string>
+    <string name="replace_all">استبدال الكل</string>
 </resources>

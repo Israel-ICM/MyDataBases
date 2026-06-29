@@ -169,4 +169,15 @@
     <string name="bracket_jump_shortcut">跳转到匹配括号</string>
     <string name="bracket_no_match">未找到匹配括号</string>
     <string name="bracket_auto_close_enabled">括号自动关闭已启用</string>
+    
+    <!-- Find & Replace (FR-1 through FR-15) -->
+    <string name="find_label">查找</string>
+    <string name="find_no_matches">无匹配项</string>
+    <string name="find_close">关闭查找</string>
+    <string name="find_match_case">区分大小写</string>
+    <string name="find_whole_word">全字匹配</string>
+    <string name="find_regex">正则表达式</string>
+    <string name="replace_label">替换</string>
+    <string name="replace_one">替换</string>
+    <string name="replace_all">全部替换</string>
 </resources>
