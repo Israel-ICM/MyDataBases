@@ -460,6 +460,100 @@ class QueryEditorViewModel @Inject constructor(
         
         return newText
     }
+    
+    // Phase 6.3: Multi-cursor ViewModel Integration
+    
+    // Internal state for multi-cursor (exposed via cursorSelections parameter in UI)
+    private var _targetColumn: Int = 0 // Cached column for Ctrl+Alt+Down/Up (Task 6.3.9)
+    
+    /**
+     * Handle Ctrl+Alt+Down: Add cursor below, preserving column (MC-1).
+     * 
+     * @param layout Text layout result for line calculations
+     * @param primarySelection Current primary cursor
+     * @param currentSelections Current cursor selections list
+     * @return Updated selections list, or null if no-op
+     */
+    fun <T : Any> handleAddCursorBelow(
+        layout: T,
+        primarySelection: TextRange,
+        currentSelections: List<TextRange>
+    ): List<TextRange>? {
+        val newCursor = MultiCursorEngine.addCursorBelow(layout, primarySelection, _targetColumn)
+        return if (newCursor != null) {
+            currentSelections + newCursor
+        } else {
+            null // No-op at last line
+        }
+    }
+    
+    /**
+     * Handle Ctrl+Alt+Up: Add cursor above, preserving column (MC-2).
+     */
+    fun <T : Any> handleAddCursorAbove(
+        layout: T,
+        primarySelection: TextRange,
+        currentSelections: List<TextRange>
+    ): List<TextRange>? {
+        val newCursor = MultiCursorEngine.addCursorAbove(layout, primarySelection, _targetColumn)
+        return if (newCursor != null) {
+            currentSelections + newCursor
+        } else {
+            null // No-op at first line
+        }
+    }
+    
+    /**
+     * Handle Ctrl+D: Select next occurrence (MC-3, MC-4, MC-5).
+     * 
+     * First press: Select word at cursor (MC-4.1)
+     * Second press: Add next occurrence (MC-4.2)
+     * No more occurrences: Show snackbar (MC-5.1)
+     * 
+     * @param text Current editor text
+     * @param selection Current primary selection
+     * @param tokens Tokens for word boundary detection
+     * @param currentSelections Current cursor selections list
+     * @param onShowSnackbar Callback to show "No more occurrences" snackbar
+     * @return Updated selection and selections list
+     */
+    fun handleSelectNextOccurrence(
+        text: String,
+        selection: TextRange,
+        tokens: List<SqlToken>,
+        currentSelections: List<TextRange>,
+        onShowSnackbar: (String) -> Unit
+    ): Pair<TextRange, List<TextRange>> {
+        // MC-4.1: First press — select word if collapsed
+        if (selection.collapsed) {
+            val wordRange = MultiCursorEngine.selectWordAtOffset(text, selection.start, tokens)
+            return Pair(wordRange, currentSelections)
+        }
+        
+        // MC-4.2: Second press — find next occurrence
+        val selectedText = text.substring(selection.start, selection.end)
+        val nextOccurrence = MultiCursorEngine.findNextOccurrence(
+            text = text,
+            selectedText = selectedText,
+            fromOffset = selection.end
+        )
+        
+        return if (nextOccurrence != null) {
+            // Append next occurrence to selections
+            Pair(selection, currentSelections + nextOccurrence)
+        } else {
+            // MC-5.1: No more occurrences — show snackbar
+            onShowSnackbar("No more occurrences") // TODO: i18n in Phase 6.6
+            Pair(selection, currentSelections)
+        }
+    }
+    
+    /**
+     * Update cached target column for Ctrl+Alt+Down/Up (Task 6.3.9).
+     */
+    fun updateTargetColumn(column: Int) {
+        _targetColumn = column
+    }
 }
 
 enum class FindReplaceMode {
