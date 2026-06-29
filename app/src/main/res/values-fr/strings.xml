@@ -184,5 +184,5 @@
     <!-- Multi-cursor (MC-1, MC-2, MC-5) -->
     <string name="add_cursor_below">Ajouter curseur en bas</string>
     <string name="add_cursor_above">Ajouter curseur en haut</string>
-    <string name="no_more_occurrences">Plus d'occurrences</string>
+    <string name="no_more_occurrences">Plus d\'occurrences</string>
 </resources>
