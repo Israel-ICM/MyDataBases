@@ -309,4 +309,110 @@ class QueryEditorViewModel @Inject constructor(
             }
         }
     }
+
+    // ========================================
+    // Find & Replace State (Phase 5.2 — PR #5)
+    // ========================================
+
+    private val _findReplaceOpen = MutableStateFlow(false)
+    val findReplaceOpen: StateFlow<Boolean> = _findReplaceOpen.asStateFlow()
+
+    private val _findReplaceMode = MutableStateFlow(FindReplaceMode.FIND)
+    val findReplaceMode: StateFlow<FindReplaceMode> = _findReplaceMode.asStateFlow()
+
+    private val _findQuery = MutableStateFlow("")
+    val findQuery: StateFlow<String> = _findQuery.asStateFlow()
+
+    private val _replaceText = MutableStateFlow("")
+    val replaceText: StateFlow<String> = _replaceText.asStateFlow()
+
+    private val _findMatches = MutableStateFlow<List<TextRange>>(emptyList())
+    val findMatches: StateFlow<List<TextRange>> = _findMatches.asStateFlow()
+
+    private val _currentMatchIndex = MutableStateFlow(-1)
+    val currentMatchIndex: StateFlow<Int> = _currentMatchIndex.asStateFlow()
+
+    private val _matchCase = MutableStateFlow(false)
+    val matchCase: StateFlow<Boolean> = _matchCase.asStateFlow()
+
+    private val _wholeWord = MutableStateFlow(false)
+    val wholeWord: StateFlow<Boolean> = _wholeWord.asStateFlow()
+
+    private val _useRegex = MutableStateFlow(false)
+    val useRegex: StateFlow<Boolean> = _useRegex.asStateFlow()
+
+    fun openFind() {
+        _findReplaceOpen.value = true
+        _findReplaceMode.value = FindReplaceMode.FIND
+    }
+
+    fun openReplace() {
+        _findReplaceOpen.value = true
+        _findReplaceMode.value = FindReplaceMode.REPLACE
+    }
+
+    fun closeFind() {
+        _findReplaceOpen.value = false
+        _findMatches.value = emptyList()
+        _currentMatchIndex.value = -1
+    }
+
+    fun updateFindQuery(query: String, text: String) {
+        _findQuery.value = query
+        
+        // Update matches
+        if (query.isEmpty()) {
+            _findMatches.value = emptyList()
+            _currentMatchIndex.value = -1
+        } else {
+            val matches = com.sphynxs.mydatabases.domain.editor.FindReplaceEngine.findAllMatches(
+                text = text,
+                query = query,
+                matchCase = _matchCase.value,
+                wholeWord = _wholeWord.value,
+                useRegex = _useRegex.value
+            )
+            _findMatches.value = matches
+            _currentMatchIndex.value = if (matches.isNotEmpty()) 0 else -1
+        }
+    }
+
+    fun updateReplaceText(text: String) {
+        _replaceText.value = text
+    }
+
+    fun toggleMatchCase(text: String) {
+        _matchCase.value = !_matchCase.value
+        updateFindQuery(_findQuery.value, text) // Refresh matches
+    }
+
+    fun toggleWholeWord(text: String) {
+        _wholeWord.value = !_wholeWord.value
+        updateFindQuery(_findQuery.value, text)
+    }
+
+    fun toggleUseRegex(text: String) {
+        _useRegex.value = !_useRegex.value
+        updateFindQuery(_findQuery.value, text)
+    }
+
+    fun navigateToNextMatch() {
+        val matches = _findMatches.value
+        if (matches.isEmpty()) return
+        
+        _currentMatchIndex.value = (_currentMatchIndex.value + 1) % matches.size
+    }
+
+    fun navigateToPreviousMatch() {
+        val matches = _findMatches.value
+        if (matches.isEmpty()) return
+        
+        val newIndex = _currentMatchIndex.value - 1
+        _currentMatchIndex.value = if (newIndex < 0) matches.size - 1 else newIndex
+    }
+}
+
+enum class FindReplaceMode {
+    FIND,
+    REPLACE
 }
