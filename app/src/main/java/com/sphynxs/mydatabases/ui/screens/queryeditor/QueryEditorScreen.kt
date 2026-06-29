@@ -525,6 +525,20 @@ fun QueryEditorScreen(
                                     viewModel.updateFindQuery(selectedText, sqlText.text)
                                 }
                             }
+                            com.sphynxs.mydatabases.domain.editor.ShortcutAction.AddCursorBelow -> {
+                                // MC-1: Add cursor below (Ctrl+Alt+Down)
+                                // TODO: Implement in Phase 6.4 UI integration
+                                // Need TextLayoutResult to calculate line positions
+                            }
+                            com.sphynxs.mydatabases.domain.editor.ShortcutAction.AddCursorAbove -> {
+                                // MC-2: Add cursor above (Ctrl+Alt+Up)
+                                // TODO: Implement in Phase 6.4 UI integration
+                            }
+                            com.sphynxs.mydatabases.domain.editor.ShortcutAction.SelectNextOccurrence -> {
+                                // MC-3/MC-4/MC-5: Select next occurrence (Ctrl+D)
+                                // TODO: Implement in Phase 6.4 UI integration
+                                // Need tokens for word selection logic
+                            }
                         }
                     },
                     modifier = Modifier
