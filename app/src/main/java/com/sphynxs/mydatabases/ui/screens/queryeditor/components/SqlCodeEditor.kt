@@ -397,7 +397,15 @@ fun SqlCodeEditor(
                             if (showCompletionPopup && (keyEvent.key == Key.Enter || keyEvent.key == Key.Tab)) {
                                 return@onKeyEvent true
                             }
-                            false
+                            
+                            // Consumir eventos de flecha para evitar navegación de foco
+                            // BasicTextField ya procesó el evento, ahora lo consumimos para que
+                            // NO se propague al sistema de navegación de UI
+                            when (keyEvent.key) {
+                                Key.DirectionUp, Key.DirectionDown,
+                                Key.DirectionLeft, Key.DirectionRight -> true
+                                else -> false
+                            }
                         }
                         .pointerInput(multiCursorMode, isCtrlPressed) {
                             detectTapGestures { offset ->
