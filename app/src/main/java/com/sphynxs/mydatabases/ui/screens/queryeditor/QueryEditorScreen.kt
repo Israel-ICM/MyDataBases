@@ -3,7 +3,6 @@ package com.sphynxs.mydatabases.ui.screens.queryeditor
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
@@ -608,7 +607,9 @@ fun QueryEditorScreen(
             }
         }
 
-            // Toolbar adaptativa pegada al editor (sin espacio)
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Toolbar adaptativa (dos grupos: izquierda y derecha)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -758,14 +759,9 @@ fun QueryEditorScreen(
                     actions = leftActions
                 )
                 
-                // Grupo derecho: Run/Stop
+                // Grupo derecho: Run/Stop (pill shape)
                 Surface(
-                    shape = RoundedCornerShape(
-                        topStart = 0.dp,
-                        topEnd = 8.dp,
-                        bottomStart = 0.dp,
-                        bottomEnd = 24.dp
-                    ),
+                    shape = CircleShape,
                     color = MaterialTheme.colorScheme.surface,
                     shadowElevation = 2.dp,
                     modifier = Modifier.height(48.dp)
@@ -1088,12 +1084,7 @@ internal fun AdaptiveToolbar(
     android.util.Log.d("AdaptiveToolbar", "screenWidth=$screenWidthDp, availableWidth=$availableWidth, maxVisible=$maxVisibleButtons, showing=${visibleActions.size}, overflow=${overflowActions.size}")
     
     Surface(
-        shape = RoundedCornerShape(
-            topStart = 8.dp,
-            topEnd = 0.dp,
-            bottomStart = 24.dp,
-            bottomEnd = 0.dp
-        ),
+        shape = CircleShape,
         color = MaterialTheme.colorScheme.surface,
         shadowElevation = 2.dp,
         modifier = modifier.height(48.dp)
