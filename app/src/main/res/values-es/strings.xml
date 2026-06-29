@@ -165,4 +165,6 @@
     <string name="completion_empty">Sin sugerencias</string>
     <string name="completion_loading_schema">Cargando esquema…</string>
     <string name="completion_keywords_only">Solo palabras clave (sin base de datos seleccionada)</string>
+    <string name="completion_column_type_separator"> : </string>
+    <string name="completion_popup_title">Autocompletado</string>
 </resources>
