@@ -1,6 +1,8 @@
 package com.sphynxs.mydatabases.domain.editor
 
 import androidx.compose.ui.text.TextRange
+import com.sphynxs.mydatabases.ui.screens.queryeditor.components.SqlToken
+import com.sphynxs.mydatabases.ui.screens.queryeditor.components.TokenKind
 
 /**
  * Pure JVM logic for multi-cursor operations (Phase 6.2 - PR #6).
@@ -110,8 +112,8 @@ object MultiCursorEngine {
     ): TextRange {
         val token = getTokenAtOffset(tokens, offset)
         
-        return if (token != null && token.type == SqlTokenType.IDENTIFIER) {
-            TextRange(token.start, token.start + token.text.length)
+        return if (token != null && token.kind == TokenKind.IDENTIFIER) {
+            TextRange(token.range.first, token.range.last + 1)
         } else {
             TextRange(offset)
         }
@@ -122,7 +124,7 @@ object MultiCursorEngine {
      */
     private fun getTokenAtOffset(tokens: List<SqlToken>, offset: Int): SqlToken? {
         return tokens.firstOrNull { token ->
-            offset >= token.start && offset < token.start + token.text.length
+            offset in token.range
         }
     }
 }

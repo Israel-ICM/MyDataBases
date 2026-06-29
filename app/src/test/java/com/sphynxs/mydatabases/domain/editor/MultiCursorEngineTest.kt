@@ -1,8 +1,8 @@
 package com.sphynxs.mydatabases.domain.editor
 
 import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.input.getTextBeforeSelection
+import com.sphynxs.mydatabases.ui.screens.queryeditor.components.SqlToken
+import com.sphynxs.mydatabases.ui.screens.queryeditor.components.TokenKind
 import org.junit.Assert.*
 import org.junit.Test
 
@@ -96,23 +96,23 @@ class MultiCursorEngineTest {
     fun `selectWordAtOffset expands to identifier boundaries when inside word`() {
         val text = "SELECT user_id FROM users"
         val tokens = listOf(
-            SqlToken(SqlTokenType.KEYWORD, "SELECT", 0),
-            SqlToken(SqlTokenType.IDENTIFIER, "user_id", 7),
-            SqlToken(SqlTokenType.KEYWORD, "FROM", 15),
-            SqlToken(SqlTokenType.IDENTIFIER, "users", 20)
+            SqlToken(range = 0..5, kind = TokenKind.KEYWORD), // "SELECT"
+            SqlToken(range = 7..13, kind = TokenKind.IDENTIFIER), // "user_id"
+            SqlToken(range = 15..18, kind = TokenKind.KEYWORD), // "FROM"
+            SqlToken(range = 20..24, kind = TokenKind.IDENTIFIER) // "users"
         )
         
         val result = MultiCursorEngine.selectWordAtOffset(text, offset = 10, tokens) // Inside "user_id"
         
-        assertEquals(TextRange(7, 14), result) // Full "user_id" range
+        assertEquals(TextRange(7, 14), result) // Full "user_id" range (range.last + 1)
     }
     
     @Test
     fun `selectWordAtOffset returns collapsed range when not inside identifier`() {
         val text = "SELECT * FROM users"
         val tokens = listOf(
-            SqlToken(SqlTokenType.KEYWORD, "SELECT", 0),
-            SqlToken(SqlTokenType.OPERATOR, "*", 7)
+            SqlToken(range = 0..5, kind = TokenKind.KEYWORD), // "SELECT"
+            SqlToken(range = 7..7, kind = TokenKind.OPERATOR) // "*"
         )
         
         val result = MultiCursorEngine.selectWordAtOffset(text, offset = 7, tokens) // On "*"
