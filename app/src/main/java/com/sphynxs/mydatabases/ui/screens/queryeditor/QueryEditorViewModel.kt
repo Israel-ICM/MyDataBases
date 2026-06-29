@@ -63,6 +63,14 @@ class QueryEditorViewModel @Inject constructor(
     private val _canRedo = MutableStateFlow(false)
     val canRedo: StateFlow<Boolean> = _canRedo.asStateFlow()
     
+    // SQL text state (para toolbar flotante)
+    private val _sqlText = MutableStateFlow("")
+    val sqlText: StateFlow<String> = _sqlText.asStateFlow()
+    
+    // Cursor positions (para multi-cursor - toolbar flotante)
+    private val _cursorPositions = MutableStateFlow<List<Int>>(emptyList())
+    val cursorPositions: StateFlow<List<Int>> = _cursorPositions.asStateFlow()
+    
     // Schema snapshot for completion
     private val _schemaSnapshot = MutableStateFlow<SchemaSnapshot?>(null)
     val schemaSnapshot: StateFlow<SchemaSnapshot?> = _schemaSnapshot.asStateFlow()
@@ -555,6 +563,27 @@ class QueryEditorViewModel @Inject constructor(
      */
     fun updateTargetColumn(column: Int) {
         _targetColumn = column
+    }
+    
+    /**
+     * Update SQL text from UI (para toolbar flotante).
+     */
+    fun updateSqlText(text: String) {
+        _sqlText.value = text
+    }
+    
+    /**
+     * Update cursor positions from UI (para toolbar flotante).
+     */
+    fun updateCursorPositions(positions: List<Int>) {
+        _cursorPositions.value = positions
+    }
+    
+    /**
+     * Clear cursor positions (para toolbar flotante Clear button).
+     */
+    fun clearCursorPositions() {
+        _cursorPositions.value = emptyList()
     }
 }
 

@@ -1,9 +1,12 @@
 package com.sphynxs.mydatabases.ui.screens.queryeditor
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.FolderOpen
@@ -115,6 +118,16 @@ fun QueryEditorScreen(
     val canUndo by viewModel.canUndo.collectAsState()
     val canRedo by viewModel.canRedo.collectAsState()
     val cursorPositions = remember { mutableStateListOf<Int>() }
+    
+    // Sync sqlText to ViewModel (para toolbar flotante)
+    LaunchedEffect(sqlText.text) {
+        viewModel.updateSqlText(sqlText.text)
+    }
+    
+    // Sync cursorPositions to ViewModel (para toolbar flotante)
+    LaunchedEffect(cursorPositions.toList()) {
+        viewModel.updateCursorPositions(cursorPositions.toList())
+    }
     
     // Load schema snapshot when databaseName changes
     LaunchedEffect(databaseName) {
@@ -607,201 +620,6 @@ fun QueryEditorScreen(
             }
         }
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Toolbar adaptativa (dos grupos: izquierda y derecha)
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                // Grupo izquierdo: acciones varias (adaptativo con overflow menu)
-                val leftActions = remember(canUndo, canRedo, sqlText.text, cursorPositions.size) {
-                    listOf(
-                        ToolbarAction(
-                            id = "find",
-                            icon = Icons.Default.Search,
-                            label = "Find",
-                            onClick = {
-                                viewModel.openFind()
-                                val selectedText = if (sqlText.selection.start != sqlText.selection.end) {
-                                    sqlText.text.substring(sqlText.selection.start, sqlText.selection.end)
-                                } else ""
-                                if (selectedText.isNotEmpty()) {
-                                    viewModel.updateFindQuery(selectedText, sqlText.text)
-                                }
-                            }
-                        ),
-                        ToolbarAction(
-                            id = "undo",
-                            icon = Icons.Default.Undo,
-                            label = "Undo",
-                            enabled = canUndo,
-                            onClick = {
-                                viewModel.undo()?.let { snapshot ->
-                                    sqlText = TextFieldValue(
-                                        text = snapshot.text,
-                                        selection = snapshot.selection
-                                    )
-                                    cursorPositions.clear()
-                                    cursorPositions.addAll(snapshot.cursorPositions)
-                                }
-                            }
-                        ),
-                        ToolbarAction(
-                            id = "redo",
-                            icon = Icons.Default.Redo,
-                            label = "Redo",
-                            enabled = canRedo,
-                            onClick = {
-                                viewModel.redo()?.let { snapshot ->
-                                    sqlText = TextFieldValue(
-                                        text = snapshot.text,
-                                        selection = snapshot.selection
-                                    )
-                                    cursorPositions.clear()
-                                    cursorPositions.addAll(snapshot.cursorPositions)
-                                }
-                            }
-                        ),
-                        ToolbarAction(
-                            id = "format",
-                            icon = Icons.Default.FormatAlignLeft,
-                            label = "Format",
-                            enabled = sqlText.text.isNotBlank(),
-                            onClick = {
-                                viewModel.pushHistory(
-                                    text = sqlText.text,
-                                    selection = sqlText.selection,
-                                    cursorPositions = cursorPositions.toList()
-                                )
-                                kotlinx.coroutines.MainScope().launch {
-                                    val formatted = viewModel.formatSql(sqlText.text)
-                                    sqlText = TextFieldValue(
-                                        text = formatted,
-                                        selection = TextRange(0)
-                                    )
-                                    cursorPositions.clear()
-                                    viewModel.pushHistory(
-                                        text = formatted,
-                                        selection = TextRange(0),
-                                        cursorPositions = emptyList()
-                                    )
-                                }
-                            }
-                        ),
-                        ToolbarAction(
-                            id = "save",
-                            icon = Icons.Default.Save,
-                            label = "Save",
-                            enabled = sqlText.text.isNotBlank(),
-                            onClick = {
-                                try {
-                                    val timestamp = java.text.SimpleDateFormat("yyyyMMdd_HHmmss", java.util.Locale.getDefault()).format(java.util.Date())
-                                    val fileName = "query_$timestamp.sql"
-                                    
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                                        val resolver = context.contentResolver
-                                        val contentValues = ContentValues().apply {
-                                            put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
-                                            put(MediaStore.MediaColumns.MIME_TYPE, "text/plain")
-                                            put(MediaStore.MediaColumns.RELATIVE_PATH, "Documents/MyDatabase/query")
-                                        }
-                                        val uri = resolver.insert(MediaStore.Files.getContentUri("external"), contentValues)
-                                        uri?.let {
-                                            resolver.openOutputStream(it)?.use { outputStream ->
-                                                outputStream.write(sqlText.text.toByteArray())
-                                            }
-                                            savedFileName = fileName
-                                            showSaveDialog = true
-                                        }
-                                    } else {
-                                        val storageDir = android.os.Environment.getExternalStorageDirectory()
-                                        val myDatabaseDir = File(storageDir, "MyDatabase")
-                                        val queryDir = File(myDatabaseDir, "query")
-                                        if (!queryDir.exists()) {
-                                            queryDir.mkdirs()
-                                        }
-                                        val file = File(queryDir, fileName)
-                                        FileOutputStream(file).use { outputStream ->
-                                            outputStream.write(sqlText.text.toByteArray())
-                                        }
-                                        savedFileName = fileName
-                                        showSaveDialog = true
-                                    }
-                                } catch (e: Exception) {
-                                    android.util.Log.e("QueryEditorScreen", "❌ Error saving file", e)
-                                }
-                            }
-                        ),
-                        ToolbarAction(
-                            id = "open",
-                            icon = Icons.Default.FolderOpen,
-                            label = "Open",
-                            onClick = { openFileLauncher.launch("*/*") }
-                        ),
-                        ToolbarAction(
-                            id = "clear",
-                            icon = Icons.Default.Clear,
-                            label = if (cursorPositions.isNotEmpty()) "Clear cursors" else "Clear",
-                            onClick = {
-                                if (cursorPositions.isNotEmpty()) {
-                                    cursorPositions.clear()
-                                } else {
-                                    sqlText = TextFieldValue("")
-                                }
-                            }
-                        )
-                    )
-                }
-                
-                AdaptiveToolbar(
-                    actions = leftActions
-                )
-                
-                // Grupo derecho: Run/Stop (pill shape)
-                Surface(
-                    shape = CircleShape,
-                    color = MaterialTheme.colorScheme.surface,
-                    shadowElevation = 2.dp,
-                    modifier = Modifier.height(48.dp)
-                ) {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(0.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(horizontal = 4.dp)
-                    ) {
-                        // Execute/Cancel button (toggle based on running state)
-                        if (uiState is QueryEditorUiState.Running) {
-                            // Cancel button (red stop icon)
-                            IconButton(
-                                onClick = { viewModel.cancel() }
-                            ) {
-                                Icon(
-                                    Icons.Default.Stop,
-                                    contentDescription = stringResource(R.string.cancel_button),
-                                    tint = Color(0xFFF44336) // Rojo
-                                )
-                            }
-                        } else {
-                            // Execute button (green play icon)
-                            IconButton(
-                                onClick = {
-                                    viewModel.executeStatements(sql = sqlText.text)
-                                },
-                                enabled = sqlText.text.isNotBlank()
-                            ) {
-                                Icon(
-                                    Icons.Default.PlayArrow,
-                                    contentDescription = stringResource(R.string.execute_button),
-                                    tint = if (sqlText.text.isNotBlank()) Color(0xFF4CAF50) else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-
             // Result pane (solo visible cuando NO está Idle)
             if (uiState !is QueryEditorUiState.Idle) {
                 Spacer(modifier = Modifier.height(16.dp))
@@ -1045,6 +863,125 @@ private fun ErrorDisplay(
                     fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
                     color = MaterialTheme.colorScheme.onErrorContainer
                 )
+            }
+        }
+    }
+}
+
+/**
+ * Toolbar row flotante para QueryEditorScreen.
+ * Renderizado FUERA del topsheet por WorkspaceOverlay.
+ */
+@Composable
+fun QueryEditorToolbarRow(
+    connectionId: String,
+    modifier: Modifier = Modifier,
+    viewModel: QueryEditorViewModel = hiltViewModel()
+) {
+    val uiState by viewModel.uiState.collectAsState()
+    val canUndo by viewModel.canUndo.collectAsState()
+    val canRedo by viewModel.canRedo.collectAsState()
+    val sqlText by viewModel.sqlText.collectAsState()
+    val cursorPositions by viewModel.cursorPositions.collectAsState()
+    
+    Row(
+        modifier = modifier.padding(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // Grupo izquierdo: acciones adaptativas
+        val leftActions = remember(canUndo, canRedo, sqlText, cursorPositions) {
+            listOf(
+                ToolbarAction(
+                    id = "find",
+                    icon = Icons.Default.Search,
+                    label = "Find",
+                    onClick = { viewModel.openFind() }
+                ),
+                ToolbarAction(
+                    id = "undo",
+                    icon = Icons.Default.Undo,
+                    label = "Undo",
+                    enabled = canUndo,
+                    onClick = { viewModel.undo() }
+                ),
+                ToolbarAction(
+                    id = "redo",
+                    icon = Icons.Default.Redo,
+                    label = "Redo",
+                    enabled = canRedo,
+                    onClick = { viewModel.redo() }
+                ),
+                ToolbarAction(
+                    id = "format",
+                    icon = Icons.Default.FormatAlignLeft,
+                    label = "Format",
+                    enabled = sqlText.isNotBlank(),
+                    onClick = { /* TODO */ }
+                ),
+                ToolbarAction(
+                    id = "save",
+                    icon = Icons.Default.Save,
+                    label = "Save",
+                    enabled = sqlText.isNotBlank(),
+                    onClick = { /* TODO */ }
+                ),
+                ToolbarAction(
+                    id = "open",
+                    icon = Icons.Default.FolderOpen,
+                    label = "Open",
+                    onClick = { /* TODO */ }
+                ),
+                ToolbarAction(
+                    id = "clear",
+                    icon = Icons.Default.Clear,
+                    label = if (cursorPositions.isNotEmpty()) "Clear cursors" else "Clear",
+                    onClick = {
+                        if (cursorPositions.isNotEmpty()) {
+                            viewModel.clearCursorPositions()
+                        } else {
+                            viewModel.updateSqlText("")
+                        }
+                    }
+                )
+            )
+        }
+        
+        AdaptiveToolbar(actions = leftActions)
+        
+        // Grupo derecho: Run/Stop
+        Surface(
+            shape = CircleShape,
+            color = MaterialTheme.colorScheme.surface,
+            shadowElevation = 2.dp,
+            modifier = Modifier.height(48.dp)
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(0.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(horizontal = 4.dp)
+            ) {
+                if (uiState is QueryEditorUiState.Running) {
+                    IconButton(onClick = { viewModel.cancel() }) {
+                        Icon(
+                            Icons.Default.Stop,
+                            contentDescription = "Cancel",
+                            tint = Color(0xFFF44336)
+                        )
+                    }
+                } else {
+                    IconButton(
+                        onClick = { viewModel.executeStatements(sql = sqlText) },
+                        enabled = sqlText.isNotBlank()
+                    ) {
+                        Icon(
+                            Icons.Default.PlayArrow,
+                            contentDescription = "Execute",
+                            tint = if (sqlText.isNotBlank()) Color(0xFF4CAF50) 
+                                  else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+                        )
+                    }
+                }
             }
         }
     }
