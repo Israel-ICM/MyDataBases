@@ -9,9 +9,11 @@ import com.sphynxs.mydatabases.domain.completion.SqlCompletionProvider
 import com.sphynxs.mydatabases.domain.editor.BracketMatcher
 import com.sphynxs.mydatabases.domain.editor.EditorHistory
 import com.sphynxs.mydatabases.domain.editor.EditorSnapshot
+import com.sphynxs.mydatabases.domain.editor.MultiCursorEngine
 import com.sphynxs.mydatabases.domain.models.StatementResult
 import com.sphynxs.mydatabases.domain.usecases.ExecuteBatchStatementsUseCase
 import com.sphynxs.mydatabases.domain.usecases.LoadSchemaSnapshotUseCase
+import com.sphynxs.mydatabases.ui.screens.queryeditor.components.SqlToken
 import com.sphynxs.mydatabases.ui.screens.queryeditor.components.SqlTokenizer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler

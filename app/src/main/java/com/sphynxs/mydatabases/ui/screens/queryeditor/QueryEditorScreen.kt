@@ -8,9 +8,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material.icons.filled.FormatAlignLeft
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Redo
 import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material.icons.filled.Undo
 import androidx.compose.material3.AlertDialog
@@ -21,6 +23,8 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -64,6 +68,19 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import androidx.compose.ui.platform.LocalConfiguration
 import android.content.res.Configuration
+import androidx.compose.ui.graphics.vector.ImageVector
+
+/**
+ * Toolbar action definition for adaptive overflow menu.
+ */
+private data class ToolbarAction(
+    val id: String,
+    val icon: ImageVector,
+    val label: String,
+    val enabled: Boolean = true,
+    val badge: String? = null,
+    val onClick: () -> Unit
+)
 
 /**
  * Pantalla del editor de queries SQL.
@@ -592,40 +609,93 @@ fun QueryEditorScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Toolbar (dos grupos: izquierda y derecha)
+            // Toolbar adaptativa (dos grupos: izquierda y derecha)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Grupo izquierdo: Open, Save, Clear, Add Cursor (pill shape)
-                Surface(
-                    shape = CircleShape,
-                    color = MaterialTheme.colorScheme.surface,
-                    shadowElevation = 2.dp,
-                    modifier = Modifier.height(48.dp)
-                ) {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(0.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(horizontal = 4.dp)
-                    ) {
-                        // Open file button
-                        IconButton(
-                            onClick = { 
-                                openFileLauncher.launch("*/*")
+                // Grupo izquierdo: acciones varias (adaptativo con overflow menu)
+                val leftActions = remember(canUndo, canRedo, sqlText.text, cursorPositions.size) {
+                    listOf(
+                        ToolbarAction(
+                            id = "find",
+                            icon = Icons.Default.Search,
+                            label = "Find",
+                            onClick = {
+                                viewModel.openFind()
+                                val selectedText = if (sqlText.selection.start != sqlText.selection.end) {
+                                    sqlText.text.substring(sqlText.selection.start, sqlText.selection.end)
+                                } else ""
+                                if (selectedText.isNotEmpty()) {
+                                    viewModel.updateFindQuery(selectedText, sqlText.text)
+                                }
                             }
-                        ) {
-                            Icon(
-                                Icons.Default.FolderOpen,
-                                contentDescription = "Open SQL file",
-                                tint = MaterialTheme.colorScheme.onSurface
-                            )
-                        }
-                        
-                        // Save button
-                        IconButton(
-                            onClick = { 
+                        ),
+                        ToolbarAction(
+                            id = "undo",
+                            icon = Icons.Default.Undo,
+                            label = "Undo",
+                            enabled = canUndo,
+                            onClick = {
+                                viewModel.undo()?.let { snapshot ->
+                                    sqlText = TextFieldValue(
+                                        text = snapshot.text,
+                                        selection = snapshot.selection
+                                    )
+                                    cursorPositions.clear()
+                                    cursorPositions.addAll(snapshot.cursorPositions)
+                                }
+                            }
+                        ),
+                        ToolbarAction(
+                            id = "redo",
+                            icon = Icons.Default.Redo,
+                            label = "Redo",
+                            enabled = canRedo,
+                            onClick = {
+                                viewModel.redo()?.let { snapshot ->
+                                    sqlText = TextFieldValue(
+                                        text = snapshot.text,
+                                        selection = snapshot.selection
+                                    )
+                                    cursorPositions.clear()
+                                    cursorPositions.addAll(snapshot.cursorPositions)
+                                }
+                            }
+                        ),
+                        ToolbarAction(
+                            id = "format",
+                            icon = Icons.Default.FormatAlignLeft,
+                            label = "Format",
+                            enabled = sqlText.text.isNotBlank(),
+                            onClick = {
+                                viewModel.pushHistory(
+                                    text = sqlText.text,
+                                    selection = sqlText.selection,
+                                    cursorPositions = cursorPositions.toList()
+                                )
+                                kotlinx.coroutines.MainScope().launch {
+                                    val formatted = viewModel.formatSql(sqlText.text)
+                                    sqlText = TextFieldValue(
+                                        text = formatted,
+                                        selection = TextRange(0)
+                                    )
+                                    cursorPositions.clear()
+                                    viewModel.pushHistory(
+                                        text = formatted,
+                                        selection = TextRange(0),
+                                        cursorPositions = emptyList()
+                                    )
+                                }
+                            }
+                        ),
+                        ToolbarAction(
+                            id = "save",
+                            icon = Icons.Default.Save,
+                            label = "Save",
+                            enabled = sqlText.text.isNotBlank(),
+                            onClick = {
                                 try {
                                     val timestamp = java.text.SimpleDateFormat("yyyyMMdd_HHmmss", java.util.Locale.getDefault()).format(java.util.Date())
                                     val fileName = "query_$timestamp.sql"
@@ -637,13 +707,11 @@ fun QueryEditorScreen(
                                             put(MediaStore.MediaColumns.MIME_TYPE, "text/plain")
                                             put(MediaStore.MediaColumns.RELATIVE_PATH, "Documents/MyDatabase/query")
                                         }
-                                        
                                         val uri = resolver.insert(MediaStore.Files.getContentUri("external"), contentValues)
                                         uri?.let {
                                             resolver.openOutputStream(it)?.use { outputStream ->
                                                 outputStream.write(sqlText.text.toByteArray())
                                             }
-                                            android.util.Log.d("QueryEditorScreen", "✅ File saved (MediaStore): Documents/MyDatabase/query/$fileName")
                                             savedFileName = fileName
                                             showSaveDialog = true
                                         }
@@ -651,175 +719,45 @@ fun QueryEditorScreen(
                                         val storageDir = android.os.Environment.getExternalStorageDirectory()
                                         val myDatabaseDir = File(storageDir, "MyDatabase")
                                         val queryDir = File(myDatabaseDir, "query")
-                                        
                                         if (!queryDir.exists()) {
                                             queryDir.mkdirs()
                                         }
-                                        
                                         val file = File(queryDir, fileName)
                                         FileOutputStream(file).use { outputStream ->
                                             outputStream.write(sqlText.text.toByteArray())
                                         }
-                                        
-                                        android.util.Log.d("QueryEditorScreen", "✅ File saved: ${file.absolutePath}")
                                         savedFileName = fileName
                                         showSaveDialog = true
                                     }
                                 } catch (e: Exception) {
                                     android.util.Log.e("QueryEditorScreen", "❌ Error saving file", e)
                                 }
-                            },
-                            enabled = sqlText.text.isNotBlank()
-                        ) {
-                            Icon(
-                                Icons.Default.Save,
-                                contentDescription = "Save query",
-                                tint = if (sqlText.text.isNotBlank()) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
-                            )
-                        }
-                        
-                        // Clear button (adaptive)
-                        IconButton(
-                            onClick = { 
+                            }
+                        ),
+                        ToolbarAction(
+                            id = "open",
+                            icon = Icons.Default.FolderOpen,
+                            label = "Open",
+                            onClick = { openFileLauncher.launch("*/*") }
+                        ),
+                        ToolbarAction(
+                            id = "clear",
+                            icon = Icons.Default.Clear,
+                            label = if (cursorPositions.isNotEmpty()) "Clear cursors" else "Clear",
+                            onClick = {
                                 if (cursorPositions.isNotEmpty()) {
                                     cursorPositions.clear()
-                                    android.util.Log.d("QueryEditorScreen", "Cursors cleared")
                                 } else {
                                     sqlText = TextFieldValue("")
-                                    android.util.Log.d("QueryEditorScreen", "Text cleared")
                                 }
                             }
-                        ) {
-                            if (cursorPositions.size >= 1) {
-                                Text(
-                                    text = "|×",
-                                    fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
-                            } else {
-                                Icon(
-                                    Icons.Default.Clear,
-                                    contentDescription = stringResource(R.string.clear_button),
-                                    tint = MaterialTheme.colorScheme.onSurface
-                                )
-                            }
-                        }
-                        
-                        // Undo button
-                        IconButton(
-                            onClick = {
-                                viewModel.undo()?.let { snapshot ->
-                                    sqlText = TextFieldValue(
-                                        text = snapshot.text,
-                                        selection = snapshot.selection
-                                    )
-                                    cursorPositions.clear()
-                                    cursorPositions.addAll(snapshot.cursorPositions)
-                                }
-                            },
-                            enabled = canUndo
-                        ) {
-                            Icon(
-                                Icons.Default.Undo,
-                                contentDescription = stringResource(R.string.undo_button),
-                                tint = if (canUndo) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
-                            )
-                        }
-                        
-                        // Redo button
-                        IconButton(
-                            onClick = {
-                                viewModel.redo()?.let { snapshot ->
-                                    sqlText = TextFieldValue(
-                                        text = snapshot.text,
-                                        selection = snapshot.selection
-                                    )
-                                    cursorPositions.clear()
-                                    cursorPositions.addAll(snapshot.cursorPositions)
-                                }
-                            },
-                            enabled = canRedo
-                        ) {
-                            Icon(
-                                Icons.Default.Redo,
-                                contentDescription = stringResource(R.string.redo_button),
-                                tint = if (canRedo) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
-                            )
-                        }
-                        
-                        // Format button
-                        IconButton(
-                            onClick = {
-                                // Push current state to history before formatting
-                                viewModel.pushHistory(
-                                    text = sqlText.text,
-                                    selection = sqlText.selection,
-                                    cursorPositions = cursorPositions.toList()
-                                )
-                                
-                                // Format SQL
-                                kotlinx.coroutines.MainScope().launch {
-                                    val formatted = viewModel.formatSql(sqlText.text)
-                                    sqlText = TextFieldValue(
-                                        text = formatted,
-                                        selection = TextRange(0) // Reset cursor to start
-                                    )
-                                    cursorPositions.clear() // Clear multi-cursors when formatting
-                                    
-                                    // Push formatted state to history (enables undo)
-                                    viewModel.pushHistory(
-                                        text = formatted,
-                                        selection = TextRange(0),
-                                        cursorPositions = emptyList()
-                                    )
-                                }
-                            },
-                            enabled = sqlText.text.isNotBlank()
-                        ) {
-                            Icon(
-                                Icons.Default.FormatAlignLeft,
-                                contentDescription = stringResource(R.string.format_button),
-                                tint = if (sqlText.text.isNotBlank()) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
-                            )
-                        }
-                        
-                        // Add cursor button with badge
-                        BadgedBox(
-                            badge = {
-                                if (cursorPositions.isNotEmpty()) {
-                                    Badge {
-                                        Text(
-                                            text = "${cursorPositions.size}",
-                                            style = MaterialTheme.typography.labelSmall
-                                        )
-                                    }
-                                }
-                            }
-                        ) {
-                            IconButton(
-                                onClick = {
-                                    val currentPos = sqlText.selection.start
-                                    android.util.Log.d("QueryEditorScreen", "Click |+ at position $currentPos")
-                                    if (!cursorPositions.contains(currentPos)) {
-                                        cursorPositions.add(currentPos)
-                                        android.util.Log.d("QueryEditorScreen", "✅ Cursor added at $currentPos")
-                                    } else {
-                                        cursorPositions.remove(currentPos)
-                                        android.util.Log.d("QueryEditorScreen", "❌ Cursor removed from $currentPos")
-                                    }
-                                }
-                            ) {
-                                Text(
-                                    text = "|+",
-                                    fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
-                            }
-                        }
-                    }
+                        )
+                    )
                 }
+                
+                AdaptiveToolbar(
+                    actions = leftActions
+                )
                 
                 // Grupo derecho: Run/Stop (pill shape)
                 Surface(
@@ -913,10 +851,151 @@ fun QueryEditorScreen(
                             is QueryEditorUiState.Idle -> {
                                 // No mostrar nada (ya está filtrado arriba)
                             }
+            }
+        }
+    }
+}
+
+/**
+ * Adaptive toolbar with overflow menu.
+ * Shows as many actions as fit, rest go to ⋮ menu.
+ */
+@Composable
+private fun AdaptiveToolbar(
+    actions: List<ToolbarAction>,
+    modifier: Modifier = Modifier
+) {
+    var showOverflowMenu by remember { mutableStateOf(false) }
+    val configuration = LocalConfiguration.current
+    val screenWidthDp = configuration.screenWidthDp.dp
+    
+    // Estimate: each button ~48dp, more button ~48dp, padding ~8dp
+    val buttonWidth = 48.dp
+    val spacing = 0.dp
+    val padding = 8.dp
+    val moreButtonWidth = 48.dp
+    
+    // Calculate how many buttons fit
+    val availableWidth = screenWidthDp - padding * 2 - moreButtonWidth
+    val maxVisibleButtons = maxOf(1, (availableWidth / (buttonWidth + spacing)).toInt())
+    
+    val visibleActions = actions.take(minOf(maxVisibleButtons, actions.size))
+    val overflowActions = actions.drop(visibleActions.size)
+    
+    Surface(
+        shape = CircleShape,
+        color = MaterialTheme.colorScheme.surface,
+        shadowElevation = 2.dp,
+        modifier = modifier.height(48.dp)
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(spacing),
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(horizontal = 4.dp)
+        ) {
+            // Visible actions
+            visibleActions.forEach { action ->
+                if (action.badge != null) {
+                    BadgedBox(
+                        badge = {
+                            Badge {
+                                Text(
+                                    text = action.badge,
+                                    style = MaterialTheme.typography.labelSmall
+                                )
+                            }
+                        }
+                    ) {
+                        IconButton(
+                            onClick = action.onClick,
+                            enabled = action.enabled
+                        ) {
+                            Icon(
+                                action.icon,
+                                contentDescription = action.label,
+                                tint = if (action.enabled) {
+                                    MaterialTheme.colorScheme.onSurface
+                                } else {
+                                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+                                }
+                            )
+                        }
+                    }
+                } else {
+                    IconButton(
+                        onClick = action.onClick,
+                        enabled = action.enabled
+                    ) {
+                        Icon(
+                            action.icon,
+                            contentDescription = action.label,
+                            tint = if (action.enabled) {
+                                MaterialTheme.colorScheme.onSurface
+                            } else {
+                                MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+                            }
+                        )
+                    }
+                }
+            }
+            
+            // Overflow menu button (⋮) if there are hidden actions
+            if (overflowActions.isNotEmpty()) {
+                Box {
+                    IconButton(onClick = { showOverflowMenu = true }) {
+                        Icon(
+                            Icons.Default.MoreVert,
+                            contentDescription = "More options",
+                            tint = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                    
+                    DropdownMenu(
+                        expanded = showOverflowMenu,
+                        onDismissRequest = { showOverflowMenu = false }
+                    ) {
+                        overflowActions.forEach { action ->
+                            DropdownMenuItem(
+                                text = { 
+                                    Row(
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Icon(
+                                            action.icon,
+                                            contentDescription = null,
+                                            tint = if (action.enabled) {
+                                                MaterialTheme.colorScheme.onSurface
+                                            } else {
+                                                MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+                                            }
+                                        )
+                                        Text(action.label)
+                                        if (action.badge != null) {
+                                            Badge {
+                                                Text(
+                                                    text = action.badge,
+                                                    style = MaterialTheme.typography.labelSmall
+                                                )
+                                            }
+                                        }
+                                    }
+                                },
+                                onClick = {
+                                    if (action.enabled) {
+                                        action.onClick()
+                                        showOverflowMenu = false
+                                    }
+                                },
+                                enabled = action.enabled
+                            )
                         }
                     }
                 }
             }
+        }
+    }
+}
         
         // Completion Bar for mobile mode (bottom-anchored)
         if (!hasPhysicalKeyboard && showCompletionPopup && completionSuggestions.isNotEmpty()) {
