@@ -1090,7 +1090,7 @@ internal fun AdaptiveToolbar(
         modifier = modifier.height(48.dp)
     ) {
         Row(
-            horizontalArrangement = Arrangement.spacedBy(spacing),
+            horizontalArrangement = Arrangement.spacedBy(0.dp),
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(horizontal = 4.dp)
         ) {
