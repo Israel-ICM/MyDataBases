@@ -174,4 +174,59 @@ class EditorHistoryTest {
         val current = history.current()
         assertEquals(listOf(10, 15, 20), current?.cursorPositions)
     }
+    
+    // Phase 6.1: Schema Migration — EditorSnapshot Dual-Field
+    
+    @Test
+    fun `push populates both cursorPositions and cursorSelections for backward compat`() {
+        // Arrange: Create snapshot with explicit selections
+        val selections = listOf(TextRange(10, 15), TextRange(20, 25))
+        val snapshot = EditorSnapshot(
+            text = "SELECT * FROM users WHERE id = 1",
+            selection = TextRange(0),
+            cursorPositions = emptyList(),
+            cursorSelections = selections,
+            timestamp = 1000
+        )
+        
+        // Act
+        history.push(snapshot)
+        val current = history.current()
+        
+        // Assert: Both fields populated
+        assertNotNull(current?.cursorSelections)
+        assertEquals(selections, current?.cursorSelections)
+        // Backward compat: cursorPositions derived from selections.start
+        assertEquals(listOf(10, 20), current?.cursorPositions)
+    }
+    
+    @Test
+    fun `undo prefers cursorSelections when present, falls back to cursorPositions`() {
+        // Arrange: Two snapshots — first with cursorSelections, second without
+        val snap1 = EditorSnapshot(
+            text = "SELECT",
+            selection = TextRange(0),
+            cursorPositions = listOf(10, 20),
+            cursorSelections = listOf(TextRange(10, 15), TextRange(20, 25)),
+            timestamp = 1000
+        )
+        val snap2 = EditorSnapshot(
+            text = "SELECT *",
+            selection = TextRange(0),
+            cursorPositions = listOf(5, 8),
+            cursorSelections = null, // Old snapshot without selections
+            timestamp = 2000
+        )
+        
+        history.push(snap1)
+        Thread.sleep(600) // Past coalescing window
+        history.push(snap2)
+        
+        // Act: Undo to snap1
+        val restored = history.undo()
+        
+        // Assert: Should restore from cursorSelections when present
+        assertNotNull(restored?.cursorSelections)
+        assertEquals(listOf(TextRange(10, 15), TextRange(20, 25)), restored?.cursorSelections)
+    }
 }

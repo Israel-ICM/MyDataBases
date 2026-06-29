@@ -19,6 +19,8 @@ class EditorHistory(
      * Applies coalescing logic: if the last snapshot is recent (within coalescingWindowMs),
      * replace it instead of adding a new one.
      *
+     * Populates both cursorPositions (backward compat) and cursorSelections (MC-8 Phase 6.1).
+     *
      * Clears the redo stack.
      *
      * @param snapshot Snapshot to push
@@ -34,7 +36,16 @@ class EditorHistory(
             undoStack.removeLast()
         }
         
-        undoStack.add(snapshot)
+        // Phase 6.1.3: Populate both fields for backward compat
+        val normalizedSnapshot = if (snapshot.cursorSelections != null) {
+            snapshot.copy(
+                cursorPositions = snapshot.cursorSelections.map { it.start }
+            )
+        } else {
+            snapshot
+        }
+        
+        undoStack.add(normalizedSnapshot)
         
         // Enforce max limit (FIFO)
         while (undoStack.size > maxSnapshots) {
