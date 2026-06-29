@@ -173,4 +173,15 @@
     <string name="bracket_jump_shortcut">Saltar al paréntesis coincidente</string>
     <string name="bracket_no_match">No se encontró paréntesis coincidente</string>
     <string name="bracket_auto_close_enabled">Cierre automático de paréntesis activado</string>
+    
+    <!-- Find & Replace (FR-1 through FR-15) -->
+    <string name="find_label">Buscar</string>
+    <string name="find_no_matches">Sin coincidencias</string>
+    <string name="find_close">Cerrar búsqueda</string>
+    <string name="find_match_case">Coincidir mayúsculas</string>
+    <string name="find_whole_word">Palabra completa</string>
+    <string name="find_regex">Regex</string>
+    <string name="replace_label">Reemplazar</string>
+    <string name="replace_one">Reemplazar</string>
+    <string name="replace_all">Reemplazar todo</string>
 </resources>
