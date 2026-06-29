@@ -85,6 +85,10 @@ fun SqlCodeEditor(
     onAddCursor: ((Int) -> Unit)? = null,
     scrollState: androidx.compose.foundation.ScrollState? = null,
     onShortcut: ((com.sphynxs.mydatabases.domain.editor.ShortcutAction) -> Unit)? = null,
+    showCompletionPopup: Boolean = false,
+    onCompletionNavigate: ((Int) -> Unit)? = null,
+    onCompletionAccept: (() -> Unit)? = null,
+    onCompletionDismiss: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     // Detectar si hay teclado físico conectado
@@ -315,6 +319,29 @@ fun SqlCodeEditor(
                         .fillMaxWidth()
                         .padding(end = 20.dp, top = 16.dp, bottom = 16.dp)
                         .onPreviewKeyEvent { keyEvent ->
+                            // Completion navigation (highest priority)
+                            if (showCompletionPopup && keyEvent.type == KeyEventType.KeyDown) {
+                                when (keyEvent.key) {
+                                    Key.DirectionDown -> {
+                                        onCompletionNavigate?.invoke(1)
+                                        return@onPreviewKeyEvent true
+                                    }
+                                    Key.DirectionUp -> {
+                                        onCompletionNavigate?.invoke(-1)
+                                        return@onPreviewKeyEvent true
+                                    }
+                                    Key.Enter, Key.Tab -> {
+                                        onCompletionAccept?.invoke()
+                                        return@onPreviewKeyEvent true
+                                    }
+                                    Key.Escape -> {
+                                        onCompletionDismiss?.invoke()
+                                        return@onPreviewKeyEvent true
+                                    }
+                                    else -> { /* continue to shortcuts */ }
+                                }
+                            }
+                            
                             // Interceptar shortcuts ANTES del input
                             if (keyEvent.type == KeyEventType.KeyDown) {
                                 val shortcut = com.sphynxs.mydatabases.domain.editor.EditorShortcuts.mapKeyEvent(keyEvent)
@@ -332,6 +359,13 @@ fun SqlCodeEditor(
                                 }
                                 else -> false
                             }
+                        }
+                        .onKeyEvent { keyEvent ->
+                            // Bloquear Enter/Tab si popup está visible (fallback por si preview no consume)
+                            if (showCompletionPopup && (keyEvent.key == Key.Enter || keyEvent.key == Key.Tab)) {
+                                return@onKeyEvent true
+                            }
+                            false
                         }
                         .pointerInput(multiCursorMode, isCtrlPressed) {
                             detectTapGestures { offset ->
