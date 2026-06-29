@@ -26,7 +26,8 @@ object EditorShortcuts {
             Key.S -> ShortcutAction.Save
             Key.Z -> if (event.isShiftPressed) ShortcutAction.Redo else ShortcutAction.Undo
             Key.Y -> ShortcutAction.Redo
-            Key.F -> if (event.isShiftPressed) ShortcutAction.Format else null
+            Key.F -> if (event.isShiftPressed) ShortcutAction.Format else ShortcutAction.Find
+            Key.H -> ShortcutAction.Replace
             Key.Spacebar -> ShortcutAction.TriggerCompletion
             Key.Backslash -> if (event.isShiftPressed) ShortcutAction.JumpToMatchingBracket else null
             else -> null

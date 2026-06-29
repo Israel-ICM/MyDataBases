@@ -55,6 +55,7 @@ import com.sphynxs.mydatabases.ui.components.ResultGrid
 import com.sphynxs.mydatabases.ui.screens.queryeditor.components.SqlCodeEditor
 import com.sphynxs.mydatabases.ui.screens.queryeditor.components.CompletionBar
 import com.sphynxs.mydatabases.ui.screens.queryeditor.components.SqlTokenizer
+import com.sphynxs.mydatabases.ui.screens.queryeditor.components.FindReplaceBar
 import com.sphynxs.mydatabases.ui.screens.queryeditor.components.TokenKind
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.FlowPreview
@@ -222,6 +223,53 @@ fun QueryEditorScreen(
                     ),
                     elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
                 ) {
+                    Column(modifier = Modifier.fillMaxSize()) {
+                        // Find & Replace bar (FR-1, FR-9)
+                        if (viewModel.findReplaceOpen.collectAsState().value) {
+                            FindReplaceBar(
+                                mode = viewModel.findReplaceMode.collectAsState().value,
+                                findQuery = viewModel.findQuery.collectAsState().value,
+                                replaceText = viewModel.replaceText.collectAsState().value,
+                                currentMatchIndex = viewModel.currentMatchIndex.collectAsState().value,
+                                totalMatches = viewModel.findMatches.collectAsState().value.size,
+                                matchCase = viewModel.matchCase.collectAsState().value,
+                                wholeWord = viewModel.wholeWord.collectAsState().value,
+                                useRegex = viewModel.useRegex.collectAsState().value,
+                                onFindQueryChange = { query ->
+                                    viewModel.updateFindQuery(query, sqlText.text)
+                                },
+                                onReplaceTextChange = { text ->
+                                    viewModel.updateReplaceText(text)
+                                },
+                                onToggleMatchCase = {
+                                    viewModel.toggleMatchCase(sqlText.text)
+                                },
+                                onToggleWholeWord = {
+                                    viewModel.toggleWholeWord(sqlText.text)
+                                },
+                                onToggleUseRegex = {
+                                    viewModel.toggleUseRegex(sqlText.text)
+                                },
+                                onNavigateNext = {
+                                    viewModel.navigateToNextMatch()
+                                    // TODO: Scroll to current match
+                                },
+                                onNavigatePrevious = {
+                                    viewModel.navigateToPreviousMatch()
+                                    // TODO: Scroll to previous match
+                                },
+                                onReplaceOne = {
+                                    // TODO: Implement replace one
+                                },
+                                onReplaceAll = {
+                                    // TODO: Implement replace all
+                                },
+                                onClose = {
+                                    viewModel.closeFind()
+                                }
+                            )
+                        }
+                        
                     SqlCodeEditor(
                     value = sqlText,
                     onValueChange = { newValue ->
@@ -439,13 +487,41 @@ fun QueryEditorScreen(
                                     sqlText = sqlText.copy(selection = androidx.compose.ui.text.TextRange(matchingOffset))
                                 }
                             }
+                            com.sphynxs.mydatabases.domain.editor.ShortcutAction.Find -> {
+                                // FR-1: Open find bar (Ctrl+F)
+                                viewModel.openFind()
+                                // Pre-populate with selected text if any
+                                val selectedText = if (sqlText.selection.start != sqlText.selection.end) {
+                                    sqlText.text.substring(sqlText.selection.start, sqlText.selection.end)
+                                } else {
+                                    ""
+                                }
+                                if (selectedText.isNotEmpty()) {
+                                    viewModel.updateFindQuery(selectedText, sqlText.text)
+                                }
+                            }
+                            com.sphynxs.mydatabases.domain.editor.ShortcutAction.Replace -> {
+                                // FR-9: Open replace bar (Ctrl+H)
+                                viewModel.openReplace()
+                                // Pre-populate with selected text
+                                val selectedText = if (sqlText.selection.start != sqlText.selection.end) {
+                                    sqlText.text.substring(sqlText.selection.start, sqlText.selection.end)
+                                } else {
+                                    ""
+                                }
+                                if (selectedText.isNotEmpty()) {
+                                    viewModel.updateFindQuery(selectedText, sqlText.text)
+                                }
+                            }
                         }
                     },
                     modifier = Modifier
                         .fillMaxSize()
+                        .weight(1f)
                         .verticalScroll(scrollState)
                 )
-            }
+                    } // Column
+                }
             
             // Completion UI (desktop popup or mobile bar)
             if (showCompletionPopup && completionSuggestions.isNotEmpty()) {

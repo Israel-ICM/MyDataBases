@@ -24,4 +24,10 @@ sealed interface ShortcutAction {
     
     /** Jump to matching bracket (Ctrl+Shift+\) - BR-2 */
     data object JumpToMatchingBracket : ShortcutAction
+    
+    /** Open find bar (Ctrl+F) - FR-1 */
+    data object Find : ShortcutAction
+    
+    /** Open replace bar (Ctrl+H) - FR-9 */
+    data object Replace : ShortcutAction
 }
