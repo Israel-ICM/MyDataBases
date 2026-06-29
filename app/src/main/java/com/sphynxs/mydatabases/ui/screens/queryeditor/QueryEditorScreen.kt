@@ -358,6 +358,8 @@ fun QueryEditorScreen(
                         lastDismissedToken = textBeforeCursor.split(Regex("\\s+")).lastOrNull() ?: ""
                         showCompletionPopup = false
                     },
+                    findMatches = viewModel.findMatches.collectAsState().value,
+                    currentMatchIndex = viewModel.currentMatchIndex.collectAsState().value,
                     onShortcut = { shortcut ->
                         when (shortcut) {
                             com.sphynxs.mydatabases.domain.editor.ShortcutAction.Run -> {

@@ -89,6 +89,8 @@ fun SqlCodeEditor(
     onCompletionNavigate: ((Int) -> Unit)? = null,
     onCompletionAccept: (() -> Unit)? = null,
     onCompletionDismiss: (() -> Unit)? = null,
+    findMatches: List<androidx.compose.ui.text.TextRange> = emptyList(),
+    currentMatchIndex: Int = -1,
     modifier: Modifier = Modifier
 ) {
     // Detectar si hay teclado físico conectado
@@ -262,8 +264,23 @@ fun SqlCodeEditor(
             }
     }
 
-    // Visual transformation con tokens actualizados
-    val visualTransformation = rememberSqlHighlightTransformation(tokens)
+    // Visual transformation con tokens actualizados + match highlighting (FR-14)
+    val syntaxHighlight = rememberSqlHighlightTransformation(tokens)
+    val matchHighlight = remember(findMatches, currentMatchIndex) {
+        if (findMatches.isNotEmpty()) {
+            MatchHighlightTransformation(findMatches, currentMatchIndex)
+        } else {
+            null
+        }
+    }
+    
+    val visualTransformation = remember(syntaxHighlight, matchHighlight) {
+        val layers = mutableListOf(syntaxHighlight)
+        if (matchHighlight != null) {
+            layers.add(matchHighlight)
+        }
+        CompositeVisualTransformation(layers)
+    }
 
     // Calcular número de líneas
     val lineCount = remember(value.text) {
