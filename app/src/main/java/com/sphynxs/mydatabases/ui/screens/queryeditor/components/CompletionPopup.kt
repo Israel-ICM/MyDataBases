@@ -22,13 +22,17 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
+import com.sphynxs.mydatabases.R
 import com.sphynxs.mydatabases.domain.completion.CompletionKind
 import com.sphynxs.mydatabases.domain.completion.CompletionSuggestion
 
@@ -62,10 +66,6 @@ fun CompletionPopup(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    if (suggestions.isEmpty()) {
-        return
-    }
-
     Popup(
         offset = anchorOffset,
         onDismissRequest = onDismiss
@@ -76,11 +76,11 @@ fun CompletionPopup(
                 .heightIn(max = 320.dp) // ~8 rows × 40dp
                 .shadow(8.dp, RoundedCornerShape(8.dp))
                 .semantics { contentDescription = "Code completion popup" },
-            shape = RoundedCornerShape(8.dp),
+            shape = RoundedCornerShape(12.dp),
             colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant
+                containerColor = Color.White
             ),
-            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+            elevation = CardDefaults.cardElevation(defaultElevation = 16.dp)
         ) {
             val listState = rememberLazyListState()
 
@@ -91,16 +91,33 @@ fun CompletionPopup(
                 }
             }
 
-            LazyColumn(
-                state = listState,
-                modifier = Modifier.padding(4.dp)
-            ) {
-                itemsIndexed(suggestions) { index, suggestion ->
-                    CompletionRow(
-                        suggestion = suggestion,
-                        isSelected = index == selectedIndex,
-                        onClick = { onSuggestionClick(suggestion) }
+            if (suggestions.isEmpty()) {
+                // Empty state
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = stringResource(R.string.completion_empty),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center
                     )
+                }
+            } else {
+                LazyColumn(
+                    state = listState,
+                    modifier = Modifier.padding(4.dp)
+                ) {
+                    itemsIndexed(suggestions) { index, suggestion ->
+                        CompletionRow(
+                            suggestion = suggestion,
+                            isSelected = index == selectedIndex,
+                            onClick = { onSuggestionClick(suggestion) }
+                        )
+                    }
                 }
             }
         }
@@ -117,18 +134,20 @@ private fun CompletionRow(
     onClick: () -> Unit
 ) {
     val backgroundColor = if (isSelected) {
-        MaterialTheme.colorScheme.primaryContainer
+        Color(0xFFF0F4FF)  // Azul muy suave para selección
     } else {
-        MaterialTheme.colorScheme.surface
+        Color.Transparent
     }
+    
+    val textColor = Color(0xFF2C3E50)  // Gris oscuro para texto principal
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .heightIn(min = 40.dp)
-            .background(backgroundColor, RoundedCornerShape(4.dp))
+            .heightIn(min = 44.dp)
+            .background(backgroundColor, RoundedCornerShape(8.dp))
             .clickable { onClick() }
-            .padding(horizontal = 12.dp, vertical = 8.dp)
+            .padding(horizontal = 16.dp, vertical = 10.dp)
             .semantics { contentDescription = "${suggestion.text} - ${suggestion.kind.name.lowercase()}" },
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -142,40 +161,28 @@ private fun CompletionRow(
             style = MaterialTheme.typography.labelSmall,
             fontWeight = FontWeight.Bold,
             color = when (suggestion.kind) {
-                CompletionKind.KEYWORD -> MaterialTheme.colorScheme.primary
-                CompletionKind.TABLE -> MaterialTheme.colorScheme.tertiary
-                CompletionKind.COLUMN -> MaterialTheme.colorScheme.secondary
+                CompletionKind.KEYWORD -> Color(0xFF5E81AC)  // Azul suave
+                CompletionKind.TABLE -> Color(0xFFA3BE8C)    // Verde suave
+                CompletionKind.COLUMN -> Color(0xFFD08770)   // Naranja suave
             },
             modifier = Modifier
-                .padding(end = 8.dp)
-                .width(16.dp)
+                .padding(end = 12.dp)
+                .width(18.dp)
         )
 
-        // Suggestion text
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = suggestion.text,
-                style = MaterialTheme.typography.bodyMedium,
-                fontFamily = FontFamily.Monospace,
-                color = if (isSelected) {
-                    MaterialTheme.colorScheme.onPrimaryContainer
-                } else {
-                    MaterialTheme.colorScheme.onSurface
-                }
-            )
-
-            // Optional detail (column type)
-            if (suggestion.detail != null) {
-                Text(
-                    text = suggestion.detail,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = if (isSelected) {
-                        MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
-                    } else {
-                        MaterialTheme.colorScheme.onSurfaceVariant
-                    }
-                )
-            }
+        // Suggestion text with optional type
+        val displayText = if (suggestion.kind == CompletionKind.COLUMN && suggestion.detail != null) {
+            "${suggestion.text} : ${suggestion.detail}"
+        } else {
+            suggestion.text
         }
+        
+        Text(
+            text = displayText,
+            style = MaterialTheme.typography.bodyMedium,
+            fontFamily = FontFamily.Monospace,
+            color = textColor,
+            modifier = Modifier.weight(1f)
+        )
     }
 }
