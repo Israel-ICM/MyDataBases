@@ -53,7 +53,16 @@ import java.io.InputStreamReader
 import com.sphynxs.mydatabases.domain.editor.EditorSnapshot
 import com.sphynxs.mydatabases.ui.components.ResultGrid
 import com.sphynxs.mydatabases.ui.screens.queryeditor.components.SqlCodeEditor
+import com.sphynxs.mydatabases.ui.screens.queryeditor.components.CompletionBar
+import com.sphynxs.mydatabases.ui.screens.queryeditor.components.SqlTokenizer
+import com.sphynxs.mydatabases.ui.screens.queryeditor.components.TokenKind
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import androidx.compose.ui.platform.LocalConfiguration
+import android.content.res.Configuration
 
 /**
  * Pantalla del editor de queries SQL.
@@ -74,6 +83,7 @@ import kotlinx.coroutines.launch
  * @author israel-icm
  * @date 2026-06-23
  */
+@OptIn(FlowPreview::class)
 @Composable
 fun QueryEditorScreen(
     connectionId: String,
@@ -101,6 +111,60 @@ fun QueryEditorScreen(
     var showCompletionPopup by remember { mutableStateOf(false) }
     var completionSuggestions by remember { mutableStateOf<List<com.sphynxs.mydatabases.domain.completion.CompletionSuggestion>>(emptyList()) }
     var selectedSuggestionIndex by remember { mutableStateOf(0) }
+    var lastDismissedToken by remember { mutableStateOf<String?>(null) }
+    
+    // Detect physical keyboard
+    val configuration = LocalConfiguration.current
+    val hasPhysicalKeyboard = remember(configuration) {
+        val keyboardType = configuration.keyboard
+        keyboardType != Configuration.KEYBOARD_NOKEYS && 
+        keyboardType != Configuration.KEYBOARD_UNDEFINED
+    }
+    
+    // Helper: check if cursor is inside string or comment
+    fun isInsideStringOrComment(text: String, cursorPos: Int): Boolean {
+        if (cursorPos == 0) return false
+        val tokens = SqlTokenizer.tokenize(text)
+        return tokens.any { token ->
+            (token.kind == TokenKind.STRING || token.kind == TokenKind.COMMENT) &&
+            cursorPos > token.range.first && cursorPos <= token.range.last
+        }
+    }
+    
+    // Auto-trigger completion with debounce (150ms)
+    val textFlow = remember { MutableStateFlow(sqlText.text) }
+    val cursorFlow = remember { MutableStateFlow(sqlText.selection.start) }
+    
+    LaunchedEffect(sqlText.text, sqlText.selection.start) {
+        textFlow.value = sqlText.text
+        cursorFlow.value = sqlText.selection.start
+    }
+    
+    LaunchedEffect(Unit) {
+        kotlinx.coroutines.flow.combine(
+            textFlow.debounce(150).distinctUntilChanged(),
+            cursorFlow.debounce(150).distinctUntilChanged()
+        ) { text, cursorPos -> text to cursorPos }
+            .collect { (text, cursorPos) ->
+                // Gating: only trigger if conditions met
+                if (cursorPositions.isNotEmpty()) return@collect // Multi-cursor active
+                if (isInsideStringOrComment(text, cursorPos)) return@collect // Inside string/comment
+                
+                // Extract prefix (word before cursor)
+                val textBeforeCursor = text.substring(0, cursorPos.coerceAtMost(text.length))
+                val lastWord = textBeforeCursor.split(Regex("\\s+")).lastOrNull() ?: ""
+                
+                // Check prefix length and dismissed token
+                if (lastWord.length >= 2 && lastWord != lastDismissedToken) {
+                    completionSuggestions = viewModel.getSuggestions(
+                        prefix = lastWord,
+                        context = textBeforeCursor
+                    )
+                    selectedSuggestionIndex = 0
+                    showCompletionPopup = completionSuggestions.isNotEmpty()
+                }
+            }
+    }
     
     // Launcher para abrir archivo SQL
     val openFileLauncher = rememberLauncherForActivityResult(
@@ -161,6 +225,34 @@ fun QueryEditorScreen(
                     SqlCodeEditor(
                     value = sqlText,
                     onValueChange = { newValue ->
+                        // Si el popup está visible y se insertó solo un newline, aceptar completion en lugar de insertar newline
+                        val isNewlineOnly = newValue.text.length == sqlText.text.length + 1 && 
+                                          newValue.text.last() == '\n'
+                        
+                        if (showCompletionPopup && isNewlineOnly) {
+                            // Aceptar la sugerencia actual
+                            if (completionSuggestions.isNotEmpty() && selectedSuggestionIndex < completionSuggestions.size) {
+                                val suggestion = completionSuggestions[selectedSuggestionIndex]
+                                val cursorPos = sqlText.selection.start
+                                val textBeforeCursor = sqlText.text.substring(0, cursorPos)
+                                val lastWord = textBeforeCursor.split(Regex("\\s+")).lastOrNull() ?: ""
+                                val textBeforeWord = textBeforeCursor.dropLast(lastWord.length)
+                                val textAfterCursor = sqlText.text.substring(cursorPos)
+                                
+                                val newText = textBeforeWord + suggestion.text + textAfterCursor
+                                val newCursorPos = (textBeforeWord + suggestion.text).length
+                                
+                                sqlText = TextFieldValue(
+                                    text = newText,
+                                    selection = TextRange(newCursorPos)
+                                )
+                                
+                                showCompletionPopup = false
+                                lastDismissedToken = null
+                            }
+                            return@SqlCodeEditor
+                        }
+                        
                         sqlText = newValue
                         // Push to history
                         viewModel.pushHistory(
@@ -172,6 +264,42 @@ fun QueryEditorScreen(
                     placeholder = "-- Enter SQL query...",
                     cursorPositions = cursorPositions,
                     scrollState = scrollState,
+                    showCompletionPopup = showCompletionPopup,
+                    onCompletionNavigate = { direction ->
+                        // Wrap selection with modulo
+                        if (completionSuggestions.isNotEmpty()) {
+                            selectedSuggestionIndex = (selectedSuggestionIndex + direction).mod(completionSuggestions.size)
+                        }
+                    },
+                    onCompletionAccept = {
+                        // Accept current selection
+                        if (completionSuggestions.isNotEmpty() && selectedSuggestionIndex < completionSuggestions.size) {
+                            val suggestion = completionSuggestions[selectedSuggestionIndex]
+                            val cursorPos = sqlText.selection.start
+                            val textBeforeCursor = sqlText.text.substring(0, cursorPos)
+                            val lastWord = textBeforeCursor.split(Regex("\\s+")).lastOrNull() ?: ""
+                            val textBeforeWord = textBeforeCursor.dropLast(lastWord.length)
+                            val textAfterCursor = sqlText.text.substring(cursorPos)
+                            
+                            val newText = textBeforeWord + suggestion.text + textAfterCursor
+                            val newCursorPos = (textBeforeWord + suggestion.text).length
+                            
+                            sqlText = TextFieldValue(
+                                text = newText,
+                                selection = TextRange(newCursorPos)
+                            )
+                            
+                            showCompletionPopup = false
+                            lastDismissedToken = null
+                        }
+                    },
+                    onCompletionDismiss = {
+                        // Remember current token to prevent re-trigger
+                        val cursorPos = sqlText.selection.start
+                        val textBeforeCursor = sqlText.text.substring(0, cursorPos)
+                        lastDismissedToken = textBeforeCursor.split(Regex("\\s+")).lastOrNull() ?: ""
+                        showCompletionPopup = false
+                    },
                     onShortcut = { shortcut ->
                         when (shortcut) {
                             com.sphynxs.mydatabases.domain.editor.ShortcutAction.Run -> {
@@ -244,7 +372,7 @@ fun QueryEditorScreen(
                                     cursorPositions.addAll(snapshot.cursorPositions)
                                 }
                             }
-                            com.sphynxs.mydatabases.ui.screens.queryeditor.domain.ShortcutAction.Format -> {
+                            com.sphynxs.mydatabases.domain.editor.ShortcutAction.Format -> {
                                 if (sqlText.text.isNotBlank()) {
                                     // Push current state to history before formatting
                                     viewModel.pushHistory(
@@ -271,7 +399,7 @@ fun QueryEditorScreen(
                                     }
                                 }
                             }
-                            com.sphynxs.mydatabases.ui.screens.queryeditor.domain.ShortcutAction.TriggerCompletion -> {
+                            com.sphynxs.mydatabases.domain.editor.ShortcutAction.TriggerCompletion -> {
                                 // Disable if multi-cursor active
                                 if (cursorPositions.isNotEmpty()) {
                                     return@SqlCodeEditor
@@ -299,34 +427,44 @@ fun QueryEditorScreen(
                 )
             }
             
-            // Completion popup
+            // Completion UI (desktop popup or mobile bar)
             if (showCompletionPopup && completionSuggestions.isNotEmpty()) {
-                com.sphynxs.mydatabases.ui.screens.queryeditor.components.CompletionPopup(
-                    suggestions = completionSuggestions,
-                    selectedIndex = selectedSuggestionIndex,
-                    anchorOffset = androidx.compose.ui.unit.IntOffset(100, 100), // Simple fixed offset for now
-                    onSuggestionClick = { suggestion ->
-                        // Insert suggestion at cursor
-                        val cursorPos = sqlText.selection.start
-                        val textBeforeCursor = sqlText.text.substring(0, cursorPos)
-                        val lastWord = textBeforeCursor.split(Regex("\\s+")).lastOrNull() ?: ""
-                        val textBeforeWord = textBeforeCursor.dropLast(lastWord.length)
-                        val textAfterCursor = sqlText.text.substring(cursorPos)
-                        
-                        val newText = textBeforeWord + suggestion.text + textAfterCursor
-                        val newCursorPos = (textBeforeWord + suggestion.text).length
-                        
-                        sqlText = TextFieldValue(
-                            text = newText,
-                            selection = TextRange(newCursorPos)
-                        )
-                        
-                        showCompletionPopup = false
-                    },
-                    onDismiss = {
-                        showCompletionPopup = false
-                    }
-                )
+                val onSuggestionClick: (com.sphynxs.mydatabases.domain.completion.CompletionSuggestion) -> Unit = { suggestion ->
+                    // Insert suggestion at cursor
+                    val cursorPos = sqlText.selection.start
+                    val textBeforeCursor = sqlText.text.substring(0, cursorPos)
+                    val lastWord = textBeforeCursor.split(Regex("\\s+")).lastOrNull() ?: ""
+                    val textBeforeWord = textBeforeCursor.dropLast(lastWord.length)
+                    val textAfterCursor = sqlText.text.substring(cursorPos)
+                    
+                    val newText = textBeforeWord + suggestion.text + textAfterCursor
+                    val newCursorPos = (textBeforeWord + suggestion.text).length
+                    
+                    sqlText = TextFieldValue(
+                        text = newText,
+                        selection = TextRange(newCursorPos)
+                    )
+                    
+                    showCompletionPopup = false
+                    lastDismissedToken = null // Clear dismissed token after accept
+                }
+                
+                if (hasPhysicalKeyboard) {
+                    // Desktop mode: floating popup
+                    com.sphynxs.mydatabases.ui.screens.queryeditor.components.CompletionPopup(
+                        suggestions = completionSuggestions,
+                        selectedIndex = selectedSuggestionIndex,
+                        anchorOffset = androidx.compose.ui.unit.IntOffset(100, 100), // Fixed offset for now
+                        onSuggestionClick = onSuggestionClick,
+                        onDismiss = {
+                            // Save current token to prevent re-trigger
+                            val cursorPos = sqlText.selection.start
+                            val textBeforeCursor = sqlText.text.substring(0, cursorPos)
+                            lastDismissedToken = textBeforeCursor.split(Regex("\\s+")).lastOrNull() ?: ""
+                            showCompletionPopup = false
+                        }
+                    )
+                }
             }
         }
 
@@ -657,7 +795,37 @@ fun QueryEditorScreen(
                     }
                 }
             }
+        
+        // Completion Bar for mobile mode (bottom-anchored)
+        if (!hasPhysicalKeyboard && showCompletionPopup && completionSuggestions.isNotEmpty()) {
+            val onSuggestionClick: (com.sphynxs.mydatabases.domain.completion.CompletionSuggestion) -> Unit = { suggestion ->
+                // Insert suggestion at cursor
+                val cursorPos = sqlText.selection.start
+                val textBeforeCursor = sqlText.text.substring(0, cursorPos)
+                val lastWord = textBeforeCursor.split(Regex("\\s+")).lastOrNull() ?: ""
+                val textBeforeWord = textBeforeCursor.dropLast(lastWord.length)
+                val textAfterCursor = sqlText.text.substring(cursorPos)
+                
+                val newText = textBeforeWord + suggestion.text + textAfterCursor
+                val newCursorPos = (textBeforeWord + suggestion.text).length
+                
+                sqlText = TextFieldValue(
+                    text = newText,
+                    selection = TextRange(newCursorPos)
+                )
+                
+                showCompletionPopup = false
+                lastDismissedToken = null // Clear dismissed token after accept
+            }
+            
+            CompletionBar(
+                suggestions = completionSuggestions,
+                selectedIndex = selectedSuggestionIndex,
+                onSuggestionClick = onSuggestionClick,
+                modifier = Modifier.fillMaxWidth()
+            )
         }
+    }
     
     // Diálogo de confirmación después de guardar
     if (showSaveDialog) {
