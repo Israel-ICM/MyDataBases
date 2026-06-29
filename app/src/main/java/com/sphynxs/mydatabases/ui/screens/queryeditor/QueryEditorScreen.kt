@@ -1061,20 +1061,27 @@ internal fun AdaptiveToolbar(
 ) {
     var showOverflowMenu by remember { mutableStateOf(false) }
     val configuration = LocalConfiguration.current
-    val screenWidthDp = configuration.screenWidthDp.dp
+    val screenWidthDp = configuration.screenWidthDp
     
-    // Estimate: each button ~48dp, more button ~48dp, padding ~8dp
-    val buttonWidth = 48.dp
-    val spacing = 0.dp
-    val padding = 8.dp
-    val moreButtonWidth = 48.dp
+    // Estimate: each button ~48dp, more button ~48dp, padding ~16dp (4dp × 2 × 2 sides)
+    val buttonWidth = 48
+    val moreButtonWidth = 48
+    val surfacePadding = 8 // horizontal padding of Surface
+    val runButtonWidth = 64 // Run button + its surface padding
+    val spaceBetween = 16 // space between left and right groups
     
-    // Calculate how many buttons fit
-    val availableWidth = screenWidthDp - padding * 2 - moreButtonWidth
-    val maxVisibleButtons = maxOf(1, (availableWidth / (buttonWidth + spacing)).toInt())
+    // Calculate available width for left toolbar
+    // screenWidth - runButton - spaceBetween - surfacePadding×2 - moreButton
+    val availableWidth = screenWidthDp - runButtonWidth - spaceBetween - (surfacePadding * 2) - moreButtonWidth
+    
+    // Calculate max visible buttons (ensure at least 1)
+    val maxVisibleButtons = maxOf(1, (availableWidth / buttonWidth))
     
     val visibleActions = actions.take(minOf(maxVisibleButtons, actions.size))
     val overflowActions = actions.drop(visibleActions.size)
+    
+    // Debug log
+    android.util.Log.d("AdaptiveToolbar", "screenWidth=$screenWidthDp, availableWidth=$availableWidth, maxVisible=$maxVisibleButtons, showing=${visibleActions.size}, overflow=${overflowActions.size}")
     
     Surface(
         shape = CircleShape,
