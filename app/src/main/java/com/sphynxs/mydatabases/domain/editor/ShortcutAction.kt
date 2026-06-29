@@ -30,4 +30,13 @@ sealed interface ShortcutAction {
     
     /** Open replace bar (Ctrl+H) - FR-9 */
     data object Replace : ShortcutAction
+    
+    /** Add cursor below, preserving column (Ctrl+Alt+Down) - MC-1 */
+    data object AddCursorBelow : ShortcutAction
+    
+    /** Add cursor above, preserving column (Ctrl+Alt+Up) - MC-2 */
+    data object AddCursorAbove : ShortcutAction
+    
+    /** Select next occurrence (Ctrl+D) - MC-3, MC-4, MC-5 */
+    data object SelectNextOccurrence : ShortcutAction
 }
