@@ -35,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextLayoutResult
@@ -350,6 +351,11 @@ fun SqlCodeEditor(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(end = 20.dp, top = 16.dp, bottom = 16.dp)
+                        .focusProperties {
+                            // Deshabilitar navegación de foco con flechas
+                            // Las flechas solo deben mover el cursor dentro del editor
+                            canFocus = true
+                        }
                         .onPreviewKeyEvent { keyEvent ->
                             // Completion navigation (highest priority)
                             if (showCompletionPopup && keyEvent.type == KeyEventType.KeyDown) {
@@ -393,19 +399,17 @@ fun SqlCodeEditor(
                             }
                         }
                         .onKeyEvent { keyEvent ->
-                            // Bloquear Enter/Tab si popup está visible (fallback por si preview no consume)
+                            // IMPORTANTE: Consumir TODOS los eventos de teclado después de procesarlos
+                            // para que NO se propaguen al sistema de navegación de foco
+                            // Esto previene que las flechas cambien el foco entre componentes
+                            
+                            // Bloquear Enter/Tab si popup está visible
                             if (showCompletionPopup && (keyEvent.key == Key.Enter || keyEvent.key == Key.Tab)) {
                                 return@onKeyEvent true
                             }
                             
-                            // Consumir eventos de flecha para evitar navegación de foco
-                            // BasicTextField ya procesó el evento, ahora lo consumimos para que
-                            // NO se propague al sistema de navegación de UI
-                            when (keyEvent.key) {
-                                Key.DirectionUp, Key.DirectionDown,
-                                Key.DirectionLeft, Key.DirectionRight -> true
-                                else -> false
-                            }
+                            // Consumir TODOS los eventos para evitar navegación de foco
+                            true
                         }
                         .pointerInput(multiCursorMode, isCtrlPressed) {
                             detectTapGestures { offset ->
