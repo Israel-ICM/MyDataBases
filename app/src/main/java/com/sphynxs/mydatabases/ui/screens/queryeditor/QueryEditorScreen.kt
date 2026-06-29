@@ -73,7 +73,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 /**
  * Toolbar action definition for adaptive overflow menu.
  */
-private data class ToolbarAction(
+internal data class ToolbarAction(
     val id: String,
     val icon: ImageVector,
     val label: String,
@@ -1055,7 +1055,7 @@ private fun ErrorDisplay(
  * Shows as many actions as fit, rest go to ⋮ menu.
  */
 @Composable
-fun AdaptiveToolbar(
+internal fun AdaptiveToolbar(
     actions: List<ToolbarAction>,
     modifier: Modifier = Modifier
 ) {
