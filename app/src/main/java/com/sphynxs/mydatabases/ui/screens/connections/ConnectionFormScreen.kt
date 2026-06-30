@@ -16,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -25,6 +26,7 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -90,6 +92,12 @@ fun ConnectionFormScreen(
     
     // Advanced connection state
     var showAdvancedConnection by remember { mutableStateOf(false) }
+    
+    // SSL Certificate state
+    var sslMode by remember { mutableStateOf("REQUIRED") }
+    var caCertificatePath by remember { mutableStateOf<String?>(null) }
+    var clientCertificatePath by remember { mutableStateOf<String?>(null) }
+    var clientKeyPath by remember { mutableStateOf<String?>(null) }
     
     // SSH Tunnel state
     var sshHost by remember { mutableStateOf("") }
@@ -340,6 +348,7 @@ fun ConnectionFormScreen(
                         modifier = Modifier.padding(start = 16.dp)
                     )
                     IOSGroupedCard {
+                        // SSL Toggle
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -363,6 +372,140 @@ fun ConnectionFormScreen(
                                     uncheckedTrackColor = Color(0xFFE5E5EA)
                                 )
                             )
+                        }
+                        
+                        // SSL Mode Dropdown (only visible when SSL is enabled)
+                        if (useSSL) {
+                            // SSL Mode selector
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(Color.White)
+                                    .padding(horizontal = 16.dp, vertical = 12.dp)
+                            ) {
+                                Text(
+                                    "Modo SSL",
+                                    fontSize = 13.sp,
+                                    color = Color(0xFF8E8E93),
+                                    modifier = Modifier.padding(bottom = 8.dp)
+                                )
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    listOf("REQUIRED", "VERIFY_CA", "VERIFY_IDENTITY").forEach { mode ->
+                                        androidx.compose.material3.FilterChip(
+                                            selected = sslMode == mode,
+                                            onClick = { sslMode = mode },
+                                            label = { 
+                                                Text(
+                                                    text = mode.replace("_", " "),
+                                                    fontSize = 13.sp
+                                                )
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+                            
+                            // CA Certificate
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(Color.White)
+                                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        "CA Certificate",
+                                        fontSize = 17.sp,
+                                        color = Color.Black
+                                    )
+                                    if (caCertificatePath != null) {
+                                        Text(
+                                            text = caCertificatePath!!.split("/").lastOrNull() ?: "",
+                                            fontSize = 13.sp,
+                                            color = Color(0xFF8E8E93)
+                                        )
+                                    }
+                                }
+                                androidx.compose.material3.TextButton(
+                                    onClick = { /* TODO: File picker */ }
+                                ) {
+                                    Text(
+                                        if (caCertificatePath == null) "Seleccionar" else "Cambiar",
+                                        color = Color(0xFF007AFF)
+                                    )
+                                }
+                            }
+                            
+                            // Client Certificate (optional)
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(Color.White)
+                                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        "Client Certificate (opcional)",
+                                        fontSize = 17.sp,
+                                        color = Color.Black
+                                    )
+                                    if (clientCertificatePath != null) {
+                                        Text(
+                                            text = clientCertificatePath!!.split("/").lastOrNull() ?: "",
+                                            fontSize = 13.sp,
+                                            color = Color(0xFF8E8E93)
+                                        )
+                                    }
+                                }
+                                androidx.compose.material3.TextButton(
+                                    onClick = { /* TODO: File picker */ }
+                                ) {
+                                    Text(
+                                        if (clientCertificatePath == null) "Seleccionar" else "Cambiar",
+                                        color = Color(0xFF007AFF)
+                                    )
+                                }
+                            }
+                            
+                            // Client Key (optional)
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(Color.White)
+                                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        "Client Key (opcional)",
+                                        fontSize = 17.sp,
+                                        color = Color.Black
+                                    )
+                                    if (clientKeyPath != null) {
+                                        Text(
+                                            text = clientKeyPath!!.split("/").lastOrNull() ?: "",
+                                            fontSize = 13.sp,
+                                            color = Color(0xFF8E8E93)
+                                        )
+                                    }
+                                }
+                                androidx.compose.material3.TextButton(
+                                    onClick = { /* TODO: File picker */ }
+                                ) {
+                                    Text(
+                                        if (clientKeyPath == null) "Seleccionar" else "Cambiar",
+                                        color = Color(0xFF007AFF)
+                                    )
+                                }
+                            }
                         }
                     }
                 }
