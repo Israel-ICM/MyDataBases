@@ -56,6 +56,41 @@
     <string name="connection_save_success">Connection saved</string>
     <string name="connection_save_failed">Save failed: %1$s</string>
     
+    <!-- Advanced connection options -->
+    <string name="connection_advanced_title">Advanced Connection</string>
+    
+    <!-- SSH Tunnel -->
+    <string name="connection_ssh_tunnel_title">SSH Tunnel</string>
+    <string name="connection_ssh_tunnel_enable">Enable SSH tunnel</string>
+    <string name="connection_ssh_host">SSH Host</string>
+    <string name="connection_ssh_host_hint">bastion.example.com</string>
+    <string name="connection_ssh_port">SSH Port</string>
+    <string name="connection_ssh_port_hint">22</string>
+    <string name="connection_ssh_username">SSH Username</string>
+    <string name="connection_ssh_username_hint">user</string>
+    <string name="connection_ssh_auth_method">Authentication Method</string>
+    <string name="connection_ssh_auth_password">Password</string>
+    <string name="connection_ssh_auth_private_key">Private Key</string>
+    <string name="connection_ssh_password">SSH Password</string>
+    <string name="connection_ssh_password_hint">••••••••</string>
+    <string name="connection_ssh_private_key">Private Key File</string>
+    <string name="connection_ssh_private_key_hint">Choose file…</string>
+    <string name="connection_ssh_private_key_selected">%1$s</string>
+    
+    <!-- SSH Security Warning -->
+    <string name="connection_ssh_security_warning_title">SSH Security Warning</string>
+    <string name="connection_ssh_security_warning_message">All SSH hosts will be accepted without verification (no known_hosts file on Android).\n\nOnly connect to trusted hosts.</string>
+    <string name="connection_ssh_security_warning_accept">I understand, continue</string>
+    
+    <!-- SSH Errors -->
+    <string name="error_ssh_timeout">SSH connection timed out. Check SSH host and port.</string>
+    <string name="error_ssh_auth_failed">SSH authentication failed. Check username and password/key.</string>
+    <string name="error_ssh_invalid_key">Invalid private key format. Expected PEM or OpenSSH format.</string>
+    <string name="error_ssh_encrypted_key">Encrypted SSH keys not supported in v1.0. Use unencrypted key or password auth.</string>
+    <string name="error_ssh_port_allocation">Cannot allocate local port for SSH tunnel. Close other connections.</string>
+    <string name="error_ssh_tunnel_dropped">SSH tunnel connection lost. Reconnecting…</string>
+    <string name="error_ssh_generic">SSH tunnel error: %1$s</string>
+    
     <!-- Databases screen -->
     <string name="databases_title">Databases</string>
     <string name="databases_empty">No databases available</string>

@@ -56,6 +56,41 @@
     <string name="connection_save_success">Conexión guardada</string>
     <string name="connection_save_failed">Error al guardar: %1$s</string>
     
+    <!-- Advanced connection options -->
+    <string name="connection_advanced_title">Conexión Avanzada</string>
+    
+    <!-- SSH Tunnel -->
+    <string name="connection_ssh_tunnel_title">Túnel SSH</string>
+    <string name="connection_ssh_tunnel_enable">Habilitar túnel SSH</string>
+    <string name="connection_ssh_host">Host SSH</string>
+    <string name="connection_ssh_host_hint">bastion.ejemplo.com</string>
+    <string name="connection_ssh_port">Puerto SSH</string>
+    <string name="connection_ssh_port_hint">22</string>
+    <string name="connection_ssh_username">Usuario SSH</string>
+    <string name="connection_ssh_username_hint">usuario</string>
+    <string name="connection_ssh_auth_method">Método de Autenticación</string>
+    <string name="connection_ssh_auth_password">Contraseña</string>
+    <string name="connection_ssh_auth_private_key">Clave Privada</string>
+    <string name="connection_ssh_password">Contraseña SSH</string>
+    <string name="connection_ssh_password_hint">••••••••</string>
+    <string name="connection_ssh_private_key">Archivo de Clave Privada</string>
+    <string name="connection_ssh_private_key_hint">Elegir archivo…</string>
+    <string name="connection_ssh_private_key_selected">%1$s</string>
+    
+    <!-- SSH Security Warning -->
+    <string name="connection_ssh_security_warning_title">Advertencia de Seguridad SSH</string>
+    <string name="connection_ssh_security_warning_message">Se aceptarán todos los hosts SSH sin verificación (no existe archivo known_hosts en Android).\n\nConecte solo a hosts de confianza.</string>
+    <string name="connection_ssh_security_warning_accept">Entiendo, continuar</string>
+    
+    <!-- SSH Errors -->
+    <string name="error_ssh_timeout">Tiempo de espera agotado para SSH. Verifique host y puerto SSH.</string>
+    <string name="error_ssh_auth_failed">Autenticación SSH fallida. Verifique usuario y contraseña/clave.</string>
+    <string name="error_ssh_invalid_key">Formato de clave privada inválido. Se esperaba formato PEM u OpenSSH.</string>
+    <string name="error_ssh_encrypted_key">Claves SSH cifradas no soportadas en v1.0. Use clave sin cifrar o autenticación por contraseña.</string>
+    <string name="error_ssh_port_allocation">No se puede asignar puerto local para túnel SSH. Cierre otras conexiones.</string>
+    <string name="error_ssh_tunnel_dropped">Conexión de túnel SSH perdida. Reconectando…</string>
+    <string name="error_ssh_generic">Error de túnel SSH: %1$s</string>
+    
     <!-- Databases screen -->
     <string name="databases_title">Bases de Datos</string>
     <string name="databases_empty">No hay bases de datos disponibles</string>
