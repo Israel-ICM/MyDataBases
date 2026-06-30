@@ -180,6 +180,9 @@ fun ConnectionsListScreen(
                             modifier = Modifier.weight(1f)
                         ) {
                             items(connections) { connection ->
+                                val disconnectSuccessMsg = stringResource(R.string.connection_disconnect_success)
+                                val disconnectErrorMsg = stringResource(R.string.connection_disconnect_error)
+                                
                                 ConnectionCard(
                                     connection = connection,
                                     onEditClick = {
@@ -199,13 +202,13 @@ fun ConnectionsListScreen(
                                             result.fold(
                                                 onSuccess = {
                                                     snackbarHostState.showSnackbar(
-                                                        message = stringResource(R.string.connection_disconnect_success),
+                                                        message = disconnectSuccessMsg,
                                                         duration = SnackbarDuration.Short
                                                     )
                                                 },
                                                 onFailure = { error ->
                                                     snackbarHostState.showSnackbar(
-                                                        message = stringResource(R.string.connection_disconnect_error, error.message ?: "Unknown"),
+                                                        message = disconnectErrorMsg.format(error.message ?: "Unknown"),
                                                         duration = SnackbarDuration.Long
                                                     )
                                                 }
