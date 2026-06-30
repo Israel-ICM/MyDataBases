@@ -1,5 +1,6 @@
 package com.sphynxs.mydatabases.ui.screens.connections
 
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
@@ -47,6 +49,8 @@ import com.sphynxs.mydatabases.R
 import com.sphynxs.mydatabases.core.database.engine.DatabaseType
 import com.sphynxs.mydatabases.core.database.models.ConnectionConfig
 import com.sphynxs.mydatabases.ui.components.DatabaseTypeSelector
+import com.sphynxs.mydatabases.ui.components.FilePicker
+import com.sphynxs.mydatabases.ui.components.getFileName
 import com.sphynxs.mydatabases.ui.components.ios.IOSButton
 import com.sphynxs.mydatabases.ui.components.ios.IOSButtonStyle
 import com.sphynxs.mydatabases.ui.components.ios.IOSGroupedCard
@@ -95,9 +99,14 @@ fun ConnectionFormScreen(
     
     // SSL Certificate state
     var sslMode by remember { mutableStateOf("REQUIRED") }
-    var caCertificatePath by remember { mutableStateOf<String?>(null) }
-    var clientCertificatePath by remember { mutableStateOf<String?>(null) }
-    var clientKeyPath by remember { mutableStateOf<String?>(null) }
+    var caCertificateUri by remember { mutableStateOf<Uri?>(null) }
+    var caCertificateName by remember { mutableStateOf<String?>(null) }
+    var clientCertificateUri by remember { mutableStateOf<Uri?>(null) }
+    var clientCertificateName by remember { mutableStateOf<String?>(null) }
+    var clientKeyUri by remember { mutableStateOf<Uri?>(null) }
+    var clientKeyName by remember { mutableStateOf<String?>(null) }
+    
+    val context = LocalContext.current
     
     // SSH Tunnel state
     var sshHost by remember { mutableStateOf("") }
@@ -409,101 +418,125 @@ fun ConnectionFormScreen(
                             }
                             
                             // CA Certificate
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .background(Color.White)
-                                    .padding(horizontal = 16.dp, vertical = 12.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text(
-                                        "CA Certificate",
-                                        fontSize = 17.sp,
-                                        color = Color.Black
-                                    )
-                                    if (caCertificatePath != null) {
+                            FilePicker(
+                                onFileSelected = { uri ->
+                                    caCertificateUri = uri
+                                    caCertificateName = uri.getFileName(context)
+                                },
+                                mimeTypes = arrayOf("application/x-pem-file", "application/x-x509-ca-cert", "*/*")
+                            ) { launchPicker ->
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .background(Color.White)
+                                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Column(modifier = Modifier.weight(1f)) {
                                         Text(
-                                            text = caCertificatePath!!.split("/").lastOrNull() ?: "",
-                                            fontSize = 13.sp,
-                                            color = Color(0xFF8E8E93)
+                                            "CA Certificate",
+                                            fontSize = 17.sp,
+                                            color = Color.Black
+                                        )
+                                        if (caCertificateName != null) {
+                                            Text(
+                                                text = caCertificateName ?: "",
+                                                fontSize = 13.sp,
+                                                color = Color(0xFF8E8E93)
+                                            )
+                                        }
+                                    }
+                                    TextButton(
+                                        onClick = { launchPicker() }
+                                    ) {
+                                        Text(
+                                            if (caCertificateName == null) "Seleccionar" else "Cambiar",
+                                            color = Color(0xFF007AFF)
                                         )
                                     }
-                                }
-                                androidx.compose.material3.TextButton(
-                                    onClick = { /* TODO: File picker */ }
-                                ) {
-                                    Text(
-                                        if (caCertificatePath == null) "Seleccionar" else "Cambiar",
-                                        color = Color(0xFF007AFF)
-                                    )
                                 }
                             }
                             
                             // Client Certificate (optional)
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .background(Color.White)
-                                    .padding(horizontal = 16.dp, vertical = 12.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text(
-                                        "Client Certificate (opcional)",
-                                        fontSize = 17.sp,
-                                        color = Color.Black
-                                    )
-                                    if (clientCertificatePath != null) {
+                            FilePicker(
+                                onFileSelected = { uri ->
+                                    clientCertificateUri = uri
+                                    clientCertificateName = uri.getFileName(context)
+                                },
+                                mimeTypes = arrayOf("application/x-pem-file", "application/x-x509-ca-cert", "*/*")
+                            ) { launchPicker ->
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .background(Color.White)
+                                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Column(modifier = Modifier.weight(1f)) {
                                         Text(
-                                            text = clientCertificatePath!!.split("/").lastOrNull() ?: "",
-                                            fontSize = 13.sp,
-                                            color = Color(0xFF8E8E93)
+                                            "Client Certificate (opcional)",
+                                            fontSize = 17.sp,
+                                            color = Color.Black
+                                        )
+                                        if (clientCertificateName != null) {
+                                            Text(
+                                                text = clientCertificateName ?: "",
+                                                fontSize = 13.sp,
+                                                color = Color(0xFF8E8E93)
+                                            )
+                                        }
+                                    }
+                                    TextButton(
+                                        onClick = { launchPicker() }
+                                    ) {
+                                        Text(
+                                            if (clientCertificateName == null) "Seleccionar" else "Cambiar",
+                                            color = Color(0xFF007AFF)
                                         )
                                     }
-                                }
-                                androidx.compose.material3.TextButton(
-                                    onClick = { /* TODO: File picker */ }
-                                ) {
-                                    Text(
-                                        if (clientCertificatePath == null) "Seleccionar" else "Cambiar",
-                                        color = Color(0xFF007AFF)
-                                    )
                                 }
                             }
                             
                             // Client Key (optional)
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .background(Color.White)
-                                    .padding(horizontal = 16.dp, vertical = 12.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text(
-                                        "Client Key (opcional)",
-                                        fontSize = 17.sp,
-                                        color = Color.Black
-                                    )
-                                    if (clientKeyPath != null) {
+                            FilePicker(
+                                onFileSelected = { uri ->
+                                    clientKeyUri = uri
+                                    clientKeyName = uri.getFileName(context)
+                                },
+                                mimeTypes = arrayOf("application/x-pem-file", "application/pkcs8", "*/*")
+                            ) { launchPicker ->
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .background(Color.White)
+                                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Column(modifier = Modifier.weight(1f)) {
                                         Text(
-                                            text = clientKeyPath!!.split("/").lastOrNull() ?: "",
-                                            fontSize = 13.sp,
-                                            color = Color(0xFF8E8E93)
+                                            "Client Key (opcional)",
+                                            fontSize = 17.sp,
+                                            color = Color.Black
+                                        )
+                                        if (clientKeyName != null) {
+                                            Text(
+                                                text = clientKeyName ?: "",
+                                                fontSize = 13.sp,
+                                                color = Color(0xFF8E8E93)
+                                            )
+                                        }
+                                    }
+                                    TextButton(
+                                        onClick = { launchPicker() }
+                                    ) {
+                                        Text(
+                                            if (clientKeyName == null) "Seleccionar" else "Cambiar",
+                                            color = Color(0xFF007AFF)
                                         )
                                     }
-                                }
-                                androidx.compose.material3.TextButton(
-                                    onClick = { /* TODO: File picker */ }
-                                ) {
-                                    Text(
-                                        if (clientKeyPath == null) "Seleccionar" else "Cambiar",
-                                        color = Color(0xFF007AFF)
-                                    )
                                 }
                             }
                         }
