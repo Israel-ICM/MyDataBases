@@ -1,6 +1,6 @@
 package com.sphynxs.mydatabases.domain.usecases
 
-import com.sphynxs.mydatabases.domain.repositories.DatabaseRepository
+import com.sphynxs.mydatabases.core.database.repository.DatabaseRepository
 import javax.inject.Inject
 
 /**
