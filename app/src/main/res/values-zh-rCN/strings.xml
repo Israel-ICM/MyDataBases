@@ -31,7 +31,10 @@
     <string name="connections_empty_message">添加您的第一个数据库连接以开始使用</string>
     <string name="connections_add_new">新建连接</string>
     <string name="connection_action_edit">编辑连接</string>
+    <string name="connection_action_disconnect">关闭连接</string>
     <string name="connection_action_delete">删除连接</string>
+    <string name="connection_disconnect_success">连接已关闭</string>
+    <string name="connection_disconnect_error">关闭连接时出错：%1$s</string>
     <string name="connection_delete_confirm_title">删除连接？</string>
     <string name="connection_delete_confirm_message">这将永久删除连接"%1$s"</string>
     

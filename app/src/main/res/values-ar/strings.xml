@@ -31,7 +31,10 @@
     <string name="connections_empty_message">أضف اتصال قاعدة البيانات الأول للبدء</string>
     <string name="connections_add_new">اتصال جديد</string>
     <string name="connection_action_edit">تحرير الاتصال</string>
+    <string name="connection_action_disconnect">إغلاق الاتصال</string>
     <string name="connection_action_delete">حذف الاتصال</string>
+    <string name="connection_disconnect_success">تم إغلاق الاتصال</string>
+    <string name="connection_disconnect_error">خطأ في إغلاق الاتصال: %1$s</string>
     <string name="connection_delete_confirm_title">حذف الاتصال؟</string>
     <string name="connection_delete_confirm_message">سيؤدي هذا إلى حذف الاتصال "%1$s" بشكل دائم</string>
     

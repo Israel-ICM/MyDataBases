@@ -199,13 +199,13 @@ fun ConnectionsListScreen(
                                             result.fold(
                                                 onSuccess = {
                                                     snackbarHostState.showSnackbar(
-                                                        message = "Connection closed",
+                                                        message = stringResource(R.string.connection_disconnect_success),
                                                         duration = SnackbarDuration.Short
                                                     )
                                                 },
                                                 onFailure = { error ->
                                                     snackbarHostState.showSnackbar(
-                                                        message = "Error closing connection: ${error.message}",
+                                                        message = stringResource(R.string.connection_disconnect_error, error.message ?: "Unknown"),
                                                         duration = SnackbarDuration.Long
                                                     )
                                                 }

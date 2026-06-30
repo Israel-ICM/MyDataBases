@@ -31,7 +31,10 @@
     <string name="connections_empty_message">最初のデータベース接続を追加して開始します</string>
     <string name="connections_add_new">新しい接続</string>
     <string name="connection_action_edit">接続を編集</string>
+    <string name="connection_action_disconnect">接続を閉じる</string>
     <string name="connection_action_delete">接続を削除</string>
+    <string name="connection_disconnect_success">接続を閉じました</string>
+    <string name="connection_disconnect_error">接続を閉じる際にエラーが発生しました：%1$s</string>
     <string name="connection_delete_confirm_title">接続を削除しますか？</string>
     <string name="connection_delete_confirm_message">接続「%1$s」が完全に削除されます</string>
     

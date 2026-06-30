@@ -31,7 +31,10 @@
     <string name="connections_empty_message">Agregá tu primera conexión para empezar</string>
     <string name="connections_add_new">Nueva conexión</string>
     <string name="connection_action_edit">Editar conexión</string>
+    <string name="connection_action_disconnect">Cerrar conexión</string>
     <string name="connection_action_delete">Eliminar conexión</string>
+    <string name="connection_disconnect_success">Conexión cerrada</string>
+    <string name="connection_disconnect_error">Error al cerrar conexión: %1$s</string>
     <string name="connection_delete_confirm_title">¿Eliminar conexión?</string>
     <string name="connection_delete_confirm_message">Esto eliminará permanentemente la conexión "%1$s"</string>
     

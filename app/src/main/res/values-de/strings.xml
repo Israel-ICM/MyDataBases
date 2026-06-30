@@ -31,7 +31,10 @@
     <string name="connections_empty_message">Fügen Sie Ihre erste Datenbankverbindung hinzu, um zu beginnen</string>
     <string name="connections_add_new">Neue Verbindung</string>
     <string name="connection_action_edit">Verbindung bearbeiten</string>
+    <string name="connection_action_disconnect">Verbindung schließen</string>
     <string name="connection_action_delete">Verbindung löschen</string>
+    <string name="connection_disconnect_success">Verbindung geschlossen</string>
+    <string name="connection_disconnect_error">Fehler beim Schließen der Verbindung: %1$s</string>
     <string name="connection_delete_confirm_title">Verbindung löschen?</string>
     <string name="connection_delete_confirm_message">Dies löscht die Verbindung "%1$s" dauerhaft</string>
     

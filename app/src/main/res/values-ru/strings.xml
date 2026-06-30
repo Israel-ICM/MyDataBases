@@ -31,7 +31,10 @@
     <string name="connections_empty_message">Добавьте первое подключение к базе данных для начала работы</string>
     <string name="connections_add_new">Новое подключение</string>
     <string name="connection_action_edit">Редактировать подключение</string>
+    <string name="connection_action_disconnect">Закрыть подключение</string>
     <string name="connection_action_delete">Удалить подключение</string>
+    <string name="connection_disconnect_success">Подключение закрыто</string>
+    <string name="connection_disconnect_error">Ошибка закрытия подключения: %1$s</string>
     <string name="connection_delete_confirm_title">Удалить подключение?</string>
     <string name="connection_delete_confirm_message">Подключение "%1$s" будет удалено безвозвратно</string>
     
