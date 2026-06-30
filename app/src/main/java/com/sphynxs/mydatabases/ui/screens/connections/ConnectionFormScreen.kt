@@ -640,6 +640,38 @@ fun ConnectionFormScreen(
                     }
                 }
                 
+                // SSH Tunnel Configuration
+                FilePicker(
+                    onFileSelected = { uri ->
+                        sshPrivateKeyUri = uri
+                        sshPrivateKeyName = uri.getFileName(context)
+                    },
+                    mimeTypes = arrayOf("*/*")  // PEM files often have no specific MIME type
+                ) { launchSshKeyPicker ->
+                    SSHTunnelSection(
+                        enabled = sshTunnelEnabled,
+                        host = sshHost,
+                        port = sshPort,
+                        username = sshUsername,
+                        authMethod = sshAuthMethod,
+                        password = sshPassword,
+                        privateKeyUri = sshPrivateKeyUri,
+                        privateKeyName = sshPrivateKeyName,
+                        onToggle = { enabled ->
+                            sshTunnelEnabled = enabled
+                            if (enabled) {
+                                showSSHSecurityWarning = true
+                            }
+                        },
+                        onHostChange = { sshHost = it },
+                        onPortChange = { sshPort = it },
+                        onUsernameChange = { sshUsername = it },
+                        onAuthMethodChange = { sshAuthMethod = it },
+                        onPasswordChange = { sshPassword = it },
+                        onSelectPrivateKey = { launchSshKeyPicker() }
+                    )
+                }
+                
                 // Connection String Configuration
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(
@@ -705,6 +737,20 @@ fun ConnectionFormScreen(
             // Spacer para scroll bottom
             Spacer(modifier = Modifier.height(32.dp))
         }
+    }
+    
+    // SSH Security Warning Dialog
+    if (showSSHSecurityWarning) {
+        SSHSecurityWarningDialog(
+            onDismiss = {
+                showSSHSecurityWarning = false
+                sshTunnelEnabled = false  // Disable SSH if user cancels
+            },
+            onAccept = {
+                showSSHSecurityWarning = false
+                // Keep SSH enabled
+            }
+        )
     }
 }
 
