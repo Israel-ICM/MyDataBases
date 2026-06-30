@@ -1,6 +1,7 @@
 package com.sphynxs.mydatabases.core.database.engine.mysql
 
 import android.content.Context
+import com.sphynxs.mydatabases.core.database.ConnectionStringParser
 import com.sphynxs.mydatabases.core.database.models.ConnectionConfig
 import com.sphynxs.mydatabases.core.database.ssl.MySQLSSLConfigBuilder
 import kotlinx.coroutines.Dispatchers
@@ -40,6 +41,10 @@ class MySQLConnectionPool(
      * Obtiene una conexión directa usando DriverManager.
      * Copia la receta probada de MyDataBasesDeprecated con soporte SSL mejorado.
      * 
+     * Prioridad de configuración:
+     * 1. Connection string (si está presente, sobreescribe host/port/user/pass)
+     * 2. Valores individuales de config (host, port, username, password)
+     * 
      * @return Conexión JDBC válida
      * @throws SQLException si no se puede obtener conexión
      */
@@ -47,11 +52,31 @@ class MySQLConnectionPool(
         // Cargar driver explícitamente (necesario en Android)
         Class.forName("com.mysql.jdbc.Driver")
         
+        // Si hay connection string, parsearla y sobreescribir config
+        val effectiveConfig = if (!config.connectionString.isNullOrBlank()) {
+            parseConnectionString(config.connectionString)
+        } else {
+            // Usar config directa
+            ConnectionData(
+                host = config.host,
+                port = config.port,
+                database = config.database,
+                username = config.username,
+                password = config.password,
+                parameters = emptyMap()
+            )
+        }
+        
         val connectionProps = Properties().apply {
-            put("user", config.username)
-            put("password", config.password)
+            put("user", effectiveConfig.username)
+            put("password", effectiveConfig.password)
             
-            // Configuración SSL avanzada
+            // Aplicar parámetros del connection string si existen
+            effectiveConfig.parameters.forEach { (key, value) ->
+                put(key, value)
+            }
+            
+            // Configuración SSL avanzada (solo si no viene del connection string)
             if (config.useSSL && config.sslConfig != null) {
                 // Usar configuración SSL detallada con certificados
                 sslConfigBuilder = MySQLSSLConfigBuilder(context, config.sslConfig)
@@ -61,22 +86,30 @@ class MySQLConnectionPool(
                 put("useSSL", "true")
                 put("requireSSL", "true")
                 put("verifyServerCertificate", "false")
-            } else {
-                // Sin SSL
+            } else if (!containsKey("useSSL")) {
+                // Sin SSL (solo si no viene en connection string)
                 put("useSSL", "false")
             }
             
             // Timeout básico (milisegundos)
-            put("connectTimeout", config.connectionTimeout.toString())
-            put("socketTimeout", config.readTimeout.toString())
+            if (!containsKey("connectTimeout")) {
+                put("connectTimeout", config.connectionTimeout.toString())
+            }
+            if (!containsKey("socketTimeout")) {
+                put("socketTimeout", config.readTimeout.toString())
+            }
             
             // Tolerancia con fechas/datos inválidos (igual que Navicat)
-            put("zeroDateTimeBehavior", "convertToNull")
-            put("jdbcCompliantTruncation", "false")
+            if (!containsKey("zeroDateTimeBehavior")) {
+                put("zeroDateTimeBehavior", "convertToNull")
+            }
+            if (!containsKey("jdbcCompliantTruncation")) {
+                put("jdbcCompliantTruncation", "false")
+            }
         }
         
-        val databaseSegment = config.database.takeIf { it.isNotBlank() } ?: ""
-        val jdbcUrl = "jdbc:mysql://${config.host}:${config.port}/$databaseSegment"
+        val databaseSegment = effectiveConfig.database.takeIf { it.isNotBlank() } ?: ""
+        val jdbcUrl = "jdbc:mysql://${effectiveConfig.host}:${effectiveConfig.port}/$databaseSegment"
         
         try {
             // DriverManager directo - la receta probada
@@ -89,6 +122,33 @@ class MySQLConnectionPool(
             throw e
         }
     }
+    
+    /**
+     * Parsea un connection string y retorna los componentes.
+     */
+    private fun parseConnectionString(connectionString: String): ConnectionData {
+        val parsed = ConnectionStringParser.parse(connectionString)
+        return ConnectionData(
+            host = parsed.host,
+            port = parsed.port ?: config.port,
+            database = parsed.database ?: config.database,
+            username = parsed.username ?: config.username,
+            password = parsed.password ?: config.password,
+            parameters = parsed.parameters
+        )
+    }
+    
+    /**
+     * Data class interna para almacenar datos efectivos de conexión.
+     */
+    private data class ConnectionData(
+        val host: String,
+        val port: Int,
+        val database: String,
+        val username: String,
+        val password: String,
+        val parameters: Map<String, String>
+    )
     
     /**
      * Cierra la conexión activa si existe.
