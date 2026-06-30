@@ -1,6 +1,7 @@
 package com.sphynxs.mydatabases.data.local.converters
 
 import androidx.room.TypeConverter
+import com.sphynxs.mydatabases.core.database.models.SSHAuthMethod
 import com.sphynxs.mydatabases.core.database.models.SSHTunnelConfig
 import org.json.JSONObject
 
@@ -10,8 +11,11 @@ import org.json.JSONObject
  * Como SSHTunnelConfig es un objeto complejo, lo serializamos a JSON
  * para guardarlo en una columna de tipo String usando JSONObject nativo de Android.
  *
+ * **Security**: SSH passwords are NOT encrypted in this converter - they're already
+ * encrypted before being passed here (handled by repository layer).
+ *
  * @author israel-icm
- * @date 2026-06-12
+ * @date 2026-06-12 (updated 2026-06-30 for full SSH support)
  */
 class SSHTunnelConfigConverter {
 
@@ -26,11 +30,13 @@ class SSHTunnelConfigConverter {
         if (config == null) return null
         
         return JSONObject().apply {
+            put("enabled", config.enabled)
             put("host", config.host)
             put("port", config.port)
             put("username", config.username)
-            config.password?.let { put("password", it) }
-            config.privateKeyPath?.let { put("privateKeyPath", it) }
+            put("authMethod", config.authMethod.name)
+            put("password", config.password)  // Already encrypted by repository
+            config.privateKeyUri?.let { put("privateKeyUri", it) }
         }.toString()
     }
 
@@ -47,11 +53,15 @@ class SSHTunnelConfigConverter {
         return try {
             val json = JSONObject(value)
             SSHTunnelConfig(
+                enabled = json.optBoolean("enabled", false),
                 host = json.getString("host"),
                 port = json.getInt("port"),
                 username = json.getString("username"),
-                password = if (json.has("password")) json.getString("password") else null,
-                privateKeyPath = if (json.has("privateKeyPath")) json.getString("privateKeyPath") else null
+                authMethod = SSHAuthMethod.valueOf(
+                    json.optString("authMethod", SSHAuthMethod.PASSWORD.name)
+                ),
+                password = json.getString("password"),  // Will be decrypted by repository
+                privateKeyUri = if (json.has("privateKeyUri")) json.getString("privateKeyUri") else null
             )
         } catch (e: Exception) {
             null

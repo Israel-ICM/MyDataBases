@@ -54,15 +54,22 @@ class ConnectionRepositoryImpl @Inject constructor(
 /**
  * Convierte un ConnectionConfig del dominio a ConnectionEntity de Room.
  *
- * Encripta el password usando [credentialEncryption].
+ * Encripta passwords (database y SSH) usando [credentialEncryption].
  *
  * @param credentialEncryption El servicio de encriptación
- * @return La entidad de Room con password encriptado
+ * @return La entidad de Room con passwords encriptados
  */
 private fun ConnectionConfig.toEntity(
     credentialEncryption: CredentialEncryption
 ): ConnectionEntity {
     val encryptedPassword = credentialEncryption.encrypt(this.password)
+    
+    // Encrypt SSH password if SSH tunnel is configured
+    val encryptedSshConfig = this.sshTunnelConfig?.let { ssh ->
+        ssh.copy(
+            password = credentialEncryption.encrypt(ssh.password)
+        )
+    }
 
     return ConnectionEntity(
         id = this.id,
@@ -74,7 +81,9 @@ private fun ConnectionConfig.toEntity(
         username = this.username,
         encryptedPassword = encryptedPassword,
         useSSL = this.useSSL,
-        sshTunnelConfig = this.sshTunnelConfig,
+        sslConfig = this.sslConfig,
+        sshTunnelConfig = encryptedSshConfig,
+        connectionString = this.connectionString,
         connectionTimeout = this.connectionTimeout,
         readTimeout = this.readTimeout,
         maxPoolSize = this.maxPoolSize,
@@ -86,15 +95,22 @@ private fun ConnectionConfig.toEntity(
 /**
  * Convierte un ConnectionEntity de Room a ConnectionConfig del dominio.
  *
- * Desencripta el password usando [credentialEncryption].
+ * Desencripta passwords (database y SSH) usando [credentialEncryption].
  *
  * @param credentialEncryption El servicio de desencriptación
- * @return El modelo de dominio con password en plaintext
+ * @return El modelo de dominio con passwords en plaintext
  */
 private fun ConnectionEntity.toDomain(
     credentialEncryption: CredentialEncryption
 ): ConnectionConfig {
     val decryptedPassword = credentialEncryption.decrypt(this.encryptedPassword)
+    
+    // Decrypt SSH password if SSH tunnel is configured
+    val decryptedSshConfig = this.sshTunnelConfig?.let { ssh ->
+        ssh.copy(
+            password = credentialEncryption.decrypt(ssh.password)
+        )
+    }
 
     return ConnectionConfig(
         id = this.id,
@@ -106,7 +122,9 @@ private fun ConnectionEntity.toDomain(
         username = this.username,
         password = decryptedPassword,
         useSSL = this.useSSL,
-        sshTunnelConfig = this.sshTunnelConfig,
+        sslConfig = this.sslConfig,
+        sshTunnelConfig = decryptedSshConfig,
+        connectionString = this.connectionString,
         connectionTimeout = this.connectionTimeout,
         readTimeout = this.readTimeout,
         maxPoolSize = this.maxPoolSize,

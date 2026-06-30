@@ -4,6 +4,7 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.sphynxs.mydatabases.data.local.converters.DatabaseTypeConverter
+import com.sphynxs.mydatabases.data.local.converters.SSLConfigConverter
 import com.sphynxs.mydatabases.data.local.converters.SSHTunnelConfigConverter
 import com.sphynxs.mydatabases.data.local.dao.ConnectionDao
 import com.sphynxs.mydatabases.data.local.entities.ConnectionEntity
@@ -15,16 +16,17 @@ import com.sphynxs.mydatabases.data.local.entities.ConnectionEntity
  * Actualmente solo tiene la tabla de conexiones.
  *
  * @author israel-icm
- * @date 2026-06-12
+ * @date 2026-06-12 (updated 2026-06-30 for SSL config converter)
  */
 @Database(
     entities = [ConnectionEntity::class],
-    version = 1,
+    version = 2,  // Bumped for new columns: ssl_config, connection_string
     exportSchema = false
 )
 @TypeConverters(
     DatabaseTypeConverter::class,
-    SSHTunnelConfigConverter::class
+    SSHTunnelConfigConverter::class,
+    SSLConfigConverter::class
 )
 abstract class AppDatabase : RoomDatabase() {
 
