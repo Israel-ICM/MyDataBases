@@ -1,5 +1,6 @@
 package com.sphynxs.mydatabases.core.database.engine.mysql
 
+import android.content.Context
 import com.sphynxs.mydatabases.core.database.engine.DatabaseEngine
 import com.sphynxs.mydatabases.core.database.engine.DatabaseFeature
 import com.sphynxs.mydatabases.core.database.engine.DatabaseType
@@ -22,11 +23,14 @@ import java.sql.SQLNonTransientConnectionException
  * - Transactions
  * - Full-text search
  * - JSON type (MySQL 8.0+)
+ * - SSL/TLS con certificados personalizados
+ * - Autenticación mutua (mTLS)
  * 
+ * @param context Contexto de Android para leer certificados SSL
  * @author israel-icm
- * @date 2026-06-12
+ * @date 2026-06-12 (updated 2026-06-30 for SSL support)
  */
-class MySQLEngine : DatabaseEngine {
+class MySQLEngine(private val context: Context) : DatabaseEngine {
     
     private var connectionPool: MySQLConnectionPool? = null
     private val metadataReader = MySQLMetadataReader()
@@ -46,8 +50,8 @@ class MySQLEngine : DatabaseEngine {
             // Validar configuración
             validateConfig(config)
             
-            // Crear connection pool
-            connectionPool = MySQLConnectionPool(config)
+            // Crear connection pool con contexto para certificados SSL
+            connectionPool = MySQLConnectionPool(config, context)
             
             // Test connection
             val testConnection = connectionPool!!.getConnection()

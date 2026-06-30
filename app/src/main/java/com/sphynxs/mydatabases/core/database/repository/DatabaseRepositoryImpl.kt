@@ -1,9 +1,11 @@
 package com.sphynxs.mydatabases.core.database.repository
 
+import android.content.Context
 import com.sphynxs.mydatabases.core.database.engine.DatabaseEngine
 import com.sphynxs.mydatabases.core.database.engine.DatabaseEngineFactory
 import com.sphynxs.mydatabases.core.database.engine.DatabaseFeature
 import com.sphynxs.mydatabases.core.database.models.*
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
 /**
@@ -12,18 +14,20 @@ import javax.inject.Inject
  * Mantiene una referencia al motor actual y delega todas las operaciones.
  * Si no hay motor conectado, retorna DatabaseError.ConnectionFailed.
  * 
+ * @param context Contexto de aplicación para leer certificados SSL
  * @param engineFactory Factory para crear instancias de DatabaseEngine
  * @author israel-icm
- * @date 2026-06-12
+ * @date 2026-06-12 (updated 2026-06-30 for SSL support)
  */
 class DatabaseRepositoryImpl @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val engineFactory: DatabaseEngineFactory
 ) : DatabaseRepository {
     
     private var currentEngine: DatabaseEngine? = null
     
     override suspend fun connect(config: ConnectionConfig): Result<Connection> {
-        currentEngine = engineFactory.create(config.type)
+        currentEngine = engineFactory.create(config.type, context)
         return currentEngine!!.connect(config)
     }
     

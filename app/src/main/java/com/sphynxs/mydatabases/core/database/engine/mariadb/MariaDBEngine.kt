@@ -1,5 +1,6 @@
 package com.sphynxs.mydatabases.core.database.engine.mariadb
 
+import android.content.Context
 import com.sphynxs.mydatabases.core.database.engine.DatabaseEngine
 import com.sphynxs.mydatabases.core.database.engine.DatabaseFeature
 import com.sphynxs.mydatabases.core.database.engine.DatabaseType
@@ -17,13 +18,14 @@ import com.sphynxs.mydatabases.core.database.models.*
  * 
  * Para v1.0, reutilizamos MySQLEngine con pequeñas adaptaciones.
  * 
+ * @param context Contexto de Android para leer certificados SSL
  * @author israel-icm
- * @date 2026-06-12
+ * @date 2026-06-12 (updated 2026-06-30 for SSL support)
  */
-class MariaDBEngine : DatabaseEngine {
+class MariaDBEngine(context: Context) : DatabaseEngine {
     
     // Delegamos la mayoría de la lógica a MySQLEngine
-    private val delegate = MySQLEngine()
+    private val delegate = MySQLEngine(context)
     
     /**
      * Conecta al servidor MariaDB usando la configuración provista.
