@@ -165,23 +165,21 @@ fun ConnectionCard(
                         }
                     )
 
-                    // Opción: Disconnect (solo si está conectada)
-                    if (isConnected) {
-                        DropdownMenuItem(
-                            text = { Text(stringResource(R.string.connection_action_disconnect)) },
-                            leadingIcon = {
-                                Icon(
-                                    imageVector = PhosphorAppIcons.Action.power,
-                                    contentDescription = null,
-                                    tint = DesignTokens.IconNormal
-                                )
-                            },
-                            onClick = {
-                                showMenu = false
-                                onDisconnectClick()
-                            }
-                        )
-                    }
+                    // Opción: Disconnect
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.connection_action_disconnect)) },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = PhosphorAppIcons.Action.power,
+                                contentDescription = null,
+                                tint = DesignTokens.IconNormal
+                            )
+                        },
+                        onClick = {
+                            showMenu = false
+                            onDisconnectClick()
+                        }
+                    )
 
                     // Opción: Delete
                     DropdownMenuItem(
