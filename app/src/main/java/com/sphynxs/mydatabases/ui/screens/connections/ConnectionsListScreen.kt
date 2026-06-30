@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.painterResource
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -300,21 +299,13 @@ fun ConnectionsListScreen(
                 }
             },
             sheetState = typeSelectorSheetState,
-            containerColor = Color.Transparent,
+            containerColor = Color(0xFFF2F2F7),
             scrimColor = DesignTokens.BackdropScrim,
-            tonalElevation = 0.dp
+            tonalElevation = 16.dp
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .shadow(
-                        elevation = 24.dp,
-                        shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp)
-                    )
-                    .background(
-                        color = Color(0xFFF2F2F7),
-                        shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp)
-                    )
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
@@ -356,35 +347,22 @@ fun ConnectionsListScreen(
                 }
             },
             sheetState = formSheetState,
-            containerColor = Color.Transparent,
+            containerColor = Color(0xFFF2F2F7),
             sheetMaxWidth = 10000.dp,
             scrimColor = DesignTokens.BackdropScrim,
-            tonalElevation = 0.dp
+            tonalElevation = 16.dp
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .shadow(
-                        elevation = 24.dp,
-                        shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp)
-                    )
-                    .background(
-                        color = Color(0xFFF2F2F7),
-                        shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp)
-                    )
-            ) {
-                ConnectionFormScreen(
-                    connectionId = editingConnectionId,
-                    preselectedType = preselectedType,
-                    onNavigateBack = { 
-                        scope.launch {
-                            formSheetState.hide()
-                            showFormSheet = false
-                        }
-                    },
-                    modifier = Modifier.fillMaxSize()
-                )
-            }
+            ConnectionFormScreen(
+                connectionId = editingConnectionId,
+                preselectedType = preselectedType,
+                onNavigateBack = { 
+                    scope.launch {
+                        formSheetState.hide()
+                        showFormSheet = false
+                    }
+                },
+                modifier = Modifier.fillMaxSize()
+            )
         }
     }
 }

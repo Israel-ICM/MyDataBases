@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.foundation.lazy.LazyColumn
@@ -205,51 +203,38 @@ fun DatabasesListScreen(
                 }
             },
             sheetState = addDatabaseSheetState,
-            containerColor = Color.Transparent,
+            containerColor = com.sphynxs.mydatabases.ui.theme.DesignTokens.BackgroundPrimary,
             sheetMaxWidth = 10000.dp,
             scrimColor = DesignTokens.BackdropScrim,
-            tonalElevation = 0.dp
+            tonalElevation = 16.dp
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .shadow(
-                        elevation = 24.dp,
-                        shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp)
+            Scaffold(
+                snackbarHost = { SnackbarHost(snackbarHostState) },
+                containerColor = Color.Transparent
+            ) { innerPadding ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                        .padding(start = 16.dp, end = 16.dp, top = statusBarHeightDp)
+                ) {
+                    AddDatabaseFormContent(
+                        connectionId = connectionId,
+                        onDismiss = {
+                            scope.launch {
+                                addDatabaseSheetState.hide()
+                                onDismissAddDatabaseSheet()
+                            }
+                        },
+                        onDatabaseCreated = { databaseName ->
+                            // Refresh the database list
+                            viewModel.loadDatabases()
+                            // Navigate directly to the newly created database's tables
+                            onNavigateToTables(databaseName)
+                        },
+                        snackbarHostState = snackbarHostState,
+                        modifier = Modifier.fillMaxSize()
                     )
-                    .background(
-                        color = com.sphynxs.mydatabases.ui.theme.DesignTokens.BackgroundPrimary,
-                        shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp)
-                    )
-            ) {
-                Scaffold(
-                    snackbarHost = { SnackbarHost(snackbarHostState) },
-                    containerColor = Color.Transparent
-                ) { innerPadding ->
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(innerPadding)
-                            .padding(start = 16.dp, end = 16.dp, top = statusBarHeightDp)
-                    ) {
-                        AddDatabaseFormContent(
-                            connectionId = connectionId,
-                            onDismiss = {
-                                scope.launch {
-                                    addDatabaseSheetState.hide()
-                                    onDismissAddDatabaseSheet()
-                                }
-                            },
-                            onDatabaseCreated = { databaseName ->
-                                // Refresh the database list
-                                viewModel.loadDatabases()
-                                // Navigate directly to the newly created database's tables
-                                onNavigateToTables(databaseName)
-                            },
-                            snackbarHostState = snackbarHostState,
-                            modifier = Modifier.fillMaxSize()
-                        )
-                    }
                 }
             }
         }
