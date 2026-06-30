@@ -31,6 +31,7 @@ import com.sphynxs.mydatabases.ui.components.BreathingBackground
 import com.sphynxs.mydatabases.ui.components.EmptyState
 import com.sphynxs.mydatabases.ui.components.ErrorCard
 import com.sphynxs.mydatabases.ui.components.LoadingIndicator
+import com.sphynxs.mydatabases.ui.components.ScreenTitle
 import com.sphynxs.mydatabases.ui.components.TableCard
 import com.sphynxs.mydatabases.ui.components.ios.IOSSearchBar
 import com.sphynxs.mydatabases.ui.components.skeleton.TableListSkeleton
@@ -57,6 +58,7 @@ import com.sphynxs.mydatabases.ui.workspace.WorkspaceManager
 fun TablesListScreen(
     databaseName: String,
     onNavigateToTableViewer: (tableName: String) -> Unit,
+    onNavigateBack: () -> Unit,
     workspaceManager: WorkspaceManager,
     viewModel: TablesListViewModel = hiltViewModel(),
     modifier: Modifier = Modifier
@@ -82,22 +84,11 @@ fun TablesListScreen(
             ) {
                 Spacer(modifier = Modifier.height(16.dp))
                 
-                // Título grande estilo iOS 26 (siempre visible)
-                Text(
-                    text = "Tables",
-                    fontSize = DesignTokens.LargeTitleSize,
-                    fontWeight = DesignTokens.LargeTitleWeight,
-                    color = DesignTokens.LargeTitleColor,
-                    modifier = Modifier.padding(horizontal = DesignTokens.ScreenPaddingHorizontal)
-                )
-                
-                // Subtítulo con nombre de la base de datos (siempre visible)
-                Text(
-                    text = databaseName,
-                    fontSize = DesignTokens.CardSubtitleSize,
-                    fontWeight = DesignTokens.CardSubtitleWeight,
-                    color = DesignTokens.TextSecondary,
-                    modifier = Modifier.padding(horizontal = DesignTokens.ScreenPaddingHorizontal, vertical = 4.dp)
+                // Título grande estilo iOS con botón de retroceso
+                ScreenTitle(
+                    title = "Tables",
+                    subtitle = databaseName,
+                    onBackClick = onNavigateBack
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))

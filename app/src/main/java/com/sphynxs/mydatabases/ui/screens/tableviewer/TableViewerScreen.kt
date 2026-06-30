@@ -15,6 +15,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
@@ -67,6 +68,7 @@ import com.sphynxs.mydatabases.ui.workspace.TableCardContent
 fun TableViewerScreen(
     databaseName: String,
     tableName: String,
+    onNavigateBack: () -> Unit,
     viewModel: TableViewerViewModel = hiltViewModel(),
     modifier: Modifier = Modifier
 ) {
@@ -81,7 +83,15 @@ fun TableViewerScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.table_viewer_title, tableName)) }
+                title = { Text(stringResource(R.string.table_viewer_title, tableName)) },
+                navigationIcon = {
+                    IconButton(onClick = onNavigateBack) {
+                        Icon(
+                            imageVector = PhosphorAppIcons.Action.back,
+                            contentDescription = "Back"
+                        )
+                    }
+                }
             )
         },
         modifier = modifier

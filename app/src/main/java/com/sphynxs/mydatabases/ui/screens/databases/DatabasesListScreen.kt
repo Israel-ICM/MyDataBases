@@ -44,6 +44,7 @@ import com.sphynxs.mydatabases.ui.components.DatabaseCard
 import com.sphynxs.mydatabases.ui.components.EmptyState
 import com.sphynxs.mydatabases.ui.components.ErrorCard
 import com.sphynxs.mydatabases.ui.components.LoadingIndicator
+import com.sphynxs.mydatabases.ui.components.ScreenTitle
 import com.sphynxs.mydatabases.ui.components.ios.IOSSearchBar
 import com.sphynxs.mydatabases.ui.components.skeleton.DatabaseListSkeleton
 import com.sphynxs.mydatabases.ui.theme.DesignTokens
@@ -71,6 +72,7 @@ import kotlinx.coroutines.launch
 fun DatabasesListScreen(
     connectionId: String,
     onNavigateToTables: (databaseName: String) -> Unit,
+    onNavigateBack: () -> Unit,
     showAddDatabaseSheet: Boolean = false,
     onDismissAddDatabaseSheet: () -> Unit = {},
     viewModel: DatabasesListViewModel = hiltViewModel(),
@@ -121,13 +123,10 @@ fun DatabasesListScreen(
                     ) {
                     Spacer(modifier = Modifier.height(16.dp))
                     
-                    // Título grande estilo iOS 26
-                    Text(
-                        text = stringResource(R.string.databases_title),
-                        fontSize = DesignTokens.LargeTitleSize,
-                        fontWeight = DesignTokens.LargeTitleWeight,
-                        color = DesignTokens.LargeTitleColor,
-                        modifier = Modifier.padding(horizontal = DesignTokens.ScreenPaddingHorizontal)
+                    // Título grande estilo iOS con botón de retroceso
+                    ScreenTitle(
+                        title = stringResource(R.string.databases_title),
+                        onBackClick = onNavigateBack
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))

@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
@@ -30,6 +31,9 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.sphynxs.mydatabases.R
+import com.sphynxs.mydatabases.ui.components.BreathingBackground
+import com.sphynxs.mydatabases.ui.components.ScreenTitle
+import com.sphynxs.mydatabases.ui.theme.DesignTokens
 
 /**
  * Pantalla para monitoreo del servidor.
@@ -49,12 +53,32 @@ import com.sphynxs.mydatabases.R
 @Composable
 fun MonitorScreen(
     connectionId: String,
+    onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var selectedTabIndex by remember { mutableIntStateOf(0) }
     
-    Column(modifier = modifier.fillMaxSize()) {
-        // TabRow con 3 tabs
+    Scaffold(
+        modifier = modifier,
+        containerColor = DesignTokens.BackgroundPrimary
+    ) { paddingValues ->
+        BreathingBackground(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
+            Column(modifier = Modifier.fillMaxSize()) {
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                // Título grande estilo iOS con botón de retroceso
+                ScreenTitle(
+                    title = stringResource(R.string.nav_monitor),
+                    onBackClick = onNavigateBack
+                )
+                
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                // TabRow con 3 tabs
         TabRow(
             selectedTabIndex = selectedTabIndex,
             modifier = Modifier.semantics {
@@ -104,6 +128,8 @@ fun MonitorScreen(
                 title = stringResource(R.string.monitor_health_title),
                 message = stringResource(R.string.monitor_placeholder)
             )
+        }
+            }
         }
     }
 }

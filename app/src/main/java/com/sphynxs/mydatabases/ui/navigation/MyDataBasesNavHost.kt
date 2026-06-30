@@ -146,6 +146,7 @@ fun MyDataBasesNavHost(
                     onNavigateToTables = { databaseName ->
                         navController.navigate(Routes.TableList.createRoute(databaseName))
                     },
+                    onNavigateBack = { navController.popBackStack() },
                     showAddDatabaseSheet = showAddDatabaseSheet,
                     onDismissAddDatabaseSheet = {
                         showAddDatabaseSheet = false
@@ -174,7 +175,8 @@ fun MyDataBasesNavHost(
             ) {
                 val connectionId = it.arguments?.getString("connectionId") ?: ""
                 com.sphynxs.mydatabases.ui.screens.databases.MonitorScreen(
-                    connectionId = connectionId
+                    connectionId = connectionId,
+                    onNavigateBack = { navController.popBackStack() }
                 )
             }
             
@@ -187,10 +189,11 @@ fun MyDataBasesNavHost(
                 val databaseName = it.arguments?.getString("databaseName") ?: ""
                 TablesListScreen(
                     databaseName = databaseName,
-                    workspaceManager = workspaceManager,
                     onNavigateToTableViewer = { tableName ->
                         navController.navigate(Routes.TableViewer.createRoute(databaseName, tableName))
-                    }
+                    },
+                    onNavigateBack = { navController.popBackStack() },
+                    workspaceManager = workspaceManager
                 )
             }
             
@@ -205,7 +208,8 @@ fun MyDataBasesNavHost(
                 val tableName = it.arguments?.getString("tableName") ?: ""
                 TableViewerScreen(
                     databaseName = databaseName,
-                    tableName = tableName
+                    tableName = tableName,
+                    onNavigateBack = { navController.popBackStack() }
                 )
             }
             
@@ -263,7 +267,13 @@ fun MyDataBasesNavHost(
             }
             
             composable(Routes.Settings.route) {
-                SettingsScreen()
+                SettingsScreen(
+                    onNavigateBack = if (navController.previousBackStackEntry != null) {
+                        { navController.popBackStack() }
+                    } else {
+                        null
+                    }
+                )
             }
         }
         } // Cierre AdaptiveNavigationScaffold
