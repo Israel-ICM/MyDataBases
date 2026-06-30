@@ -33,6 +33,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
@@ -115,14 +116,35 @@ fun WorkspaceOverlay(
                 )
                 
                 // Capa 3: Toolbar flotante FUERA del topsheet (solo para Query cards)
-                if (card is WorkspaceCard.Query && isCardExpanded) {
+                if (card is WorkspaceCard.Query) {
                     val navBarPadding = WindowInsets.navigationBars.asPaddingValues()
+                    val density = androidx.compose.ui.platform.LocalDensity.current
+                    
+                    // Calcular offset target: toolbar entra desde abajo (positivo) a su posición final (0)
+                    // Cuando topsheet está minimizado (progress=0), toolbar está oculta abajo (+100dp)
+                    // Cuando topsheet está expandido (progress=1), toolbar está visible (0dp)
+                    val targetOffsetY = with(density) { 
+                        (1f - expansionProgress) * 100.dp.toPx()
+                    }
+                    
+                    // Animar el offset para suavizar movimientos rápidos
+                    val animatedOffsetY by androidx.compose.animation.core.animateFloatAsState(
+                        targetValue = targetOffsetY,
+                        animationSpec = androidx.compose.animation.core.spring(
+                            dampingRatio = androidx.compose.animation.core.Spring.DampingRatioMediumBouncy,
+                            stiffness = androidx.compose.animation.core.Spring.StiffnessLow
+                        ),
+                        label = "toolbarOffset"
+                    )
                     
                     com.sphynxs.mydatabases.ui.screens.queryeditor.QueryEditorToolbarRow(
                         connectionId = card.connectionId,
                         modifier = Modifier
                             .fillMaxWidth()
                             .align(Alignment.BottomCenter)
+                            .graphicsLayer { 
+                                translationY = animatedOffsetY
+                            }
                             .padding(bottom = navBarPadding.calculateBottomPadding())
                     )
                 }
