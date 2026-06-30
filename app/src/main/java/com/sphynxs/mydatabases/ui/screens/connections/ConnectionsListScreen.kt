@@ -300,7 +300,8 @@ fun ConnectionsListScreen(
             },
             sheetState = typeSelectorSheetState,
             containerColor = Color(0xFFF2F2F7),
-            scrimColor = DesignTokens.BackdropScrim
+            scrimColor = DesignTokens.BackdropScrim,
+            tonalElevation = 16.dp
         ) {
             Column(
                 modifier = Modifier
@@ -348,7 +349,8 @@ fun ConnectionsListScreen(
             sheetState = formSheetState,
             containerColor = Color(0xFFF2F2F7),
             sheetMaxWidth = 10000.dp,
-            scrimColor = DesignTokens.BackdropScrim
+            scrimColor = DesignTokens.BackdropScrim,
+            tonalElevation = 16.dp
         ) {
             ConnectionFormScreen(
                 connectionId = editingConnectionId,
