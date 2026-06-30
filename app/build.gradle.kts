@@ -115,6 +115,10 @@ dependencies {
     // Receta probada en MyDataBasesDeprecated
     implementation("mysql:mysql-connector-java:5.1.46")
     
+    // SSH Tunneling
+    // Fork mantenido de JSch (original abandonado en 2018)
+    implementation("com.github.mwiede:jsch:0.2.16")
+    
     // Testing
     testImplementation("junit:junit:4.13.2")
     testImplementation("com.google.truth:truth:1.1.5")
