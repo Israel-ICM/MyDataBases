@@ -314,23 +314,8 @@ fun ConnectionFormScreen(
                         value = name,
                         onValueChange = { name = it },
                         placeholder = stringResource(R.string.connection_field_name_hint),
-                        showDivider = preselectedType == null
+                        showDivider = false
                     )
-                    
-                    // Database type selector solo si NO viene preseleccionado
-                    if (preselectedType == null) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(Color.White)
-                                .padding(horizontal = 16.dp, vertical = 12.dp)
-                        ) {
-                            DatabaseTypeSelector(
-                                selected = selectedType,
-                                onSelect = { selectedType = it }
-                            )
-                        }
-                    }
                 }
             }
 
