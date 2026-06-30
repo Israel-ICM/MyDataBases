@@ -31,7 +31,7 @@
     <string name="connections_empty_message">Add your first database connection to get started</string>
     <string name="connections_add_new">New connection</string>
     <string name="connection_action_edit">Edit connection</string>
-    <string name="connection_action_disconnect">Disconnect</string>
+    <string name="connection_action_disconnect">Close connection</string>
     <string name="connection_action_delete">Delete connection</string>
     <string name="connection_delete_confirm_title">Delete connection?</string>
     <string name="connection_delete_confirm_message">This will permanently delete the connection "%1$s"</string>
