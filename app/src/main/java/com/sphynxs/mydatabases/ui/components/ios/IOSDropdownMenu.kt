@@ -1,6 +1,7 @@
 package com.sphynxs.mydatabases.ui.components.ios
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.MenuDefaults
@@ -34,7 +35,7 @@ fun IOSDropdownMenu(
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
     offset: DpOffset = DpOffset(0.dp, 4.dp),
-    content: @Composable () -> Unit
+    content: @Composable ColumnScope.() -> Unit
 ) {
     DropdownMenu(
         expanded = expanded,
