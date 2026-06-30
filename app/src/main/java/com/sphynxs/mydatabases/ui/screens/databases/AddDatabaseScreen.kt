@@ -323,7 +323,7 @@ fun AddDatabaseFormContent(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.5f)),
+                    .background(Color.White.copy(alpha = 0.4f)),
                 contentAlignment = Alignment.Center
             ) {
                 Column(
@@ -336,7 +336,7 @@ fun AddDatabaseFormContent(
                     Text(
                         text = stringResource(R.string.add_database_creating),
                         fontSize = 16.sp,
-                        color = Color.White,
+                        color = Color.Black,
                         fontWeight = FontWeight.Medium
                     )
                 }

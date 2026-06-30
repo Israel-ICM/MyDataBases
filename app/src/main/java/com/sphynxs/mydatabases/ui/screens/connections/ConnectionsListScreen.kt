@@ -272,7 +272,7 @@ fun ConnectionsListScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.5f)),
+                .background(Color.White.copy(alpha = 0.4f)),
             contentAlignment = Alignment.Center
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -282,7 +282,7 @@ fun ConnectionsListScreen(
                 Spacer(Modifier.height(16.dp))
                 Text(
                     "Conectando...",
-                    color = Color.White,
+                    color = Color.Black,
                     fontSize = 17.sp
                 )
             }
@@ -347,7 +347,7 @@ fun ConnectionsListScreen(
             sheetState = formSheetState,
             containerColor = Color(0xFFF2F2F7),
             sheetMaxWidth = 10000.dp,
-            scrimColor = Color.Black.copy(alpha = 0.5f)
+            scrimColor = Color.White.copy(alpha = 0.4f)
         ) {
             ConnectionFormScreen(
                 connectionId = editingConnectionId,
