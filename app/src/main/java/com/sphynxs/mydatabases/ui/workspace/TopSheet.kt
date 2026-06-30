@@ -142,7 +142,8 @@ fun TopSheet(
                         }
                     }
             ) {
-                drawRect(Color.Black.copy(alpha = backdropAlpha))
+                // Fondo claro semitransparente (sin blur real por limitaciones de Android)
+                drawRect(Color.White.copy(alpha = backdropAlpha * 0.85f))
             }
         }
         
