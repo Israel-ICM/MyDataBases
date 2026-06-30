@@ -3,6 +3,7 @@ package com.sphynxs.mydatabases.core.database.engine.mysql
 import android.content.Context
 import com.sphynxs.mydatabases.core.database.ConnectionStringParser
 import com.sphynxs.mydatabases.core.database.models.ConnectionConfig
+import com.sphynxs.mydatabases.core.database.ssh.SSHTunnelManager
 import com.sphynxs.mydatabases.core.database.ssl.MySQLSSLConfigBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -21,13 +22,14 @@ import java.util.Properties
  * Características:
  * - Soporte SSL/TLS con certificados personalizados
  * - Autenticación mutua (mTLS) opcional
+ * - SSH tunneling para conexiones a través de bastion hosts
  * - Timeouts básicos de socket
  * - Sin pooling (una conexión por request)
  * 
  * @param config Configuración de conexión con credenciales
- * @param context Contexto de Android para leer certificados
+ * @param context Contexto de Android para leer certificados y claves SSH
  * @author israel-icm
- * @date 2026-06-15 (updated 2026-06-30 for SSL certificates)
+ * @date 2026-06-15 (updated 2026-06-30 for SSL certificates and SSH tunneling)
  */
 class MySQLConnectionPool(
     private val config: ConnectionConfig,
@@ -36,17 +38,26 @@ class MySQLConnectionPool(
     
     private var activeConnection: Connection? = null
     private var sslConfigBuilder: MySQLSSLConfigBuilder? = null
+    private var sshTunnelManager: SSHTunnelManager? = null
     
     /**
      * Obtiene una conexión directa usando DriverManager.
-     * Copia la receta probada de MyDataBasesDeprecated con soporte SSL mejorado.
+     * Copia la receta probada de MyDataBasesDeprecated con soporte SSL mejorado y SSH tunneling.
      * 
-     * Prioridad de configuración:
-     * 1. Connection string (si está presente, sobreescribe host/port/user/pass)
-     * 2. Valores individuales de config (host, port, username, password)
+     * Flujo de conexión:
+     * 1. Si SSH tunnel habilitado → establecer túnel primero
+     * 2. Connection string (si está presente, sobreescribe host/port/user/pass)
+     * 3. Aplicar configuración SSL (certificados)
+     * 4. Establecer conexión JDBC
+     * 
+     * Prioridad de host/port:
+     * 1. SSH tunnel (localhost:localPort) si está activo
+     * 2. Connection string si está presente
+     * 3. Valores individuales de config
      * 
      * @return Conexión JDBC válida
      * @throws SQLException si no se puede obtener conexión
+     * @throws SSHTunnelException si SSH tunnel falla
      */
     suspend fun getConnection(): Connection = withContext(Dispatchers.IO) {
         // Cargar driver explícitamente (necesario en Android)
@@ -65,6 +76,13 @@ class MySQLConnectionPool(
                 password = config.password,
                 parameters = emptyMap()
             )
+        }
+        
+        // Establecer SSH tunnel si está configurado (ANTES de JDBC connection)
+        val (jdbcHost, jdbcPort) = if (shouldUseSSHTunnel()) {
+            establishSSHTunnel(effectiveConfig.host, effectiveConfig.port)
+        } else {
+            effectiveConfig.host to effectiveConfig.port
         }
         
         val connectionProps = Properties().apply {
@@ -109,7 +127,7 @@ class MySQLConnectionPool(
         }
         
         val databaseSegment = effectiveConfig.database.takeIf { it.isNotBlank() } ?: ""
-        val jdbcUrl = "jdbc:mysql://${effectiveConfig.host}:${effectiveConfig.port}/$databaseSegment"
+        val jdbcUrl = "jdbc:mysql://${jdbcHost}:${jdbcPort}/$databaseSegment"
         
         try {
             // DriverManager directo - la receta probada
@@ -117,8 +135,51 @@ class MySQLConnectionPool(
             activeConnection = connection
             connection
         } catch (e: Exception) {
-            // Limpiar certificados temporales si falló la conexión
+            // Limpiar recursos si falló la conexión
             sslConfigBuilder?.cleanup()
+            sshTunnelManager?.disconnect()
+            throw e
+        }
+    }
+    
+    /**
+     * Determina si se debe usar SSH tunnel para esta conexión.
+     * 
+     * SSH tunnel NO se usa si:
+     * - No está habilitado en config
+     * - Se está usando connection string (asumimos que el string ya maneja la conexión)
+     */
+    private fun shouldUseSSHTunnel(): Boolean {
+        return config.sshTunnelConfig?.enabled == true &&
+               config.connectionString.isNullOrBlank()
+    }
+    
+    /**
+     * Establece SSH tunnel y retorna el host/port efectivo para JDBC.
+     * 
+     * @param databaseHost Host del servidor de base de datos (destino del túnel)
+     * @param databasePort Puerto del servidor de base de datos
+     * @return Pair(host, port) para usar en JDBC URL (localhost:localPort)
+     * @throws SSHTunnelException si el túnel no se puede establecer
+     */
+    private fun establishSSHTunnel(databaseHost: String, databasePort: Int): Pair<String, Int> {
+        val sshConfig = config.sshTunnelConfig
+            ?: throw IllegalStateException("SSH tunnel config is null but shouldUseSSHTunnel returned true")
+        
+        try {
+            sshTunnelManager = SSHTunnelManager(sshConfig, context)
+            val localPort = sshTunnelManager!!.connect(
+                remoteHost = databaseHost,
+                remotePort = databasePort
+            )
+            
+            // Retornar localhost:localPort para JDBC connection
+            return "127.0.0.1" to localPort
+            
+        } catch (e: Exception) {
+            // Cleanup tunnel manager on failure
+            sshTunnelManager?.disconnect()
+            sshTunnelManager = null
             throw e
         }
     }
@@ -153,6 +214,11 @@ class MySQLConnectionPool(
     /**
      * Cierra la conexión activa si existe.
      * Debe llamarse al desconectar para evitar leaks.
+     * 
+     * Limpia recursos en orden:
+     * 1. Conexión JDBC
+     * 2. Certificados SSL temporales
+     * 3. Túnel SSH
      */
     fun close() {
         activeConnection?.let {
@@ -162,8 +228,12 @@ class MySQLConnectionPool(
         }
         activeConnection = null
         
-        // Limpiar certificados temporales
+        // Limpiar certificados temporales SSL
         sslConfigBuilder?.cleanup()
         sslConfigBuilder = null
+        
+        // Limpiar túnel SSH
+        sshTunnelManager?.disconnect()
+        sshTunnelManager = null
     }
 }
