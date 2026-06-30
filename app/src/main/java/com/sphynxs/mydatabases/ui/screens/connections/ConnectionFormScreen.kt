@@ -87,6 +87,18 @@ fun ConnectionFormScreen(
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
     var useSSL by remember { mutableStateOf(false) }  // Default false - mayoría de DBs locales no usan SSL
+    
+    // Advanced connection state
+    var showAdvancedConnection by remember { mutableStateOf(false) }
+    
+    // SSH Tunnel state
+    var sshHost by remember { mutableStateOf("") }
+    var sshPort by remember { mutableStateOf("22") }
+    var sshUsername by remember { mutableStateOf("") }
+    var sshPassword by remember { mutableStateOf("") }
+    
+    // Connection String state
+    var connectionString by remember { mutableStateOf("") }
 
     // Load existing connection if editing
     LaunchedEffect(connectionId) {
@@ -257,34 +269,9 @@ fun ConnectionFormScreen(
                         value = port,
                         onValueChange = { port = it },
                         placeholder = stringResource(R.string.connection_field_port_hint),
-                        keyboardType = KeyboardType.Number
+                        keyboardType = KeyboardType.Number,
+                        showDivider = false
                     )
-                    
-                    // SSL Toggle
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(Color.White)
-                            .padding(horizontal = 16.dp, vertical = 12.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            "Usar SSL/TLS",
-                            fontSize = 17.sp,
-                            color = Color.Black
-                        )
-                        Switch(
-                            checked = useSSL,
-                            onCheckedChange = { useSSL = it },
-                            colors = SwitchDefaults.colors(
-                                checkedThumbColor = Color.White,
-                                checkedTrackColor = Color(0xFF34C759),
-                                uncheckedThumbColor = Color.White,
-                                uncheckedTrackColor = Color(0xFFE5E5EA)
-                            )
-                        )
-                    }
                 }
             }
 
@@ -312,6 +299,134 @@ fun ConnectionFormScreen(
                 }
             }
 
+            // Card 4: Conexión avanzada (toggle)
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                IOSGroupedCard {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color.White)
+                            .padding(horizontal = 16.dp, vertical = 12.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            "Conexión avanzada",
+                            fontSize = 17.sp,
+                            color = Color.Black
+                        )
+                        Switch(
+                            checked = showAdvancedConnection,
+                            onCheckedChange = { showAdvancedConnection = it },
+                            colors = SwitchDefaults.colors(
+                                checkedThumbColor = Color.White,
+                                checkedTrackColor = Color(0xFF007AFF),
+                                uncheckedThumbColor = Color.White,
+                                uncheckedTrackColor = Color(0xFFE5E5EA)
+                            )
+                        )
+                    }
+                }
+            }
+            
+            // Advanced connection sections (visible when toggle is ON)
+            if (showAdvancedConnection) {
+                // SSL Configuration
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        "SSL/TLS",
+                        fontSize = 13.sp,
+                        color = Color(0xFF8E8E93),
+                        modifier = Modifier.padding(start = 16.dp)
+                    )
+                    IOSGroupedCard {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(Color.White)
+                                .padding(horizontal = 16.dp, vertical = 12.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                "Usar SSL/TLS",
+                                fontSize = 17.sp,
+                                color = Color.Black
+                            )
+                            Switch(
+                                checked = useSSL,
+                                onCheckedChange = { useSSL = it },
+                                colors = SwitchDefaults.colors(
+                                    checkedThumbColor = Color.White,
+                                    checkedTrackColor = Color(0xFF34C759),
+                                    uncheckedThumbColor = Color.White,
+                                    uncheckedTrackColor = Color(0xFFE5E5EA)
+                                )
+                            )
+                        }
+                    }
+                }
+                
+                // SSH Tunnel Configuration
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        "TÚNEL SSH",
+                        fontSize = 13.sp,
+                        color = Color(0xFF8E8E93),
+                        modifier = Modifier.padding(start = 16.dp)
+                    )
+                    IOSGroupedCard {
+                        IOSTextField(
+                            value = sshHost,
+                            onValueChange = { sshHost = it },
+                            placeholder = "SSH Host (ej: bastion.ejemplo.com)"
+                        )
+                        IOSTextField(
+                            value = sshPort,
+                            onValueChange = { sshPort = it },
+                            placeholder = "SSH Port",
+                            keyboardType = KeyboardType.Number
+                        )
+                        IOSTextField(
+                            value = sshUsername,
+                            onValueChange = { sshUsername = it },
+                            placeholder = "SSH Usuario"
+                        )
+                        IOSTextField(
+                            value = sshPassword,
+                            onValueChange = { sshPassword = it },
+                            placeholder = "SSH Contraseña",
+                            isPassword = true,
+                            showDivider = false
+                        )
+                    }
+                }
+                
+                // Connection String Configuration
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        "CONNECTION STRING",
+                        fontSize = 13.sp,
+                        color = Color(0xFF8E8E93),
+                        modifier = Modifier.padding(start = 16.dp)
+                    )
+                    IOSGroupedCard {
+                        IOSTextField(
+                            value = connectionString,
+                            onValueChange = { connectionString = it },
+                            placeholder = "postgresql://user:pass@host:5432/db",
+                            showDivider = false
+                        )
+                    }
+                    Text(
+                        "Si se proporciona, sobreescribe host, port, user y password",
+                        fontSize = 13.sp,
+                        color = Color(0xFF8E8E93),
+                        modifier = Modifier.padding(start = 16.dp)
+                    )
+                }
+            }
+
             // Botón de test
             IOSButton(
                 text = stringResource(R.string.action_test),
@@ -331,6 +446,9 @@ fun ConnectionFormScreen(
                 style = IOSButtonStyle.Secondary,
                 enabled = testState != ConnectionTestUiState.Testing
             )
+            
+            // Spacer para scroll bottom
+            Spacer(modifier = Modifier.height(32.dp))
         }
     }
 }
