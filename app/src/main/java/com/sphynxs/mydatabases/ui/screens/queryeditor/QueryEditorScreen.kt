@@ -1017,7 +1017,8 @@ fun QueryEditorToolbarRow(
                         Icon(
                             Icons.Default.Stop,
                             contentDescription = "Cancel",
-                            tint = Color(0xFFF44336)
+                            tint = Color(0xFFF44336),
+                            modifier = Modifier.size(32.dp)
                         )
                     }
                 } else {
@@ -1029,7 +1030,8 @@ fun QueryEditorToolbarRow(
                             Icons.Default.PlayArrow,
                             contentDescription = "Execute",
                             tint = if (sqlText.isNotBlank()) Color(0xFF4CAF50) 
-                                  else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+                                  else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
+                            modifier = Modifier.size(32.dp)
                         )
                     }
                 }
@@ -1050,26 +1052,32 @@ internal fun AdaptiveToolbar(
     var showOverflowMenu by remember { mutableStateOf(false) }
     val configuration = LocalConfiguration.current
     val screenWidthDp = configuration.screenWidthDp
+    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
     
-    // Estimate: each button ~48dp, more button ~48dp, padding ~16dp (4dp × 2 × 2 sides)
-    val buttonWidth = 48
-    val moreButtonWidth = 48
-    val surfacePadding = 8 // horizontal padding of Surface
-    val runButtonWidth = 64 // Run button + its surface padding
-    val spaceBetween = 16 // space between left and right groups
+    // Estrategia adaptativa:
+    // - Móvil vertical (< 600dp portrait): 3 botones + overflow
+    // - Móvil horizontal (< 600dp landscape): 5 botones + overflow
+    // - Tablet/Desktop (≥ 600dp): calcular dinámicamente
+    val isMobile = screenWidthDp < 600
     
-    // Calculate available width for left toolbar
-    // screenWidth - runButton - spaceBetween - surfacePadding×2 - moreButton
-    val availableWidth = screenWidthDp - runButtonWidth - spaceBetween - (surfacePadding * 2) - moreButtonWidth
-    
-    // Calculate max visible buttons (ensure at least 1)
-    val maxVisibleButtons = maxOf(1, (availableWidth / buttonWidth))
+    val maxVisibleButtons = if (isMobile) {
+        if (isLandscape) 5 else 3 // Horizontal: 5 botones, Vertical: 3 botones
+    } else {
+        // Calcular dinámicamente para tablet/desktop
+        val buttonWidth = 48
+        val moreButtonWidth = 48
+        val surfacePadding = 8
+        val runButtonWidth = 64
+        val spaceBetween = 16
+        val availableWidth = screenWidthDp - runButtonWidth - spaceBetween - (surfacePadding * 2) - moreButtonWidth
+        maxOf(1, (availableWidth / buttonWidth))
+    }
     
     val visibleActions = actions.take(minOf(maxVisibleButtons, actions.size))
     val overflowActions = actions.drop(visibleActions.size)
     
     // Debug log
-    android.util.Log.d("AdaptiveToolbar", "screenWidth=$screenWidthDp, availableWidth=$availableWidth, maxVisible=$maxVisibleButtons, showing=${visibleActions.size}, overflow=${overflowActions.size}")
+    android.util.Log.d("AdaptiveToolbar", "screenWidth=$screenWidthDp, orientation=${if (isLandscape) "landscape" else "portrait"}, maxVisible=$maxVisibleButtons, showing=${visibleActions.size}, overflow=${overflowActions.size}")
     
     Surface(
         shape = CircleShape,
@@ -1106,7 +1114,8 @@ internal fun AdaptiveToolbar(
                                     MaterialTheme.colorScheme.onSurface
                                 } else {
                                     MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
-                                }
+                                },
+                                modifier = Modifier.size(28.dp)
                             )
                         }
                     }
@@ -1122,7 +1131,8 @@ internal fun AdaptiveToolbar(
                                 MaterialTheme.colorScheme.onSurface
                             } else {
                                 MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
-                            }
+                            },
+                            modifier = Modifier.size(28.dp)
                         )
                     }
                 }
@@ -1135,19 +1145,23 @@ internal fun AdaptiveToolbar(
                         Icon(
                             Icons.Default.MoreVert,
                             contentDescription = "More options",
-                            tint = MaterialTheme.colorScheme.onSurface
+                            tint = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier.size(28.dp)
                         )
                     }
                     
-                    DropdownMenu(
+                    androidx.compose.material3.DropdownMenu(
                         expanded = showOverflowMenu,
-                        onDismissRequest = { showOverflowMenu = false }
+                        onDismissRequest = { showOverflowMenu = false },
+                        shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
+                        tonalElevation = 3.dp,
+                        shadowElevation = 8.dp
                     ) {
                         overflowActions.forEach { action ->
                             DropdownMenuItem(
                                 text = { 
                                     Row(
-                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                        horizontalArrangement = Arrangement.spacedBy(12.dp),
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         Icon(
@@ -1157,9 +1171,13 @@ internal fun AdaptiveToolbar(
                                                 MaterialTheme.colorScheme.onSurface
                                             } else {
                                                 MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
-                                            }
+                                            },
+                                            modifier = Modifier.size(28.dp)
                                         )
-                                        Text(action.label)
+                                        Text(
+                                            text = action.label,
+                                            style = MaterialTheme.typography.bodyLarge
+                                        )
                                         if (action.badge != null) {
                                             Badge {
                                                 Text(
@@ -1176,7 +1194,11 @@ internal fun AdaptiveToolbar(
                                         showOverflowMenu = false
                                     }
                                 },
-                                enabled = action.enabled
+                                enabled = action.enabled,
+                                contentPadding = androidx.compose.foundation.layout.PaddingValues(
+                                    horizontal = 16.dp,
+                                    vertical = 12.dp
+                                )
                             )
                         }
                     }
