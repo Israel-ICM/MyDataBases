@@ -299,7 +299,8 @@ fun ConnectionsListScreen(
                 }
             },
             sheetState = typeSelectorSheetState,
-            containerColor = Color(0xFFF2F2F7)
+            containerColor = Color(0xFFF2F2F7),
+            scrimColor = DesignTokens.BackdropScrim
         ) {
             Column(
                 modifier = Modifier
