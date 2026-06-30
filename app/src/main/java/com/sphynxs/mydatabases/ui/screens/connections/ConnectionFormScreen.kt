@@ -109,10 +109,15 @@ fun ConnectionFormScreen(
     val context = LocalContext.current
     
     // SSH Tunnel state
+    var sshTunnelEnabled by remember { mutableStateOf(false) }
     var sshHost by remember { mutableStateOf("") }
     var sshPort by remember { mutableStateOf("22") }
     var sshUsername by remember { mutableStateOf("") }
+    var sshAuthMethod by remember { mutableStateOf(com.sphynxs.mydatabases.core.database.models.SSHAuthMethod.PASSWORD) }
     var sshPassword by remember { mutableStateOf("") }
+    var sshPrivateKeyUri by remember { mutableStateOf<Uri?>(null) }
+    var sshPrivateKeyName by remember { mutableStateOf<String?>(null) }
+    var showSSHSecurityWarning by remember { mutableStateOf(false) }
     
     // Connection String state
     var connectionString by remember { mutableStateOf("") }
@@ -158,10 +163,16 @@ fun ConnectionFormScreen(
                 
                 // Load SSH tunnel config
                 config.sshTunnelConfig?.let { ssh ->
+                    sshTunnelEnabled = ssh.enabled
                     sshHost = ssh.host
                     sshPort = ssh.port.toString()
                     sshUsername = ssh.username
-                    sshPassword = ssh.password ?: ""
+                    sshAuthMethod = ssh.authMethod
+                    sshPassword = ssh.password
+                    ssh.privateKeyUri?.let { uri ->
+                        sshPrivateKeyUri = android.net.Uri.parse(uri)
+                        sshPrivateKeyName = sshPrivateKeyUri?.getFileName(context)
+                    }
                 }
                 
                 // Load connection string
@@ -253,10 +264,13 @@ fun ConnectionFormScreen(
                             caCertificateUri = caCertificateUri?.toString(),
                             clientCertificateUri = clientCertificateUri?.toString(),
                             clientKeyUri = clientKeyUri?.toString(),
-                            sshHost = if (showAdvancedConnection) sshHost else null,
-                            sshPort = if (showAdvancedConnection) sshPort.toIntOrNull() else null,
-                            sshUsername = if (showAdvancedConnection) sshUsername else null,
-                            sshPassword = if (showAdvancedConnection) sshPassword else null,
+                            sshTunnelEnabled = sshTunnelEnabled,
+                            sshHost = if (showAdvancedConnection && sshTunnelEnabled) sshHost else null,
+                            sshPort = if (showAdvancedConnection && sshTunnelEnabled) sshPort.toIntOrNull() else null,
+                            sshUsername = if (showAdvancedConnection && sshTunnelEnabled) sshUsername else null,
+                            sshAuthMethod = sshAuthMethod,
+                            sshPassword = if (showAdvancedConnection && sshTunnelEnabled) sshPassword else null,
+                            sshPrivateKeyUri = sshPrivateKeyUri?.toString(),
                             connectionString = if (showAdvancedConnection) connectionString else null
                         )
                         viewModel.saveConnection(config)
@@ -673,10 +687,13 @@ fun ConnectionFormScreen(
                         caCertificateUri = caCertificateUri?.toString(),
                         clientCertificateUri = clientCertificateUri?.toString(),
                         clientKeyUri = clientKeyUri?.toString(),
-                        sshHost = if (showAdvancedConnection) sshHost else null,
-                        sshPort = if (showAdvancedConnection) sshPort.toIntOrNull() else null,
-                        sshUsername = if (showAdvancedConnection) sshUsername else null,
-                        sshPassword = if (showAdvancedConnection) sshPassword else null,
+                        sshTunnelEnabled = sshTunnelEnabled,
+                        sshHost = if (showAdvancedConnection && sshTunnelEnabled) sshHost else null,
+                        sshPort = if (showAdvancedConnection && sshTunnelEnabled) sshPort.toIntOrNull() else null,
+                        sshUsername = if (showAdvancedConnection && sshTunnelEnabled) sshUsername else null,
+                        sshAuthMethod = sshAuthMethod,
+                        sshPassword = if (showAdvancedConnection && sshTunnelEnabled) sshPassword else null,
+                        sshPrivateKeyUri = sshPrivateKeyUri?.toString(),
                         connectionString = if (showAdvancedConnection) connectionString else null
                     )
                     viewModel.testConnection(config)
@@ -708,10 +725,13 @@ private fun createConnectionConfig(
     caCertificateUri: String? = null,
     clientCertificateUri: String? = null,
     clientKeyUri: String? = null,
+    sshTunnelEnabled: Boolean = false,
     sshHost: String? = null,
     sshPort: Int? = null,
     sshUsername: String? = null,
+    sshAuthMethod: com.sphynxs.mydatabases.core.database.models.SSHAuthMethod = com.sphynxs.mydatabases.core.database.models.SSHAuthMethod.PASSWORD,
     sshPassword: String? = null,
+    sshPrivateKeyUri: String? = null,
     connectionString: String? = null
 ): ConnectionConfig {
     // Crear SSL config si SSL está habilitado y hay configuración avanzada
@@ -728,13 +748,16 @@ private fun createConnectionConfig(
         )
     } else null
     
-    // Crear SSH tunnel config si se proporcionaron datos SSH
-    val sshTunnelConfig = if (!sshHost.isNullOrBlank()) {
+    // Crear SSH tunnel config si está habilitado
+    val sshTunnelConfig = if (sshTunnelEnabled && !sshHost.isNullOrBlank()) {
         com.sphynxs.mydatabases.core.database.models.SSHTunnelConfig(
+            enabled = true,
             host = sshHost,
             port = sshPort ?: 22,
             username = sshUsername ?: "",
-            password = sshPassword
+            authMethod = sshAuthMethod,
+            password = sshPassword ?: "",
+            privateKeyUri = sshPrivateKeyUri
         )
     } else null
     
