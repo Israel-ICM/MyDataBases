@@ -216,17 +216,23 @@ fun ConnectionsListScreen(
                                         }
                                     },
                                     onCardClick = {
-                                        scope.launch {
-                                            val result = viewModel.connect(connection.id)
-                                            result.fold(
-                                                onSuccess = { onConnect(connection.id) },
-                                                onFailure = { error ->
-                                                    snackbarHostState.showSnackbar(
-                                                        message = "Error: ${error.message}",
-                                                        duration = SnackbarDuration.Long
-                                                    )
-                                                }
-                                            )
+                                        // Si ya está conectada, solo navegar
+                                        if (connection.id == activeConnectionId) {
+                                            onConnect(connection.id)
+                                        } else {
+                                            // Si no está conectada, conectar primero
+                                            scope.launch {
+                                                val result = viewModel.connect(connection.id)
+                                                result.fold(
+                                                    onSuccess = { onConnect(connection.id) },
+                                                    onFailure = { error ->
+                                                        snackbarHostState.showSnackbar(
+                                                            message = "Error: ${error.message}",
+                                                            duration = SnackbarDuration.Long
+                                                        )
+                                                    }
+                                                )
+                                            }
                                         }
                                     },
                                     isConnected = connection.id == activeConnectionId,
