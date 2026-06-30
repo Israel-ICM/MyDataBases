@@ -414,7 +414,12 @@ fun ConnectionFormScreen(
                         IOSTextField(
                             value = connectionString,
                             onValueChange = { connectionString = it },
-                            placeholder = "postgresql://user:pass@host:5432/db",
+                            placeholder = when (selectedType) {
+                                DatabaseType.MYSQL -> "mysql://user:pass@host:3306/database"
+                                DatabaseType.POSTGRESQL -> "postgresql://user:pass@host:5432/database"
+                                DatabaseType.MARIADB -> "mariadb://user:pass@host:3306/database"
+                                DatabaseType.SQLITE -> "sqlite:///path/to/database.db"
+                            },
                             showDivider = false
                         )
                     }
