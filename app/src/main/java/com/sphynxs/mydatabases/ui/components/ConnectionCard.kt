@@ -68,7 +68,7 @@ fun ConnectionCard(
     val accentColor = DbAccents.accentFor(connection.type)
 
     IOSCard(
-        onClick = {},
+        onClick = onCardClick,
         modifier = modifier
     ) {
         Row(
@@ -131,11 +131,9 @@ fun ConnectionCard(
                 }
             }
 
-            // Contenido principal (clickable para conectar)
+            // Contenido principal
             Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .clickable(onClick = onCardClick),
+                modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 // Nombre de la conexión
