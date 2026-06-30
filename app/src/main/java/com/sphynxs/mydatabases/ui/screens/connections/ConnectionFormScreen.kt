@@ -129,6 +129,45 @@ fun ConnectionFormScreen(
                 username = config.username.trim()
                 password = config.password.trim()
                 useSSL = config.useSSL
+                
+                // Load advanced connection settings
+                if (config.hasAdvancedConfig) {
+                    showAdvancedConnection = true
+                }
+                
+                // Load SSL config
+                config.sslConfig?.let { ssl ->
+                    sslMode = when (ssl.mode) {
+                        com.sphynxs.mydatabases.core.database.models.SSLMode.VERIFY_CA -> "VERIFY_CA"
+                        com.sphynxs.mydatabases.core.database.models.SSLMode.VERIFY_IDENTITY -> "VERIFY_IDENTITY"
+                        else -> "REQUIRED"
+                    }
+                    ssl.caCertificateUri?.let { uri ->
+                        caCertificateUri = android.net.Uri.parse(uri)
+                        caCertificateName = caCertificateUri?.getFileName(context)
+                    }
+                    ssl.clientCertificateUri?.let { uri ->
+                        clientCertificateUri = android.net.Uri.parse(uri)
+                        clientCertificateName = clientCertificateUri?.getFileName(context)
+                    }
+                    ssl.clientKeyUri?.let { uri ->
+                        clientKeyUri = android.net.Uri.parse(uri)
+                        clientKeyName = clientKeyUri?.getFileName(context)
+                    }
+                }
+                
+                // Load SSH tunnel config
+                config.sshTunnelConfig?.let { ssh ->
+                    sshHost = ssh.host
+                    sshPort = ssh.port.toString()
+                    sshUsername = ssh.username
+                    sshPassword = ssh.password ?: ""
+                }
+                
+                // Load connection string
+                config.connectionString?.let { cs ->
+                    connectionString = cs
+                }
             }
         }
     }
@@ -209,7 +248,16 @@ fun ConnectionFormScreen(
                             port = port.toIntOrNull() ?: selectedType.defaultPort,
                             username = username,
                             password = password,
-                            useSSL = useSSL
+                            useSSL = useSSL,
+                            sslMode = if (showAdvancedConnection) sslMode else null,
+                            caCertificateUri = caCertificateUri?.toString(),
+                            clientCertificateUri = clientCertificateUri?.toString(),
+                            clientKeyUri = clientKeyUri?.toString(),
+                            sshHost = if (showAdvancedConnection) sshHost else null,
+                            sshPort = if (showAdvancedConnection) sshPort.toIntOrNull() else null,
+                            sshUsername = if (showAdvancedConnection) sshUsername else null,
+                            sshPassword = if (showAdvancedConnection) sshPassword else null,
+                            connectionString = if (showAdvancedConnection) connectionString else null
                         )
                         viewModel.saveConnection(config)
                     },
@@ -620,7 +668,16 @@ fun ConnectionFormScreen(
                         port = port.toIntOrNull() ?: selectedType.defaultPort,
                         username = username,
                         password = password,
-                        useSSL = useSSL
+                        useSSL = useSSL,
+                        sslMode = if (showAdvancedConnection) sslMode else null,
+                        caCertificateUri = caCertificateUri?.toString(),
+                        clientCertificateUri = clientCertificateUri?.toString(),
+                        clientKeyUri = clientKeyUri?.toString(),
+                        sshHost = if (showAdvancedConnection) sshHost else null,
+                        sshPort = if (showAdvancedConnection) sshPort.toIntOrNull() else null,
+                        sshUsername = if (showAdvancedConnection) sshUsername else null,
+                        sshPassword = if (showAdvancedConnection) sshPassword else null,
+                        connectionString = if (showAdvancedConnection) connectionString else null
                     )
                     viewModel.testConnection(config)
                 },
@@ -646,8 +703,41 @@ private fun createConnectionConfig(
     port: Int,
     username: String,
     password: String,
-    useSSL: Boolean
+    useSSL: Boolean,
+    sslMode: String? = null,
+    caCertificateUri: String? = null,
+    clientCertificateUri: String? = null,
+    clientKeyUri: String? = null,
+    sshHost: String? = null,
+    sshPort: Int? = null,
+    sshUsername: String? = null,
+    sshPassword: String? = null,
+    connectionString: String? = null
 ): ConnectionConfig {
+    // Crear SSL config si SSL está habilitado y hay configuración avanzada
+    val sslConfig = if (useSSL && (sslMode != null || caCertificateUri != null)) {
+        com.sphynxs.mydatabases.core.database.models.SSLConfig(
+            mode = when (sslMode) {
+                "VERIFY_CA" -> com.sphynxs.mydatabases.core.database.models.SSLMode.VERIFY_CA
+                "VERIFY_IDENTITY" -> com.sphynxs.mydatabases.core.database.models.SSLMode.VERIFY_IDENTITY
+                else -> com.sphynxs.mydatabases.core.database.models.SSLMode.REQUIRED
+            },
+            caCertificateUri = caCertificateUri,
+            clientCertificateUri = clientCertificateUri,
+            clientKeyUri = clientKeyUri
+        )
+    } else null
+    
+    // Crear SSH tunnel config si se proporcionaron datos SSH
+    val sshTunnelConfig = if (!sshHost.isNullOrBlank()) {
+        com.sphynxs.mydatabases.core.database.models.SSHTunnelConfig(
+            host = sshHost,
+            port = sshPort ?: 22,
+            username = sshUsername ?: "",
+            password = sshPassword
+        )
+    } else null
+    
     return ConnectionConfig(
         id = id ?: java.util.UUID.randomUUID().toString(),
         name = name,
@@ -657,6 +747,9 @@ private fun createConnectionConfig(
         database = "",  // Se selecciona después de conectar
         username = username,
         password = password,
-        useSSL = useSSL
+        useSSL = useSSL,
+        sslConfig = sslConfig,
+        sshTunnelConfig = sshTunnelConfig,
+        connectionString = if (!connectionString.isNullOrBlank()) connectionString else null
     )
 }
