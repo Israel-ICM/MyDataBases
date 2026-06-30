@@ -80,5 +80,7 @@ object PhosphorAppIcons {
         val check: ImageVector get() = TablerIcons.Check
         val info: ImageVector get() = TablerIcons.InfoCircle
         val back: ImageVector get() = TablerIcons.ArrowLeft
+        val more: ImageVector get() = TablerIcons.DotsVertical
+        val power: ImageVector get() = TablerIcons.Power
     }
 }

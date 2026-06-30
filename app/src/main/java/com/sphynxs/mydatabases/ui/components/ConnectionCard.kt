@@ -10,10 +10,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,7 +44,9 @@ import com.sphynxs.mydatabases.ui.theme.MyDataBasesTheme
  * @param connection La configuración de conexión a mostrar
  * @param onEditClick Callback cuando se toca el botón editar
  * @param onDeleteClick Callback cuando se toca el botón eliminar
+ * @param onDisconnectClick Callback cuando se toca el botón desconectar
  * @param onCardClick Callback cuando se toca la tarjeta completa (conectar)
+ * @param isConnected Si la conexión está activa actualmente
  * @param modifier Modificador opcional
  *
  * @author israel-icm
@@ -49,9 +57,12 @@ fun ConnectionCard(
     connection: ConnectionConfig,
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
+    onDisconnectClick: () -> Unit,
     onCardClick: () -> Unit,
+    isConnected: Boolean = false,
     modifier: Modifier = Modifier
 ) {
+    var showMenu by remember { mutableStateOf(false) }
     val accentColor = DbAccents.accentFor(connection.type)
 
     IOSCard(
@@ -123,23 +134,71 @@ fun ConnectionCard(
                 )
             }
 
-            // Botones de acción
-            IconButton(onClick = onEditClick) {
-                Icon(
-                    imageVector = PhosphorAppIcons.Action.edit,
-                    contentDescription = stringResource(R.string.connection_action_edit),
-                    tint = DesignTokens.IconNormal,
-                    modifier = Modifier.size(DesignTokens.IconSmall)
-                )
-            }
+            // Botón "More" con menú
+            Box {
+                IconButton(onClick = { showMenu = true }) {
+                    Icon(
+                        imageVector = PhosphorAppIcons.Action.more,
+                        contentDescription = "More options",
+                        tint = DesignTokens.IconNormal,
+                        modifier = Modifier.size(DesignTokens.IconSmall)
+                    )
+                }
 
-            IconButton(onClick = onDeleteClick) {
-                Icon(
-                    imageVector = PhosphorAppIcons.Action.delete,
-                    contentDescription = stringResource(R.string.connection_action_delete),
-                    tint = DesignTokens.IconNormal,
-                    modifier = Modifier.size(DesignTokens.IconSmall)
-                )
+                DropdownMenu(
+                    expanded = showMenu,
+                    onDismissRequest = { showMenu = false }
+                ) {
+                    // Opción: Edit
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.connection_action_edit)) },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = PhosphorAppIcons.Action.edit,
+                                contentDescription = null,
+                                tint = DesignTokens.IconNormal
+                            )
+                        },
+                        onClick = {
+                            showMenu = false
+                            onEditClick()
+                        }
+                    )
+
+                    // Opción: Disconnect (solo si está conectada)
+                    if (isConnected) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.connection_action_disconnect)) },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = PhosphorAppIcons.Action.power,
+                                    contentDescription = null,
+                                    tint = DesignTokens.IconNormal
+                                )
+                            },
+                            onClick = {
+                                showMenu = false
+                                onDisconnectClick()
+                            }
+                        )
+                    }
+
+                    // Opción: Delete
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.connection_action_delete)) },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = PhosphorAppIcons.Action.delete,
+                                contentDescription = null,
+                                tint = DesignTokens.DestructiveAction
+                            )
+                        },
+                        onClick = {
+                            showMenu = false
+                            onDeleteClick()
+                        }
+                    )
+                }
             }
         }
     }
@@ -149,21 +208,46 @@ fun ConnectionCard(
 @Composable
 private fun ConnectionCardPreview() {
     MyDataBasesTheme {
-        ConnectionCard(
-            connection = ConnectionConfig(
-                id = "1",
-                name = "Producción",
-                type = DatabaseType.MYSQL,
-                host = "db.example.com",
-                port = 3306,
-                database = "mydb",
-                username = "admin",
-                password = "secret"
-            ),
-            onEditClick = {},
-            onDeleteClick = {},
-            onCardClick = {},
-            modifier = Modifier.padding(16.dp)
-        )
+        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            // Conexión normal
+            ConnectionCard(
+                connection = ConnectionConfig(
+                    id = "1",
+                    name = "Producción",
+                    type = DatabaseType.MYSQL,
+                    host = "db.example.com",
+                    port = 3306,
+                    database = "mydb",
+                    username = "admin",
+                    password = "secret"
+                ),
+                onEditClick = {},
+                onDeleteClick = {},
+                onDisconnectClick = {},
+                onCardClick = {},
+                isConnected = false,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
+
+            // Conexión activa
+            ConnectionCard(
+                connection = ConnectionConfig(
+                    id = "2",
+                    name = "Desarrollo",
+                    type = DatabaseType.POSTGRESQL,
+                    host = "localhost",
+                    port = 5432,
+                    database = "devdb",
+                    username = "dev",
+                    password = "dev"
+                ),
+                onEditClick = {},
+                onDeleteClick = {},
+                onDisconnectClick = {},
+                onCardClick = {},
+                isConnected = true,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
+        }
     }
 }

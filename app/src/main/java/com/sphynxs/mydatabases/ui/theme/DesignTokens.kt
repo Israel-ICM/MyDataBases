@@ -56,6 +56,9 @@ object DesignTokens {
     /** Color de íconos normales - gris violáceo */
     val IconNormal = Color(0xFF75788C)
     
+    /** Color destructivo para acciones peligrosas - rojo iOS */
+    val DestructiveAction = Color(0xFFFF3B30)
+    
     /** Backdrop/scrim para modales y overlays - blanco transparente claro */
     val BackdropScrim = Color.White.copy(alpha = 0.4f)
     

@@ -192,6 +192,15 @@ fun ConnectionsListScreen(
                                     onDeleteClick = {
                                         connectionToDelete = connection
                                     },
+                                    onDisconnectClick = {
+                                        // TODO: Implement disconnect when DisconnectUseCase is ready
+                                        scope.launch {
+                                            snackbarHostState.showSnackbar(
+                                                message = "Disconnect not implemented yet",
+                                                duration = SnackbarDuration.Short
+                                            )
+                                        }
+                                    },
                                     onCardClick = {
                                         scope.launch {
                                             val result = viewModel.connect(connection.id)
@@ -206,6 +215,7 @@ fun ConnectionsListScreen(
                                             )
                                         }
                                     },
+                                    isConnected = false, // TODO: Track active connection state
                                     modifier = Modifier.padding(
                                         horizontal = DesignTokens.ScreenPaddingHorizontal,
                                         vertical = DesignTokens.CardSpacing / 2

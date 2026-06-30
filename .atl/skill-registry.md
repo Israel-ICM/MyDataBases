@@ -34,7 +34,7 @@ Last updated: 2026-06-30
 | `judgment-day` | Trigger: judgment day, dual review, adversarial review, juzgar. Run blind dual review, fix confirmed issues, then re-judge. | user | `C:\Users\mkys0\.config\opencode\skills\judgment-day\SKILL.md` |
 | `skill-creator` | Trigger: new skills, agent instructions, documenting AI usage patterns. Create LLM-first skills with valid frontmatter. | user | `C:\Users\mkys0\.config\opencode\skills\skill-creator\SKILL.md` |
 | `skill-improver` | Trigger: improve skills, audit skills, refactor skills, skill quality. Audit and upgrade existing LLM-first skills. | user | `C:\Users\mkys0\.config\opencode\skills\skill-improver\SKILL.md` |
-| `spanish-commits` | Trigger: commit, commits, git commit, committing, mensaje de commit, conventional commits. Use when creating git commits, amending commits, or reviewing commit messages. All commits in this project must follow Conventional Commits format in Spanish. | user | `C:\Users\mkys0\.config\opencode\skills\spanish-commits\SKILL.md` |
+| `spanish-commits` | — | user | `C:\Users\mkys0\.config\opencode\skills\spanish-commits\SKILL.md` |
 | `work-unit-commits` | Plan commits as reviewable work units. Trigger: implementation, commit splitting, chained PRs, or keeping tests and docs with code. | user | `C:\Users\mkys0\.config\opencode\skills\work-unit-commits\SKILL.md` |
 
 ## Loading protocol
