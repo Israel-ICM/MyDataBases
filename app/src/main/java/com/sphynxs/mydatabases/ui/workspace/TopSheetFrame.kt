@@ -66,9 +66,9 @@ fun TopSheetFrame(
     // Altura de la barra de estado
     val statusBarHeightPx = with(density) { WindowInsets.statusBars.getTop(density).toFloat() }
     
-    // Altura del panel (92% igual que el base)
+    // Altura del panel (92% menos 16dp de espacio para toolbar, igual que el base)
     val screenHeightDp = configuration.screenHeightDp.dp
-    val sheetHeight = screenHeightDp * 0.92f
+    val sheetHeight = (screenHeightDp * 0.92f) - 16.dp
     val sheetHeightPx = with(density) { sheetHeight.toPx() }
     
     // Offset colapsado del base (referencia)
