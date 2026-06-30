@@ -82,7 +82,18 @@ fun MyDataBasesNavHost(
             onModalAction = { destinationId ->
                 when (destinationId) {
                     "add_database" -> showAddDatabaseSheet = true
-                    // Futuro: otros modales aquí
+                    "new_query" -> {
+                        // Extraer connectionId del contexto actual
+                        val connectionId = when (navigationContext) {
+                            is NavigationContext.InsideConnection -> navigationContext.connectionId
+                            else -> ""
+                        }
+                        // WorkspaceManager maneja su propio sheet/overlay
+                        workspaceManager.openQueryCard(
+                            connectionId = connectionId,
+                            initialSql = null
+                        )
+                    }
                 }
             }
         ) {

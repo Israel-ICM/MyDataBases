@@ -108,6 +108,7 @@ private fun destinationsForDatabaseList(connectionId: String): List<NavigationDe
             labelRes = R.string.nav_new_query,
             icon = com.sphynxs.mydatabases.ui.components.PhosphorAppIcons.Nav.newQuery,
             route = Routes.NewQuery.createRoute(connectionId),
+            isModal = true, // Abre ModalBottomSheet en vez de navegar
         ),
         NavigationDestination(
             id = "monitor",
