@@ -81,9 +81,9 @@ fun TopSheet(
     // Altura de la barra de estado (cámara/notch incluido)
     val statusBarHeightPx = with(density) { WindowInsets.statusBars.getTop(density).toFloat() }
     
-    // Altura del panel: 92% de la pantalla menos 16dp de espacio para toolbar
+    // Altura del panel: 92% de la pantalla menos espacio para toolbar
     val screenHeightDp = configuration.screenHeightDp.dp
-    val sheetHeight = (screenHeightDp * 0.92f) - 16.dp
+    val sheetHeight = (screenHeightDp * 0.92f) - WorkspaceConstants.TOOLBAR_SPACING
     val sheetHeightPx = with(density) { sheetHeight.toPx() }
     
     // Offset colapsado: el sheet se esconde dejando solo peekHeight visible DEBAJO de la barra de estado
