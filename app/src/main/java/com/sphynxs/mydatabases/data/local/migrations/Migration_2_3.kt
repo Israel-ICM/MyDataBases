@@ -16,11 +16,11 @@ import androidx.sqlite.db.SupportSQLiteDatabase
  */
 val MIGRATION_2_3 = object : Migration(2, 3) {
     override fun migrate(database: SupportSQLiteDatabase) {
-        // 1. Agregar columna `order` a connections (default 0)
-        database.execSQL("ALTER TABLE connections ADD COLUMN `order` INTEGER NOT NULL DEFAULT 0")
+        // 1. Agregar columna `folder_id` a connections (nullable)
+        database.execSQL("ALTER TABLE connections ADD COLUMN folder_id TEXT")
         
-        // 2. Agregar columna `folder_id` a connections (nullable, default NULL)
-        database.execSQL("ALTER TABLE connections ADD COLUMN folder_id TEXT DEFAULT NULL")
+        // 2. Agregar columna `order` a connections (NOT NULL default 0)
+        database.execSQL("ALTER TABLE connections ADD COLUMN `order` INTEGER NOT NULL DEFAULT 0")
         
         // 3. Crear tabla connection_folders
         database.execSQL("""
@@ -34,11 +34,5 @@ val MIGRATION_2_3 = object : Migration(2, 3) {
                 created_at INTEGER NOT NULL
             )
         """.trimIndent())
-        
-        // 4. Crear índice para búsquedas rápidas de conexiones por folder
-        database.execSQL("CREATE INDEX IF NOT EXISTS index_connections_folder_id ON connections(folder_id)")
-        
-        // 5. Crear índice para orden de folders
-        database.execSQL("CREATE INDEX IF NOT EXISTS index_connection_folders_order ON connection_folders(`order`)")
     }
 }
