@@ -98,6 +98,9 @@ fun ConnectionsListScreen(
     // Estado para el diálogo de confirmación de eliminación
     var connectionToDelete by remember { mutableStateOf<com.sphynxs.mydatabases.core.database.models.ConnectionConfig?>(null) }
     
+    // Estado para modo de reordenamiento
+    var isReorderMode by remember { mutableStateOf(false) }
+    
     // Estado para el bottom sheet del selector de tipo
     var showTypeSelectorSheet by remember { mutableStateOf(false) }
     val typeSelectorSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -165,14 +168,35 @@ fun ConnectionsListScreen(
                         ) {
                         Spacer(modifier = Modifier.height(16.dp))
                         
-                        // Título grande estilo iOS 26
-                        Text(
-                            text = stringResource(R.string.connections_title),
-                            fontSize = DesignTokens.LargeTitleSize,
-                            fontWeight = DesignTokens.LargeTitleWeight,
-                            color = DesignTokens.LargeTitleColor,
-                            modifier = Modifier.padding(horizontal = DesignTokens.ScreenPaddingHorizontal)
-                        )
+                        // Header con título y botón de reordenar
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = DesignTokens.ScreenPaddingHorizontal),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            // Título grande estilo iOS 26
+                            Text(
+                                text = stringResource(R.string.connections_title),
+                                fontSize = DesignTokens.LargeTitleSize,
+                                fontWeight = DesignTokens.LargeTitleWeight,
+                                color = DesignTokens.LargeTitleColor
+                            )
+                            
+                            // Botón de reordenar
+                            IconButton(
+                                onClick = { isReorderMode = !isReorderMode },
+                                modifier = Modifier.size(40.dp)
+                            ) {
+                                Icon(
+                                    imageVector = if (isReorderMode) PhosphorAppIcons.Action.check else PhosphorAppIcons.Action.edit,
+                                    contentDescription = if (isReorderMode) "Done reordering" else "Reorder connections",
+                                    tint = if (isReorderMode) DesignTokens.AccentPrimary else DesignTokens.IconNormal,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                            }
+                        }
 
                         Spacer(modifier = Modifier.height(16.dp))
 
@@ -185,6 +209,7 @@ fun ConnectionsListScreen(
                                 
                                 ConnectionCard(
                                     connection = connection,
+                                    isReorderMode = isReorderMode,
                                     onEditClick = {
                                         editingConnectionId = connection.id
                                         preselectedType = null

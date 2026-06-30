@@ -82,5 +82,6 @@ object PhosphorAppIcons {
         val back: ImageVector get() = TablerIcons.ArrowLeft
         val more: ImageVector get() = TablerIcons.DotsVertical
         val power: ImageVector get() = TablerIcons.Power
+        val dragHandle: ImageVector get() = TablerIcons.GripVertical
     }
 }

@@ -49,6 +49,7 @@ import com.sphynxs.mydatabases.ui.theme.MyDataBasesTheme
  * @param onDisconnectClick Callback cuando se toca el botón desconectar
  * @param onCardClick Callback cuando se toca la tarjeta completa (conectar)
  * @param isConnected Si la conexión está activa actualmente
+ * @param isReorderMode Si está en modo de reordenamiento
  * @param modifier Modificador opcional
  *
  * @author israel-icm
@@ -62,6 +63,7 @@ fun ConnectionCard(
     onDisconnectClick: () -> Unit,
     onCardClick: () -> Unit,
     isConnected: Boolean = false,
+    isReorderMode: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     var showMenu by remember { mutableStateOf(false) }
@@ -157,21 +159,32 @@ fun ConnectionCard(
                 )
             }
 
-            // Botón "More" con menú
-            Box {
-                IconButton(onClick = { showMenu = true }) {
-                    Icon(
-                        imageVector = PhosphorAppIcons.Action.more,
-                        contentDescription = "More options",
-                        tint = DesignTokens.IconNormal,
-                        modifier = Modifier.size(DesignTokens.IconSmall)
-                    )
-                }
+            // Botón "More" con menú o handle de drag
+            if (isReorderMode) {
+                // Handle de drag (solo visual por ahora)
+                Icon(
+                    imageVector = PhosphorAppIcons.Action.dragHandle,
+                    contentDescription = "Drag to reorder",
+                    tint = DesignTokens.IconNormal,
+                    modifier = Modifier
+                        .size(40.dp)
+                        .padding(8.dp)
+                )
+            } else {
+                Box {
+                    IconButton(onClick = { showMenu = true }) {
+                        Icon(
+                            imageVector = PhosphorAppIcons.Action.more,
+                            contentDescription = "More options",
+                            tint = DesignTokens.IconNormal,
+                            modifier = Modifier.size(DesignTokens.IconSmall)
+                        )
+                    }
 
-                IOSDropdownMenu(
-                    expanded = showMenu,
-                    onDismissRequest = { showMenu = false }
-                ) {
+                    IOSDropdownMenu(
+                        expanded = showMenu,
+                        onDismissRequest = { showMenu = false }
+                    ) {
                     // Opción: Edit
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.connection_action_edit)) },
@@ -221,6 +234,7 @@ fun ConnectionCard(
                             onDeleteClick()
                         }
                     )
+                    }
                 }
             }
         }
@@ -249,6 +263,7 @@ private fun ConnectionCardPreview() {
                 onDisconnectClick = {},
                 onCardClick = {},
                 isConnected = false,
+                isReorderMode = false,
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
 
@@ -269,6 +284,28 @@ private fun ConnectionCardPreview() {
                 onDisconnectClick = {},
                 onCardClick = {},
                 isConnected = true,
+                isReorderMode = false,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
+            
+            // Conexión en modo reorder
+            ConnectionCard(
+                connection = ConnectionConfig(
+                    id = "3",
+                    name = "Testing",
+                    type = DatabaseType.MARIADB,
+                    host = "test.example.com",
+                    port = 3307,
+                    database = "testdb",
+                    username = "tester",
+                    password = "test"
+                ),
+                onEditClick = {},
+                onDeleteClick = {},
+                onDisconnectClick = {},
+                onCardClick = {},
+                isConnected = false,
+                isReorderMode = true,
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
         }
