@@ -6,7 +6,11 @@ import com.sphynxs.mydatabases.core.database.engine.DatabaseEngineFactory
 import com.sphynxs.mydatabases.core.database.engine.DatabaseFeature
 import com.sphynxs.mydatabases.core.database.models.*
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Implementación del repository usando DatabaseEngine.
@@ -19,6 +23,7 @@ import javax.inject.Inject
  * @author israel-icm
  * @date 2026-06-12 (updated 2026-06-30 for SSL support)
  */
+@Singleton
 class DatabaseRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context,
     private val engineFactory: DatabaseEngineFactory
@@ -26,13 +31,32 @@ class DatabaseRepositoryImpl @Inject constructor(
     
     private var currentEngine: DatabaseEngine? = null
     
+    private val _activeConnectionId = MutableStateFlow<String?>(null)
+    override val activeConnectionId: StateFlow<String?> = _activeConnectionId.asStateFlow()
+    
     override suspend fun connect(config: ConnectionConfig): Result<Connection> {
+        // Auto-disconnect previous connection
+        currentEngine?.disconnect()
+        
         currentEngine = engineFactory.create(config.type, context)
-        return currentEngine!!.connect(config)
+        val result = currentEngine!!.connect(config)
+        
+        if (result.isSuccess) {
+            _activeConnectionId.value = config.id
+        }
+        
+        return result
     }
     
     override suspend fun disconnect(): Result<Unit> {
-        return currentEngine?.disconnect() ?: Result.success(Unit)
+        val result = currentEngine?.disconnect() ?: Result.success(Unit)
+        
+        if (result.isSuccess) {
+            currentEngine = null
+            _activeConnectionId.value = null
+        }
+        
+        return result
     }
     
     override suspend fun executeQuery(query: String, params: List<Any>): Result<QueryResult> {

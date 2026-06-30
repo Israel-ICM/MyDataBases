@@ -2,6 +2,7 @@ package com.sphynxs.mydatabases.core.database.repository
 
 import com.sphynxs.mydatabases.core.database.engine.DatabaseFeature
 import com.sphynxs.mydatabases.core.database.models.*
+import kotlinx.coroutines.flow.StateFlow
 
 /**
  * Repository que abstrae el acceso a DatabaseEngine.
@@ -12,6 +13,13 @@ import com.sphynxs.mydatabases.core.database.models.*
  * @date 2026-06-12
  */
 interface DatabaseRepository {
+    
+    /**
+     * Flow del ID de la conexión activa actualmente.
+     * 
+     * Emite null si no hay conexión activa.
+     */
+    val activeConnectionId: StateFlow<String?>
     
     /**
      * Conecta a una base de datos usando la configuración provista.

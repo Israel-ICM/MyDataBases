@@ -91,6 +91,7 @@ fun ConnectionsListScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val connectingState by viewModel.connectingState.collectAsState()
+    val activeConnectionId by viewModel.activeConnectionId.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
@@ -193,11 +194,21 @@ fun ConnectionsListScreen(
                                         connectionToDelete = connection
                                     },
                                     onDisconnectClick = {
-                                        // TODO: Implement disconnect when DisconnectUseCase is ready
                                         scope.launch {
-                                            snackbarHostState.showSnackbar(
-                                                message = "Disconnect not implemented yet",
-                                                duration = SnackbarDuration.Short
+                                            val result = viewModel.disconnect()
+                                            result.fold(
+                                                onSuccess = {
+                                                    snackbarHostState.showSnackbar(
+                                                        message = "Disconnected successfully",
+                                                        duration = SnackbarDuration.Short
+                                                    )
+                                                },
+                                                onFailure = { error ->
+                                                    snackbarHostState.showSnackbar(
+                                                        message = "Error disconnecting: ${error.message}",
+                                                        duration = SnackbarDuration.Long
+                                                    )
+                                                }
                                             )
                                         }
                                     },
@@ -215,7 +226,7 @@ fun ConnectionsListScreen(
                                             )
                                         }
                                     },
-                                    isConnected = false, // TODO: Track active connection state
+                                    isConnected = connection.id == activeConnectionId,
                                     modifier = Modifier.padding(
                                         horizontal = DesignTokens.ScreenPaddingHorizontal,
                                         vertical = DesignTokens.CardSpacing / 2

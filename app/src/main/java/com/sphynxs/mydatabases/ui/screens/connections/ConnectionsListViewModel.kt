@@ -38,7 +38,8 @@ class ConnectionsListViewModel @Inject constructor(
     private val getConnectionUseCase: GetConnectionUseCase,
     private val deleteConnectionUseCase: DeleteConnectionUseCase,
     private val testConnectionUseCase: TestConnectionUseCase,
-    private val connectToDatabaseUseCase: ConnectToDatabaseUseCase
+    private val connectToDatabaseUseCase: ConnectToDatabaseUseCase,
+    private val repository: com.sphynxs.mydatabases.core.database.repository.DatabaseRepository
 ) : ViewModel() {
 
     companion object {
@@ -78,6 +79,11 @@ class ConnectionsListViewModel @Inject constructor(
 
     private val _connectingState = MutableStateFlow<String?>(null)
     val connectingState: StateFlow<String?> = _connectingState.asStateFlow()
+    
+    /**
+     * Flow del ID de la conexión activa actualmente.
+     */
+    val activeConnectionId: StateFlow<String?> = repository.activeConnectionId
 
     /**
      * Prueba una conexión sin guardarla.
@@ -116,6 +122,26 @@ class ConnectionsListViewModel @Inject constructor(
         } catch (e: Exception) {
             _connectingState.value = null
             Log.e(TAG, "Connect crashed: id=$connectionId", e)
+            Result.failure(e)
+        }
+    }
+    
+    /**
+     * Desconecta de la base de datos activa.
+     * 
+     * @return Result con Unit si exitoso, error si falla
+     */
+    suspend fun disconnect(): Result<Unit> {
+        return try {
+            val result = repository.disconnect()
+            
+            result.exceptionOrNull()?.let { error ->
+                Log.e(TAG, "Disconnect failed", error)
+            }
+            
+            result
+        } catch (e: Exception) {
+            Log.e(TAG, "Disconnect crashed", e)
             Result.failure(e)
         }
     }
