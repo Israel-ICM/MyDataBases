@@ -7,6 +7,8 @@ import io.mockk.every
 import io.mockk.mockk
 import org.junit.Assert.*
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
 import java.io.ByteArrayInputStream
 
 /**
@@ -17,6 +19,7 @@ import java.io.ByteArrayInputStream
  * @author israel-icm
  * @date 2026-06-30
  */
+@RunWith(RobolectricTestRunner::class)
 class SSHKeyReaderTest {
 
     private val context: Context = mockk()

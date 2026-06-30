@@ -89,6 +89,9 @@ class MySQLConnectionPool(
             put("user", effectiveConfig.username)
             put("password", effectiveConfig.password)
             
+            // Fix para MySQL 8.0+ con driver 5.1.46
+            put("allowPublicKeyRetrieval", "true")
+            
             // Aplicar parámetros del connection string si existen
             effectiveConfig.parameters.forEach { (key, value) ->
                 put(key, value)
@@ -129,12 +132,16 @@ class MySQLConnectionPool(
         val databaseSegment = effectiveConfig.database.takeIf { it.isNotBlank() } ?: ""
         val jdbcUrl = "jdbc:mysql://${jdbcHost}:${jdbcPort}/$databaseSegment"
         
+        android.util.Log.d("MySQLConnectionPool", "Attempting JDBC connection to: $jdbcUrl")
+        
         try {
             // DriverManager directo - la receta probada
             val connection = DriverManager.getConnection(jdbcUrl, connectionProps)
             activeConnection = connection
+            android.util.Log.d("MySQLConnectionPool", "JDBC connection successful!")
             connection
         } catch (e: Exception) {
+            android.util.Log.e("MySQLConnectionPool", "JDBC connection failed to $jdbcUrl", e)
             // Limpiar recursos si falló la conexión
             sslConfigBuilder?.cleanup()
             sshTunnelManager?.disconnect()

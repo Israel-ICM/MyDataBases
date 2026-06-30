@@ -53,10 +53,10 @@ class MySQLEngine(private val context: Context) : DatabaseEngine {
             // Crear connection pool con contexto para certificados SSL
             connectionPool = MySQLConnectionPool(config, context)
             
-            // Test connection
+            // Test connection (NO cerrar la conexión JDBC para mantener el túnel SSH activo)
             val testConnection = connectionPool!!.getConnection()
             val version = testConnection.metaData.databaseProductVersion
-            testConnection.close()
+            // NO cerrar testConnection - se cerrará con connectionPool.close()
             
             Result.success(Connection(
                 id = config.id,

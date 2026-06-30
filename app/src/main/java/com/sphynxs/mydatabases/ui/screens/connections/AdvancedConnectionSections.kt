@@ -77,7 +77,6 @@ fun SSHTunnelSection(
     modifier: Modifier = Modifier
 ) {
     IOSGroupedCard(
-        title = stringResource(R.string.connection_ssh_tunnel_title),
         modifier = modifier
     ) {
         Column(
@@ -107,9 +106,7 @@ fun SSHTunnelSection(
                 IOSTextField(
                     value = host,
                     onValueChange = onHostChange,
-                    label = stringResource(R.string.connection_ssh_host),
                     placeholder = stringResource(R.string.connection_ssh_host_hint),
-                    isError = host.isBlank(),
                     modifier = Modifier.fillMaxWidth()
                 )
                 
@@ -117,9 +114,8 @@ fun SSHTunnelSection(
                 IOSTextField(
                     value = port,
                     onValueChange = onPortChange,
-                    label = stringResource(R.string.connection_ssh_port),
                     placeholder = stringResource(R.string.connection_ssh_port_hint),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    keyboardType = KeyboardType.Number,
                     modifier = Modifier.fillMaxWidth()
                 )
                 
@@ -127,9 +123,7 @@ fun SSHTunnelSection(
                 IOSTextField(
                     value = username,
                     onValueChange = onUsernameChange,
-                    label = stringResource(R.string.connection_ssh_username),
                     placeholder = stringResource(R.string.connection_ssh_username_hint),
-                    isError = username.isBlank(),
                     modifier = Modifier.fillMaxWidth()
                 )
                 
@@ -186,23 +180,27 @@ fun SSHTunnelSection(
                         IOSTextField(
                             value = password,
                             onValueChange = onPasswordChange,
-                            label = stringResource(R.string.connection_ssh_password),
                             placeholder = stringResource(R.string.connection_ssh_password_hint),
                             isPassword = true,
-                            isError = password.isBlank(),
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
                     
                     SSHAuthMethod.PRIVATE_KEY -> {
                         FilePicker(
-                            label = stringResource(R.string.connection_ssh_private_key),
-                            selectedFileName = privateKeyName,
-                            onSelectFile = onSelectPrivateKey,
-                            mimeTypes = arrayOf("*/*"),  // PEM files often have no specific MIME type
-                            isError = privateKeyUri == null,
-                            modifier = Modifier.fillMaxWidth()
-                        )
+                            onFileSelected = { uri -> onSelectPrivateKey() },
+                            mimeTypes = arrayOf("*/*")  // PEM files often have no specific MIME type
+                        ) { launchPicker ->
+                            TextButton(
+                                onClick = launchPicker,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text(
+                                    text = privateKeyName ?: stringResource(R.string.connection_ssh_private_key),
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            }
+                        }
                     }
                 }
             }

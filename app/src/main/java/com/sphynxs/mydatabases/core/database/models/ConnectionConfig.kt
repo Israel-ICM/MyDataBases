@@ -3,6 +3,7 @@ package com.sphynxs.mydatabases.core.database.models
 import android.os.Parcelable
 import com.sphynxs.mydatabases.core.database.engine.DatabaseType
 import kotlinx.parcelize.Parcelize
+import kotlinx.parcelize.RawValue
 import java.util.UUID
 
 /**
@@ -42,8 +43,8 @@ data class ConnectionConfig(
     val username: String,
     val password: String,
     val useSSL: Boolean = false,
-    val sslConfig: SSLConfig? = null,
-    val sshTunnelConfig: SSHTunnelConfig? = null,
+    val sslConfig: @RawValue SSLConfig? = null,
+    val sshTunnelConfig: @RawValue SSHTunnelConfig? = null,
     val connectionString: String? = null,
     val connectionTimeout: Long = 10_000L,
     val readTimeout: Long = 30_000L,

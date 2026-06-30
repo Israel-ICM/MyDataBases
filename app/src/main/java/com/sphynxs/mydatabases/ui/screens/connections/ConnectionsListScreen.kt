@@ -343,7 +343,10 @@ fun ConnectionsListScreen(
             onDismissRequest = { 
                 scope.launch {
                     formSheetState.hide()
+                }.invokeOnCompletion {
                     showFormSheet = false
+                    editingConnectionId = null
+                    preselectedType = null
                 }
             },
             sheetState = formSheetState,
@@ -358,7 +361,10 @@ fun ConnectionsListScreen(
                 onNavigateBack = { 
                     scope.launch {
                         formSheetState.hide()
+                    }.invokeOnCompletion {
                         showFormSheet = false
+                        editingConnectionId = null
+                        preselectedType = null
                     }
                 },
                 modifier = Modifier.fillMaxSize()

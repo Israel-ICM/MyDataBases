@@ -12,6 +12,8 @@ import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
 
 /**
  * Unit tests para SSHTunnelManager.
@@ -22,6 +24,7 @@ import org.junit.Test
  * @author israel-icm
  * @date 2026-06-30
  */
+@RunWith(RobolectricTestRunner::class)
 class SSHTunnelManagerTest {
 
     private lateinit var context: Context

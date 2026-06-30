@@ -125,8 +125,9 @@ fun ConnectionFormScreen(
     // Load existing connection if editing
     LaunchedEffect(connectionId) {
         connectionId?.let { id ->
-            val loadedConfig = viewModel.loadConnection(id)
-            loadedConfig?.let { config ->
+            try {
+                val loadedConfig = viewModel.loadConnection(id)
+                loadedConfig?.let { config ->
                 name = config.name.trim()
                 selectedType = config.type
                 host = config.host.trim()
@@ -179,6 +180,9 @@ fun ConnectionFormScreen(
                 config.connectionString?.let { cs ->
                     connectionString = cs
                 }
+            }
+            } catch (e: Exception) {
+                android.util.Log.e("ConnectionFormScreen", "Error loading connection $id", e)
             }
         }
     }
