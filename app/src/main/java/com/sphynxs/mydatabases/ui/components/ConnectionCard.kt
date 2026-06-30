@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -23,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -76,34 +78,57 @@ fun ConnectionCard(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(DesignTokens.InnerSpacing)
         ) {
-            // Ícono con gradiente vibrante
+            // Ícono con gradiente vibrante + indicador de conexión activa
             Box(
-                modifier = Modifier
-                    .size(56.dp)
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(
-                        brush = Brush.linearGradient(
-                            colors = listOf(
-                                accentColor.copy(alpha = 0.25f),
-                                accentColor.copy(alpha = 0.12f)
-                            )
-                        )
-                    ),
-                contentAlignment = Alignment.Center
+                modifier = Modifier.size(56.dp)
             ) {
-                Icon(
-                    painter = painterResource(
-                        when (connection.type) {
-                            DatabaseType.MYSQL -> AppIcons.Db.MySql
-                            DatabaseType.POSTGRESQL -> AppIcons.Db.Postgres
-                            DatabaseType.MARIADB -> AppIcons.Db.MariaDb
-                            DatabaseType.SQLITE -> AppIcons.Db.Sqlite
-                        }
-                    ),
-                    contentDescription = connection.type.displayName,
-                    tint = accentColor,
-                    modifier = Modifier.size(32.dp)
-                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(
+                            brush = Brush.linearGradient(
+                                colors = listOf(
+                                    accentColor.copy(alpha = 0.25f),
+                                    accentColor.copy(alpha = 0.12f)
+                                )
+                            )
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        painter = painterResource(
+                            when (connection.type) {
+                                DatabaseType.MYSQL -> AppIcons.Db.MySql
+                                DatabaseType.POSTGRESQL -> AppIcons.Db.Postgres
+                                DatabaseType.MARIADB -> AppIcons.Db.MariaDb
+                                DatabaseType.SQLITE -> AppIcons.Db.Sqlite
+                            }
+                        ),
+                        contentDescription = connection.type.displayName,
+                        tint = accentColor,
+                        modifier = Modifier.size(32.dp)
+                    )
+                }
+                
+                // Punto verde indicador de conexión activa
+                if (isConnected) {
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .size(14.dp)
+                            .clip(RoundedCornerShape(7.dp))
+                            .background(Color.White)
+                            .padding(2.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clip(RoundedCornerShape(5.dp))
+                                .background(Color(0xFF34C759)) // Verde iOS success
+                        )
+                    }
+                }
             }
 
             // Contenido principal (clickable para conectar)
