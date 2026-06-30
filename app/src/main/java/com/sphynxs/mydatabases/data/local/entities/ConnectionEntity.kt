@@ -37,8 +37,10 @@ import com.sphynxs.mydatabases.core.database.models.SSHTunnelConfig
  * @property maxPoolSize Tamaño máximo del connection pool
  * @property createdAt Timestamp de creación
  * @property lastUsedAt Timestamp del último uso (null si nunca se usó)
+ * @property folderId ID del folder que contiene esta conexión (null = nivel root)
+ * @property order Posición en la lista dentro del folder o en root (menor = arriba)
  * @author israel-icm
- * @date 2026-06-12 (updated 2026-06-30 for advanced connection options)
+ * @date 2026-06-12 (updated 2026-06-30 for folders & ordering)
  */
 @Entity(tableName = "connections")
 data class ConnectionEntity(
@@ -58,5 +60,7 @@ data class ConnectionEntity(
     @ColumnInfo(name = "read_timeout") val readTimeout: Long,
     @ColumnInfo(name = "max_pool_size") val maxPoolSize: Int,
     @ColumnInfo(name = "created_at") val createdAt: Long,
-    @ColumnInfo(name = "last_used_at") val lastUsedAt: Long?
+    @ColumnInfo(name = "last_used_at") val lastUsedAt: Long?,
+    @ColumnInfo(name = "folder_id") val folderId: String? = null,
+    val order: Int = 0
 )

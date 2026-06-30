@@ -60,6 +60,58 @@ interface ConnectionDao {
      */
     @Query("SELECT * FROM connections ORDER BY last_used_at DESC, created_at DESC")
     fun getAll(): Flow<List<ConnectionEntity>>
+    
+    /**
+     * Obtiene las conexiones del nivel root (sin folder) ordenadas por `order`.
+     *
+     * @return Flow con la lista de conexiones root
+     */
+    @Query("SELECT * FROM connections WHERE folder_id IS NULL ORDER BY `order` ASC")
+    fun getRootConnections(): Flow<List<ConnectionEntity>>
+    
+    /**
+     * Obtiene las conexiones dentro de un folder específico ordenadas por `order`.
+     *
+     * @param folderId El ID del folder
+     * @return Flow con la lista de conexiones del folder
+     */
+    @Query("SELECT * FROM connections WHERE folder_id = :folderId ORDER BY `order` ASC")
+    fun getConnectionsInFolder(folderId: String): Flow<List<ConnectionEntity>>
+    
+    /**
+     * Mueve una conexión a un folder (o a root si folderId es null).
+     *
+     * @param connectionId El ID de la conexión a mover
+     * @param folderId El ID del folder destino (null = root)
+     */
+    @Query("UPDATE connections SET folder_id = :folderId WHERE id = :connectionId")
+    suspend fun moveToFolder(connectionId: String, folderId: String?)
+    
+    /**
+     * Actualiza el orden de una conexión.
+     *
+     * @param connectionId El ID de la conexión
+     * @param order La nueva posición
+     */
+    @Query("UPDATE connections SET `order` = :order WHERE id = :connectionId")
+    suspend fun updateOrder(connectionId: String, order: Int)
+    
+    /**
+     * Cuenta cuántas conexiones hay en un folder.
+     *
+     * @param folderId El ID del folder
+     * @return Número de conexiones en el folder
+     */
+    @Query("SELECT COUNT(*) FROM connections WHERE folder_id = :folderId")
+    suspend fun getConnectionCountInFolder(folderId: String): Int
+    
+    /**
+     * Mueve todas las conexiones de un folder a root.
+     *
+     * @param folderId El ID del folder
+     */
+    @Query("UPDATE connections SET folder_id = NULL WHERE folder_id = :folderId")
+    suspend fun moveConnectionsToRoot(folderId: String)
 
     /**
      * Actualiza el timestamp del último uso de una conexión.

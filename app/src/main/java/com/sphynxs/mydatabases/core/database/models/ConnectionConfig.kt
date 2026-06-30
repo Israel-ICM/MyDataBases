@@ -29,8 +29,10 @@ import java.util.UUID
  * @property maxPoolSize Número máximo de conexiones en el pool
  * @property createdAt Timestamp de creación de la configuración
  * @property lastUsedAt Timestamp del último uso (null si nunca se usó)
+ * @property folderId ID del folder que contiene esta conexión (null = nivel root)
+ * @property order Posición en la lista dentro del folder o en root (menor = arriba)
  * @author israel-icm
- * @date 2026-06-11 (updated 2026-06-30 for advanced connection options)
+ * @date 2026-06-11 (updated 2026-06-30 for folders & ordering)
  */
 @Parcelize
 data class ConnectionConfig(
@@ -50,7 +52,9 @@ data class ConnectionConfig(
     val readTimeout: Long = 30_000L,
     val maxPoolSize: Int = 10,
     val createdAt: Long = System.currentTimeMillis(),
-    val lastUsedAt: Long? = null
+    val lastUsedAt: Long? = null,
+    val folderId: String? = null,
+    val order: Int = 0
 ) : Parcelable {
     
     /**
