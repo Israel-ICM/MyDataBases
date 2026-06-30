@@ -323,7 +323,7 @@ fun AddDatabaseFormContent(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.White.copy(alpha = 0.4f)),
+                    .background(com.sphynxs.mydatabases.ui.theme.DesignTokens.BackdropScrim),
                 contentAlignment = Alignment.Center
             ) {
                 Column(

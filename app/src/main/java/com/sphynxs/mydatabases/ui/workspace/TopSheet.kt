@@ -127,8 +127,9 @@ fun TopSheet(
         onProgressChange?.invoke(expansionProgress, isDragging)
     }
     
-    // Alpha del backdrop proporcional al progreso (0 cuando minimizado, 0.5 cuando expandido)
-    val backdropAlpha = expansionProgress * 0.5f
+    // Alpha del backdrop proporcional al progreso (0 cuando minimizado, 0.4 cuando expandido)
+    // Usamos el alpha del token BackdropScrim (0.4f) como máximo
+    val backdropAlpha = expansionProgress * 0.4f
     
     Box(modifier = modifier.fillMaxSize()) {
         // Backdrop - siempre visible pero con alpha variable
@@ -142,8 +143,8 @@ fun TopSheet(
                         }
                     }
             ) {
-                // Fondo claro semitransparente (sin blur real por limitaciones de Android)
-                drawRect(Color.White.copy(alpha = backdropAlpha * 0.85f))
+                // Fondo claro semitransparente usando el color base de BackdropScrim
+                drawRect(Color.White.copy(alpha = backdropAlpha))
             }
         }
         

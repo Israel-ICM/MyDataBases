@@ -205,7 +205,7 @@ fun DatabasesListScreen(
             sheetState = addDatabaseSheetState,
             containerColor = com.sphynxs.mydatabases.ui.theme.DesignTokens.BackgroundPrimary,
             sheetMaxWidth = 10000.dp,
-            scrimColor = Color.White.copy(alpha = 0.4f)
+            scrimColor = DesignTokens.BackdropScrim
         ) {
             Scaffold(
                 snackbarHost = { SnackbarHost(snackbarHostState) },

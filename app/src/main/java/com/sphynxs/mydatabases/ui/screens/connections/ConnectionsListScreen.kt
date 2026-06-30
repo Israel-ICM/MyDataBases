@@ -272,7 +272,7 @@ fun ConnectionsListScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White.copy(alpha = 0.4f)),
+                .background(DesignTokens.BackdropScrim),
             contentAlignment = Alignment.Center
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -347,7 +347,7 @@ fun ConnectionsListScreen(
             sheetState = formSheetState,
             containerColor = Color(0xFFF2F2F7),
             sheetMaxWidth = 10000.dp,
-            scrimColor = Color.White.copy(alpha = 0.4f)
+            scrimColor = DesignTokens.BackdropScrim
         ) {
             ConnectionFormScreen(
                 connectionId = editingConnectionId,

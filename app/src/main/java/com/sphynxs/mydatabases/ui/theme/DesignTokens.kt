@@ -56,6 +56,9 @@ object DesignTokens {
     /** Color de íconos normales - gris violáceo */
     val IconNormal = Color(0xFF75788C)
     
+    /** Backdrop/scrim para modales y overlays - blanco transparente claro */
+    val BackdropScrim = Color.White.copy(alpha = 0.4f)
+    
     
     // ============ TIPOGRAFÍA ============
     
