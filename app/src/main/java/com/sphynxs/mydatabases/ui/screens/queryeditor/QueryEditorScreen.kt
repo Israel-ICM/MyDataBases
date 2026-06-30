@@ -7,6 +7,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.FolderOpen
@@ -138,6 +139,11 @@ fun QueryEditorScreen(
     var showSaveDialog by remember { mutableStateOf(false) }
     var savedFileName by remember { mutableStateOf("") }
     
+    // Splitter state: editor weight (0.0 to 1.0, default 0.5 = 50% each)
+    var editorWeight by remember { mutableStateOf(0.5f) }
+    var isDraggingSplitter by remember { mutableStateOf(false) }
+    var containerHeightPx by remember { mutableStateOf(0f) }
+    
     // Completion state
     var showCompletionPopup by remember { mutableStateOf(false) }
     var completionSuggestions by remember { mutableStateOf<List<com.sphynxs.mydatabases.domain.completion.CompletionSuggestion>>(emptyList()) }
@@ -239,12 +245,15 @@ fun QueryEditorScreen(
         modifier = modifier
             .fillMaxSize()
             .padding(16.dp)
+            .onSizeChanged { size ->
+                containerHeightPx = size.height.toFloat()
+            }
     ) {
             // SQL Editor (estilo VS Code - modo claro) + Completion Popup
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)
+                    .weight(if (uiState !is QueryEditorUiState.Idle) editorWeight else 1f)
             ) {
                 Card(
                     modifier = Modifier.fillMaxSize(),
@@ -620,14 +629,56 @@ fun QueryEditorScreen(
             }
         }
 
+            // Splitter (solo visible cuando hay resultados)
+            if (uiState !is QueryEditorUiState.Idle) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(16.dp)
+                        .pointerInput(containerHeightPx) {
+                            detectDragGestures(
+                                onDragStart = { isDraggingSplitter = true },
+                                onDragEnd = { isDraggingSplitter = false },
+                                onDragCancel = { isDraggingSplitter = false }
+                            ) { change, dragAmount ->
+                                change.consume()
+                                
+                                // Calculate new weight based on drag offset relative to container height
+                                // dragAmount.y > 0 = dragging down (increase editor)
+                                // dragAmount.y < 0 = dragging up (decrease editor)
+                                if (containerHeightPx > 0) {
+                                    val deltaWeight = dragAmount.y / containerHeightPx
+                                    editorWeight = (editorWeight + deltaWeight).coerceIn(0.2f, 0.8f)
+                                }
+                            }
+                        }
+                        .background(
+                            if (isDraggingSplitter) 
+                                MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
+                            else 
+                                MaterialTheme.colorScheme.surfaceVariant
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    // Drag handle visual indicator
+                    Box(
+                        modifier = Modifier
+                            .width(48.dp)
+                            .height(4.dp)
+                            .background(
+                                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                                shape = androidx.compose.foundation.shape.RoundedCornerShape(2.dp)
+                            )
+                    )
+                }
+            }
+
             // Result pane (solo visible cuando NO está Idle)
             if (uiState !is QueryEditorUiState.Idle) {
-                Spacer(modifier = Modifier.height(16.dp))
-                
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .weight(1f)
+                        .weight(1f - editorWeight)
                 ) {
                     Box(
                         modifier = Modifier
