@@ -88,7 +88,9 @@ private fun ConnectionConfig.toEntity(
         readTimeout = this.readTimeout,
         maxPoolSize = this.maxPoolSize,
         createdAt = this.createdAt,
-        lastUsedAt = this.lastUsedAt
+        lastUsedAt = this.lastUsedAt,
+        folderId = this.folderId,
+        order = this.order
     )
 }
 
@@ -129,6 +131,8 @@ private fun ConnectionEntity.toDomain(
         readTimeout = this.readTimeout,
         maxPoolSize = this.maxPoolSize,
         createdAt = this.createdAt,
-        lastUsedAt = this.lastUsedAt
+        lastUsedAt = this.lastUsedAt,
+        folderId = this.folderId,
+        order = this.order
     )
 }

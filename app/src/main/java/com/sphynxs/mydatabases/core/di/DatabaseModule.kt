@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.room.Room
 import com.sphynxs.mydatabases.data.local.AppDatabase
 import com.sphynxs.mydatabases.data.local.dao.ConnectionDao
+import com.sphynxs.mydatabases.data.local.dao.FolderDao
+import com.sphynxs.mydatabases.data.local.migrations.MIGRATION_2_3
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,7 +19,7 @@ import javax.inject.Singleton
  * Configura la base de datos local de la app con conexiones encriptadas.
  *
  * @author israel-icm
- * @date 2026-06-12
+ * @date 2026-06-12 (updated 2026-06-30 for folders)
  */
 @Module
 @InstallIn(SingletonComponent::class)
@@ -39,7 +41,7 @@ object DatabaseModule {
             AppDatabase::class.java,
             "mydatabases.db"
         )
-            .fallbackToDestructiveMigration() // TODO: Cambiar a migraciones reales en producción
+            .addMigrations(MIGRATION_2_3)
             .build()
     }
 
@@ -52,5 +54,16 @@ object DatabaseModule {
     @Provides
     fun provideConnectionDao(database: AppDatabase): ConnectionDao {
         return database.connectionDao()
+    }
+    
+    /**
+     * Provee el DAO de folders desde la base de datos.
+     *
+     * @param database Instancia de AppDatabase
+     * @return DAO para operaciones CRUD en folders
+     */
+    @Provides
+    fun provideFolderDao(database: AppDatabase): FolderDao {
+        return database.folderDao()
     }
 }
