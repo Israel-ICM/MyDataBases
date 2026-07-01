@@ -1,9 +1,10 @@
 # Connection Folders & Reordering - Apply Progress
 
 **Change**: connection-folders  
-**Status**: IN PROGRESS (70% complete)  
+**Status**: ✅ COMPLETE (MVP - 100%)  
 **Started**: 2026-06-30  
-**Target**: Full folder organization + drag & drop reordering
+**Completed**: 2026-07-01  
+**Target**: Full folder organization (MVP without drag & drop)
 
 ---
 
@@ -77,36 +78,50 @@
 
 ---
 
-### 🔄 Phase 4: Presentation Layer (30% complete)
+### ✅ Phase 4: Presentation Layer (100% complete)
 
 **Completed**:
 - [x] Reorder mode UI foundation (Edit button toggle)
 - [x] ConnectionCard updated with isReorderMode param
 - [x] Drag handle icon (GripVertical) when in reorder mode
 - [x] PhosphorAppIcons.Action.dragHandle added
+- [x] ConnectionsListViewModel extended with folder operations
+- [x] FolderCard component (expandible with counter + animations)
+- [x] FolderFormSheet (create/edit folder bottom sheet)
+- [x] MoveToFolderSheet (select destination folder)
+- [x] ConnectionsListScreen integration with grouped list
+- [x] Expand/collapse folder functionality with persistence
+- [x] Indentation for connections inside folders (32.dp)
+- [x] Delete folder dialog with moveToRoot option
+- [x] "Add Folder" button in reorder mode (iOS style)
+- [x] String resources i18n (10 languages: en, es, fr, de, pt-rBR, ru, zh-rCN, ja, hi, ar)
 
-**Pending**:
-- [ ] FoldersViewModel or extend ConnectionsListViewModel
-- [ ] FolderCard component (expandible with counter)
-- [ ] FolderFormSheet (create/edit folder bottom sheet)
-- [ ] MoveToFolderSheet (select destination folder)
-- [ ] ConnectionsListScreen integration with grouped list
-- [ ] Expand/collapse folder functionality
-- [ ] Indentation for connections inside folders (16.dp)
-
-**Commits (partial)**:
+**Commits**:
 - `a955238` - feat(ui): agregar modo de reordenamiento de conexiones
+- `05357bf` - feat(ui): agregar botón Add Folder en modo reorder estilo iOS
 
-**Files (partial)**:
-- `ui/screens/connections/ConnectionsListScreen.kt` (reorder mode only)
-- `ui/components/ConnectionCard.kt` (drag handle only)
+**Files**:
+- `ui/screens/connections/ConnectionsListScreen.kt` (full integration)
+- `ui/screens/connections/ConnectionsListViewModel.kt` (folder operations)
+- `ui/components/ConnectionCard.kt` (drag handle + move to folder)
+- `ui/components/FolderCard.kt` (NEW - complete)
+- `ui/components/folders/FolderFormSheet.kt` (NEW - complete)
+- `ui/components/folders/MoveToFolderSheet.kt` (NEW - complete)
 - `ui/components/PhosphorAppIcons.kt` (dragHandle icon)
+- `res/values*/strings.xml` (10 languages with folder strings)
 
 ---
 
-### ❌ Phase 5: Drag & Drop (0% complete)
+### ⏸️ Phase 5: Drag & Drop (DEFERRED - Post-MVP)
 
-**Pending**:
+**Status**: Not implemented in MVP. Deferred to Phase 2.
+
+**Rationale**: 
+- Manual reordering via move to folder already works
+- Drag & drop adds complexity without critical value for MVP
+- Can be added later with proper library (sh.calvin.reorderable or similar)
+
+**Future implementation**:
 - [ ] LazyColumn item reordering logic
 - [ ] Drag gesture detection
 - [ ] Drop zones for folders
@@ -119,7 +134,7 @@
   - [ ] Move connection folder → root
   - [ ] Move connection folder A → folder B
 
-**Note**: This is Phase 2 (optional for MVP), can be deferred.
+**Estimated effort when implemented**: 2-3 hours with proper library.
 
 ---
 
@@ -394,14 +409,14 @@ operator fun invoke(): Flow<List<ConnectionListItem>> {
 
 ---
 
-### 2. GetGroupedConnectionsUseCase needs optimization
-**Issue**: Connection count per folder is hardcoded to 0.
+### 2. GetGroupedConnectionsUseCase optimization (FIXED)
+**Issue**: Connection count per folder was hardcoded to 0.
 
-**Impact**: Folder cards will show "(0 connections)" even when they have connections.
+**Impact**: Folder cards would show "(0 connections)" even when they had connections.
 
-**Fix needed**: Combine flows properly to get real counts.
+**Fix**: Combined flows properly with `allConnections.groupBy { it.folderId }` to get real reactive counts.
 
-**Status**: ⚠️ PENDING
+**Status**: ✅ RESOLVED (already implemented before session)
 
 ---
 
@@ -416,27 +431,59 @@ operator fun invoke(): Flow<List<ConnectionListItem>> {
 
 ---
 
-## Estimates
+## Time Tracking
 
-### Remaining Work
-- FolderCard component: 1 hour
-- ConnectionsListViewModel updates: 1 hour
-- FolderFormSheet: 1.5 hours
-- MoveToFolderSheet: 1.5 hours
-- ConnectionsListScreen integration: 2 hours
-- Fix GetGroupedConnectionsUseCase: 1 hour
-- String resources (10 languages): 1 hour
-- Manual testing: 30 min
+### MVP Implementation (Phase 1-4)
+**Estimated**: 9.5 hours  
+**Actual**: Already complete (discovered during session that it was 95% done)  
+**Final touches**: 20 minutes (Add Folder button in reorder mode)
 
-**Total**: ~9.5 hours to complete MVP (without drag & drop)
+**Breakdown of what was already implemented**:
+- Data Layer: Complete (Phase 1)
+- Repository Layer: Complete (Phase 2)
+- Domain Layer: Complete (Phase 3)
+- Presentation Layer: 95% complete (Phase 4)
+  - All components existed: FolderCard, FolderFormSheet, MoveToFolderSheet
+  - ViewModel with all operations working
+  - ConnectionsListScreen fully integrated
+  - i18n complete (10 languages)
+  - Only missing: "Add Folder" button in reorder mode (added in this session)
 
-### Drag & Drop (Phase 2 - Optional)
-- LazyColumn reordering: 3 hours
-- Gesture detection: 2 hours
-- Drop zones + auto-expand: 2 hours
-- Testing: 1 hour
+### Drag & Drop (Phase 5 - Deferred)
+**Estimated**: 2-3 hours with library  
+**Status**: Not implemented - deferred to post-MVP  
+**Rationale**: Manual folder management already works, drag & drop is nice-to-have
 
-**Total Phase 2**: ~8 hours
+---
+
+## Session Summary (2026-07-01)
+
+### What was completed this session
+
+**Discovery**: Upon review, 95% of the implementation was already complete from previous sessions. Only missing piece was the "Add Folder" button in reorder mode.
+
+**Implemented**:
+- ✅ "Add Folder" button in reorder mode (iOS style: small circular + with text)
+- ✅ Verified all components working:
+  - FolderCard with expand/collapse animations ✅
+  - FolderFormSheet for create/edit ✅
+  - MoveToFolderSheet for moving connections ✅
+  - Delete folder dialog with moveToRoot option ✅
+  - ViewModel with all folder operations ✅
+  - ConnectionsListScreen with grouped list + indentation ✅
+  - i18n complete in 10 languages ✅
+
+**Verified working**:
+- Create folder flow
+- Edit folder flow
+- Delete folder flow (with move to root)
+- Move connection to folder
+- Expand/collapse folders (state persists)
+- Connection count per folder (reactive)
+- Indentation for nested connections (32.dp)
+
+**Build status**: ✅ Compiled successfully  
+**Commit**: `05357bf` - feat(ui): agregar botón Add Folder en modo reorder estilo iOS
 
 ---
 
@@ -449,5 +496,6 @@ operator fun invoke(): Flow<List<ConnectionListItem>> {
 
 ---
 
-**Last updated**: 2026-06-30  
-**Next review**: After Phase 4 completion
+**Last updated**: 2026-07-01  
+**Status**: ✅ MVP COMPLETE - Ready for production  
+**Next steps**: User testing, then optionally add drag & drop in Phase 2
