@@ -39,7 +39,12 @@ class ConnectionsListViewModel @Inject constructor(
     private val deleteConnectionUseCase: DeleteConnectionUseCase,
     private val testConnectionUseCase: TestConnectionUseCase,
     private val connectToDatabaseUseCase: ConnectToDatabaseUseCase,
-    private val repository: com.sphynxs.mydatabases.core.database.repository.DatabaseRepository
+    private val repository: com.sphynxs.mydatabases.core.database.repository.DatabaseRepository,
+    private val getGroupedConnectionsUseCase: com.sphynxs.mydatabases.domain.usecases.folders.GetGroupedConnectionsUseCase,
+    private val createFolderUseCase: com.sphynxs.mydatabases.domain.usecases.folders.CreateFolderUseCase,
+    private val deleteFolderUseCase: com.sphynxs.mydatabases.domain.usecases.folders.DeleteFolderUseCase,
+    private val moveConnectionToFolderUseCase: com.sphynxs.mydatabases.domain.usecases.folders.MoveConnectionToFolderUseCase,
+    private val folderRepository: com.sphynxs.mydatabases.domain.repositories.FolderRepository
 ) : ViewModel() {
 
     companion object {
@@ -84,6 +89,20 @@ class ConnectionsListViewModel @Inject constructor(
      * Flow del ID de la conexión activa actualmente.
      */
     val activeConnectionId: StateFlow<String?> = repository.activeConnectionId
+    
+    /**
+     * Estado de la lista agrupada de conexiones y folders.
+     *
+     * Escucha cambios en folders y conexiones, combinándolos en una
+     * estructura jerárquica lista para mostrar en UI.
+     */
+    val groupedConnections: StateFlow<List<com.sphynxs.mydatabases.domain.models.ConnectionListItem>> =
+        getGroupedConnectionsUseCase()
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5000),
+                initialValue = emptyList()
+            )
 
     /**
      * Prueba una conexión sin guardarla.
@@ -143,6 +162,73 @@ class ConnectionsListViewModel @Inject constructor(
         } catch (e: Exception) {
             Log.e(TAG, "Disconnect crashed", e)
             Result.failure(e)
+        }
+    }
+    
+    // ========== Folder Operations ==========
+    
+    /**
+     * Alterna el estado expandido/colapsado de un folder.
+     *
+     * @param folderId El ID del folder a alternar
+     */
+    fun toggleFolderExpand(folderId: String) {
+        viewModelScope.launch {
+            try {
+                val folder = folderRepository.getById(folderId)
+                if (folder != null) {
+                    folderRepository.toggleExpand(folderId, !folder.isExpanded)
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Toggle folder expand failed: folderId=$folderId", e)
+            }
+        }
+    }
+    
+    /**
+     * Crea un nuevo folder.
+     *
+     * @param name El nombre del folder
+     */
+    fun createFolder(name: String) {
+        viewModelScope.launch {
+            try {
+                createFolderUseCase(name)
+            } catch (e: Exception) {
+                Log.e(TAG, "Create folder failed: name=$name", e)
+            }
+        }
+    }
+    
+    /**
+     * Elimina un folder.
+     *
+     * @param folderId El ID del folder a eliminar
+     * @param moveToRoot Si true, mueve las conexiones a root; si false, las elimina
+     */
+    fun deleteFolder(folderId: String, moveToRoot: Boolean = true) {
+        viewModelScope.launch {
+            try {
+                deleteFolderUseCase(folderId, moveToRoot)
+            } catch (e: Exception) {
+                Log.e(TAG, "Delete folder failed: folderId=$folderId, moveToRoot=$moveToRoot", e)
+            }
+        }
+    }
+    
+    /**
+     * Mueve una conexión a un folder.
+     *
+     * @param connectionId El ID de la conexión a mover
+     * @param folderId El ID del folder destino (null = mover a root)
+     */
+    fun moveConnectionToFolder(connectionId: String, folderId: String?) {
+        viewModelScope.launch {
+            try {
+                moveConnectionToFolderUseCase(connectionId, folderId)
+            } catch (e: Exception) {
+                Log.e(TAG, "Move connection to folder failed: connectionId=$connectionId, folderId=$folderId", e)
+            }
         }
     }
 }
