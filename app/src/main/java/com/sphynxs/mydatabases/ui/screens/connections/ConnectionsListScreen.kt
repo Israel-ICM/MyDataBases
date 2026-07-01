@@ -27,6 +27,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -385,6 +386,49 @@ fun ConnectionsListScreen(
                                                 horizontal = DesignTokens.ScreenPaddingHorizontal,
                                                 vertical = DesignTokens.CardSpacing / 2
                                             )
+                                        )
+                                    }
+                                }
+                            }
+                            
+                            // Add Folder button (only in reorder mode)
+                            if (isReorderMode) {
+                                item {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clickable {
+                                                showFolderFormSheet = true
+                                                editingFolder = null
+                                            }
+                                            .padding(
+                                                horizontal = DesignTokens.ScreenPaddingHorizontal,
+                                                vertical = 12.dp
+                                            ),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                    ) {
+                                        // Small circular + button (iOS style)
+                                        Box(
+                                            modifier = Modifier
+                                                .size(28.dp)
+                                                .clip(RoundedCornerShape(14.dp))
+                                                .background(DesignTokens.AccentPrimary),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Icon(
+                                                imageVector = PhosphorAppIcons.Action.add,
+                                                contentDescription = null,
+                                                tint = Color.White,
+                                                modifier = Modifier.size(18.dp)
+                                            )
+                                        }
+                                        
+                                        // "Add Folder" text
+                                        Text(
+                                            text = stringResource(R.string.folder_create),
+                                            style = MaterialTheme.typography.bodyLarge,
+                                            color = DesignTokens.AccentPrimary
                                         )
                                     }
                                 }
