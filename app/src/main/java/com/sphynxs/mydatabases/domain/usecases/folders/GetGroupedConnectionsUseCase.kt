@@ -37,11 +37,15 @@ class GetGroupedConnectionsUseCase @Inject constructor(
     operator fun invoke(): Flow<List<ConnectionListItem>> {
         return combine(
             folderRepository.getAllFolders(),
-            connectionDao.getRootConnections()
-        ) { folders, rootConnections ->
+            connectionDao.getRootConnections(),
+            connectionDao.getAll()
+        ) { folders, rootConnections, allConnections ->
+            // Agrupar conexiones por folderId para eficiencia
+            val connectionsByFolder = allConnections.groupBy { it.folderId }
+            
             buildList {
                 // Primero agregar root connections (sin folder)
-                rootConnections.forEach { entity ->
+                rootConnections.sortedBy { it.order }.forEach { entity ->
                     add(
                         ConnectionListItem.ConnectionItem(
                             connection = entity.toDomainWithoutDecryption(),
@@ -50,24 +54,20 @@ class GetGroupedConnectionsUseCase @Inject constructor(
                     )
                 }
                 
-                // Luego agregar folders
-                folders.forEach { folder ->
-                    // Obtener count de conexiones en el folder
-                    // TODO: Esto debería ser parte del flow combinado para eficiencia
-                    val connectionCount = 0  // Placeholder, necesita query suspendida
+                // Luego agregar folders con sus conexiones
+                folders.sortedBy { it.order }.forEach { folder ->
+                    val folderConnections = connectionsByFolder[folder.id]
+                        ?.sortedBy { it.order }
+                        ?.map { it.toDomainWithoutDecryption() }
+                        ?: emptyList()
                     
                     add(
                         ConnectionListItem.FolderItem(
                             folder = folder,
-                            connectionCount = connectionCount,
-                            connections = emptyList()  // Se cargan bajo demanda cuando se expande
+                            connectionCount = folderConnections.size,
+                            connections = if (folder.isExpanded) folderConnections else emptyList()
                         )
                     )
-                }
-            }.sortedBy { item ->
-                when (item) {
-                    is ConnectionListItem.FolderItem -> item.folder.order
-                    is ConnectionListItem.ConnectionItem -> item.connection.order
                 }
             }
         }
