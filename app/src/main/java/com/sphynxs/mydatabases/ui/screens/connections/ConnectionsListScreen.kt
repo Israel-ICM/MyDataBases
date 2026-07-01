@@ -59,7 +59,11 @@ import com.sphynxs.mydatabases.ui.components.ConnectionCard
 import com.sphynxs.mydatabases.ui.components.DatabaseTypeCard
 import com.sphynxs.mydatabases.ui.components.EmptyState
 import com.sphynxs.mydatabases.ui.components.ErrorCard
+import com.sphynxs.mydatabases.ui.components.FolderCard
 import com.sphynxs.mydatabases.ui.components.PhosphorAppIcons
+import com.sphynxs.mydatabases.ui.components.folders.FolderFormSheet
+import com.sphynxs.mydatabases.ui.components.folders.MoveToFolderSheet
+import com.sphynxs.mydatabases.domain.models.ConnectionListItem
 import com.sphynxs.mydatabases.ui.components.ios.IOSGroupedCard
 import com.sphynxs.mydatabases.ui.components.ios.IOSListItem
 import com.sphynxs.mydatabases.ui.theme.DbAccents
@@ -100,6 +104,15 @@ fun ConnectionsListScreen(
     
     // Estado para modo de reordenamiento
     var isReorderMode by remember { mutableStateOf(false) }
+    
+    // Estados para folders
+    var showFolderFormSheet by remember { mutableStateOf(false) }
+    var editingFolder by remember { mutableStateOf<com.sphynxs.mydatabases.core.database.models.ConnectionFolder?>(null) }
+    var showMoveToFolderSheet by remember { mutableStateOf(false) }
+    var movingConnection by remember { mutableStateOf<com.sphynxs.mydatabases.core.database.models.ConnectionConfig?>(null) }
+    var showDeleteFolderDialog by remember { mutableStateOf(false) }
+    var deletingFolder by remember { mutableStateOf<com.sphynxs.mydatabases.core.database.models.ConnectionFolder?>(null) }
+    val allFolders by viewModel.groupedConnections.collectAsState()
     
     // Estado para el bottom sheet del selector de tipo
     var showTypeSelectorSheet by remember { mutableStateOf(false) }
@@ -203,69 +216,178 @@ fun ConnectionsListScreen(
                         LazyColumn(
                             modifier = Modifier.weight(1f)
                         ) {
-                            items(connections) { connection ->
-                                val disconnectSuccessMsg = stringResource(R.string.connection_disconnect_success)
-                                val disconnectErrorMsg = stringResource(R.string.connection_disconnect_error)
-                                
-                                ConnectionCard(
-                                    connection = connection,
-                                    isReorderMode = isReorderMode,
-                                    onEditClick = {
-                                        editingConnectionId = connection.id
-                                        preselectedType = null
-                                        showFormSheet = true
-                                        scope.launch { 
-                                            formSheetState.expand() 
-                                        }
-                                    },
-                                    onDeleteClick = {
-                                        connectionToDelete = connection
-                                    },
-                                    onDisconnectClick = {
-                                        scope.launch {
-                                            val result = viewModel.disconnect()
-                                            result.fold(
-                                                onSuccess = {
-                                                    snackbarHostState.showSnackbar(
-                                                        message = disconnectSuccessMsg,
-                                                        duration = SnackbarDuration.Short
-                                                    )
-                                                },
-                                                onFailure = { error ->
-                                                    snackbarHostState.showSnackbar(
-                                                        message = disconnectErrorMsg.format(error.message ?: "Unknown"),
-                                                        duration = SnackbarDuration.Long
-                                                    )
-                                                }
+                            items(
+                                items = allFolders,
+                                key = { item ->
+                                    when (item) {
+                                        is ConnectionListItem.FolderItem -> "folder_${item.folder.id}"
+                                        is ConnectionListItem.ConnectionItem -> "conn_${item.connection.id}"
+                                    }
+                                }
+                            ) { item ->
+                                when (item) {
+                                    is ConnectionListItem.FolderItem -> {
+                                        // Folder card
+                                        FolderCard(
+                                            folder = item.folder,
+                                            connectionCount = item.connectionCount,
+                                            isExpanded = item.folder.isExpanded,
+                                            onToggleExpand = { 
+                                                viewModel.toggleFolderExpand(item.folder.id)
+                                            },
+                                            onEditClick = {
+                                                editingFolder = item.folder
+                                                showFolderFormSheet = true
+                                            },
+                                            onDeleteClick = {
+                                                deletingFolder = item.folder
+                                                showDeleteFolderDialog = true
+                                            },
+                                            isReorderMode = isReorderMode,
+                                            modifier = Modifier.padding(
+                                                horizontal = DesignTokens.ScreenPaddingHorizontal,
+                                                vertical = DesignTokens.CardSpacing / 2
                                             )
-                                        }
-                                    },
-                                    onCardClick = {
-                                        // Si ya está conectada, solo navegar
-                                        if (connection.id == activeConnectionId) {
-                                            onConnect(connection.id)
-                                        } else {
-                                            // Si no está conectada, conectar primero
-                                            scope.launch {
-                                                val result = viewModel.connect(connection.id)
-                                                result.fold(
-                                                    onSuccess = { onConnect(connection.id) },
-                                                    onFailure = { error ->
-                                                        snackbarHostState.showSnackbar(
-                                                            message = "Error: ${error.message}",
-                                                            duration = SnackbarDuration.Long
-                                                        )
-                                                    }
+                                        )
+                                        
+                                        // Connections inside folder (indented)
+                                        if (item.folder.isExpanded) {
+                                            item.connections.forEach { connection ->
+                                                val disconnectSuccessMsg = stringResource(R.string.connection_disconnect_success)
+                                                val disconnectErrorMsg = stringResource(R.string.connection_disconnect_error)
+                                                
+                                                ConnectionCard(
+                                                    connection = connection,
+                                                    isReorderMode = isReorderMode,
+                                                    onEditClick = {
+                                                        editingConnectionId = connection.id
+                                                        preselectedType = null
+                                                        showFormSheet = true
+                                                        scope.launch { formSheetState.expand() }
+                                                    },
+                                                    onDeleteClick = {
+                                                        connectionToDelete = connection
+                                                    },
+                                                    onDisconnectClick = {
+                                                        scope.launch {
+                                                            val result = viewModel.disconnect()
+                                                            result.fold(
+                                                                onSuccess = {
+                                                                    snackbarHostState.showSnackbar(
+                                                                        message = disconnectSuccessMsg,
+                                                                        duration = SnackbarDuration.Short
+                                                                    )
+                                                                },
+                                                                onFailure = { error ->
+                                                                    snackbarHostState.showSnackbar(
+                                                                        message = disconnectErrorMsg.format(error.message ?: "Unknown"),
+                                                                        duration = SnackbarDuration.Long
+                                                                    )
+                                                                }
+                                                            )
+                                                        }
+                                                    },
+                                                    onMoveToFolderClick = {
+                                                        movingConnection = connection
+                                                        showMoveToFolderSheet = true
+                                                    },
+                                                    onCardClick = {
+                                                        if (connection.id == activeConnectionId) {
+                                                            onConnect(connection.id)
+                                                        } else {
+                                                            scope.launch {
+                                                                val result = viewModel.connect(connection.id)
+                                                                result.fold(
+                                                                    onSuccess = { onConnect(connection.id) },
+                                                                    onFailure = { error ->
+                                                                        snackbarHostState.showSnackbar(
+                                                                            message = "Error: ${error.message}",
+                                                                            duration = SnackbarDuration.Long
+                                                                        )
+                                                                    }
+                                                                )
+                                                            }
+                                                        }
+                                                    },
+                                                    isConnected = connection.id == activeConnectionId,
+                                                    modifier = Modifier.padding(
+                                                        start = DesignTokens.ScreenPaddingHorizontal + 32.dp, // Indent 32.dp
+                                                        end = DesignTokens.ScreenPaddingHorizontal,
+                                                        top = DesignTokens.CardSpacing / 2,
+                                                        bottom = DesignTokens.CardSpacing / 2
+                                                    )
                                                 )
                                             }
                                         }
-                                    },
-                                    isConnected = connection.id == activeConnectionId,
-                                    modifier = Modifier.padding(
-                                        horizontal = DesignTokens.ScreenPaddingHorizontal,
-                                        vertical = DesignTokens.CardSpacing / 2
-                                    )
-                                )
+                                    }
+                                    
+                                    is ConnectionListItem.ConnectionItem -> {
+                                        // Root connection (no folder)
+                                        val connection = item.connection
+                                        val disconnectSuccessMsg = stringResource(R.string.connection_disconnect_success)
+                                        val disconnectErrorMsg = stringResource(R.string.connection_disconnect_error)
+                                        
+                                        ConnectionCard(
+                                            connection = connection,
+                                            isReorderMode = isReorderMode,
+                                            onEditClick = {
+                                                editingConnectionId = connection.id
+                                                preselectedType = null
+                                                showFormSheet = true
+                                                scope.launch { formSheetState.expand() }
+                                            },
+                                            onDeleteClick = {
+                                                connectionToDelete = connection
+                                            },
+                                            onDisconnectClick = {
+                                                scope.launch {
+                                                    val result = viewModel.disconnect()
+                                                    result.fold(
+                                                        onSuccess = {
+                                                            snackbarHostState.showSnackbar(
+                                                                message = disconnectSuccessMsg,
+                                                                duration = SnackbarDuration.Short
+                                                            )
+                                                        },
+                                                        onFailure = { error ->
+                                                            snackbarHostState.showSnackbar(
+                                                                message = disconnectErrorMsg.format(error.message ?: "Unknown"),
+                                                                duration = SnackbarDuration.Long
+                                                            )
+                                                        }
+                                                    )
+                                                }
+                                            },
+                                            onMoveToFolderClick = {
+                                                movingConnection = connection
+                                                showMoveToFolderSheet = true
+                                            },
+                                            onCardClick = {
+                                                if (connection.id == activeConnectionId) {
+                                                    onConnect(connection.id)
+                                                } else {
+                                                    scope.launch {
+                                                        val result = viewModel.connect(connection.id)
+                                                        result.fold(
+                                                            onSuccess = { onConnect(connection.id) },
+                                                            onFailure = { error ->
+                                                                snackbarHostState.showSnackbar(
+                                                                    message = "Error: ${error.message}",
+                                                                    duration = SnackbarDuration.Long
+                                                                )
+                                                            }
+                                                        )
+                                                    }
+                                                }
+                                            },
+                                            isConnected = connection.id == activeConnectionId,
+                                            modifier = Modifier.padding(
+                                                horizontal = DesignTokens.ScreenPaddingHorizontal,
+                                                vertical = DesignTokens.CardSpacing / 2
+                                            )
+                                        )
+                                    }
+                                }
                             }
                             
                             item {
@@ -477,7 +599,7 @@ private fun DatabaseTypeSelectorCard(
 }
 
 /**
- * Descripción para cada tipo de DB.
+ * Card para seleccionar tipo de base de datos.
  */
 private fun getDescriptionForType(type: DatabaseType): String {
     return when (type) {
