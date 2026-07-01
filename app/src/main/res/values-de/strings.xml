@@ -188,4 +188,23 @@
     <string name="add_cursor_below">Cursor unten hinzufügen</string>
     <string name="add_cursor_above">Cursor oben hinzufügen</string>
     <string name="no_more_occurrences">Keine weiteren Vorkommen</string>
+    
+    <!-- Ordner -->
+    <string name="folder_create">Neuer Ordner</string>
+    <string name="folder_edit">Ordner bearbeiten</string>
+    <string name="folder_delete">Ordner löschen</string>
+    <string name="folder_name">Ordnername</string>
+    <string name="folder_name_hint">Mein Projekt</string>
+    <string name="folder_delete_confirm_title">Ordner löschen?</string>
+    <string name="folder_delete_confirm_message">%1$d Verbindungen in Stammverzeichnis verschieben oder löschen?</string>
+    <string name="folder_delete_move_to_root">In Stammverzeichnis verschieben</string>
+    <string name="folder_delete_all">Alle löschen</string>
+    <string name="folder_connections_count">%1$d Verbindungen</string>
+    <string name="folder_empty">Keine Verbindungen in diesem Ordner</string>
+    <string name="move_to_folder">In Ordner verschieben</string>
+    <string name="move_to_root">Stammebene</string>
+    <string name="folder_expand">Ordner erweitern</string>
+    <string name="folder_collapse">Ordner reduzieren</string>
+    <string name="action_more">Weitere Optionen</string>
+    <string name="action_reorder">Neu anordnen</string>
 </resources>

@@ -188,4 +188,23 @@
     <string name="add_cursor_below">إضافة مؤشر أسفل</string>
     <string name="add_cursor_above">إضافة مؤشر أعلى</string>
     <string name="no_more_occurrences">لا مزيد من التطابقات</string>
+    
+    <!-- المجلدات -->
+    <string name="folder_create">مجلد جديد</string>
+    <string name="folder_edit">تحرير المجلد</string>
+    <string name="folder_delete">حذف المجلد</string>
+    <string name="folder_name">اسم المجلد</string>
+    <string name="folder_name_hint">مشروعي</string>
+    <string name="folder_delete_confirm_title">حذف المجلد؟</string>
+    <string name="folder_delete_confirm_message">نقل %1$d اتصالات إلى الجذر أو حذفها؟</string>
+    <string name="folder_delete_move_to_root">نقل إلى الجذر</string>
+    <string name="folder_delete_all">حذف الكل</string>
+    <string name="folder_connections_count">%1$d اتصالات</string>
+    <string name="folder_empty">لا توجد اتصالات في هذا المجلد</string>
+    <string name="move_to_folder">نقل إلى مجلد</string>
+    <string name="move_to_root">المستوى الجذر</string>
+    <string name="folder_expand">توسيع المجلد</string>
+    <string name="folder_collapse">طي المجلد</string>
+    <string name="action_more">المزيد من الخيارات</string>
+    <string name="action_reorder">إعادة ترتيب</string>
 </resources>

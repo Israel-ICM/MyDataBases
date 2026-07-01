@@ -188,4 +188,23 @@
     <string name="add_cursor_below">नीचे कर्सर जोड़ें</string>
     <string name="add_cursor_above">ऊपर कर्सर जोड़ें</string>
     <string name="no_more_occurrences">कोई और मिलान नहीं</string>
+    
+    <!-- फ़ोल्डर -->
+    <string name="folder_create">नया फ़ोल्डर</string>
+    <string name="folder_edit">फ़ोल्डर संपादित करें</string>
+    <string name="folder_delete">फ़ोल्डर हटाएं</string>
+    <string name="folder_name">फ़ोल्डर का नाम</string>
+    <string name="folder_name_hint">मेरा प्रोजेक्ट</string>
+    <string name="folder_delete_confirm_title">फ़ोल्डर हटाएं?</string>
+    <string name="folder_delete_confirm_message">%1$d कनेक्शन को रूट में ले जाएं या हटाएं?</string>
+    <string name="folder_delete_move_to_root">रूट में ले जाएं</string>
+    <string name="folder_delete_all">सभी हटाएं</string>
+    <string name="folder_connections_count">%1$d कनेक्शन</string>
+    <string name="folder_empty">इस फ़ोल्डर में कोई कनेक्शन नहीं</string>
+    <string name="move_to_folder">फ़ोल्डर में ले जाएं</string>
+    <string name="move_to_root">रूट स्तर</string>
+    <string name="folder_expand">फ़ोल्डर विस्तृत करें</string>
+    <string name="folder_collapse">फ़ोल्डर संक्षिप्त करें</string>
+    <string name="action_more">अधिक विकल्प</string>
+    <string name="action_reorder">पुनः क्रमबद्ध करें</string>
 </resources>

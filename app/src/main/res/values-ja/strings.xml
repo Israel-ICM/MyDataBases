@@ -188,4 +188,23 @@
     <string name="add_cursor_below">下にカーソルを追加</string>
     <string name="add_cursor_above">上にカーソルを追加</string>
     <string name="no_more_occurrences">これ以上の出現なし</string>
+    
+    <!-- フォルダ -->
+    <string name="folder_create">新しいフォルダ</string>
+    <string name="folder_edit">フォルダを編集</string>
+    <string name="folder_delete">フォルダを削除</string>
+    <string name="folder_name">フォルダ名</string>
+    <string name="folder_name_hint">マイプロジェクト</string>
+    <string name="folder_delete_confirm_title">フォルダを削除しますか？</string>
+    <string name="folder_delete_confirm_message">%1$d 件の接続をルートに移動するか削除しますか？</string>
+    <string name="folder_delete_move_to_root">ルートに移動</string>
+    <string name="folder_delete_all">すべて削除</string>
+    <string name="folder_connections_count">%1$d 件の接続</string>
+    <string name="folder_empty">このフォルダには接続がありません</string>
+    <string name="move_to_folder">フォルダに移動</string>
+    <string name="move_to_root">ルートレベル</string>
+    <string name="folder_expand">フォルダを展開</string>
+    <string name="folder_collapse">フォルダを折りたたむ</string>
+    <string name="action_more">その他のオプション</string>
+    <string name="action_reorder">並べ替え</string>
 </resources>

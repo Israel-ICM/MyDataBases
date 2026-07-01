@@ -188,4 +188,24 @@
     <string name="add_cursor_below">Добавить курсор ниже</string>
     <string name="add_cursor_above">Добавить курсор выше</string>
     <string name="no_more_occurrences">Больше нет совпадений</string>
+    
+    <!-- Папки -->
+    <string name="folder_create">Новая папка</string>
+    <string name="folder_edit">Редактировать папку</string>
+    <string name="folder_delete">Удалить папку</string>
+    <string name="folder_name">Название папки</string>
+    <string name="folder_name_hint">Мой проект</string>
+    <string name="folder_delete_confirm_title">Удалить папку?</string>
+    <string name="folder_delete_confirm_message">Переместить %1$d подключений в корень или удалить их?</string>
+    <string name="folder_delete_move_to_root">Переместить в корень</string>
+    <string name="folder_delete_all">Удалить все</string>
+    <string name="folder_connections_count">%1 подключений</string>
+    <string name="folder_empty">В этой папке нет подключений</string>
+    <string name="move_to_folder">Переместить в папку</string>
+    <string name="move_to_root">Корневой уровень</string>
+    <string name="folder_expand">Развернуть папку</string>
+    <string name="folder_collapse">Свернуть папку</string>
+    <string name="action_more">Дополнительно</string>
+    <string name="action_reorder">Изменить порядок</string>
 </resources>
+

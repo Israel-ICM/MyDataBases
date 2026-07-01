@@ -227,4 +227,23 @@
     <string name="add_cursor_below">Agregar cursor abajo</string>
     <string name="add_cursor_above">Agregar cursor arriba</string>
     <string name="no_more_occurrences">No hay más coincidencias</string>
+    
+    <!-- Carpetas -->
+    <string name="folder_create">Nueva carpeta</string>
+    <string name="folder_edit">Editar carpeta</string>
+    <string name="folder_delete">Eliminar carpeta</string>
+    <string name="folder_name">Nombre de carpeta</string>
+    <string name="folder_name_hint">Mi Proyecto</string>
+    <string name="folder_delete_confirm_title">¿Eliminar carpeta?</string>
+    <string name="folder_delete_confirm_message">¿Mover %1$d conexiones a raíz o eliminarlas?</string>
+    <string name="folder_delete_move_to_root">Mover a raíz</string>
+    <string name="folder_delete_all">Eliminar todas</string>
+    <string name="folder_connections_count">%1$d conexiones</string>
+    <string name="folder_empty">No hay conexiones en esta carpeta</string>
+    <string name="move_to_folder">Mover a carpeta</string>
+    <string name="move_to_root">Nivel raíz</string>
+    <string name="folder_expand">Expandir carpeta</string>
+    <string name="folder_collapse">Colapsar carpeta</string>
+    <string name="action_more">Más opciones</string>
+    <string name="action_reorder">Reordenar</string>
 </resources>

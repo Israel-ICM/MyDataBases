@@ -188,4 +188,23 @@
     <string name="add_cursor_below">Ajouter curseur en bas</string>
     <string name="add_cursor_above">Ajouter curseur en haut</string>
     <string name="no_more_occurrences">Plus d\'occurrences</string>
+    
+    <!-- Dossiers -->
+    <string name="folder_create">Nouveau dossier</string>
+    <string name="folder_edit">Modifier le dossier</string>
+    <string name="folder_delete">Supprimer le dossier</string>
+    <string name="folder_name">Nom du dossier</string>
+    <string name="folder_name_hint">Mon Projet</string>
+    <string name="folder_delete_confirm_title">Supprimer le dossier?</string>
+    <string name="folder_delete_confirm_message">Déplacer %1$d connexions à la racine ou les supprimer?</string>
+    <string name="folder_delete_move_to_root">Déplacer à la racine</string>
+    <string name="folder_delete_all">Tout supprimer</string>
+    <string name="folder_connections_count">%1$d connexions</string>
+    <string name="folder_empty">Aucune connexion dans ce dossier</string>
+    <string name="move_to_folder">Déplacer vers dossier</string>
+    <string name="move_to_root">Niveau racine</string>
+    <string name="folder_expand">Développer le dossier</string>
+    <string name="folder_collapse">Réduire le dossier</string>
+    <string name="action_more">Plus d\'options</string>
+    <string name="action_reorder">Réorganiser</string>
 </resources>

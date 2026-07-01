@@ -227,4 +227,23 @@
     <string name="add_cursor_below">Add cursor below</string>
     <string name="add_cursor_above">Add cursor above</string>
     <string name="no_more_occurrences">No more occurrences</string>
+    
+    <!-- Folders -->
+    <string name="folder_create">New folder</string>
+    <string name="folder_edit">Edit folder</string>
+    <string name="folder_delete">Delete folder</string>
+    <string name="folder_name">Folder name</string>
+    <string name="folder_name_hint">My Project</string>
+    <string name="folder_delete_confirm_title">Delete folder?</string>
+    <string name="folder_delete_confirm_message">Move %1$d connections to root or delete them?</string>
+    <string name="folder_delete_move_to_root">Move to root</string>
+    <string name="folder_delete_all">Delete all</string>
+    <string name="folder_connections_count">%1$d connections</string>
+    <string name="folder_empty">No connections in this folder</string>
+    <string name="move_to_folder">Move to folder</string>
+    <string name="move_to_root">Root level</string>
+    <string name="folder_expand">Expand folder</string>
+    <string name="folder_collapse">Collapse folder</string>
+    <string name="action_more">More options</string>
+    <string name="action_reorder">Reorder</string>
 </resources>

@@ -188,4 +188,23 @@
     <string name="add_cursor_below">在下方添加光标</string>
     <string name="add_cursor_above">在上方添加光标</string>
     <string name="no_more_occurrences">没有更多匹配项</string>
+    
+    <!-- 文件夹 -->
+    <string name="folder_create">新建文件夹</string>
+    <string name="folder_edit">编辑文件夹</string>
+    <string name="folder_delete">删除文件夹</string>
+    <string name="folder_name">文件夹名称</string>
+    <string name="folder_name_hint">我的项目</string>
+    <string name="folder_delete_confirm_title">删除文件夹？</string>
+    <string name="folder_delete_confirm_message">将 %1$d 个连接移至根目录还是删除它们？</string>
+    <string name="folder_delete_move_to_root">移至根目录</string>
+    <string name="folder_delete_all">全部删除</string>
+    <string name="folder_connections_count">%1$d 个连接</string>
+    <string name="folder_empty">此文件夹中没有连接</string>
+    <string name="move_to_folder">移至文件夹</string>
+    <string name="move_to_root">根级别</string>
+    <string name="folder_expand">展开文件夹</string>
+    <string name="folder_collapse">折叠文件夹</string>
+    <string name="action_more">更多选项</string>
+    <string name="action_reorder">重新排序</string>
 </resources>

@@ -188,4 +188,23 @@
     <string name="add_cursor_below">Adicionar cursor abaixo</string>
     <string name="add_cursor_above">Adicionar cursor acima</string>
     <string name="no_more_occurrences">Sem mais ocorrências</string>
+    
+    <!-- Pastas -->
+    <string name="folder_create">Nova pasta</string>
+    <string name="folder_edit">Editar pasta</string>
+    <string name="folder_delete">Excluir pasta</string>
+    <string name="folder_name">Nome da pasta</string>
+    <string name="folder_name_hint">Meu Projeto</string>
+    <string name="folder_delete_confirm_title">Excluir pasta?</string>
+    <string name="folder_delete_confirm_message">Mover %1$d conexões para raiz ou excluí-las?</string>
+    <string name="folder_delete_move_to_root">Mover para raiz</string>
+    <string name="folder_delete_all">Excluir todas</string>
+    <string name="folder_connections_count">%1$d conexões</string>
+    <string name="folder_empty">Nenhuma conexão nesta pasta</string>
+    <string name="move_to_folder">Mover para pasta</string>
+    <string name="move_to_root">Nível raiz</string>
+    <string name="folder_expand">Expandir pasta</string>
+    <string name="folder_collapse">Recolher pasta</string>
+    <string name="action_more">Mais opções</string>
+    <string name="action_reorder">Reordenar</string>
 </resources>
