@@ -39,6 +39,8 @@ import com.sphynxs.mydatabases.ui.components.ios.IOSDropdownMenu
 import com.sphynxs.mydatabases.ui.theme.DbAccents
 import com.sphynxs.mydatabases.ui.theme.DesignTokens
 import com.sphynxs.mydatabases.ui.theme.MyDataBasesTheme
+import compose.icons.TablerIcons
+import compose.icons.tablericons.Folder
 
 /**
  * Card de conexión con diseño iOS unificado.
@@ -64,6 +66,7 @@ fun ConnectionCard(
     onCardClick: () -> Unit,
     isConnected: Boolean = false,
     isReorderMode: Boolean = false,
+    onMoveToFolderClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var showMenu by remember { mutableStateOf(false) }
@@ -198,6 +201,22 @@ fun ConnectionCard(
                         onClick = {
                             showMenu = false
                             onEditClick()
+                        }
+                    )
+
+                    // Opción: Move to folder
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.move_to_folder)) },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = TablerIcons.Folder,
+                                contentDescription = null,
+                                tint = DesignTokens.IconNormal
+                            )
+                        },
+                        onClick = {
+                            showMenu = false
+                            onMoveToFolderClick()
                         }
                     )
 
