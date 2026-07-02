@@ -67,7 +67,7 @@ fun ConnectionCard(
     isConnected: Boolean = false,
     isReorderMode: Boolean = false,
     onMoveToFolderClick: () -> Unit = {},
-    dragHandleModifier: Modifier = Modifier,
+    onDragHandleTouch: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var showMenu by remember { mutableStateOf(false) }
@@ -165,15 +165,17 @@ fun ConnectionCard(
 
             // Botón "More" con menú o handle de drag
             if (isReorderMode) {
-                // Handle de drag
-                Icon(
-                    imageVector = PhosphorAppIcons.Action.dragHandle,
-                    contentDescription = "Drag to reorder",
-                    tint = DesignTokens.IconNormal,
-                    modifier = dragHandleModifier
-                        .size(40.dp)
-                        .padding(8.dp)
-                )
+                IconButton(
+                    onClick = onDragHandleTouch,
+                    modifier = Modifier.size(40.dp)
+                ) {
+                    Icon(
+                        imageVector = PhosphorAppIcons.Action.dragHandle,
+                        contentDescription = "Drag to reorder",
+                        tint = DesignTokens.IconNormal,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
             } else {
                 Box {
                     IconButton(onClick = { showMenu = true }) {

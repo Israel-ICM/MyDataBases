@@ -58,4 +58,12 @@ interface ConnectionRepository {
      * @return Result.success si conectó bien, Result.failure con error si falló
      */
     suspend fun testConnection(config: ConnectionConfig): Result<Unit>
+    
+    /**
+     * Actualiza el orden de una conexión.
+     *
+     * @param connectionId El ID de la conexión
+     * @param order La nueva posición
+     */
+    suspend fun updateOrder(connectionId: String, order: Int)
 }

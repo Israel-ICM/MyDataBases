@@ -49,6 +49,10 @@ class ConnectionRepositoryImpl @Inject constructor(
         // For MVP, we just return success (real test deferred to integration with engine)
         return Result.success(Unit)
     }
+    
+    override suspend fun updateOrder(connectionId: String, order: Int) {
+        connectionDao.updateOrder(connectionId, order)
+    }
 }
 
 /**

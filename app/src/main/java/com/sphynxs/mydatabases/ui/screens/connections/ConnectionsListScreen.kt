@@ -15,9 +15,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.painterResource
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.zIndex
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
@@ -72,10 +78,6 @@ import com.sphynxs.mydatabases.ui.theme.DesignTokens
 import com.sphynxs.mydatabases.ui.components.skeleton.ConnectionListSkeleton
 import kotlinx.coroutines.launch
 import androidx.compose.foundation.lazy.rememberLazyListState
-import sh.calvin.reorderable.ReorderableItem
-import sh.calvin.reorderable.rememberReorderableLazyListState
-import sh.calvin.reorderable.reorderable
-import sh.calvin.reorderable.draggableHandle
 
 /**
  * Pantalla de lista de conexiones.
@@ -220,65 +222,109 @@ fun ConnectionsListScreen(
                         Spacer(modifier = Modifier.height(16.dp))
 
                         val lazyListState = rememberLazyListState()
-                        val reorderableLazyListState = rememberReorderableLazyListState(lazyListState) { from, to ->
-                            // TODO: Implementar reordering real cuando tengamos la lógica en el ViewModel
-                            // Por ahora solo log para verificar que funciona
-                        }
+                        
+                        var draggingItemIndex by remember { mutableStateOf(-1) }
+                        var draggingItemOffset by remember { mutableStateOf(0f) }
+                        var draggingItemInitialOffset by remember { mutableStateOf(0) }
+                        
+                        val listState = rememberLazyListState()
 
                         LazyColumn(
-                            state = lazyListState,
-                            modifier = Modifier
-                                .weight(1f)
-                                .then(
-                                    if (isReorderMode) {
-                                        Modifier.reorderable(reorderableLazyListState)
-                                    } else {
-                                        Modifier
-                                    }
-                                )
+                            state = listState,
+                            modifier = Modifier.weight(1f)
                         ) {
-                            items(
+                            itemsIndexed(
                                 items = allFolders,
-                                key = { item ->
+                                key = { _, item ->
                                     when (item) {
-                                        is ConnectionListItem.FolderItem -> "folder_${item.folder.id}"
-                                        is ConnectionListItem.ConnectionItem -> "conn_${item.connection.id}"
+                                        is ConnectionListItem.FolderItem -> "folder-${item.folder.id}"
+                                        is ConnectionListItem.ConnectionItem -> "connection-${item.connection.id}"
                                     }
                                 }
-                            ) { item ->
-                                val itemKey = when (item) {
-                                    is ConnectionListItem.FolderItem -> "folder_${item.folder.id}"
-                                    is ConnectionListItem.ConnectionItem -> "conn_${item.connection.id}"
-                                }
-                                
-                                ReorderableItem(reorderableLazyListState, key = itemKey) {
-                                    when (item) {
-                                        is ConnectionListItem.FolderItem -> {
-                                            // Folder card
-                                            FolderCard(
-                                                folder = item.folder,
-                                                connectionCount = item.connectionCount,
-                                                isExpanded = item.folder.isExpanded,
-                                                onToggleExpand = { 
-                                                    viewModel.toggleFolderExpand(item.folder.id)
-                                                },
-                                                onEditClick = {
-                                                    editingFolder = item.folder
-                                                    showFolderFormSheet = true
-                                                },
-                                                onDeleteClick = {
-                                                    deletingFolder = item.folder
-                                                    showDeleteFolderDialog = true
-                                                },
-                                                isReorderMode = isReorderMode,
-                                                dragHandleModifier = if (isReorderMode) Modifier.draggableHandle() else Modifier,
-                                                modifier = Modifier
-                                                    .animateItem()
-                                                    .padding(
-                                                        horizontal = DesignTokens.ScreenPaddingHorizontal,
-                                                        vertical = DesignTokens.CardSpacing / 2
-                                                    )
-                                            )
+                            ) { index, item ->
+                                val isDragging = draggingItemIndex == index
+                                when (item) {
+                                    is ConnectionListItem.FolderItem -> {
+                                        // Folder card
+                                        FolderCard(
+                                            folder = item.folder,
+                                            connectionCount = item.connectionCount,
+                                            isExpanded = item.folder.isExpanded,
+                                            onToggleExpand = { 
+                                                viewModel.toggleFolderExpand(item.folder.id)
+                                            },
+                                            onEditClick = {
+                                                editingFolder = item.folder
+                                                showFolderFormSheet = true
+                                            },
+                                            onDeleteClick = {
+                                                deletingFolder = item.folder
+                                                showDeleteFolderDialog = true
+                                            },
+                                            isReorderMode = isReorderMode,
+                                            onDragHandleTouch = {},
+                                            modifier = Modifier
+                                                .zIndex(if (isDragging) 1f else 0f)
+                                                .graphicsLayer {
+                                                    translationY = if (isDragging) draggingItemOffset else 0f
+                                                }
+                                                .padding(
+                                                    horizontal = DesignTokens.ScreenPaddingHorizontal,
+                                                    vertical = DesignTokens.CardSpacing / 2
+                                                )
+                                                .then(
+                                                    if (isReorderMode) {
+                                                        Modifier.pointerInput(allFolders.size) {
+                                                            detectDragGesturesAfterLongPress(
+                                                                onDragStart = {
+                                                                    draggingItemIndex = index
+                                                                    draggingItemOffset = 0f
+                                                                    draggingItemInitialOffset = listState.layoutInfo.visibleItemsInfo
+                                                                        .firstOrNull { it.index == index }?.offset ?: 0
+                                                                },
+                                                                onDrag = { change, dragAmount ->
+                                                                    change.consume()
+                                                                    draggingItemOffset += dragAmount.y
+                                                                    
+                                                                    // Calcular punto medio
+                                                                    val draggingItemSize = listState.layoutInfo.visibleItemsInfo
+                                                                        .firstOrNull { it.index == draggingItemIndex }?.size ?: 0
+                                                                    val startOffset = draggingItemInitialOffset + draggingItemOffset
+                                                                    val middleOffset = startOffset + draggingItemSize / 2f
+                                                                    
+                                                                    // Buscar target
+                                                                    listState.layoutInfo.visibleItemsInfo.firstOrNull { targetItem ->
+                                                                        middleOffset.toInt() in targetItem.offset..(targetItem.offset + targetItem.size) &&
+                                                                        targetItem.index != draggingItemIndex
+                                                                    }?.let { targetItem ->
+                                                                        // Swap
+                                                                        val newOrder = allFolders.take(targetItem.index + 1)
+                                                                            .count { it is ConnectionListItem.FolderItem } - 1
+                                                                        viewModel.reorderItem(draggingItemIndex, newOrder.coerceAtLeast(0), "folder", item.folder.id)
+                                                                        
+                                                                        // Ajustar offset
+                                                                        draggingItemOffset += (draggingItemInitialOffset - targetItem.offset).toFloat()
+                                                                        draggingItemIndex = targetItem.index
+                                                                        draggingItemInitialOffset = targetItem.offset
+                                                                    }
+                                                                },
+                                                                onDragEnd = {
+                                                                    draggingItemIndex = -1
+                                                                    draggingItemOffset = 0f
+                                                                    draggingItemInitialOffset = 0
+                                                                },
+                                                                onDragCancel = {
+                                                                    draggingItemIndex = -1
+                                                                    draggingItemOffset = 0f
+                                                                    draggingItemInitialOffset = 0
+                                                                }
+                                                            )
+                                                        }
+                                                    } else {
+                                                        Modifier
+                                                    }
+                                                )
+                                        )
                                         
                                         // Connections inside folder (indented)
                                         if (item.folder.isExpanded) {
@@ -351,75 +397,125 @@ fun ConnectionsListScreen(
                                         }
                                     }
                                     
-                                        is ConnectionListItem.ConnectionItem -> {
-                                            // Root connection (no folder)
-                                            val connection = item.connection
-                                            val disconnectSuccessMsg = stringResource(R.string.connection_disconnect_success)
-                                            val disconnectErrorMsg = stringResource(R.string.connection_disconnect_error)
-                                            
-                                            ConnectionCard(
-                                                connection = connection,
-                                                isReorderMode = isReorderMode,
-                                                onEditClick = {
-                                                    editingConnectionId = connection.id
-                                                    preselectedType = null
-                                                    showFormSheet = true
-                                                    scope.launch { formSheetState.expand() }
-                                                },
-                                                onDeleteClick = {
-                                                    connectionToDelete = connection
-                                                },
-                                                onDisconnectClick = {
+                                    is ConnectionListItem.ConnectionItem -> {
+                                        // Root connection (no folder)
+                                        val connection = item.connection
+                                        val disconnectSuccessMsg = stringResource(R.string.connection_disconnect_success)
+                                        val disconnectErrorMsg = stringResource(R.string.connection_disconnect_error)
+                                        
+                                        ConnectionCard(
+                                            connection = connection,
+                                            isReorderMode = isReorderMode,
+                                            onEditClick = {
+                                                editingConnectionId = connection.id
+                                                preselectedType = null
+                                                showFormSheet = true
+                                                scope.launch { formSheetState.expand() }
+                                            },
+                                            onDeleteClick = {
+                                                connectionToDelete = connection
+                                            },
+                                            onDisconnectClick = {
+                                                scope.launch {
+                                                    val result = viewModel.disconnect()
+                                                    result.fold(
+                                                        onSuccess = {
+                                                            snackbarHostState.showSnackbar(
+                                                                message = disconnectSuccessMsg,
+                                                                duration = SnackbarDuration.Short
+                                                            )
+                                                        },
+                                                        onFailure = { error ->
+                                                            snackbarHostState.showSnackbar(
+                                                                message = disconnectErrorMsg.format(error.message ?: "Unknown"),
+                                                                duration = SnackbarDuration.Long
+                                                            )
+                                                        }
+                                                    )
+                                                }
+                                            },
+                                            onMoveToFolderClick = {
+                                                movingConnection = connection
+                                                showMoveToFolderSheet = true
+                                            },
+                                            onCardClick = {
+                                                if (connection.id == activeConnectionId) {
+                                                    onConnect(connection.id)
+                                                } else {
                                                     scope.launch {
-                                                        val result = viewModel.disconnect()
+                                                        val result = viewModel.connect(connection.id)
                                                         result.fold(
-                                                            onSuccess = {
-                                                                snackbarHostState.showSnackbar(
-                                                                    message = disconnectSuccessMsg,
-                                                                    duration = SnackbarDuration.Short
-                                                                )
-                                                            },
+                                                            onSuccess = { onConnect(connection.id) },
                                                             onFailure = { error ->
                                                                 snackbarHostState.showSnackbar(
-                                                                    message = disconnectErrorMsg.format(error.message ?: "Unknown"),
+                                                                    message = "Error: ${error.message}",
                                                                     duration = SnackbarDuration.Long
                                                                 )
                                                             }
                                                         )
                                                     }
-                                                },
-                                                onMoveToFolderClick = {
-                                                    movingConnection = connection
-                                                    showMoveToFolderSheet = true
-                                                },
-                                                onCardClick = {
-                                                    if (connection.id == activeConnectionId) {
-                                                        onConnect(connection.id)
-                                                    } else {
-                                                        scope.launch {
-                                                            val result = viewModel.connect(connection.id)
-                                                            result.fold(
-                                                                onSuccess = { onConnect(connection.id) },
-                                                                onFailure = { error ->
-                                                                    snackbarHostState.showSnackbar(
-                                                                        message = "Error: ${error.message}",
-                                                                        duration = SnackbarDuration.Long
-                                                                    )
+                                                }
+                                            },
+                                            isConnected = connection.id == activeConnectionId,
+                                            onDragHandleTouch = {},
+                                            modifier = Modifier
+                                                .zIndex(if (isDragging) 1f else 0f)
+                                                .graphicsLayer {
+                                                    translationY = if (isDragging) draggingItemOffset else 0f
+                                                }
+                                                .padding(
+                                                    horizontal = DesignTokens.ScreenPaddingHorizontal,
+                                                    vertical = DesignTokens.CardSpacing / 2
+                                                )
+                                                .then(
+                                                    if (isReorderMode) {
+                                                        Modifier.pointerInput(allFolders.size) {
+                                                            detectDragGesturesAfterLongPress(
+                                                                onDragStart = {
+                                                                    draggingItemIndex = index
+                                                                    draggingItemOffset = 0f
+                                                                    draggingItemInitialOffset = listState.layoutInfo.visibleItemsInfo
+                                                                        .firstOrNull { it.index == index }?.offset ?: 0
+                                                                },
+                                                                onDrag = { change, dragAmount ->
+                                                                    change.consume()
+                                                                    draggingItemOffset += dragAmount.y
+                                                                    
+                                                                    val draggingItemSize = listState.layoutInfo.visibleItemsInfo
+                                                                        .firstOrNull { it.index == draggingItemIndex }?.size ?: 0
+                                                                    val startOffset = draggingItemInitialOffset + draggingItemOffset
+                                                                    val middleOffset = startOffset + draggingItemSize / 2f
+                                                                    
+                                                                    listState.layoutInfo.visibleItemsInfo.firstOrNull { targetItem ->
+                                                                        middleOffset.toInt() in targetItem.offset..(targetItem.offset + targetItem.size) &&
+                                                                        targetItem.index != draggingItemIndex
+                                                                    }?.let { targetItem ->
+                                                                        val newOrder = allFolders.take(targetItem.index + 1)
+                                                                            .count { it is ConnectionListItem.ConnectionItem } - 1
+                                                                        viewModel.reorderItem(draggingItemIndex, newOrder.coerceAtLeast(0), "connection", connection.id)
+                                                                        
+                                                                        draggingItemOffset += (draggingItemInitialOffset - targetItem.offset).toFloat()
+                                                                        draggingItemIndex = targetItem.index
+                                                                        draggingItemInitialOffset = targetItem.offset
+                                                                    }
+                                                                },
+                                                                onDragEnd = {
+                                                                    draggingItemIndex = -1
+                                                                    draggingItemOffset = 0f
+                                                                    draggingItemInitialOffset = 0
+                                                                },
+                                                                onDragCancel = {
+                                                                    draggingItemIndex = -1
+                                                                    draggingItemOffset = 0f
+                                                                    draggingItemInitialOffset = 0
                                                                 }
                                                             )
                                                         }
+                                                    } else {
+                                                        Modifier
                                                     }
-                                                },
-                                                isConnected = connection.id == activeConnectionId,
-                                                dragHandleModifier = if (isReorderMode) Modifier.draggableHandle() else Modifier,
-                                                modifier = Modifier
-                                                    .animateItem()
-                                                    .padding(
-                                                        horizontal = DesignTokens.ScreenPaddingHorizontal,
-                                                        vertical = DesignTokens.CardSpacing / 2
-                                                    )
-                                            )
-                                        }
+                                                )
+                                        )
                                     }
                                 }
                             }

@@ -87,8 +87,7 @@ dependencies {
     // Cloudy - Backdrop blur for glassmorphism
     implementation("com.github.skydoves:cloudy:0.2.2")
     
-    // Reorderable - Drag and drop for LazyColumn/LazyRow/Grid
-    implementation("sh.calvin.reorderable:reorderable:3.1.0")
+
     
     // Compose Navigation
     implementation("androidx.navigation:navigation-compose:2.8.6")

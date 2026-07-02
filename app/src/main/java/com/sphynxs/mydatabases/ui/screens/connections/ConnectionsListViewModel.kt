@@ -40,6 +40,7 @@ class ConnectionsListViewModel @Inject constructor(
     private val testConnectionUseCase: TestConnectionUseCase,
     private val connectToDatabaseUseCase: ConnectToDatabaseUseCase,
     private val repository: com.sphynxs.mydatabases.core.database.repository.DatabaseRepository,
+    private val connectionRepository: com.sphynxs.mydatabases.domain.repositories.ConnectionRepository,
     private val getGroupedConnectionsUseCase: com.sphynxs.mydatabases.domain.usecases.folders.GetGroupedConnectionsUseCase,
     private val createFolderUseCase: com.sphynxs.mydatabases.domain.usecases.folders.CreateFolderUseCase,
     private val deleteFolderUseCase: com.sphynxs.mydatabases.domain.usecases.folders.DeleteFolderUseCase,
@@ -201,6 +202,22 @@ class ConnectionsListViewModel @Inject constructor(
     }
     
     /**
+     * Actualiza el nombre de un folder existente.
+     *
+     * @param folderId El ID del folder a actualizar
+     * @param name El nuevo nombre
+     */
+    fun updateFolder(folderId: String, name: String) {
+        viewModelScope.launch {
+            try {
+                folderRepository.updateName(folderId, name)
+            } catch (e: Exception) {
+                Log.e(TAG, "Update folder failed: folderId=$folderId, name=$name", e)
+            }
+        }
+    }
+    
+    /**
      * Elimina un folder.
      *
      * @param folderId El ID del folder a eliminar
@@ -228,6 +245,31 @@ class ConnectionsListViewModel @Inject constructor(
                 moveConnectionToFolderUseCase(connectionId, folderId)
             } catch (e: Exception) {
                 Log.e(TAG, "Move connection to folder failed: connectionId=$connectionId, folderId=$folderId", e)
+            }
+        }
+    }
+    
+    /**
+     * Reordena items en la lista (folders y conexiones).
+     *
+     * @param fromIndex Índice original del item
+     * @param toIndex Índice destino del item
+     * @param itemType Tipo de item ("folder" o "connection")
+     * @param itemId ID del item a reordenar
+     */
+    fun reorderItem(fromIndex: Int, toIndex: Int, itemType: String, itemId: String) {
+        viewModelScope.launch {
+            try {
+                when (itemType) {
+                    "folder" -> {
+                        folderRepository.updateOrder(itemId, toIndex)
+                    }
+                    "connection" -> {
+                        connectionRepository.updateOrder(itemId, toIndex)
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Reorder item failed: type=$itemType, id=$itemId, from=$fromIndex, to=$toIndex", e)
             }
         }
     }

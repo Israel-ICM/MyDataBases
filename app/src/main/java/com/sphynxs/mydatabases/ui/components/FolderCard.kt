@@ -66,7 +66,7 @@ fun FolderCard(
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
     isReorderMode: Boolean = false,
-    dragHandleModifier: Modifier = Modifier,
+    onDragHandleTouch: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var showMenu by remember { mutableStateOf(false) }
@@ -158,14 +158,17 @@ fun FolderCard(
 
             // More menu o drag handle
             if (isReorderMode) {
-                Icon(
-                    imageVector = PhosphorAppIcons.Action.dragHandle,
-                    contentDescription = stringResource(R.string.action_reorder),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = dragHandleModifier
-                        .size(40.dp)
-                        .padding(8.dp)
-                )
+                IconButton(
+                    onClick = onDragHandleTouch,
+                    modifier = Modifier.size(40.dp)
+                ) {
+                    Icon(
+                        imageVector = PhosphorAppIcons.Action.dragHandle,
+                        contentDescription = stringResource(R.string.action_reorder),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
             } else {
                 Box {
                     IconButton(
