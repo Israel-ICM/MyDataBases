@@ -35,7 +35,8 @@ data class NavigationDestination(
  * - **OutsideConnection** → 2 destinos: Conexiones, Configuración
  * - **InsideConnection** → bifurca según currentRoute:
  *   - Si `currentRoute?.endsWith("/databases")` → 4 destinos: Add Database, New Query, Monitor, Settings
- *   - Si otro suffix o null → 5 destinos: Tablas, Vistas, Editor, Funciones, Backup
+ *   - Si `currentRoute?.startsWith("table_list/")` → 4 destinos: New Table, New Query, Console, Settings
+ *   - Si otro suffix o null → 5 destinos: Vistas, Editor, Funciones, Backup
  *
  * Los destinos `InsideConnection` interpolan el `connectionId` en la ruta.
  *
@@ -77,12 +78,19 @@ fun destinationsForContext(
         )
         
         is NavigationContext.InsideConnection -> {
-            if (currentRoute?.endsWith("/databases") == true) {
-                // Menú servidor (4 items) cuando estamos en /databases
-                destinationsForDatabaseList(context.connectionId)
-            } else {
-                // Menú DB (5 items) para todos los demás destinos InsideConnection
-                destinationsForDatabaseContext(context.connectionId)
+            when {
+                currentRoute?.endsWith("/databases") == true -> {
+                    // Menú servidor (4 items) cuando estamos en /databases
+                    destinationsForDatabaseList(context.connectionId)
+                }
+                currentRoute?.contains("/tables/") == true -> {
+                    // Menú de tablas (4 items) cuando estamos en connection/{id}/tables/{db}
+                    destinationsForTablesList(context.connectionId)
+                }
+                else -> {
+                    // Menú DB (5 items) para todos los demás destinos InsideConnection
+                    destinationsForDatabaseContext(context.connectionId)
+                }
             }
         }
     }
@@ -115,6 +123,43 @@ private fun destinationsForDatabaseList(connectionId: String): List<NavigationDe
             labelRes = R.string.nav_monitor,
             icon = com.sphynxs.mydatabases.ui.components.PhosphorAppIcons.Nav.monitor,
             route = Routes.Monitor.createRoute(connectionId),
+        ),
+        NavigationDestination(
+            id = "settings",
+            labelRes = R.string.nav_settings,
+            icon = com.sphynxs.mydatabases.ui.components.PhosphorAppIcons.Nav.settings,
+            route = Routes.Settings.route,
+        ),
+    )
+}
+
+/**
+ * Destinos para el menú de tablas (cuando estamos en /tables).
+ *
+ * @param connectionId ID de la conexión activa
+ * @return Lista de 4 destinos: New Table, New Query, Console, Settings
+ */
+private fun destinationsForTablesList(connectionId: String): List<NavigationDestination> {
+    return listOf(
+        NavigationDestination(
+            id = "new_table",
+            labelRes = R.string.nav_new_table,
+            icon = com.sphynxs.mydatabases.ui.components.PhosphorAppIcons.Nav.newTable,
+            route = Routes.NewQuery.createRoute(connectionId), // TODO: Crear Routes.NewTable cuando esté listo
+            isModal = true, // Abre ModalBottomSheet en vez de navegar
+        ),
+        NavigationDestination(
+            id = "new_query",
+            labelRes = R.string.nav_new_query,
+            icon = com.sphynxs.mydatabases.ui.components.PhosphorAppIcons.Nav.newQuery,
+            route = Routes.NewQuery.createRoute(connectionId),
+            isModal = true, // Abre ModalBottomSheet en vez de navegar
+        ),
+        NavigationDestination(
+            id = "console",
+            labelRes = R.string.nav_console,
+            icon = com.sphynxs.mydatabases.ui.components.PhosphorAppIcons.Nav.console,
+            route = Routes.Monitor.createRoute(connectionId), // TODO: Crear Routes.Console cuando esté listo
         ),
         NavigationDestination(
             id = "settings",

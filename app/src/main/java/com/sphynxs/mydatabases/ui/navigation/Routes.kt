@@ -96,17 +96,21 @@ sealed class Routes(val route: String) {
     /**
      * Pantalla de lista de tablas de una base de datos específica.
      *
-     * @property route Template con argumento `databaseName`
+     * NOTA: Esta ruta usa el modelo contextual connection/{id}/tables/{db}
+     * para mantener el connectionId y ser consistente con otros destinos.
+     *
+     * @property route Template con argumentos `connectionId` y `databaseName`
      */
-    data object TableList : Routes("table_list/{databaseName}") {
+    data object TableList : Routes("connection/{connectionId}/tables/{databaseName}") {
         /**
-         * Crea la ruta completa reemplazando el argumento databaseName.
+         * Crea la ruta completa reemplazando los argumentos.
          *
+         * @param connectionId ID de la conexión activa
          * @param databaseName Nombre de la base de datos
-         * @return Ruta navegable (ej: "table_list/my_db")
+         * @return Ruta navegable (ej: "connection/abc-123/tables/my_db")
          */
-        fun createRoute(databaseName: String): String {
-            return "table_list/$databaseName"
+        fun createRoute(connectionId: String, databaseName: String): String {
+            return "connection/$connectionId/tables/$databaseName"
         }
     }
     

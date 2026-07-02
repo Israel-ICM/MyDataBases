@@ -6,7 +6,9 @@
     <string name="nav_connections">Connections</string>
     <string name="nav_database_list">Databases</string>
     <string name="nav_add_database">Add Database</string>
+    <string name="nav_new_table">New Table</string>
     <string name="nav_new_query">New Query</string>
+    <string name="nav_console">Console</string>
     <string name="nav_monitor">Monitor</string>
     <string name="nav_tables">Tables</string>
     <string name="nav_views">Views</string>

@@ -144,7 +144,7 @@ fun MyDataBasesNavHost(
                 DatabasesListScreen(
                     connectionId = connectionId,
                     onNavigateToTables = { databaseName ->
-                        navController.navigate(Routes.TableList.createRoute(databaseName))
+                        navController.navigate(Routes.TableList.createRoute(connectionId, databaseName))
                     },
                     onNavigateBack = { navController.popBackStack() },
                     showAddDatabaseSheet = showAddDatabaseSheet,
@@ -183,9 +183,11 @@ fun MyDataBasesNavHost(
             composable(
                 route = Routes.TableList.route,
                 arguments = listOf(
+                    navArgument("connectionId") { type = NavType.StringType },
                     navArgument("databaseName") { type = NavType.StringType }
                 )
             ) {
+                val connectionId = it.arguments?.getString("connectionId") ?: ""
                 val databaseName = it.arguments?.getString("databaseName") ?: ""
                 TablesListScreen(
                     databaseName = databaseName,
