@@ -119,6 +119,7 @@ fun QueryEditorScreen(
     val canUndo by viewModel.canUndo.collectAsState()
     val canRedo by viewModel.canRedo.collectAsState()
     val cursorPositions = remember { mutableStateListOf<Int>() }
+    val scope = rememberCoroutineScope()
     
     // Sync sqlText to ViewModel (para toolbar flotante)
     LaunchedEffect(sqlText.text) {
@@ -133,6 +134,52 @@ fun QueryEditorScreen(
     // Load schema snapshot when databaseName changes
     LaunchedEffect(databaseName) {
         viewModel.loadSchema(databaseName)
+    }
+
+    /**
+     * Format the current SQL text (UPPERCASE keywords, major-clause newlines).
+     *
+     * History-atomic: pushes the pre-format snapshot BEFORE applying the formatted
+     * text so a single Undo restores the original text byte-for-byte (spec scenario 11).
+     * Clears cursorPositions because the reflow invalidates pinned multi-cursor offsets
+     * (spec scenario 12).
+     *
+     * Shared by both entry points — toolbar button (via [QueryEditorViewModel.formatRequest])
+     * and the Ctrl+Shift+F shortcut — so behavior stays identical (spec scenario 10).
+     *
+     * Spec: openspec/changes/editor-completion-and-format/spec.md (scenarios 9-12)
+     */
+    suspend fun applyFormat() {
+        if (sqlText.text.isBlank()) return
+        viewModel.pushHistory(
+            text = sqlText.text,
+            selection = sqlText.selection,
+            cursorPositions = cursorPositions.toList()
+        )
+        val formatted = viewModel.formatSql(sqlText.text)
+        sqlText = TextFieldValue(
+            text = formatted,
+            selection = TextRange(0)
+        )
+        cursorPositions.clear()
+        viewModel.pushHistory(
+            text = formatted,
+            selection = TextRange(0),
+            cursorPositions = emptyList()
+        )
+    }
+
+    // Listen for Format requests triggered from QueryEditorToolbarRow (a separate
+    // composable rendered outside this Card by WorkspaceOverlay, sharing the same
+    // ViewModel instance via hiltViewModel() scoping). The toolbar button cannot
+    // mutate this screen's local sqlText/cursorPositions state directly, so it
+    // signals through viewModel.formatRequest instead (tick counter starts at 0).
+    LaunchedEffect(Unit) {
+        viewModel.formatRequest.collect { tick ->
+            if (tick > 0) {
+                applyFormat()
+            }
+        }
     }
     val scrollState = rememberScrollState()
     val context = LocalContext.current
@@ -473,29 +520,7 @@ fun QueryEditorScreen(
                             }
                             com.sphynxs.mydatabases.domain.editor.ShortcutAction.Format -> {
                                 if (sqlText.text.isNotBlank()) {
-                                    // Push current state to history before formatting
-                                    viewModel.pushHistory(
-                                        text = sqlText.text,
-                                        selection = sqlText.selection,
-                                        cursorPositions = cursorPositions.toList()
-                                    )
-                                    
-                                    // Format SQL
-                                    kotlinx.coroutines.MainScope().launch {
-                                        val formatted = viewModel.formatSql(sqlText.text)
-                                        sqlText = TextFieldValue(
-                                            text = formatted,
-                                            selection = TextRange(0)
-                                        )
-                                        cursorPositions.clear()
-                                        
-                                        // Push formatted state to history
-                                        viewModel.pushHistory(
-                                            text = formatted,
-                                            selection = TextRange(0),
-                                            cursorPositions = emptyList()
-                                        )
-                                    }
+                                    scope.launch { applyFormat() }
                                 }
                             }
                             com.sphynxs.mydatabases.domain.editor.ShortcutAction.TriggerCompletion -> {
@@ -934,6 +959,7 @@ fun QueryEditorToolbarRow(
     val canRedo by viewModel.canRedo.collectAsState()
     val sqlText by viewModel.sqlText.collectAsState()
     val cursorPositions by viewModel.cursorPositions.collectAsState()
+    val formatButtonLabel = stringResource(R.string.format_button_label)
     
     Row(
         modifier = modifier.padding(horizontal = 16.dp),
@@ -941,7 +967,7 @@ fun QueryEditorToolbarRow(
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Grupo izquierdo: acciones adaptativas
-        val leftActions = remember(canUndo, canRedo, sqlText, cursorPositions) {
+        val leftActions = remember(canUndo, canRedo, sqlText, cursorPositions, formatButtonLabel) {
             listOf(
                 ToolbarAction(
                     id = "find",
@@ -966,9 +992,9 @@ fun QueryEditorToolbarRow(
                 ToolbarAction(
                     id = "format",
                     icon = Icons.Default.FormatAlignLeft,
-                    label = "Format",
+                    label = formatButtonLabel,
                     enabled = sqlText.isNotBlank(),
-                    onClick = { /* TODO */ }
+                    onClick = { viewModel.requestFormat() }
                 ),
                 ToolbarAction(
                     id = "save",

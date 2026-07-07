@@ -227,6 +227,24 @@ class QueryEditorViewModel @Inject constructor(
     suspend fun formatSql(currentText: String): String = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Default) {
         com.sphynxs.mydatabases.domain.editor.SqlFormatter.format(currentText)
     }
+
+    // Format toolbar button trigger (tick counter, StateFlow always replays last value)
+    private val _formatRequest = MutableStateFlow(0)
+    val formatRequest: StateFlow<Int> = _formatRequest.asStateFlow()
+
+    /**
+     * Request a Format apply from outside QueryEditorScreen's local Compose state
+     * (e.g. the QueryEditorToolbarRow Format button, a separate composable that
+     * shares this ViewModel instance but cannot mutate the screen's local
+     * `sqlText`/`cursorPositions` state directly).
+     *
+     * QueryEditorScreen observes [formatRequest] and applies the format using the
+     * exact same pathway as the Ctrl+Shift+F shortcut (spec scenario 10: same
+     * behavior regardless of entry point).
+     */
+    fun requestFormat() {
+        _formatRequest.value += 1
+    }
     
     /**
      * Load schema snapshot for the current database.

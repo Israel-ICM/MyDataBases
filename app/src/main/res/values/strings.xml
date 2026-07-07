@@ -138,6 +138,8 @@
     <string name="undo_button">Undo</string>
     <string name="redo_button">Redo</string>
     <string name="format_button">Format SQL</string>
+    <string name="format_button_label">Format</string>
+    <string name="format_button_description">Format SQL query</string>
     <string name="query_editor_empty_state">Run a query to see results here</string>
     <string name="query_editor_error_prefix">Query Error</string>
     <string name="rows_affected">Rows affected</string>

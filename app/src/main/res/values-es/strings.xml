@@ -136,6 +136,8 @@
     <string name="undo_button">Deshacer</string>
     <string name="redo_button">Rehacer</string>
     <string name="format_button">Formatear SQL</string>
+    <string name="format_button_label">Formato</string>
+    <string name="format_button_description">Dar formato al SQL</string>
     <string name="query_editor_empty_state">Ejecutá una consulta para ver los resultados acá</string>
     <string name="query_editor_error_prefix">Error de consulta</string>
     <string name="rows_affected">Filas afectadas</string>
