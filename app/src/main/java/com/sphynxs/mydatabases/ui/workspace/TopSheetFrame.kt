@@ -13,7 +13,9 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.TableChart
+import androidx.compose.material.icons.filled.ViewCarousel
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -26,12 +28,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.ui.draw.alpha
+import com.sphynxs.mydatabases.R
 import kotlin.math.roundToInt
 
 /**
@@ -45,6 +49,9 @@ import kotlin.math.roundToInt
  * @param card WorkspaceCard con los datos a mostrar
  * @param isExpanded Si el frame está expandido (muestra contenido completo)
  * @param onClose Callback cuando se cierra la card
+ * @param totalCardCount Cantidad total de cards abiertas en el workspace; controla la visibilidad
+ *                        del botón de carrusel (visible solo si >= 2, ver workspace-card-carousel)
+ * @param onShowCarousel Callback cuando se presiona el botón de carrusel (delega el toggle a WorkspaceOverlay)
  * @param speedMultiplier Multiplicador de velocidad respecto al base (ej: 1.5 = baja 50% más rápido)
  * @param peekHeight Altura peek del TopSheet base (para sincronizar posiciones)
  */
@@ -55,6 +62,8 @@ fun TopSheetFrame(
     card: WorkspaceCard,
     isExpanded: Boolean,
     onClose: () -> Unit,
+    totalCardCount: Int,
+    onShowCarousel: () -> Unit,
     modifier: Modifier = Modifier,
     speedMultiplier: Float = 1.8f,
     peekHeight: Dp = 60.dp
@@ -173,8 +182,27 @@ fun TopSheetFrame(
                 alpha = expansionProgress,
                 modifier = Modifier
                     .align(Alignment.BottomStart)
-                    .padding(start = configuration.screenWidthDp.dp * 0.18f, bottom = 24.dp)
+                    .padding(start = configuration.screenWidthDp.dp * 0.18f, bottom = 16.dp)
             )
+
+            // Botón de carrusel, espejo horizontal de StepIcon; visible solo con 2+ cards abiertas.
+            // IconButton reserva un touch target de 48dp alrededor del glifo de 28dp (10dp de inset
+            // por lado), a diferencia de StepIcon que es un Icon plano sin caja extra. Se resta ese
+            // inset del padding para que el GLIFO quede a la misma altura/distancia que StepIcon,
+            // no la caja invisible del botón.
+            if (totalCardCount >= 2) {
+                val iconButtonInset = 10.dp // (48.dp touch target - 28.dp icon) / 2
+                CarouselTriggerIcon(
+                    onShowCarousel = onShowCarousel,
+                    alpha = expansionProgress,
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(
+                            end = configuration.screenWidthDp.dp * 0.18f - iconButtonInset,
+                            bottom = 16.dp - iconButtonInset
+                        )
+                )
+            }
         }
     }
 }
@@ -198,6 +226,35 @@ private fun StepIcon(
         imageVector = icon,
         contentDescription = card.title,
         tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f * alpha),
-        modifier = modifier.size(24.dp)
+        modifier = modifier.size(28.dp)
     )
+}
+
+/**
+ * Botón trigger del carrusel de cards, en el escalón del TopSheet.
+ *
+ * Espejo horizontal de [StepIcon]: mismo tratamiento de alpha (`0.6f * expansionProgress`)
+ * y mismo inset inferior (16.dp), alineado a `BottomEnd` en lugar de `BottomStart`.
+ * A diferencia de [StepIcon] (un [Icon] plano, no interactivo), este se envuelve en
+ * [IconButton] para garantizar un touch target mínimo de 48dp pese a que el glifo
+ * visible sigue siendo de 28dp (Requirement: Localized content-description strings /
+ * Non-Functional Requirements — Accessibility, spec.md).
+ */
+@Composable
+private fun CarouselTriggerIcon(
+    onShowCarousel: () -> Unit,
+    alpha: Float,
+    modifier: Modifier = Modifier
+) {
+    IconButton(
+        onClick = onShowCarousel,
+        modifier = modifier
+    ) {
+        Icon(
+            imageVector = Icons.Filled.ViewCarousel,
+            contentDescription = stringResource(R.string.workspace_carousel_button),
+            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f * alpha),
+            modifier = Modifier.size(28.dp)
+        )
+    }
 }

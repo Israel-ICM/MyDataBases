@@ -1,5 +1,6 @@
 package com.sphynxs.mydatabases.ui.workspace
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -69,6 +70,15 @@ fun WorkspaceOverlay(
     var expansionProgress by remember { mutableFloatStateOf(0f) }
     var isDragging by remember { mutableStateOf(false) }
     
+    // Estado local del carrusel de cards (Option A — sin cambios en WorkspaceManager,
+    // ver design.md "Decision: Carousel visibility state ownership")
+    var isCarouselOpen by remember { mutableStateOf(false) }
+    
+    // Intercepta el botón/gesto de back SOLO mientras el carrusel está abierto;
+    // no interfiere con el back-behavior existente del nav-graph (design.md confirma
+    // que no existía ningún BackHandler en el repo antes de este cambio)
+    BackHandler(enabled = isCarouselOpen) { isCarouselOpen = false }
+    
     // Auto-expandir cuando aparece una nueva card
     LaunchedEffect(activeCards.size) {
         if (activeCards.isNotEmpty()) {
@@ -112,7 +122,9 @@ fun WorkspaceOverlay(
                     modifier = Modifier.fillMaxSize(),
                     card = card,
                     isExpanded = isCardExpanded,
-                    onClose = { workspaceManager.closeCard(selectedCardIndex) }
+                    onClose = { workspaceManager.closeCard(selectedCardIndex) },
+                    totalCardCount = activeCards.size,
+                    onShowCarousel = { isCarouselOpen = true }
                 )
                 
                 // Capa 3: Toolbar flotante FUERA del topsheet (solo para Query cards)
@@ -149,6 +161,28 @@ fun WorkspaceOverlay(
                     )
                 }
             }
+        }
+        
+        // Capa 4: Carrusel de cards — ÚLTIMO hijo del Box exterior (z-order superior).
+        // Guard `isNotEmpty()` (NO `size >= 2`): el carrusel debe seguir abierto aunque
+        // queden 0 o 1 card tras un close hecho desde adentro (nuance crítica 3.11/3.12
+        // de tasks.md — Scenario 11 de spec.md). El umbral `>= 2` aplica ÚNICAMENTE al
+        // botón trigger de TopSheetFrame (Fase 1), nunca a esta condición.
+        if (isCarouselOpen && activeCards.isNotEmpty()) {
+            WorkspaceCarousel(
+                cards = activeCards,
+                activeIndex = selectedCardIndex,
+                onSelectCard = { index ->
+                    // DECISION D4: tocar la card YA activa es dismiss puro, sin mutar el manager
+                    if (index != selectedCardIndex) {
+                        workspaceManager.setActiveIndex(index)
+                    }
+                    isCarouselOpen = false
+                },
+                onCloseCard = { index -> workspaceManager.closeCard(index) },
+                onDismiss = { isCarouselOpen = false },
+                modifier = Modifier.fillMaxSize()
+            )
         }
     }
 }

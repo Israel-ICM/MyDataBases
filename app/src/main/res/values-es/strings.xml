@@ -248,4 +248,8 @@
     <string name="folder_collapse">Colapsar carpeta</string>
     <string name="action_more">Más opciones</string>
     <string name="action_reorder">Reordenar</string>
+    
+    <!-- Workspace Carousel -->
+    <string name="workspace_carousel_button">Ver todas las tarjetas abiertas</string>
+    <string name="workspace_carousel_close_card">Cerrar %1$s</string>
 </resources>

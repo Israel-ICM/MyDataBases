@@ -250,4 +250,8 @@
     <string name="folder_collapse">Collapse folder</string>
     <string name="action_more">More options</string>
     <string name="action_reorder">Reorder</string>
+    
+    <!-- Workspace Carousel -->
+    <string name="workspace_carousel_button">Show all open cards</string>
+    <string name="workspace_carousel_close_card">Close %1$s</string>
 </resources>
