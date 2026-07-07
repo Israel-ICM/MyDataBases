@@ -243,6 +243,123 @@ showPopup = true
 
 ---
 
+### ADR 7: Statement + List Breaking via Depth-Tracked State Machine
+
+**[NEW 2026-07-07]** — Context: proposal.md REVISED 2026-07-07 reverses the original flat-projection decision (Q3 below). `SqlFormatter` must now split multi-statement input on top-level `;`, break `INSERT INTO`/`VALUES` parenthesized comma-lists one-item-per-line, break the `SELECT` projection one-column-per-line, and indent `FROM`/`WHERE` clause bodies — without becoming a full SQL parser.
+
+**Decision**: Keep the existing single-pass token-stream architecture (ADR 2 unchanged). Add a **pre-pass** that splits tokens into independent statements at top-level `;`, then extend the per-statement loop with four pieces of state: `parenDepth: Int`, `activeListDepth: Int?` (non-null while inside a tracked INSERT/VALUES list), `listMode: NONE|PROJECTION|PAREN_LIST`, and a generalized `atLineStart: Boolean` (replaces the old ad hoc `needsIndent` check) that suppresses the WHITESPACE token immediately following any forced line break. One shared "list-breaking" code path (gated by `listMode`/`activeListDepth`) serves both INSERT-columns and VALUES-items — no per-keyword duplication.
+
+**Alternatives considered**:
+- Full parser → AST → pretty-printer: rejected — disproportionate effort for one nesting level of breaking; replaces a working, tested module with a new bug surface.
+- Two-pass (token → line-item tree → render): rejected for v1 — an `Int`/`enum` state machine already expresses the required rules; revisit only if a 3rd distinct breaking rule is added later.
+- Per-keyword special-casing (`if keyword=="INSERT" ... if keyword=="VALUES" ...` duplicated): rejected — violates the shared-context-driven design explicitly requested; `listMode` unifies both triggers.
+
+**Rationale**: Every new rule reduces to "did we cross a boundary token (`;`, `,`, `(`, `)`, or a major keyword) at a given depth?" — a question simple counters already answer, so no new dependency or data structure is needed.
+
+**Consequences**:
+- ✅ `SqlTokenizer` contract and ADR 2 (pure function) untouched.
+- ✅ One code path for both list-breaking flavors.
+- ✅ Idempotency (`format(format(x)) == format(x)`) preserved — see rationale below.
+- ⚠️ Only ONE active list-breaking depth at a time (`activeListDepth`); deeper nesting (subquery inside `VALUES(...)`) stays flat — matches spec's explicit out-of-scope clause.
+- ⚠️ New FROM/WHERE-body-indent and SELECT-projection-break rules are gated on `parenDepth == 0` at the triggering keyword. A subquery's OWN `WHERE`/`SELECT` (depth ≥ 1) keeps today's flat behavior — but this means the pre-existing Scenario 3 test's OUTER `WHERE` now DOES get body-indent even though Scenario 3 itself isn't marked `[REVISED]`. See Backward Compatibility below — this scenario's expected string must change too.
+- ⚠️ Module size roughly triples (~134 → ~300–340 lines) — see Risks for LOC delta.
+
+#### Algorithm (implementer-ready pseudocode)
+
+**Pass 0 — split top-level statements** (never inside string/comment — already excluded by tokenizer precedence — and never inside parens):
+
+```
+fun splitTopLevelStatements(tokens): Pair<List<List<Token>>, Boolean> {
+    var depth = 0
+    val segments = mutableListOf(mutableListOf<Token>())
+    for (tok in tokens) {
+        if (tok.kind == PUNCTUATION) {
+            if (tok.text == "(") depth++
+            if (tok.text == ")") depth = max(0, depth - 1)
+            if (tok.text == ";" && depth == 0) {
+                segments.add(mutableListOf())   // start new segment, drop the ';' itself
+                continue
+            }
+        }
+        segments.last().add(tok)
+    }
+    val trailingSemicolon = segments.last().all { it.kind == WHITESPACE }
+    if (trailingSemicolon) segments.removeLast()
+    return segments to trailingSemicolon
+}
+
+fun format(sql): String {
+    val tokens = tokenize(sql); if (tokens.isEmpty()) return ""
+    val (segments, hadTrailingSemicolon) = splitTopLevelStatements(tokens)
+    val formatted = segments.map { formatStatement(it) }.filter { it.isNotBlank() }
+    val joined = formatted.joinToString(";\n")
+    return if (hadTrailingSemicolon) "$joined;" else joined
+}
+```
+
+**Pass 1 — per-statement loop** (`formatStatement`), extended state:
+
+```
+var parenDepth = 0
+var activeListDepth: Int? = null
+var listMode = NONE            // NONE | PROJECTION | PAREN_LIST
+var indentLevel = 0            // 0 or 1 — single nesting level supported
+var atLineStart = false
+var pendingListTrigger = false // true right after INSERT..INTO<table> or VALUES,
+                                // until the next '(' is consumed or the clause ends
+var pendingTableCapture = false // true right after INTO, until the table identifier is appended
+
+fun breakLine(result) {
+    result.append("\n"); result.append("  ".repeat(indentLevel)); atLineStart = true
+}
+```
+
+Per token kind:
+
+> **[CORRECTED during sdd-apply, 2026-07-07]** Three ordering bugs were found by manually
+> tracing this pseudocode against the maintainer's golden example (Scenario 8a) BEFORE
+> writing any code — the original ordering below produced the wrong output. Corrections
+> are inlined below with a short rationale each; the state variables and overall shape of
+> the algorithm are otherwise unchanged.
+
+- **KEYWORD** (uppercase first): `CLAUSE_NEWLINE_KEYWORDS` now includes `VALUES` in addition to `FROM, WHERE, HAVING, LIMIT, UNION, INNER, LEFT, RIGHT, OUTER, CROSS, FULL, GROUP, ORDER` *(corrected — the original set had no way to put `VALUES` on its own clause line; without it, `VALUES` stayed glued to the preceding `)` and the golden fixture's `)\nVALUES\n(` layout was unreachable)*. If `kw in CLAUSE_NEWLINE_KEYWORDS && parenDepth == 0` → `indentLevel = 0; listMode = NONE; breakLine()` *(corrected order — indent/mode MUST be reset BEFORE the break, not after; the original `breakLine(); indentLevel = 0; ...` order breaks the line using the STALE indent level, e.g. `FROM` right after a `SELECT` projection would render indented instead of flush-left)*. Existing ON/AND/OR-after-JOIN indent (unchanged) routes through the same `atLineStart` flag: if `kw in {"ON","AND","OR"} && previousKeyword in JOIN_KEYWORDS` → `indentLevel = 1; breakLine()`. Append keyword. Then: if `kw == "SELECT" && parenDepth == 0` → `listMode = PROJECTION; indentLevel = 1; breakLine()`. If `kw in {"FROM","WHERE"} && parenDepth == 0` → `indentLevel = 1; breakLine()`. If `kw == "INTO"` → `pendingTableCapture = true`. If `kw == "VALUES" && parenDepth == 0` → `pendingListTrigger = true`.
+- **IDENTIFIER**: append as-is; if `pendingTableCapture` → `pendingListTrigger = true; pendingTableCapture = false`.
+- **WHITESPACE**: if `atLineStart` → skip entirely (indent already emitted); else if `result.isNotEmpty()` → append a single space (collapse). *(Clarified: the gate is `atLineStart` ALONE, not `result.endsWith("\n")` — when `indentLevel == 1`, `breakLine()` leaves the buffer ending in `"  "` (spaces), not `"\n"`, so the old ad hoc newline-suffix check would fail to suppress the whitespace token right after an indented break. This is exactly why `atLineStart` was introduced; the pseudocode's own stated intent already implied this, just making it explicit here.)*
+- **PUNCTUATION `(`**: if `pendingListTrigger && parenDepth == 0 && activeListDepth == null` → `parenDepth++; activeListDepth = parenDepth; listMode = PAREN_LIST; breakLine(); append("("); indentLevel = 1; breakLine(); pendingListTrigger = false` *(corrected order — `breakLine()` MUST happen BEFORE `append("(")`, using the CURRENT (base) indent level, so `(` lands alone on its own new line; only THEN does `indentLevel` bump to 1 for a second break that pushes the first list item onto its own indented line. The original `append("("); breakLine()` order glued `(` onto the end of the preceding line — e.g. `` `INSERT INTO `t` (` `` on one line — which contradicts Scenario 8b/8c and the golden fixture's `(` sitting alone on its own line)*. Else → `parenDepth++; append("(")` (flat, unchanged).
+- **PUNCTUATION `)`**: if `activeListDepth != null && parenDepth == activeListDepth` → `indentLevel = 0; breakLine(); append(")"); parenDepth--; activeListDepth = null; listMode = NONE` (this one was already in the correct reset-before-break order). Else → `append(")"); parenDepth = max(0, parenDepth - 1)` (flat, unchanged).
+- **PUNCTUATION `,`**: breaks when `(listMode == PAREN_LIST && parenDepth == activeListDepth) || (listMode == PROJECTION && parenDepth == 0)` → `append(","); breakLine()`. Else → `append(",")` (flat, unchanged — e.g. a comma inside a `COUNT(*)`-style call at `parenDepth > 0` never breaks).
+- **STRING, COMMENT**: append verbatim (unchanged).
+- Everything else (NUMBER, OPERATOR, and PUNCTUATION other than `( ) ,`): append as-is (unchanged). Note keywords like `MAX`/`COUNT`/`SUM` etc. are tokenized as KEYWORD (uppercase-normalized) even inside nested function calls (Scenario 8f) — they still go through the KEYWORD branch above, just with none of the clause conditions matching at `parenDepth > 0`.
+
+Post-processing (trim trailing whitespace per line, collapse 3+ blank lines, `.trim()`) runs **per statement** before the `;\n` join, so each formatted statement stays self-contained.
+
+#### Idempotency
+
+The formatter derives ALL structure from token KIND + punctuation identity (keyword names, `(` `)` `,` `;`) — WHITESPACE tokens are discarded and regenerated every run, never inspected for content. Re-tokenizing `format(x)`'s output reproduces the identical KEYWORD/IDENTIFIER/PUNCTUATION/STRING/COMMENT sequence as the input (only WHITESPACE differs, and WHITESPACE is never a decision input), so the same decision tree runs and produces byte-identical output. Statement re-splitting is safe because we only ever join with a literal `;\n` and never introduce a new top-level `;` mid-statement. No genuine idempotency risk was found; the theoretical risk case (an emitted indent being misclassified on re-tokenization) cannot occur given the tokenizer's `\s+` WHITESPACE rule.
+
+#### Backward compatibility — existing `SqlFormatterTest` scenarios
+
+Because "SELECT sits alone on its clause line" and FROM/WHERE body-indent apply **unconditionally** (not only when a comma-list is present), the footprint is larger than the proposal's single called-out scenario:
+
+| Scenario | Verdict | Reason |
+|---|---|---|
+| 1 `format_simpleSelectWithWhere_producesExpectedLayout` | **UPDATE expected string** | SELECT alone on its line; FROM/WHERE bodies now indented |
+| 2 `format_innerJoinWithOnPredicate_indentsOnUnderJoin` | **UPDATE expected string** | Same FROM/WHERE change; JOIN/ON indent unaffected |
+| 3 `format_nestedSubquery_uppercasesKeywordsWithoutDeepIndent` | **UPDATE + rename** (e.g. `..._outerIndentedInnerStaysFlat`) | Outer WHERE (depth 0) now indents; inner subquery FROM/WHERE (depth ≥ 1) stay flat, unchanged |
+| 4 `format_stringLiterals_preservedVerbatim` | **UPDATE expected string** | 2-item projection now breaks one-per-line; string-preservation assertion itself unaffected |
+| 5 `format_lineComment_preservedVerbatim` | **UPDATE expected string** | SELECT alone even with 1 column (list-breaking applies unconditionally per spec) |
+| 6 `format_blockComment_preservedVerbatim` | **UPDATE expected string** | Same — SELECT alone, comment stays inline with its token |
+| 7 `format_projectionList_keptOnOneLine` | **SUPERSEDE + rename** to `format_projectionList_breaksOneColumnPerLine` | Explicit reversal from proposal.md |
+| 8 `format_isIdempotent_acrossAllGoldenFixtures` | No change | Relative equality assertion, unaffected by layout changes |
+| `format_emptyString_returnsEmpty` | No change | — |
+| `format_onlyWhitespace_returnsEmpty` | No change | — |
+| `format_mixedCaseKeywords_allUppercase` | No change | Uses `.contains()`, not exact match |
+| `format_trailingSemicolon_preserved` | **UPDATE expected string** | Same SELECT/FROM layout change |
+
+**New tests needed**: `format_multipleStatements_splitsAndFormatsEachIndependently` (the INSERT+SELECT example), `format_insertIntoColumnList_breaksOneColumnPerLine`, `format_valuesList_breaksOneValuePerLine`, `format_parenListSingleItem_stillBreaksOntoOwnLines` (no special-case for count=1), `format_selectProjectionWithFunctionCall_innerCommaNotBroken` (e.g. `SELECT COUNT(*), name FROM t` — inner comma at `parenDepth>0` stays flat), `format_multipleStatementsWithTrailingSemicolon_preservesTrailingSemicolon`.
+
+---
+
 ## 3. Component Specifications
 
 ### SqlKeywords.kt (NEW)
@@ -297,25 +414,21 @@ object SqlFormatter {
 **Responsibilities**:
 - Tokenize via `SqlTokenizer`
 - UPPERCASE tokens where `token.kind == KEYWORD`
+- **[REVISED]** Split multi-statement input on top-level `;` (outside strings/comments/parens); format each independently, rejoin with `;\n`
 - Insert newline before FROM/WHERE/JOIN/GROUP BY/ORDER BY/HAVING/LIMIT/UNION
-- Insert 2-space indent after newline for ON/AND/OR subclauses
+- **[REVISED]** `FROM`/`WHERE` clause bodies break onto their own indented line (2 spaces), unconditionally
+- **[REVISED]** `SELECT` sits alone on its clause line; projection breaks one column per line (2-space indent), even for a single column
+- **[REVISED]** A top-level parenthesized comma list after `INSERT INTO <table>` or `VALUES` breaks one item per line (2-space indent), including single-item lists
+- Insert 2-space indent after newline for ON/AND/OR subclauses (unchanged)
 - Preserve STRING/COMMENT tokens verbatim (byte-for-byte)
-- Preserve user projection formatting (no comma breaks)
 - Trim trailing whitespace per line
 - Collapse 3+ blank lines to 1
 - Idempotent: `format(format(x)) == format(x)`
+- Algorithm: see **ADR 7** (depth-tracked state machine + pseudocode)
 
 **Dependencies**: `SqlTokenizer`, `SqlKeywords`
 
-**Test Strategy**: Unit tests with 12 format scenarios from spec.md:
-- `format_simpleSelectWithWhere_producesExpectedLayout()`
-- `format_innerJoinWithOnPredicate_indentsOnUnderJoin()`
-- `format_nestedSubquery_uppercasesKeywordsWithoutDeepIndent()`
-- `format_stringLiterals_preservedVerbatim()`
-- `format_lineComment_preservedVerbatim()`
-- `format_blockComment_preservedVerbatim()`
-- `format_projectionList_keptOnOneLine()`
-- `format_isIdempotent_acrossAllGoldenFixtures()` (property-based)
+**Test Strategy**: See ADR 7 "Backward compatibility" table — 8 of the 12 original scenarios need updated expected strings (not just projection), plus 6 new scenarios for statement-split, INSERT/VALUES list-breaking, single-item lists, nested function-call commas, and trailing-semicolon-with-multi-statement.
 
 ---
 
@@ -704,7 +817,7 @@ Visible (selectedIndex = 0)
 | Test File | Coverage | Key Tests |
 |-----------|----------|-----------|
 | `SqlKeywordsTest.kt` | SqlKeywords | Non-empty, canonical set, all uppercase |
-| `SqlFormatterTest.kt` | SqlFormatter | 12 scenarios from spec (golden files, idempotency) |
+| `SqlFormatterTest.kt` | SqlFormatter | ~18 scenarios: 8 updated golden-file expectations (FROM/WHERE indent, SELECT-alone, projection break — see ADR 7 table) + 6 new (statement split, INSERT/VALUES list-break, single-item list, nested-call comma, trailing-semicolon multi-statement) + idempotency + 3 unaffected triangulation tests |
 | `SqlCompletionProviderTest.kt` | SqlCompletionProvider | 16 scenarios from spec (ranking, filtering, context) |
 | `EditorShortcutsTest.kt` | EditorShortcuts | Ctrl+Shift+F → Format, Ctrl+Space → TriggerCompletion |
 | `LoadSchemaSnapshotUseCaseTest.kt` | LoadSchemaSnapshotUseCase | Valid DB, invalid DB, JDBC error |
@@ -877,13 +990,15 @@ Visible (selectedIndex = 0)
 
 ## 7. PR Breakdown (3 PRs)
 
-### PR #1: SQL Formatter (~300 LOC)
+### PR #1: SQL Formatter (~300 LOC original estimate → ~650–720 LOC revised, see Risks)
+
+**[REVISED 2026-07-07]** Formatter scope now includes statement-split + INSERT/VALUES/SELECT list-breaking (ADR 7). LOC estimate below updated accordingly; consider the PR #1a/#1b split noted in Risks if 650–720 LOC in one PR is unwieldy for review.
 
 **Purpose**: Ship Format end-to-end (toolbar + shortcut + tests).
 
 **Files**:
 - `domain/editor/SqlKeywords.kt` (NEW, ~80 lines) — keyword set extraction
-- `domain/editor/SqlFormatter.kt` (NEW, ~120 lines) — pure formatter
+- `domain/editor/SqlFormatter.kt` (NEW, **~300–340 lines**, was ~120) — pure formatter + statement-split pre-pass + depth-tracked list/clause breaking (ADR 7)
 - `domain/editor/ShortcutAction.kt` (MODIFIED, +1 line) — add `Format` case
 - `domain/editor/EditorShortcuts.kt` (MODIFIED, +2 lines) — map `Ctrl+Shift+F`
 - `ui/screens/queryeditor/QueryEditorViewModel.kt` (MODIFIED, +15 lines) — `formatSql()` method
@@ -892,20 +1007,20 @@ Visible (selectedIndex = 0)
 - `res/values/strings.xml` (MODIFIED, +2 strings) — `format_button_label`, `format_button_description`
 - `res/values-es/strings.xml` (MODIFIED, +2 strings)
 - `test/.../editor/SqlKeywordsTest.kt` (NEW, ~40 lines)
-- `test/.../editor/SqlFormatterTest.kt` (NEW, ~100 lines) — 12 scenarios
+- `test/.../editor/SqlFormatterTest.kt` (NEW, **~380–420 lines**, was ~100) — ~18 scenarios (8 updated golden files + 6 new + idempotency + 3 unaffected)
 - `test/.../editor/EditorShortcutsTest.kt` (MODIFIED, +10 lines) — `Ctrl+Shift+F` test
 - `androidTest/.../QueryEditorScreenTest.kt` (MODIFIED, +30 lines) — E2E format tests
 
-**Total**: ~300 LOC (within review budget)
+**Total**: ~650–720 LOC (within the 800-line global ceiling; consumes most of the margin — see Risks)
 
 **Dependencies**: None (self-contained)
 
 **Acceptance Criteria**:
 - [ ] Toolbar Format button visible, enabled when text non-blank
 - [ ] Ctrl+Shift+F formats SQL
-- [ ] Keywords UPPERCASE, newlines before major clauses
+- [ ] Keywords UPPERCASE, newlines before major clauses, FROM/WHERE bodies indented, SELECT-alone + one-column-per-line projection, INSERT/VALUES lists broken one-item-per-line, multi-statement split on top-level `;`
 - [ ] Ctrl+Z undoes format atomically
-- [ ] 12 unit tests green, 3 E2E tests green
+- [ ] ~18 unit tests green, 3 E2E tests green
 
 ---
 
@@ -987,9 +1102,9 @@ Visible (selectedIndex = 0)
 **Impact**: `CompletionSuggestion` has `typeLabel: String?` field. CompletionPopup renders `label` (pre-formatted by provider).
 
 **Q3: Projection list formatting**  
-**Status**: RESOLVED in proposal phase.  
-**Decision**: Keep `SELECT a, b, c` on one line (preserve user formatting). No comma breaks in v1.  
-**Impact**: SqlFormatter preserves projection list intra-whitespace. Spec scenario 7 enforces this.
+**Status**: **REVERSED 2026-07-07** (originally RESOLVED in proposal phase as "keep on one line").  
+**Decision**: `SELECT` projection now breaks one column per line (2-space indent), same pattern as `WHERE`/`FROM`; `SELECT` sits alone on its clause line even for a single column. `INSERT INTO`/`VALUES` parenthesized lists break the same way. See **ADR 7**.  
+**Impact**: `SqlFormatter` gains the depth-tracked state machine described in ADR 7. Old Scenario 7 is superseded (renamed `format_projectionList_breaksOneColumnPerLine`); 7 OTHER existing scenarios also need expected-string updates because the new rule is unconditional — see ADR 7's Backward Compatibility table.
 
 **Q4: PR split strategy**  
 **Status**: RESOLVED.  
@@ -1012,6 +1127,8 @@ Visible (selectedIndex = 0)
 | **Schema cost on huge DBs** | Low | Slow editor open | ✅ Lazy per-table column load, only on completion request |
 | **Popup focus stealing** | Medium | Editor loses typing focus | ✅ Popup is non-focusable, navigation via onPreviewKeyEvent |
 | **Format reflow invalidates multi-cursor** | High | Cursor positions meaningless | ✅ Format clears cursors (spec scenario 12) |
+| **[NEW 2026-07-07] Formatter algorithm complexity increase** | High | `SqlFormatter.kt` grows ~134 → ~300–340 lines (statement split + list-breaking state machine per ADR 7); `SqlFormatterTest.kt` grows ~205 → ~380–420 lines (8 updated + 6 new scenarios). PR #1 LOC delta ≈ +350–420 vs original ~300 LOC estimate | ⚠️ Revised PR #1 total ≈ 650–720 LOC — still under the 800-line global review-budget ceiling but consumes nearly all margin. Mitigation: either accept the larger single PR, or split into PR #1a (clause-newline + FROM/WHERE indent + SELECT-projection break, ~450 LOC) and PR #1b (statement split + INSERT/VALUES list-breaking, ~250 LOC) |
+| **[NEW 2026-07-07] Backward-compat footprint underestimated in proposal** | Medium | Proposal called out only Scenario 7 as needing rewrite; actual impact is 8 of 12 existing `SqlFormatterTest` scenarios (SELECT-alone + FROM/WHERE-indent apply unconditionally, not only with comma-lists) | ✅ Full enumeration captured in ADR 7's Backward Compatibility table — task planning (sdd-tasks) should budget for 8 rewrites + 6 new tests, not 1 rewrite |
 
 ---
 

@@ -7,7 +7,11 @@ The Level 1 editor (shortcuts + undo/redo) shipped a solid foundation, but writi
 ## Scope
 
 ### In Scope
-- `SqlFormatter` pure module: UPPERCASE keywords, newline before major clauses (`FROM`/`WHERE`/`JOIN`/`GROUP BY`/`ORDER BY`/`HAVING`/`LIMIT`/`UNION`), 2-space indent for subclauses, preserve strings/comments/projection lists verbatim, idempotent.
+- `SqlFormatter` pure module: UPPERCASE keywords, newline before major clauses (`FROM`/`WHERE`/`JOIN`/`GROUP BY`/`ORDER BY`/`HAVING`/`LIMIT`/`UNION`), 2-space indent for subclauses, preserve strings/comments verbatim, idempotent.
+- **[REVISED 2026-07-07]** Multi-statement formatting: split top-level statements on `;` (outside strings/comments/parens) and format each independently, joined by `;\n`.
+- **[REVISED 2026-07-07]** `INSERT INTO` column list and `VALUES` list: break each parenthesized comma-separated item onto its own 2-space-indented line — `(` on the clause's own line, one identifier/value per line with trailing comma (last item no comma), closing `)` on its own line at base indent. Applies to any top-level parenthesized comma-list following `INSERT INTO <table>` or `VALUES`.
+- **[REVISED 2026-07-07]** `SELECT` projection list: break each comma-separated column onto its own 2-space-indented line under `SELECT` (same pattern as `WHERE`/`FROM`) — reverses the original "keep on one line" decision below, based on user example.
+- **[REVISED 2026-07-07]** `WHERE` clause body: indent the condition 2 spaces under `WHERE` (same indent pattern as `ON` under `JOIN`).
 - Format toolbar button (left pill, after Redo) + `Ctrl+Shift+F` shortcut; pushes current snapshot to `EditorHistory` before applying so `Ctrl+Z` undoes atomically.
 - `SqlCompletionProvider` pure module: ranked suggestions (keywords always, tables + columns when schema available), context bias (after `FROM`/`JOIN`/`UPDATE`/`INTO` rank TABLE first; after `SELECT`/`WHERE`/`ON`/`,` rank COLUMN first), suppression inside strings/comments, cap 8 items.
 - `SqlKeywords` extracted as single source of truth (tokenizer + formatter + provider consume it).
@@ -20,8 +24,8 @@ The Level 1 editor (shortcuts + undo/redo) shipped a solid foundation, but writi
 - i18n: ~8 strings × 10 locales (full en + es; other 8 fall back per Level 1 precedent).
 
 ### Out of Scope
-- Smart indentation for nested subqueries (v1 formatter is flat).
-- Format restructuring of projection lists (`SELECT a, b, c` stays on one line — user explicitly opted out).
+- Smart indentation for nested subqueries beyond one paren-depth level (deep/recursive nesting still flat past depth 1).
+- ~~Format restructuring of projection lists~~ — **REVISED 2026-07-07**: now IN SCOPE, see above (user provided concrete example requiring column-per-line breaking for both `SELECT` and `INSERT`/`VALUES`).
 - Alias detection (`SELECT u.id FROM users u` → `u.` member suggestions).
 - JOIN-path / FK-aware suggestions.
 - Custom snippet templates.

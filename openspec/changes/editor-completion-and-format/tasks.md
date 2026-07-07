@@ -2,99 +2,116 @@
 
 ## Review Workload Forecast
 
+**[REVISED 2026-07-07]** PR #1 recomputed per design.md ADR 7 (statement-split + depth-tracked list/clause breaking, full statement pretty-printing). PR #2/#3 unaffected — their only PR #1 dependency (`SqlKeywords`) is untouched by ADR 7.
+
 | Field | Value |
 |-------|-------|
-| Estimated changed lines | ~1250 total across 3 PRs |
-| Max PR size | 550 LOC (PR #3) |
-| 400-line budget risk | Low |
+| Estimated changed lines | ~1600–1670 total across 3 PRs (was ~1250) |
+| Max PR size | ~650–720 LOC (PR #1, revised — was 550 LOC / PR #3) |
+| 400-line budget risk | Medium (PR #1 now ~81–90% of the 800-line budget; PR #2/#3 unchanged, still Low) |
 | Chained PRs recommended | No |
-| Delivery strategy | ask-always |
-| Chain strategy | N/A (all PRs under 800-line budget) |
+| Delivery strategy | ask-on-risk |
+| Chain strategy | N/A (all 3 PRs still individually under the 800-line budget) |
 
 Decision needed before apply: No
 Chained PRs recommended: No
 Chain strategy: N/A
-400-line budget risk: Low
+400-line budget risk: Medium
+
+**Note**: design.md's Risks table flags PR #1's ~650–720 LOC as "consumes nearly all margin" and offers an OPTIONAL split into PR #1a (clause-newline + FROM/WHERE indent + SELECT-projection break, ~450 LOC) and PR #1b (statement split + INSERT/VALUES list-breaking, ~250 LOC) if the maintainer prefers a smaller diff. This is NOT required — PR #1 as a single unit stays under the 800-line ceiling — but it's surfaced here per `ask-on-risk` since the margin is tight. If the maintainer wants the split, re-run sdd-tasks to break Phase 1B below into two PR-scoped sub-phases before `sdd-apply`.
 
 ### Workload Breakdown by PR
 
 | PR | Scope | Estimated LOC | Budget Status |
 |----|-------|---------------|---------------|
-| PR #1 | SQL Formatter | ~300 | ✅ SAFE (37.5% of 800) |
-| PR #2 | Schema + Provider | ~400 | ✅ SAFE (50% of 800) |
-| PR #3 | Popup UI | ~550 | ✅ SAFE (68.75% of 800) |
+| PR #1 | SQL Formatter (revised, ADR 7) | ~650–720 | ✅ SAFE, tight margin (~81–90% of 800) |
+| PR #2 | Schema + Provider | ~400 | ✅ SAFE (50% of 800) — unchanged |
+| PR #3 | Popup UI | ~550 | ✅ SAFE (68.75% of 800) — unchanged |
 
-**Analysis**: All 3 PRs individually fit within the 800-line review budget. Total ~1250 LOC split across independent PRs. No chaining required. Each PR is reviewable, testable, and independently deployable.
+**Analysis**: All 3 PRs individually still fit within the 800-line review budget after the PR #1 revision. Total ~1600–1670 LOC split across independent PRs (was ~1250). No chaining required — PR #1's margin is tight but the maintainer has not requested a smaller diff. Each PR remains reviewable, testable, and independently deployable.
 
 ---
 
-## PR #1: SQL Formatter (~300 LOC)
+## PR #1: SQL Formatter (~650–720 LOC) — **[REVISED 2026-07-07]**
 
-**Goal**: Ship Format end-to-end — toolbar button + Ctrl+Shift+F shortcut + history-atomic apply + pure formatter with 12 unit tests.
+**Goal**: Ship Format end-to-end — toolbar button + Ctrl+Shift+F shortcut + history-atomic apply + pure formatter with full statement pretty-printing (multi-statement split, INSERT/VALUES paren-list breaking, SELECT projection breaking, FROM/WHERE indent) per design.md ADR 7.
 
-**Budget**: 800 lines | **Estimate**: ~300 LOC | **Status**: SAFE ✅
+**Budget**: 800 lines | **Estimate**: ~650–720 LOC (was ~300 LOC) | **Status**: SAFE ✅ (tight margin)
 
-### Phase 1: Domain Layer — SqlKeywords + SqlFormatter (Pure, JVM-testable)
+**Progress note**: Per Engram `sdd/editor-completion-and-format/apply-progress` (obs #1977, #2135): Phase 1 (`SqlKeywords`), Phase 2 (Integration), Phase 3 (UI wiring), Phase 4 (tokenizer) were already executed against the ORIGINAL flat-formatter design. Phases 1 (SqlKeywords only), 2, 3, 4 are correct and DONE below — carried forward, not regenerated. Phase 1B below SUPERSEDES the old flat-formatter portion of Phase 1 (old tasks 1.7–1.23) with the new ADR 7 depth-tracked state machine.
 
-- [ ] 1.1 **TDD RED**: Write `SqlKeywordsTest::keywords_notEmpty()` (assert `SqlKeywords.KEYWORDS.isNotEmpty()`) — FAIL
-- [ ] 1.2 **TDD GREEN**: Create `domain/editor/SqlKeywords.kt` with `object SqlKeywords { val KEYWORDS: Set<String> = setOf("SELECT", "FROM", ...) }` — ~80 lines, 75+ keywords
-- [ ] 1.3 **TDD RED**: Write `SqlKeywordsTest::keywords_containsCanonicalSet()` (assert SELECT, FROM, WHERE, JOIN, INSERT, UPDATE, DELETE present) — FAIL
-- [ ] 1.4 **TDD GREEN**: Add canonical keywords to `SqlKeywords.KEYWORDS` — PASS
-- [ ] 1.5 **TDD RED**: Write `SqlKeywordsTest::keywords_allUppercase()` (assert all keywords == keyword.uppercase()) — FAIL
-- [ ] 1.6 **TDD GREEN**: Ensure all keywords in `SqlKeywords.KEYWORDS` are UPPERCASE — PASS
-- [ ] 1.7 **TDD RED**: Write `SqlFormatterTest::format_simpleSelectWithWhere_producesExpectedLayout()` (scenario 1: `select id from users where active = 1` → formatted with newlines + UPPERCASE) — FAIL
-- [ ] 1.8 **TDD GREEN**: Create `domain/editor/SqlFormatter.kt` with `fun format(sql: String): String` skeleton returning `sql.uppercase()` — minimal logic to pass
-- [ ] 1.9 **TDD RED**: Write `SqlFormatterTest::format_innerJoinWithOnPredicate_indentsOnUnderJoin()` (scenario 2: JOIN with ON indented 2 spaces) — FAIL
-- [ ] 1.10 **TDD GREEN**: Implement token-stream rewriter in `SqlFormatter.format()`: tokenize via `SqlTokenizer`, UPPERCASE keywords, insert newlines before FROM/WHERE/JOIN/GROUP BY/ORDER BY/HAVING/LIMIT/UNION, indent ON subclauses 2 spaces
-- [ ] 1.11 **TDD RED**: Write `SqlFormatterTest::format_nestedSubquery_uppercasesKeywordsWithoutDeepIndent()` (scenario 3: nested subquery, flat indent) — FAIL
-- [ ] 1.12 **TDD GREEN**: Extend formatter to normalize nested subqueries (UPPERCASE keywords, no deep indent) — PASS
-- [ ] 1.13 **TDD RED**: Write `SqlFormatterTest::format_stringLiterals_preservedVerbatim()` (scenario 4: strings with keyword-looking words preserved) — FAIL
-- [ ] 1.14 **TDD GREEN**: Preserve STRING tokens byte-for-byte (don't uppercase inside strings) — PASS
-- [ ] 1.15 **TDD RED**: Write `SqlFormatterTest::format_lineComment_preservedVerbatim()` (scenario 5: `-- foo select` preserved) — FAIL
-- [ ] 1.16 **TDD GREEN**: Preserve COMMENT tokens byte-for-byte (don't uppercase inside comments) — PASS
-- [ ] 1.17 **TDD RED**: Write `SqlFormatterTest::format_blockComment_preservedVerbatim()` (scenario 6: `/* FROM WHERE */` preserved) — FAIL
-- [ ] 1.18 **TDD GREEN**: Preserve block comment contents unchanged — PASS
-- [ ] 1.19 **TDD RED**: Write `SqlFormatterTest::format_projectionList_keptOnOneLine()` (scenario 7: `SELECT a, b, c` stays one line) — FAIL
-- [ ] 1.20 **TDD GREEN**: Preserve user projection formatting (no comma breaks) — PASS
-- [ ] 1.21 **TDD RED**: Write `SqlFormatterTest::format_isIdempotent_acrossAllGoldenFixtures()` (scenario 8: `format(format(x)) == format(x)`) — FAIL on non-idempotent edge case
-- [ ] 1.22 **TDD GREEN**: Fix idempotency bugs (trim trailing whitespace, collapse 3+ blank lines to 1) — PASS
-- [ ] 1.23 **REFACTOR**: Extract helper methods in `SqlFormatter` (e.g. `shouldInsertNewlineBefore(keyword)`, `indentLevel(context)`)
+### Phase 1: Domain Layer — SqlKeywords (DONE — unaffected by the revision)
 
-### Phase 2: Integration — EditorShortcuts + QueryEditorViewModel
+- [x] 1.1 **TDD RED**: `SqlKeywordsTest::keywords_notEmpty()` — DONE
+- [x] 1.2 **TDD GREEN**: `domain/editor/SqlKeywords.kt` with `KEYWORDS: Set<String>` (~80 lines, 75+ keywords) — DONE
+- [x] 1.3 **TDD RED**: `SqlKeywordsTest::keywords_containsCanonicalSet()` — DONE
+- [x] 1.4 **TDD GREEN**: canonical keywords added — DONE
+- [x] 1.5 **TDD RED**: `SqlKeywordsTest::keywords_allUppercase()` — DONE
+- [x] 1.6 **TDD GREEN**: uppercase enforced — DONE
 
-- [ ] 2.1 **TDD RED**: Write `EditorShortcutsTest::mapKeyEvent_ctrlShiftF_returnsFormat()` (assert `Ctrl+Shift+F` → `ShortcutAction.Format`) — FAIL
-- [ ] 2.2 **TDD GREEN**: Add `Format` case to `domain/editor/ShortcutAction.kt` sealed class (+1 line)
-- [ ] 2.3 **TDD GREEN**: Map `Ctrl+Shift+F` to `Format` in `domain/editor/EditorShortcuts.kt` (+2 lines)
-- [ ] 2.4 **TDD RED**: Write `QueryEditorViewModelTest::formatSql_validSql_returnsFormatted()` (unit test: `formatSql("select 1")` → `"SELECT 1"`) — FAIL
-- [ ] 2.5 **TDD GREEN**: Add `suspend fun formatSql(currentText: String): String` to `ui/screens/queryeditor/QueryEditorViewModel.kt` wrapping `SqlFormatter.format()` on `Dispatchers.Default` (+15 lines)
-- [ ] 2.6 **TDD RED**: Write `QueryEditorViewModelTest::formatSql_runsOnDefaultDispatcher()` (assert coroutine context) — FAIL
-- [ ] 2.7 **TDD GREEN**: Ensure `formatSql()` uses `withContext(Dispatchers.Default)` — PASS
+### Phase 1B: Domain Layer — SqlFormatter Rewrite per ADR 7 — **SUPERSEDES old tasks 1.7–1.23**
 
-### Phase 3: UI Wiring — Toolbar Button + Shortcut
+> The previously-implemented flat token-stream rewriter (old tasks 1.7–1.23) UPPERCASEd keywords and inserted flat clause newlines only — it does NOT satisfy the revised spec (multi-statement split, list-breaking, unconditional SELECT/FROM/WHERE indent). Treat `SqlFormatter.kt`'s current body as a WIP starting point, not a finished deliverable. Algorithm reference: design.md ADR 7 pseudocode.
 
-- [ ] 3.1 **TDD RED**: Write `QueryEditorScreenTest::formatButton_exists_whenTextNotBlank()` (E2E: assert Format button exists and enabled) — FAIL
-- [ ] 3.2 **TDD GREEN**: Add Format toolbar button to `ui/screens/queryeditor/QueryEditorScreen.kt` (left pill, after Redo button) with `enabled = sqlText.text.isNotBlank()` (+10 lines)
-- [ ] 3.3 Add `format_button_label` and `format_button_description` strings to `res/values/strings.xml` (+2 lines)
-- [ ] 3.4 Add Spanish translations to `res/values-es/strings.xml` (`format_button_label = "Formato"`, `format_button_description = "Dar formato al SQL"`) (+2 lines)
-- [ ] 3.5 **TDD RED**: Write `QueryEditorScreenTest::tappingFormatButton_replacesTextAndPushesHistory()` (E2E scenario 9: tap button → text formatted + undo restores) — FAIL
-- [ ] 3.6 **TDD GREEN**: Wire Format button `onClick` to call `viewModel.formatSql()` and push to `EditorHistory` before apply (+10 lines in `QueryEditorScreen.kt`)
-- [ ] 3.7 **TDD RED**: Write `QueryEditorScreenTest::ctrlShiftF_triggersFormat()` (E2E scenario 10: shortcut → same behavior as button) — FAIL
-- [ ] 3.8 **TDD GREEN**: Wire `onShortcut(Format)` in `QueryEditorScreen.kt` to same `formatSql()` pathway (+5 lines)
-- [ ] 3.9 **TDD RED**: Write `QueryEditorScreenTest::formatThenUndo_restoresOriginal()` (E2E scenario 11: format → Ctrl+Z → original text byte-for-byte) — FAIL
-- [ ] 3.10 **TDD GREEN**: Ensure `pushHistory(currentSnapshot)` called BEFORE `formatSql()` apply — PASS
-- [ ] 3.11 **TDD RED**: Write `QueryEditorScreenTest::formatWithMultiCursor_clearsCursorsAndFormatsFullText()` (E2E scenario 12: multi-cursor → format clears cursors) — FAIL
-- [ ] 3.12 **TDD GREEN**: Clear `cursorPositions` when Format applied (+3 lines in format handler)
+- [x] 1.7 **TDD RED**: Write `SqlFormatterTest::format_maintainerExample_producesExactLayout()` (spec Scenario 8a — two-statement golden fixture: `INSERT INTO ... VALUES (...);SELECT ... FROM ... WHERE ...;`) — FAIL
+- [x] 1.8 **TDD GREEN**: Implement `splitTopLevelStatements(tokens)` pre-pass — track `parenDepth`, split segments at top-level `;` (depth 0), drop the `;`, detect trailing semicolon (ADR 7 Pass 0)
+- [x] 1.9 **TDD GREEN**: Wire `format(sql)`: tokenize once → split into segments → `map { formatStatement(it) }` → join with `;\n` → restore trailing `;` if present — PASS 1.7
+- [x] 1.10 **TDD RED**: Write `SqlFormatterTest::format_fromTable_indentedUnderFrom()` (Scenario 8d) — FAIL
+- [x] 1.11 **TDD GREEN**: Add `indentLevel`/`atLineStart` state to `formatStatement`; on `FROM`/`WHERE` at `parenDepth == 0` → `breakLine()`, `indentLevel = 1` (shared code path, no per-keyword duplication) — PASS
+- [x] 1.12 **TDD RED**: Write `SqlFormatterTest::format_whereCondition_indentedUnderWhere()` (Scenario 8e) — FAIL
+- [x] 1.13 **TDD GREEN**: Confirm WHERE body indent reuses the 1.11 code path — PASS
+- [x] 1.14 **TDD RED**: Write `SqlFormatterTest::format_projectionList_breaksColumnPerLine()` (Scenario 7a — **supersedes + renames** old `format_projectionList_keptOnOneLine`; delete the old test) — FAIL
+- [x] 1.15 **TDD GREEN**: On `SELECT` at `parenDepth == 0` → `listMode = PROJECTION; indentLevel = 1; breakLine()`; on `,` when `listMode == PROJECTION && parenDepth == 0` → append `,` + `breakLine()` — PASS
+- [x] 1.16 **TDD RED**: Write `SqlFormatterTest::format_insertColumnList_breaksPerLine()` (Scenario 8b) and `format_valuesTuple_breaksPerLine()` (Scenario 8c) — FAIL
+- [x] 1.17 **TDD GREEN**: Add `pendingTableCapture`/`pendingListTrigger` flags + `activeListDepth: Int?` + `listMode = PAREN_LIST`, triggered on `(` following `INSERT INTO <table>` or `VALUES`; close list on matching `)` — ONE shared list-breaking path for both triggers (ADR 7 — no per-keyword duplication) — PASS
+- [x] 1.18 **TDD RED**: Write `SqlFormatterTest::format_singleItemList_stillBreaks()` (Scenario 7b: `INSERT INTO t (id) VALUES (1);`) — FAIL
+- [x] 1.19 **TDD GREEN**: Confirm list-breaking has no count==1 special case — PASS (comma-driven logic naturally covers it)
+- [x] 1.20 **TDD RED**: Write `SqlFormatterTest::format_deepNesting_leftFlatDepth1Only()` (Scenario 8f: subquery nested inside `VALUES(...)`) — FAIL
+- [x] 1.21 **TDD GREEN**: Ensure `activeListDepth` tracks only ONE active depth; `(`/`)` beyond it append flat (no breaking, keyword-case normalization only) — PASS
+- [x] 1.22 **Rewrite expected strings** (regression, no new scenario) for the 7 existing tests impacted by unconditional SELECT/FROM/WHERE breaking: `format_simpleSelectWithWhere_producesExpectedLayout`, `format_innerJoinWithOnPredicate_indentsOnUnderJoin`, `format_nestedSubquery_uppercasesKeywordsWithoutDeepIndent` (name unchanged per spec Scenario 3 — do NOT rename despite design.md's optional suggestion), `format_stringLiterals_preservedVerbatim`, `format_lineComment_preservedVerbatim`, `format_blockComment_preservedVerbatim`, `format_trailingSemicolon_preserved` — see design.md ADR 7 Backward Compatibility table for the exact reasoning per scenario — PASS
+- [x] 1.23 **Verify unaffected** (no expected-string change needed): `format_isIdempotent_acrossAllGoldenFixtures`, `format_emptyString_returnsEmpty`, `format_onlyWhitespace_returnsEmpty`, `format_mixedCaseKeywords_allUppercase` — confirm still PASS
+- [x] 1.24 **TDD RED**: Write `SqlFormatterTest::format_isIdempotent_onMultiStatementAndBrokenLists()` (Scenario 8 companion) — FAIL
+- [x] 1.25 **TDD GREEN**: Fix any idempotency gaps in statement re-splitting/list re-breaking (decisions must derive only from KEYWORD/PUNCTUATION identity, never WHITESPACE content, per ADR 7 idempotency rationale) — PASS
+- [x] 1.26 **REFACTOR**: Extract `shouldInsertNewlineBefore(kw)`, `breakLine()`, `isListBreakComma()`, `isListOpenParen()` helpers per ADR 7 pseudocode
 
-### Phase 4: SqlTokenizer Integration
+> **Implementation note (sdd-apply, 2026-07-07)**: "PASS"/"FAIL" markers above describe the TDD
+> red-first INTENT of each task per the strict-TDD convention already established for this
+> change (see prior apply-progress obs #1977/#2135) — actual test execution is explicitly
+> DEFERRED to the maintainer (no `./gradlew` invocation performed this session, per standing
+> instruction). Additionally, 3 ordering bugs were found in design.md ADR 7's pseudocode by
+> manually tracing it against the golden example BEFORE writing code; design.md was corrected
+> in place (see ADR 7 "[CORRECTED during sdd-apply]" note) and the implementation follows the
+> corrected version. All 20 tests in `SqlFormatterTest.kt` are written; none have been compiled
+> or run.
 
-- [ ] 4.1 Modify `ui/screens/queryeditor/components/SqlTokenizer.kt` to build keyword regex from `SqlKeywords.KEYWORDS` instead of inlined list (~10 lines changed)
-- [ ] 4.2 Verify existing `SqlTokenizerTest` still passes (no regression in syntax highlighting)
+**Net test tally for `SqlFormatterTest.kt`**: 20 scenarios total = 7 updated-expected-string + 1 superseded/renamed + 4 unaffected (all from the original 12) + 8 net-new (7b, 8-companion, 8a, 8b, 8c, 8d, 8e, 8f).
 
-### Phase 5: Verification
+### Phase 2: Integration — EditorShortcuts + QueryEditorViewModel (DONE — unaffected, public contract unchanged)
 
-- [ ] 5.1 Run all unit tests: `SqlKeywordsTest` (3 tests), `SqlFormatterTest` (12 scenarios), `EditorShortcutsTest` (+1 test), `QueryEditorViewModelTest` (+2 tests)
-- [ ] 5.2 Run E2E tests: `QueryEditorScreenTest` (+5 scenarios: button exists, tap button, Ctrl+Shift+F, undo, multi-cursor)
-- [ ] 5.3 Manual smoke: Open editor → type `select id from users where active = 1` → tap Format button → verify UPPERCASE + newlines → Ctrl+Z → verify original restored
+- [x] 2.1 **TDD RED**: `EditorShortcutsTest::mapKeyEvent_ctrlShiftF_returnsFormat()` — DONE
+- [x] 2.2 **TDD GREEN**: `Format` case added to `ShortcutAction.kt` — DONE
+- [x] 2.3 **TDD GREEN**: `Ctrl+Shift+F` mapped in `EditorShortcuts.kt` — DONE
+- [x] 2.4 **TDD RED**: `QueryEditorViewModelTest::formatSql_validSql_returnsFormatted()` — DONE
+- [x] 2.5 **TDD GREEN**: `formatSql()` added to `QueryEditorViewModel.kt`, wraps `SqlFormatter.format()` — DONE (interface unchanged by ADR 7 — no rework needed)
+- [x] 2.6 **TDD RED**: `QueryEditorViewModelTest::formatSql_runsOnDefaultDispatcher()` — DONE
+- [x] 2.7 **TDD GREEN**: `withContext(Dispatchers.Default)` confirmed — DONE
+
+### Phase 3: UI Wiring — Toolbar Button + Shortcut (DONE — carried forward unchanged)
+
+- [x] 3.1 through 3.12 — see apply-progress obs #1977/#2135 for full detail; NOT regenerated by this revision (Format toolbar button, i18n strings, click/shortcut wiring, history-atomic apply, cursor clearing all already implemented and unaffected by the formatter algorithm change)
+
+### Phase 4: SqlTokenizer Integration (DONE — carried forward unchanged)
+
+- [x] 4.1 `SqlTokenizer.kt` keyword regex built from `SqlKeywords.KEYWORDS` — DONE (verified prior session)
+- [ ] 4.2 Verify existing `SqlTokenizerTest` still passes — STILL NOT DONE: no `SqlTokenizerTest.kt` exists in the repo (gap carried forward from apply-progress, unrelated to this revision)
+
+### Phase 5: Verification — **updated for revised scenario set**
+
+- [ ] 5.1 Run all unit tests: `SqlKeywordsTest` (3 tests, unaffected), `SqlFormatterTest` (20 scenarios — see Phase 1B tally), `EditorShortcutsTest` (+1 test, unaffected), `QueryEditorViewModelTest` (+2 tests, unaffected)
+- [ ] 5.2 Run E2E tests: `QueryEditorScreenTest` (+5 scenarios — re-verify green now that formatted output shape changed: button exists, tap button, Ctrl+Shift+F, undo, multi-cursor)
+- [ ] 5.3 Manual smoke: Open editor → type `select id, name from users where active = 1` → tap Format → verify column-per-line `SELECT` + indented `FROM`/`WHERE` (spec Scenario 1) → Ctrl+Z → verify original restored
+- [ ] 5.4 Manual smoke: Paste the maintainer's two-statement example (spec Scenario 8a) → verify INSERT/VALUES list-breaking, SELECT breaking, and correct `;\n` join between statements
+- [ ] 5.5 Manual smoke: `INSERT INTO t (id) VALUES (1);` → verify single-item lists still break onto their own lines (Scenario 7b) and the trailing `;` is preserved
 
 ---
 

@@ -4,7 +4,7 @@ Delta spec for change `editor-completion-and-format`. Introduces two new capabil
 
 ## ADDED Capabilities
 
-- `sql-formatter` — pure SQL formatter (UPPERCASE keywords, major-clause newlines, 2-space indent), toolbar + shortcut entry points, history-atomic apply, idempotency contract.
+- `sql-formatter` — pure SQL formatter (UPPERCASE keywords, multi-statement split on `;`, major-clause newlines, column-per-line `SELECT`/`INSERT`/`VALUES` breaking, 2-space indent for `FROM`/`WHERE`/list bodies, flat past paren-depth 1), toolbar + shortcut entry points, history-atomic apply, idempotency contract.
 - `sql-completion` — context-aware suggestion engine (keywords + tables + columns), auto + manual trigger gating, popup UI anchored at cursor, multi-cursor exclusion, schema lifecycle (load + DDL/USE invalidation).
 
 ---
@@ -13,27 +13,39 @@ Delta spec for change `editor-completion-and-format`. Introduces two new capabil
 
 ### Requirement: Pure formatter rules
 
+**[REVISED 2026-07-07]** This requirement now mandates FULL statement pretty-printing (multi-statement split + column/value-per-line breaking), replacing the earlier flat "keep projection list on one line" contract. See the superseded Scenario 7 note below.
+
 The system MUST expose a pure function `SqlFormatter.format(sql: String): String` that, given any SQL string accepted by the existing `SqlTokenizer`, returns a normalized form satisfying ALL of:
 
 - All KEYWORD tokens are emitted in UPPERCASE.
+- **[REVISED]** Multiple top-level statements separated by `;` (where the `;` sits OUTSIDE any string, comment, or parenthesis) MUST be split, each formatted independently, and re-joined with `;\n`. A trailing `;` after the final statement MUST be preserved.
 - A newline precedes each major clause keyword: `FROM`, `WHERE`, `JOIN` (including the prefixes `INNER`, `LEFT`, `RIGHT`, `OUTER`, `CROSS`, `FULL`), `GROUP BY`, `ORDER BY`, `HAVING`, `LIMIT`, `UNION`.
+- **[REVISED]** The single table reference following `FROM` MUST be placed on its own line, indented 2 spaces under `FROM`.
+- **[REVISED]** The condition body following `WHERE` MUST be placed on its own line, indented 2 spaces under `WHERE` (same indent treatment as `ON` under `JOIN`).
 - Sub-clauses introduced by `ON`, `AND`, `OR` after a `JOIN` predicate SHOULD be indented by 2 spaces relative to their parent clause line.
-- STRING tokens (single- and double-quoted) and COMMENT tokens (`--` line and `/* … */` block) MUST be preserved BYTE-FOR-BYTE.
-- Projection lists (the token stream between `SELECT` and the next major clause) MUST keep the user's existing intra-list whitespace; the formatter MUST NOT insert or remove newlines between projection commas.
+- **[REVISED]** The `SELECT` projection list MUST break each comma-separated column onto its own line, indented 2 spaces under `SELECT`, with a trailing comma after every column EXCEPT the last (which has no comma). `SELECT` sits alone on its clause line.
+- **[REVISED]** A top-level parenthesized comma list following `INSERT INTO <table>` or `VALUES` MUST break as: the introducing token (`INSERT INTO <table>` or `VALUES`) on its own line, then `(` alone on the next line at base indent, then each item on its own 2-space-indented line with a trailing comma except the last, then `)` alone on its own line at base indent.
+- **[REVISED]** List-breaking MUST apply even when the parenthesized list has exactly ONE item (no special-casing for count=1).
+- **[REVISED]** Parenthesized nesting BEYOND depth 1 (e.g. a subquery inside `VALUES`, or a function call inside a column expression) is OUT OF SCOPE: the formatter MAY leave content at depth ≥ 2 flat/unbroken. Only keyword-case normalization is guaranteed inside deeper nesting.
+- STRING tokens (single- and double-quoted, and backtick-quoted identifiers) and COMMENT tokens (`--` line and `/* … */` block) MUST be preserved BYTE-FOR-BYTE.
 - Trailing whitespace on each line MUST be trimmed; runs of 3+ blank lines MUST collapse to a single blank line.
-- The function MUST be idempotent: `format(format(x)) == format(x)` for all `x`.
+- The function MUST be idempotent: `format(format(x)) == format(x)` for all `x`, INCLUDING inputs exercising multi-statement split and list-breaking.
 
 This is the contract every consumer (toolbar button, shortcut, future API) relies on.
 
-#### Scenario 1: Format simple SELECT with WHERE
+#### Scenario 1: Format simple SELECT with WHERE — **[REVISED 2026-07-07: column-per-line]**
 
 - **GIVEN** input `select id, name from users where active = 1`
 - **WHEN** `SqlFormatter.format(input)` is invoked
-- **THEN** the result is exactly:
+- **THEN** the result is exactly (projection broken per column, `FROM`/`WHERE` operands indented 2 spaces):
   ```sql
-  SELECT id, name
-  FROM users
-  WHERE active = 1
+  SELECT
+    id,
+    name
+  FROM
+    users
+  WHERE
+    active = 1
   ```
 - **Acceptance**:
   - [ ] Unit: `SqlFormatterTest::format_simpleSelectWithWhere_producesExpectedLayout()`
@@ -42,15 +54,15 @@ This is the contract every consumer (toolbar button, shortcut, future API) relie
 
 - **GIVEN** input `select u.id from users u inner join orders o on u.id = o.user_id where o.total > 100`
 - **WHEN** `SqlFormatter.format(input)` is invoked
-- **THEN** the result has `SELECT`, `FROM`, `INNER JOIN`, and `WHERE` each on its own line, with `ON u.id = o.user_id` indented 2 spaces under its `INNER JOIN`.
+- **THEN** the result has `SELECT`, `FROM`, `INNER JOIN`, and `WHERE` each on its own clause line; the single projection `u.id` is indented 2 spaces under `SELECT`; the table `users u` is indented 2 spaces under `FROM`; `ON u.id = o.user_id` is indented 2 spaces under its `INNER JOIN`; and `o.total > 100` is indented 2 spaces under `WHERE`.
 - **Acceptance**:
   - [ ] Unit: `SqlFormatterTest::format_innerJoinWithOnPredicate_indentsOnUnderJoin()`
 
-#### Scenario 3: Format nested subquery (flat indent for v1)
+#### Scenario 3: Format nested subquery (flat indent past depth 1)
 
 - **GIVEN** input containing a nested subquery (e.g. `select id from users where id in (select user_id from orders where total > 100)`)
 - **WHEN** `SqlFormatter.format(input)` is invoked
-- **THEN** the OUTER query is formatted per the rules, AND the inner subquery contents inside parentheses are normalized for keyword case ONLY — no additional nested indentation is applied (v1 is flat).
+- **THEN** the OUTER query is formatted per the rules (including `SELECT`/`FROM`/`WHERE` clause newlines and the 2-space `WHERE`-condition indent), AND the inner subquery contents inside parentheses are normalized for keyword case ONLY — no additional nested clause-breaking or indentation is applied inside the parenthesized subquery (formatter is flat past paren-depth 1, consistent with Scenario 8f).
 - **Acceptance**:
   - [ ] Unit: `SqlFormatterTest::format_nestedSubquery_uppercasesKeywordsWithoutDeepIndent()`
 
@@ -78,21 +90,128 @@ This is the contract every consumer (toolbar button, shortcut, future API) relie
 - **Acceptance**:
   - [ ] Unit: `SqlFormatterTest::format_blockComment_preservedVerbatim()`
 
-#### Scenario 7: Preserve user projection formatting (do not break at commas)
+#### Scenario 7: ~~Preserve user projection formatting (do not break at commas)~~ — **[REVISED 2026-07-07: SUPERSEDED]**
+
+> **SUPERSEDED.** The original rule ("projection `a, b, c` MUST remain on a single line; formatter MUST NOT split at commas") is REVERSED as of 2026-07-07. Projection lists now break column-per-line. The replacement behavior is specified in **Scenario 7a** below. This entry is retained only to document the contradiction resolution — implementers MUST follow 7a, NOT this stricken rule.
+
+#### Scenario 7a: Break SELECT projection list column-per-line (replaces Scenario 7)
 
 - **GIVEN** input `SELECT a, b, c FROM t`
 - **WHEN** `SqlFormatter.format(input)` is invoked
-- **THEN** the projection `a, b, c` MUST remain on a single line after `SELECT`. The formatter MUST NOT split into `SELECT a,\n  b,\n  c`.
+- **THEN** the result is exactly:
+  ```sql
+  SELECT
+    a,
+    b,
+    c
+  FROM
+    t
+  ```
+- **AND** each column carries a trailing comma except the last (`c`), and `SELECT` / `FROM` each sit alone on their clause line with their operands indented 2 spaces.
 - **Acceptance**:
-  - [ ] Unit: `SqlFormatterTest::format_projectionList_keptOnOneLine()`
+  - [ ] Unit: `SqlFormatterTest::format_projectionList_breaksColumnPerLine()`
 
-#### Scenario 8: Idempotent formatting
+#### Scenario 7b: Single-item parenthesized list still breaks
 
-- **GIVEN** any input `x`
+- **GIVEN** input `INSERT INTO t (id) VALUES (1);`
+- **WHEN** `SqlFormatter.format(input)` is invoked
+- **THEN** the result is exactly:
+  ```sql
+  INSERT INTO t
+  (
+    id
+  )
+  VALUES
+  (
+    1
+  );
+  ```
+- **AND** the single-item lists (`id` and `1`) are NOT special-cased to stay inline — they break onto their own 2-space-indented line with no trailing comma.
+- **Acceptance**:
+  - [ ] Unit: `SqlFormatterTest::format_singleItemList_stillBreaks()`
+
+#### Scenario 8: Idempotent formatting (including list-breaking and multi-statement)
+
+- **GIVEN** any input `x`, including inputs that exercise multi-statement split, `SELECT` column breaking, and `INSERT`/`VALUES` list breaking
 - **WHEN** `SqlFormatter.format(SqlFormatter.format(x))` is computed
 - **THEN** the result MUST equal `SqlFormatter.format(x)`.
 - **Acceptance**:
   - [ ] Unit (property-based / golden): `SqlFormatterTest::format_isIdempotent_acrossAllGoldenFixtures()`
+  - [ ] Unit: `SqlFormatterTest::format_isIdempotent_onMultiStatementAndBrokenLists()`
+
+#### Scenario 8a: Multi-statement split and independent formatting (maintainer authoritative example)
+
+- **GIVEN** input (two statements on one line, separated by `;`):
+  ```sql
+  INSERT INTO `glo_service` (`gsv_id`,`gsv_tipo_modulo`,`gsv_almacen_siap`) VALUES (2033, 'CRM', 'CRM');SELECT `gsv_id`,`gsv_tipo_modulo`, `gsv_almacen_siap` FROM glo_service WHERE a > b;
+  ```
+- **WHEN** `SqlFormatter.format(input)` is invoked
+- **THEN** the result is EXACTLY:
+  ```sql
+  INSERT INTO `glo_service`
+  (
+    `gsv_id`,
+    `gsv_tipo_modulo`,
+    `gsv_almacen_siap`
+  )
+  VALUES
+  (
+    2033,
+    'CRM',
+    'CRM'
+  );
+  SELECT
+    `gsv_id`,
+    `gsv_tipo_modulo`,
+    `gsv_almacen_siap`
+  FROM
+    glo_service
+  WHERE
+    a > b;
+  ```
+- **AND** each top-level statement is formatted independently and re-joined with `;\n`; backtick-quoted identifiers are preserved verbatim; the `;` inside neither string nor paren triggers the split.
+- **Acceptance**:
+  - [ ] Unit: `SqlFormatterTest::format_maintainerExample_producesExactLayout()` (golden fixture)
+
+#### Scenario 8b: INSERT INTO column list breaks per line
+
+- **GIVEN** input `INSERT INTO users (id, name, email) VALUES (1, 'a', 'b')`
+- **WHEN** `SqlFormatter.format(input)` is invoked
+- **THEN** the table name `users` stays on the `INSERT INTO` line; `(` sits alone on the next line at base indent; `id`, `name`, `email` each occupy their own 2-space-indented line with trailing commas except `email`; `)` sits alone on its own line at base indent.
+- **Acceptance**:
+  - [ ] Unit: `SqlFormatterTest::format_insertColumnList_breaksPerLine()`
+
+#### Scenario 8c: VALUES tuple breaks per line
+
+- **GIVEN** the same input as Scenario 8b
+- **WHEN** `SqlFormatter.format(input)` is invoked
+- **THEN** `VALUES` sits alone on its own line; `(` alone on the next line at base indent; `1`, `'a'`, `'b'` each on their own 2-space-indented line with trailing commas except `'b'`; `)` alone on its own line at base indent (same paren-list pattern as the column list).
+- **Acceptance**:
+  - [ ] Unit: `SqlFormatterTest::format_valuesTuple_breaksPerLine()`
+
+#### Scenario 8d: FROM table indented under FROM
+
+- **GIVEN** input `SELECT id FROM users`
+- **WHEN** `SqlFormatter.format(input)` is invoked
+- **THEN** `FROM` sits alone on its clause line and `users` appears on the next line indented 2 spaces.
+- **Acceptance**:
+  - [ ] Unit: `SqlFormatterTest::format_fromTable_indentedUnderFrom()`
+
+#### Scenario 8e: WHERE condition indented under WHERE
+
+- **GIVEN** input `SELECT id FROM users WHERE a > b`
+- **WHEN** `SqlFormatter.format(input)` is invoked
+- **THEN** `WHERE` sits alone on its clause line and `a > b` appears on the next line indented 2 spaces (same treatment as `ON` under `JOIN`).
+- **Acceptance**:
+  - [ ] Unit: `SqlFormatterTest::format_whereCondition_indentedUnderWhere()`
+
+#### Scenario 8f: Nested parens beyond depth 1 left flat (explicit non-goal)
+
+- **GIVEN** input `INSERT INTO t (id) VALUES ((SELECT max(x) FROM y))`
+- **WHEN** `SqlFormatter.format(input)` is invoked
+- **THEN** the top-level (depth-1) `(id)` and `VALUES (...)` lists break per the rules, BUT the depth-2 content (the subquery `(SELECT max(x) FROM y)` nested inside the value tuple) is NOT further broken/indented — only its keyword case is normalized. The formatter MUST NOT crash or attempt deep restructuring.
+- **Acceptance**:
+  - [ ] Unit: `SqlFormatterTest::format_deepNesting_leftFlatDepth1Only()`
 
 ### Requirement: Toolbar button entry point
 
@@ -409,7 +528,7 @@ All user-facing strings introduced by this change MUST be defined in `res/values
 
 The following are explicitly NOT required by this spec and MUST NOT be implemented in this change:
 
-- Smart indentation for nested subqueries (the formatter is flat in v1).
+- Smart indentation / list-breaking for parenthesized content nested BEYOND depth 1 (subqueries inside `VALUES`, function-call argument lists inside a column expression, etc.). Depth-1 lists break per Scenarios 8b/8c; deeper nesting stays flat (Scenario 8f). **[REVISED 2026-07-07]** — top-level projection and `INSERT`/`VALUES` list breaking is now IN SCOPE; only depth ≥ 2 remains excluded.
 - Alias detection (e.g. `SELECT u.id FROM users u` resolving `u.` to `users` columns).
 - JOIN-path / foreign-key-aware table suggestions.
 - Custom snippet templates or user-defined completions.
