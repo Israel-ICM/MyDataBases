@@ -496,6 +496,48 @@ operator fun invoke(): Flow<List<ConnectionListItem>> {
 
 ---
 
-**Last updated**: 2026-07-01  
-**Status**: ✅ MVP COMPLETE - Ready for production  
-**Next steps**: User testing, then optionally add drag & drop in Phase 2
+## Known Issues (added 2026-07-07)
+
+### 4. Delete Folder Dialog — simplified, does NOT match this doc's Phase 4 description
+
+**Issue**: This doc (line ~95, "Delete folder dialog with moveToRoot option") describes a
+dialog that lets the user choose "move connections to root" vs "delete all". The dialog
+actually committed (`ConnectionsListScreen.kt`) is a simpler direct-delete confirm/cancel
+with no moveToRoot choice — connections in the folder are just deleted along with it via
+`viewModel.deleteFolder(folder.id)`.
+
+**Impact**: Medium — data loss risk if a user deletes a folder expecting connections to
+survive at root level (matches the original MVP design intent), since there is currently
+no such option in the UI.
+
+**Also found**: the post-delete snackbar message `"Folder eliminado"` is **hardcoded**,
+not using a string resource — violates this project's i18n convention (all user-facing
+strings must go through `strings.xml` in 10 languages).
+
+**Status**: ⚠️ PENDING — committed as-is per maintainer instruction (commit now, fix later).
+Follow-up needed:
+- [ ] Add `moveToRoot: Boolean` choice to the delete dialog (or confirm direct-delete is
+      the intentionally simplified final behavior and update this doc instead).
+- [ ] Replace hardcoded `"Folder eliminado"` with a `stringResource(R.string.folder_deleted_snackbar)` (or similar key), translated to at least en+es per project convention.
+
+---
+
+## Unrelated Pending Items Surfaced Elsewhere (cross-reference, not this change's scope)
+
+Discovered during unrelated `editor-completion-and-format` / `workspace-card-carousel`
+SDD work in the same session, noted here only for visibility since they remain open:
+
+- QueryEditor toolbar's Undo/Redo/Save/Open/Clear buttons share the same
+  overlay/screen state-bridge gap that Format had — only Format was fixed
+  (see `openspec/changes/editor-completion-and-format/tasks.md` deviations).
+- `SqlTokenizerTest.kt` and `QueryEditorViewModelTest.kt` do not exist despite being
+  referenced by earlier progress notes — test coverage gap.
+- `temp_drag_changes.patch` (repo root) is an orphaned, unapplied patch from an earlier
+  drag & drop attempt — not committed, recommended for deletion, left untouched pending
+  maintainer confirmation.
+
+---
+
+**Last updated**: 2026-07-07
+**Status**: ✅ MVP COMPLETE for CRUD/expand/collapse/move — ⚠️ Delete Folder simplified, see Known Issues #4
+**Next steps**: User testing, then optionally add drag & drop in Phase 2; resolve Known Issue #4

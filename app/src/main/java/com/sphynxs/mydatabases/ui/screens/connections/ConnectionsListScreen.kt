@@ -721,6 +721,48 @@ fun ConnectionsListScreen(
             )
         }
     }
+    
+    // Delete Folder Dialog
+    deletingFolder?.let { folder ->
+        val connectionCount = allFolders.filterIsInstance<ConnectionListItem.FolderItem>()
+            .firstOrNull { it.folder.id == folder.id }?.connectionCount ?: 0
+        
+        AlertDialog(
+            onDismissRequest = { 
+                deletingFolder = null
+                showDeleteFolderDialog = false
+            },
+            title = { Text(stringResource(R.string.folder_delete_confirm_title)) },
+            text = { Text(stringResource(R.string.folder_delete_confirm_message, connectionCount)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.deleteFolder(folder.id)
+                        deletingFolder = null
+                        showDeleteFolderDialog = false
+                        scope.launch {
+                            snackbarHostState.showSnackbar(
+                                message = "Folder eliminado",
+                                duration = SnackbarDuration.Short
+                            )
+                        }
+                    }
+                ) {
+                    Text(stringResource(R.string.action_delete))
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { 
+                        deletingFolder = null
+                        showDeleteFolderDialog = false
+                    }
+                ) {
+                    Text(stringResource(R.string.action_cancel))
+                }
+            }
+        )
+    }
 }
 
 /**
