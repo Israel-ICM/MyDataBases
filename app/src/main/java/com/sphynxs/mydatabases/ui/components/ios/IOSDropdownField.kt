@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.sphynxs.mydatabases.R
-import com.sphynxs.mydatabases.ui.theme.DesignTokens
+import com.sphynxs.mydatabases.ui.theme.LocalDesignTokens
 
 /**
  * Dropdown field estilo iOS para usar dentro de IOSGroupedCard.
@@ -103,7 +103,7 @@ fun <T> IOSDropdownField(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(if (enabled) DesignTokens.SurfacePrimary else DesignTokens.BackgroundPrimary)
+                .background(if (enabled) LocalDesignTokens.current.surfacePrimary else LocalDesignTokens.current.backgroundPrimary)
                 .clickable(enabled = enabled && !isLoading) { expanded = true }
                 .padding(horizontal = 16.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -112,9 +112,9 @@ fun <T> IOSDropdownField(
             // Texto seleccionado o placeholder
             Text(
                 text = value?.let { itemLabel(it) } ?: placeholder,
-                color = if (value != null) DesignTokens.TextPrimary else DesignTokens.TextTertiary,
-                fontSize = DesignTokens.CardTitleSize,
-                fontWeight = if (value != null) DesignTokens.CardTitleWeight else FontWeight.Normal,
+                color = if (value != null) LocalDesignTokens.current.textPrimary else LocalDesignTokens.current.textTertiary,
+                fontSize = LocalDesignTokens.current.cardTitleSize,
+                fontWeight = if (value != null) LocalDesignTokens.current.cardTitleWeight else FontWeight.Normal,
                 modifier = Modifier.weight(1f)
             )
             
@@ -123,13 +123,13 @@ fun <T> IOSDropdownField(
                 CircularProgressIndicator(
                     modifier = Modifier.size(20.dp),
                     strokeWidth = 2.dp,
-                    color = DesignTokens.IconNormal
+                    color = LocalDesignTokens.current.iconNormal
                 )
             } else if (enabled) {
                 Icon(
                     imageVector = Icons.Default.KeyboardArrowDown,
                     contentDescription = null,
-                    tint = DesignTokens.IconNormal,
+                    tint = LocalDesignTokens.current.iconNormal,
                     modifier = Modifier.size(20.dp)
                 )
             }
@@ -138,7 +138,7 @@ fun <T> IOSDropdownField(
         // Divider — lo movemos antes del Dialog para mantener el layout del trigger
         if (showDivider) {
             HorizontalDivider(
-                color = DesignTokens.Separator,
+                color = LocalDesignTokens.current.separator,
                 thickness = 0.5.dp,
                 modifier = Modifier.padding(start = 16.dp)
             )
@@ -175,7 +175,7 @@ fun <T> IOSDropdownField(
                             Icon(
                                 imageVector = Icons.Default.Search,
                                 contentDescription = null,
-                                tint = DesignTokens.IconNormal,
+                                tint = LocalDesignTokens.current.iconNormal,
                                 modifier = Modifier.size(20.dp)
                             )
                         },
@@ -185,12 +185,12 @@ fun <T> IOSDropdownField(
                             .focusRequester(focusRequester),
                         textStyle = TextStyle(
                             fontSize = 15.sp,
-                            color = DesignTokens.TextPrimary
+                            color = LocalDesignTokens.current.textPrimary
                         ),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = DesignTokens.AccentPrimary,
-                            unfocusedBorderColor = DesignTokens.Separator,
-                            cursorColor = DesignTokens.AccentPrimary,
+                            focusedBorderColor = LocalDesignTokens.current.accentPrimary,
+                            unfocusedBorderColor = LocalDesignTokens.current.separator,
+                            cursorColor = LocalDesignTokens.current.accentPrimary,
                             focusedContainerColor = Color.White,
                             unfocusedContainerColor = Color.White
                         ),
@@ -204,7 +204,7 @@ fun <T> IOSDropdownField(
                         )
                     )
                     HorizontalDivider(
-                        color = DesignTokens.Separator,
+                        color = LocalDesignTokens.current.separator,
                         thickness = 0.5.dp
                     )
                 }
@@ -218,8 +218,8 @@ fun <T> IOSDropdownField(
                     if (filteredItems.isEmpty()) {
                         Text(
                             text = stringResource(R.string.no_results),
-                            fontSize = DesignTokens.LabelSize,
-                            color = DesignTokens.TextSecondary,
+                            fontSize = LocalDesignTokens.current.labelSize,
+                            color = LocalDesignTokens.current.textSecondary,
                             modifier = Modifier.padding(16.dp)
                         )
                     } else {
@@ -238,16 +238,16 @@ fun <T> IOSDropdownField(
                                 Column(modifier = Modifier.weight(1f)) {
                                     Text(
                                         text = itemLabel(item),
-                                        fontSize = DesignTokens.CardTitleSize,
-                                        color = DesignTokens.TextPrimary,
+                                        fontSize = LocalDesignTokens.current.cardTitleSize,
+                                        color = LocalDesignTokens.current.textPrimary,
                                         fontWeight = FontWeight.Medium
                                     )
                                     itemSubtitle?.invoke(item)?.let { subtitle ->
                                         Spacer(modifier = Modifier.height(4.dp))
                                         Text(
                                             text = subtitle,
-                                            fontSize = DesignTokens.LabelSize,
-                                            color = DesignTokens.TextSecondary,
+                                            fontSize = LocalDesignTokens.current.labelSize,
+                                            color = LocalDesignTokens.current.textSecondary,
                                             lineHeight = 16.sp
                                         )
                                     }
@@ -255,7 +255,7 @@ fun <T> IOSDropdownField(
                                 itemTrailing?.invoke(item)
                             }
                             HorizontalDivider(
-                                color = DesignTokens.Separator.copy(alpha = 0.5f),
+                                color = LocalDesignTokens.current.separator.copy(alpha = 0.5f),
                                 thickness = 0.5.dp,
                                 modifier = Modifier.padding(start = 16.dp)
                             )

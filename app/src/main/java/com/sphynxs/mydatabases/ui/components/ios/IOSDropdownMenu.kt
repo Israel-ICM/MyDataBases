@@ -12,7 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
-import com.sphynxs.mydatabases.ui.theme.DesignTokens
+import com.sphynxs.mydatabases.ui.theme.LocalDesignTokens
 
 /**
  * Dropdown menu estilo iOS con bordes redondeados y sombra suave.
@@ -45,7 +45,7 @@ fun IOSDropdownMenu(
             .shadow(
                 elevation = 12.dp,
                 shape = RoundedCornerShape(16.dp),
-                spotColor = DesignTokens.CardShadowColor
+                spotColor = LocalDesignTokens.current.cardShadowColor
             )
             .background(
                 color = Color.White,

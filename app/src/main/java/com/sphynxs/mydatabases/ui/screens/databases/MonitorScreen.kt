@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.dp
 import com.sphynxs.mydatabases.R
 import com.sphynxs.mydatabases.ui.components.BreathingBackground
 import com.sphynxs.mydatabases.ui.components.ScreenTitle
-import com.sphynxs.mydatabases.ui.theme.DesignTokens
+import com.sphynxs.mydatabases.ui.theme.LocalDesignTokens
 
 /**
  * Pantalla para monitoreo del servidor.
@@ -60,7 +60,7 @@ fun MonitorScreen(
     
     Scaffold(
         modifier = modifier,
-        containerColor = DesignTokens.BackgroundPrimary
+        containerColor = LocalDesignTokens.current.backgroundPrimary
     ) { paddingValues ->
         BreathingBackground(
             modifier = Modifier

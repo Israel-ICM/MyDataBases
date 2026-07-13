@@ -1,142 +1,214 @@
 package com.sphynxs.mydatabases.ui.theme
 
+import androidx.compose.material3.ColorScheme
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 /**
- * Tokens de diseño unificados para toda la app.
+ * Tokens de diseño unificados para toda la app — theme-aware (light/dark).
  *
- * Define colores, tamaños, espaciados y estilos consistentes.
+ * Define colores, tamaños, espaciados y estilos consistentes. Los campos de color
+ * varían por tema (ver [buildDesignTokens]); typography/spacing/icon-size son
+ * theme-INVARIANTES pero viven aquí también, para un único patrón de acceso.
  *
- * @author israel-icm
+ * Se expone vía [LocalDesignTokens], provisto por `AppTheme` con [LightDesignTokens]
+ * o [DarkDesignTokens] según el `darkTheme` resuelto — ver `openspec/changes/dark-mode`.
+ *
+ * @author israel-icm (theme-aware conversion: gentle-ai, PR-2)
  * @date 2026-06-17
  */
-object DesignTokens {
-    
+@Immutable
+data class DesignTokens(
     // ============ COLORES ============
-    
-    /** Fondo principal - gradiente sutil violeta/turquesa */
-    val BackgroundPrimary = Color(0xFFF5F6FA)  // Mismo que brand_light_bg
-    val BackgroundGradientStart = Color(0xFFF8F8FF)  // Blanco con toque violeta visible
-    val BackgroundGradientEnd = Color(0xFFF5FFFE)  // Blanco con toque turquesa visible
-    
-    /** Fondo de cards - blanco puro */
-    val SurfacePrimary = Color.White
-    
-    /** Texto principal - negro profundo del branded */
-    val TextPrimary = Color(0xFF1A1F2E)  // brand_light_on_bg
-    
-    /** Texto secundario - gris violáceo del branded */
-    val TextSecondary = Color(0xFF5B5F7D)  // brand_outline
-    
-    /** Texto terciario - violeta muy claro */
-    val TextTertiary = Color(0xFF9DA1C0)
-    
-    /** Acento primario - violeta brillante branded */
-    val AccentPrimary = Color(0xFF7C80E8)  // brand_primary
-    val AccentPrimaryLight = Color(0xFFE6E7FF)  // Violeta muy claro
-    val AccentPrimaryDark = Color(0xFF5B5EC8)  // Violeta oscuro
-    
-    /** Acento secundario - turquesa menta branded */
-    val AccentSecondary = Color(0xFF8EE3D3)  // brand_tertiary
-    val AccentSecondaryLight = Color(0xFFB3F5EA)  // Turquesa claro
-    
-    /** Acento de éxito - turquesa oscuro branded */
-    val AccentSuccess = Color(0xFF006B63)  // Turquesa oscuro
-    val AccentSuccessLight = Color(0xFFA3F2E6)  // Turquesa muy claro
-    
-    /** Separadores - violeta muy claro */
-    val Separator = Color(0xFFE3E5F0)
-    
-    /** Fondo de íconos - violeta muy claro */
-    val IconBackground = Color(0xFFF0F1FF)
-    
-    /** Color de íconos normales - gris violáceo */
-    val IconNormal = Color(0xFF75788C)
-    
-    /** Color destructivo para acciones peligrosas - rojo iOS */
-    val DestructiveAction = Color(0xFFFF3B30)
-    
-    /** Backdrop/scrim para modales y overlays - blanco transparente claro */
-    val BackdropScrim = Color.White.copy(alpha = 0.4f)
-    
-    
+    val backgroundPrimary: Color,
+    val backgroundGradientStart: Color,
+    val backgroundGradientEnd: Color,
+    val surfacePrimary: Color,
+    val textPrimary: Color,
+    val textSecondary: Color,
+    val textTertiary: Color,
+    val accentPrimary: Color,
+    val accentPrimaryLight: Color,
+    val accentPrimaryDark: Color,
+    val accentSecondary: Color,
+    val accentSecondaryLight: Color,
+    val accentSuccess: Color,
+    val accentSuccessLight: Color,
+    val separator: Color,
+    val iconBackground: Color,
+    val iconNormal: Color,
+    val destructiveAction: Color,
+    val backdropScrim: Color,
+
     // ============ TIPOGRAFÍA ============
-    
-    /** Título GRANDE estilo iOS 26 (ej: "Todo lo de iCloud") */
-    val LargeTitleSize = 34.sp
-    val LargeTitleWeight = FontWeight.Bold
-    val LargeTitleColor = TextPrimary
-    
-    /** Título de sección desplegable (ej: "Destacadas") */
-    val SectionTitleSize = 22.sp
-    val SectionTitleWeight = FontWeight.Bold
-    val SectionTitleColor = TextPrimary
-    
-    /** Título principal de card (ej: nombre de conexión) */
-    val CardTitleSize = 17.sp
-    val CardTitleWeight = FontWeight.SemiBold
-    val CardTitleColor = TextPrimary
-    
-    /** Subtítulo de card (ej: host:puerto) */
-    val CardSubtitleSize = 15.sp
-    val CardSubtitleWeight = FontWeight.Normal
-    val CardSubtitleColor = TextSecondary
-    
-    /** Label pequeño (ej: badges, metadata) */
-    val LabelSize = 13.sp
-    val LabelWeight = FontWeight.Medium
-    val LabelColor = TextSecondary
-    
-    /** Caption (ej: contadores, información extra) */
-    val CaptionSize = 12.sp
-    val CaptionWeight = FontWeight.Normal
-    val CaptionColor = TextTertiary
-    
-    
+    val largeTitleSize: TextUnit,
+    val largeTitleWeight: FontWeight,
+    val largeTitleColor: Color,
+    val sectionTitleSize: TextUnit,
+    val sectionTitleWeight: FontWeight,
+    val sectionTitleColor: Color,
+    val cardTitleSize: TextUnit,
+    val cardTitleWeight: FontWeight,
+    val cardTitleColor: Color,
+    val cardSubtitleSize: TextUnit,
+    val cardSubtitleWeight: FontWeight,
+    val cardSubtitleColor: Color,
+    val labelSize: TextUnit,
+    val labelWeight: FontWeight,
+    val labelColor: Color,
+    val captionSize: TextUnit,
+    val captionWeight: FontWeight,
+    val captionColor: Color,
+
     // ============ ESPACIADO ============
-    
-    /** Padding interno de cards */
-    val CardPadding = 16.dp
-    
-    /** Espaciado entre cards en listas */
-    val CardSpacing = 12.dp
-    
-    /** Padding horizontal de pantallas */
-    val ScreenPaddingHorizontal = 16.dp
-    
-    /** Espaciado entre secciones */
-    val SectionSpacing = 24.dp
-    
-    /** Espaciado entre elementos dentro de un card */
-    val InnerSpacing = 12.dp
-    
-    
+    val cardPadding: Dp,
+    val cardSpacing: Dp,
+    val screenPaddingHorizontal: Dp,
+    val sectionSpacing: Dp,
+    val innerSpacing: Dp,
+
     // ============ TAMAÑOS DE ÍCONOS ============
-    
-    /** Ícono grande en cards principales */
-    val IconLarge = 48.dp
-    
-    /** Ícono mediano en cards secundarios */
-    val IconMedium = 40.dp
-    
-    /** Ícono pequeño en botones y acciones */
-    val IconSmall = 24.dp
-    
-    
+    val iconLarge: Dp,
+    val iconMedium: Dp,
+    val iconSmall: Dp,
+
     // ============ BORDES Y SOMBRAS ============
-    
-    /** Radio de bordes de cards - mucho más redondeados */
-    val CardCornerRadius = 24.dp
-    
-    /** Elevación de sombra de cards - pronunciada */
-    val CardElevation = 12.dp
-    
-    /** Sombra con color de acento - violeta branded */
-    val CardShadowColor = Color(0xFF7C80E8).copy(alpha = 0.15f)
-    
-    /** Radio de bordes de íconos */
-    val IconCornerRadius = 16.dp
+    val cardCornerRadius: Dp,
+    val cardElevation: Dp,
+    val cardShadowColor: Color,
+    val iconCornerRadius: Dp
+)
+
+/**
+ * CompositionLocal para exponer [DesignTokens] a toda la jerarquía de Composables,
+ * mirroring el patrón de `LocalAppSpacing`/`LocalAppShapes`.
+ *
+ * `AppTheme` SIEMPRE lo provee explícitamente ([LightDesignTokens] o [DarkDesignTokens]
+ * según `darkTheme` resuelto); el default acá es solo un fallback de seguridad para
+ * contextos que leen `LocalDesignTokens.current` sin pasar por `AppTheme` (no debería
+ * ocurrir en producción).
+ *
+ * Uso:
+ * ```kotlin
+ * val tokens = LocalDesignTokens.current
+ * Text(color = tokens.textPrimary)
+ * ```
+ *
+ * @author gentle-ai (PR-2)
+ * @date 2026-07-13
+ */
+val LocalDesignTokens = staticCompositionLocalOf { LightDesignTokens }
+
+/** Instancia de [DesignTokens] para tema claro, derivada de [BrandedLightColorScheme]. */
+val LightDesignTokens: DesignTokens = buildDesignTokens(BrandedLightColorScheme)
+
+/** Instancia de [DesignTokens] para tema oscuro, derivada de [BrandedDarkColorScheme]. */
+val DarkDesignTokens: DesignTokens = buildDesignTokens(BrandedDarkColorScheme)
+
+/**
+ * Deriva un [DesignTokens] completo a partir de un [ColorScheme] branded resuelto
+ * (light o dark). Función pura — sin dependencias de Compose runtime más allá de
+ * `ColorScheme`/`Color` — extraída para test unitario directo (ver `DesignTokensTest`).
+ *
+ * `DesignTokens` permanece anclado a la paleta BRANDED (no a dynamic color) — preserva
+ * la identidad visual de marca de los componentes iOS-style (cards, botones, sombras)
+ * independientemente de si `brandedPaletteEnabled` está OFF y `MaterialTheme.colorScheme`
+ * usa dynamic color; ver design.md Architecture Decisions ("Preserves branded WCAG AA
+ * identity").
+ *
+ * Decisiones de contraste WCAG AA tomadas en esta derivación (ver apply-progress para el
+ * detalle de cálculo):
+ * - `textSecondary` deriva de `scheme.secondary`, NO de `scheme.outline` — `outline` en
+ *   `BrandedDarkColorScheme` da solo 2.37:1 contra `surface` (falla AA); `secondary` da
+ *   5.81:1 (pasa AA). En light ambos son casi idénticos visualmente (6.22 vs 6.23:1).
+ * - `textPrimary`/`backgroundPrimary`/`surfacePrimary` derivan 1:1 de `onBackground`/
+ *   `background`/`surface` — coinciden exactamente con los valores light ya shippeados.
+ * - `iconNormal` deriva de `scheme.outline` (coincide exacto con el valor light actual,
+ *   4.36:1 — sobrado para contraste no-textual 3:1 de WCAG 1.4.11).
+ * - `separator` deriva de `scheme.surfaceVariant` (coincide exacto con el valor light
+ *   actual).
+ * - `accentPrimary`/`accentSecondary`/`destructiveAction`/`cardShadowColor` permanecen
+ *   theme-INVARIANTES (colores de identidad de marca, ya verificados en ambos fondos vía
+ *   `BrandedDarkColorScheme`/`BrandedLightColorScheme` — ver `BrandedColors.kt`).
+ * - `backdropScrim` deriva de `scheme.background` (antes hardcoded a `Color.White`, lo
+ *   que en dark mode habría producido un velo blanco brillante sobre fondo oscuro).
+ *
+ * @param scheme El `ColorScheme` branded resuelto (light o dark) del cual derivar roles
+ * @return Un [DesignTokens] completo, coherente con el tema activo
+ *
+ * @author gentle-ai (TDD GREEN, PR-2)
+ * @date 2026-07-13
+ */
+internal fun buildDesignTokens(scheme: ColorScheme): DesignTokens {
+    val textPrimary = scheme.onBackground
+    val textSecondary = scheme.secondary
+    val textTertiary = scheme.outline
+
+    return DesignTokens(
+        // ============ COLORES ============
+        backgroundPrimary = scheme.background,
+        backgroundGradientStart = lerp(scheme.background, scheme.primaryContainer, 0.06f),
+        backgroundGradientEnd = lerp(scheme.background, scheme.tertiaryContainer, 0.06f),
+        surfacePrimary = scheme.surface,
+        textPrimary = textPrimary,
+        textSecondary = textSecondary,
+        textTertiary = textTertiary,
+        accentPrimary = brand_primary,
+        accentPrimaryLight = Color(0xFFE6E7FF),
+        accentPrimaryDark = Color(0xFF5B5EC8),
+        accentSecondary = brand_tertiary,
+        accentSecondaryLight = Color(0xFFB3F5EA),
+        accentSuccess = Color(0xFF006B63),
+        accentSuccessLight = Color(0xFFA3F2E6),
+        separator = scheme.surfaceVariant,
+        iconBackground = Color(0xFFF0F1FF),
+        iconNormal = scheme.outline,
+        destructiveAction = Color(0xFFFF3B30),
+        backdropScrim = scheme.background.copy(alpha = 0.4f),
+
+        // ============ TIPOGRAFÍA ============
+        largeTitleSize = 34.sp,
+        largeTitleWeight = FontWeight.Bold,
+        largeTitleColor = textPrimary,
+        sectionTitleSize = 22.sp,
+        sectionTitleWeight = FontWeight.Bold,
+        sectionTitleColor = textPrimary,
+        cardTitleSize = 17.sp,
+        cardTitleWeight = FontWeight.SemiBold,
+        cardTitleColor = textPrimary,
+        cardSubtitleSize = 15.sp,
+        cardSubtitleWeight = FontWeight.Normal,
+        cardSubtitleColor = textSecondary,
+        labelSize = 13.sp,
+        labelWeight = FontWeight.Medium,
+        labelColor = textSecondary,
+        captionSize = 12.sp,
+        captionWeight = FontWeight.Normal,
+        captionColor = textTertiary,
+
+        // ============ ESPACIADO ============
+        cardPadding = 16.dp,
+        cardSpacing = 12.dp,
+        screenPaddingHorizontal = 16.dp,
+        sectionSpacing = 24.dp,
+        innerSpacing = 12.dp,
+
+        // ============ TAMAÑOS DE ÍCONOS ============
+        iconLarge = 48.dp,
+        iconMedium = 40.dp,
+        iconSmall = 24.dp,
+
+        // ============ BORDES Y SOMBRAS ============
+        cardCornerRadius = 24.dp,
+        cardElevation = 12.dp,
+        cardShadowColor = brand_primary.copy(alpha = 0.15f),
+        iconCornerRadius = 16.dp
+    )
 }

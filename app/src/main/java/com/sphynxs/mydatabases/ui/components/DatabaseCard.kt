@@ -20,7 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.sphynxs.mydatabases.core.database.models.Database
 import com.sphynxs.mydatabases.ui.components.ios.IOSCard
-import com.sphynxs.mydatabases.ui.theme.DesignTokens
+import com.sphynxs.mydatabases.ui.theme.LocalDesignTokens
 import com.sphynxs.mydatabases.ui.theme.AppTheme
 
 /**
@@ -46,9 +46,9 @@ fun DatabaseCard(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(DesignTokens.CardPadding),
+                .padding(LocalDesignTokens.current.cardPadding),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(DesignTokens.InnerSpacing)
+            horizontalArrangement = Arrangement.spacedBy(LocalDesignTokens.current.innerSpacing)
         ) {
             // Ícono de database con gradiente turquesa
             Box(
@@ -81,9 +81,9 @@ fun DatabaseCard(
                 // Nombre de la base de datos
                 Text(
                     text = database.name,
-                    fontSize = DesignTokens.CardTitleSize,
-                    fontWeight = DesignTokens.CardTitleWeight,
-                    color = DesignTokens.CardTitleColor,
+                    fontSize = LocalDesignTokens.current.cardTitleSize,
+                    fontWeight = LocalDesignTokens.current.cardTitleWeight,
+                    color = LocalDesignTokens.current.cardTitleColor,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -91,9 +91,9 @@ fun DatabaseCard(
                 // Charset
                 Text(
                     text = database.charset,
-                    fontSize = DesignTokens.CardSubtitleSize,
-                    fontWeight = DesignTokens.CardSubtitleWeight,
-                    color = DesignTokens.CardSubtitleColor,
+                    fontSize = LocalDesignTokens.current.cardSubtitleSize,
+                    fontWeight = LocalDesignTokens.current.cardSubtitleWeight,
+                    color = LocalDesignTokens.current.cardSubtitleColor,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )

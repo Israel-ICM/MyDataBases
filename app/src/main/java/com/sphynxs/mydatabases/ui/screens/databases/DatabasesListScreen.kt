@@ -47,7 +47,7 @@ import com.sphynxs.mydatabases.ui.components.LoadingIndicator
 import com.sphynxs.mydatabases.ui.components.ScreenTitle
 import com.sphynxs.mydatabases.ui.components.ios.IOSSearchBar
 import com.sphynxs.mydatabases.ui.components.skeleton.DatabaseListSkeleton
-import com.sphynxs.mydatabases.ui.theme.DesignTokens
+import com.sphynxs.mydatabases.ui.theme.LocalDesignTokens
 import com.sphynxs.mydatabases.ui.theme.AppTheme
 import kotlinx.coroutines.launch
 
@@ -135,7 +135,7 @@ fun DatabasesListScreen(
                         query = searchQuery,
                         onQueryChange = viewModel::setSearchQuery,
                         placeholder = stringResource(R.string.databases_search_hint),
-                        modifier = Modifier.padding(horizontal = DesignTokens.ScreenPaddingHorizontal)
+                        modifier = Modifier.padding(horizontal = LocalDesignTokens.current.screenPaddingHorizontal)
                     )
 
                     if (databases.isEmpty()) {
@@ -147,7 +147,7 @@ fun DatabasesListScreen(
                             modifier = Modifier.weight(1f)
                         )
                     } else {
-                        Spacer(modifier = Modifier.height(DesignTokens.CardSpacing))
+                        Spacer(modifier = Modifier.height(LocalDesignTokens.current.cardSpacing))
                         
                         LazyColumn(modifier = Modifier.weight(1f)) {
                             items(databases, key = { it.name }) { database ->
@@ -155,8 +155,8 @@ fun DatabasesListScreen(
                                     database = database,
                                     onCardClick = { onNavigateToTables(database.name) },
                                     modifier = Modifier.padding(
-                                        horizontal = DesignTokens.ScreenPaddingHorizontal,
-                                        vertical = DesignTokens.CardSpacing / 2
+                                        horizontal = LocalDesignTokens.current.screenPaddingHorizontal,
+                                        vertical = LocalDesignTokens.current.cardSpacing / 2
                                     )
                                 )
                             }
@@ -203,9 +203,9 @@ fun DatabasesListScreen(
                 }
             },
             sheetState = addDatabaseSheetState,
-            containerColor = com.sphynxs.mydatabases.ui.theme.DesignTokens.BackgroundPrimary,
+            containerColor = LocalDesignTokens.current.backgroundPrimary,
             sheetMaxWidth = 10000.dp,
-            scrimColor = DesignTokens.BackdropScrim,
+            scrimColor = LocalDesignTokens.current.backdropScrim,
             tonalElevation = 16.dp
         ) {
             Scaffold(

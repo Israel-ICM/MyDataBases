@@ -74,7 +74,7 @@ import com.sphynxs.mydatabases.domain.models.ConnectionListItem
 import com.sphynxs.mydatabases.ui.components.ios.IOSGroupedCard
 import com.sphynxs.mydatabases.ui.components.ios.IOSListItem
 import com.sphynxs.mydatabases.ui.theme.DbAccents
-import com.sphynxs.mydatabases.ui.theme.DesignTokens
+import com.sphynxs.mydatabases.ui.theme.LocalDesignTokens
 import com.sphynxs.mydatabases.ui.components.skeleton.ConnectionListSkeleton
 import kotlinx.coroutines.launch
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -145,8 +145,8 @@ fun ConnectionsListScreen(
     }
 
     Scaffold(
-        modifier = modifier.background(DesignTokens.BackgroundPrimary),
-        containerColor = DesignTokens.BackgroundPrimary,
+        modifier = modifier.background(LocalDesignTokens.current.backgroundPrimary),
+        containerColor = LocalDesignTokens.current.backgroundPrimary,
         snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButton = {
             if (uiState is ConnectionsUiState.Success) {
@@ -193,16 +193,16 @@ fun ConnectionsListScreen(
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = DesignTokens.ScreenPaddingHorizontal),
+                                .padding(horizontal = LocalDesignTokens.current.screenPaddingHorizontal),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             // Título grande estilo iOS 26
                             Text(
                                 text = stringResource(R.string.connections_title),
-                                fontSize = DesignTokens.LargeTitleSize,
-                                fontWeight = DesignTokens.LargeTitleWeight,
-                                color = DesignTokens.LargeTitleColor
+                                fontSize = LocalDesignTokens.current.largeTitleSize,
+                                fontWeight = LocalDesignTokens.current.largeTitleWeight,
+                                color = LocalDesignTokens.current.largeTitleColor
                             )
                             
                             // Botón de reordenar
@@ -213,7 +213,7 @@ fun ConnectionsListScreen(
                                 Icon(
                                     imageVector = if (isReorderMode) PhosphorAppIcons.Action.check else PhosphorAppIcons.Action.edit,
                                     contentDescription = if (isReorderMode) "Done reordering" else "Reorder connections",
-                                    tint = if (isReorderMode) DesignTokens.AccentPrimary else DesignTokens.IconNormal,
+                                    tint = if (isReorderMode) LocalDesignTokens.current.accentPrimary else LocalDesignTokens.current.iconNormal,
                                     modifier = Modifier.size(24.dp)
                                 )
                             }
@@ -269,8 +269,8 @@ fun ConnectionsListScreen(
                                                     translationY = if (isDragging) draggingItemOffset else 0f
                                                 }
                                                 .padding(
-                                                    horizontal = DesignTokens.ScreenPaddingHorizontal,
-                                                    vertical = DesignTokens.CardSpacing / 2
+                                                    horizontal = LocalDesignTokens.current.screenPaddingHorizontal,
+                                                    vertical = LocalDesignTokens.current.cardSpacing / 2
                                                 )
                                                 .then(
                                                     if (isReorderMode) {
@@ -387,10 +387,10 @@ fun ConnectionsListScreen(
                                                     },
                                                     isConnected = connection.id == activeConnectionId,
                                                     modifier = Modifier.padding(
-                                                        start = DesignTokens.ScreenPaddingHorizontal + 32.dp, // Indent 32.dp
-                                                        end = DesignTokens.ScreenPaddingHorizontal,
-                                                        top = DesignTokens.CardSpacing / 2,
-                                                        bottom = DesignTokens.CardSpacing / 2
+                                                        start = LocalDesignTokens.current.screenPaddingHorizontal + 32.dp, // Indent 32.dp
+                                                        end = LocalDesignTokens.current.screenPaddingHorizontal,
+                                                        top = LocalDesignTokens.current.cardSpacing / 2,
+                                                        bottom = LocalDesignTokens.current.cardSpacing / 2
                                                     )
                                                 )
                                             }
@@ -464,8 +464,8 @@ fun ConnectionsListScreen(
                                                     translationY = if (isDragging) draggingItemOffset else 0f
                                                 }
                                                 .padding(
-                                                    horizontal = DesignTokens.ScreenPaddingHorizontal,
-                                                    vertical = DesignTokens.CardSpacing / 2
+                                                    horizontal = LocalDesignTokens.current.screenPaddingHorizontal,
+                                                    vertical = LocalDesignTokens.current.cardSpacing / 2
                                                 )
                                                 .then(
                                                     if (isReorderMode) {
@@ -531,7 +531,7 @@ fun ConnectionsListScreen(
                                                 editingFolder = null
                                             }
                                             .padding(
-                                                horizontal = DesignTokens.ScreenPaddingHorizontal,
+                                                horizontal = LocalDesignTokens.current.screenPaddingHorizontal,
                                                 vertical = 12.dp
                                             ),
                                         verticalAlignment = Alignment.CenterVertically,
@@ -542,7 +542,7 @@ fun ConnectionsListScreen(
                                             modifier = Modifier
                                                 .size(28.dp)
                                                 .clip(RoundedCornerShape(14.dp))
-                                                .background(DesignTokens.AccentPrimary),
+                                                .background(LocalDesignTokens.current.accentPrimary),
                                             contentAlignment = Alignment.Center
                                         ) {
                                             Icon(
@@ -557,7 +557,7 @@ fun ConnectionsListScreen(
                                         Text(
                                             text = stringResource(R.string.folder_create),
                                             style = MaterialTheme.typography.bodyLarge,
-                                            color = DesignTokens.AccentPrimary
+                                            color = LocalDesignTokens.current.accentPrimary
                                         )
                                     }
                                 }
@@ -622,7 +622,7 @@ fun ConnectionsListScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(DesignTokens.BackdropScrim),
+                .background(LocalDesignTokens.current.backdropScrim),
             contentAlignment = Alignment.Center
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -650,7 +650,7 @@ fun ConnectionsListScreen(
             },
             sheetState = typeSelectorSheetState,
             containerColor = Color(0xFFF2F2F7),
-            scrimColor = DesignTokens.BackdropScrim,
+            scrimColor = LocalDesignTokens.current.backdropScrim,
             tonalElevation = 16.dp
         ) {
             Column(
@@ -702,7 +702,7 @@ fun ConnectionsListScreen(
             sheetState = formSheetState,
             containerColor = Color(0xFFF2F2F7),
             sheetMaxWidth = 10000.dp,
-            scrimColor = DesignTokens.BackdropScrim,
+            scrimColor = LocalDesignTokens.current.backdropScrim,
             tonalElevation = 16.dp
         ) {
             ConnectionFormScreen(

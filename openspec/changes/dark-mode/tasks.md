@@ -48,15 +48,15 @@ Chain strategy: stacked-to-main (resolved — PR-1 targets `master`, PR-2 target
 
 ## Phase 2 (PR-2): Theme-Aware Design Tokens
 
-- [ ] 2.1 RED: `buildDesignTokens(scheme)` pure fn test — light scheme → light values, dark scheme → dark values
-- [ ] 2.2 GREEN: `DesignTokens.kt` `object` → `@Immutable data class` + `buildDesignTokens()` + `LightDesignTokens`/`DarkDesignTokens`
-- [ ] 2.3 GREEN: add `LocalDesignTokens = staticCompositionLocalOf { LightDesignTokens }`
-- [ ] 2.4 REFACTOR: extract shared role-derivation locals (e.g. `textPrimary`) per design.md interface
-- [ ] 2.5 GREEN: `AppTheme.kt` provides `LocalDesignTokens` via `CompositionLocalProvider` alongside `MaterialTheme`
-- [ ] 2.6 Migrate `DesignTokens.X` → `LocalDesignTokens.current.x` (~120 sites) in: `AdaptiveNavigationScaffold`, `BreathingBackground`, `ConnectionCard`, `DatabaseCard`, `FolderCard`, `ScreenTitle`, `TableCard`, `IOSButton`, `IOSDropdownField`, `IOSDropdownMenu`, `ConnectionsListScreen`, `AddDatabaseScreen`, `DatabasesListScreen`, `MonitorScreen`, `TablesListScreen`
-- [ ] 2.7 In non-composable draw lambdas (`drawBehind`/`Canvas`), capture `LocalDesignTokens.current` to a local `val` first
-- [ ] 2.8 Manual/visual: screenshot check light+dark for each of the 15 migrated files
-- [ ] 2.9 Run `./gradlew test` + `./gradlew compileDebugKotlin`; confirm no pre-existing failures
+- [x] 2.1 RED: `buildDesignTokens(scheme)` pure fn test — light scheme → light values, dark scheme → dark values
+- [x] 2.2 GREEN: `DesignTokens.kt` `object` → `@Immutable data class` + `buildDesignTokens()` + `LightDesignTokens`/`DarkDesignTokens`
+- [x] 2.3 GREEN: add `LocalDesignTokens = staticCompositionLocalOf { LightDesignTokens }`
+- [x] 2.4 REFACTOR: extract shared role-derivation locals (e.g. `textPrimary`) per design.md interface
+- [x] 2.5 GREEN: `AppTheme.kt` provides `LocalDesignTokens` via `CompositionLocalProvider` alongside `MaterialTheme`
+- [x] 2.6 Migrate `DesignTokens.X` → `LocalDesignTokens.current.x` (~115 sites) in: `AdaptiveNavigationScaffold`, `BreathingBackground`, `ConnectionCard`, `DatabaseCard`, `FolderCard`, `ScreenTitle`, `TableCard`, `IOSButton`, `IOSDropdownField`, `IOSDropdownMenu`, `ConnectionsListScreen`, `AddDatabaseScreen`, `DatabasesListScreen`, `MonitorScreen`, `TablesListScreen`
+- [x] 2.7 In non-composable draw lambdas (`drawBehind`/`Canvas`), capture `LocalDesignTokens.current` to a local `val` first — N/A: none of the 15 migrated files contain `drawBehind`/`Canvas`/`drawWithContent` (verified via grep); all ~115 sites are already inside `@Composable` scope. `WorkspaceCarousel` (the one file with a draw lambda) is explicitly PR-3 scope, untouched.
+- [x] 2.8 Manual/visual: screenshot check light+dark for each of the 15 migrated files — NOT performed (no emulator/device available in this session); compile + unit test verification done instead. Flagged as a residual manual-QA gap for a human reviewer before merge.
+- [x] 2.9 Run `./gradlew test` + `./gradlew compileDebugKotlin`; confirm no pre-existing failures
 
 ## Phase 3 (PR-3): Custom-Draw Dark-Safety & Literal Sweep
 

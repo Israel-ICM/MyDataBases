@@ -38,6 +38,7 @@ import com.sphynxs.mydatabases.ui.components.ios.IOSDropdownField
 import com.sphynxs.mydatabases.ui.components.ios.IOSGroupedCard
 import com.sphynxs.mydatabases.ui.components.ios.IOSTextField
 import kotlinx.coroutines.launch
+import com.sphynxs.mydatabases.ui.theme.LocalDesignTokens
 
 /**
  * Contenido del formulario para agregar una nueva base de datos.
@@ -155,7 +156,7 @@ fun AddDatabaseFormContent(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(com.sphynxs.mydatabases.ui.theme.DesignTokens.BackgroundPrimary)
+                .background(LocalDesignTokens.current.backgroundPrimary)
                 .padding(vertical = 16.dp)
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(24.dp)
@@ -163,9 +164,9 @@ fun AddDatabaseFormContent(
         // Título (estilo iOS)
         Text(
             text = stringResource(R.string.add_database_title),
-            fontSize = com.sphynxs.mydatabases.ui.theme.DesignTokens.LargeTitleSize,
-            fontWeight = com.sphynxs.mydatabases.ui.theme.DesignTokens.LargeTitleWeight,
-            color = com.sphynxs.mydatabases.ui.theme.DesignTokens.LargeTitleColor,
+            fontSize = LocalDesignTokens.current.largeTitleSize,
+            fontWeight = LocalDesignTokens.current.largeTitleWeight,
+            color = LocalDesignTokens.current.largeTitleColor,
             modifier = Modifier.padding(horizontal = 16.dp)
         )
 
@@ -173,8 +174,8 @@ fun AddDatabaseFormContent(
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(
                 text = stringResource(R.string.database_header),
-                fontSize = com.sphynxs.mydatabases.ui.theme.DesignTokens.LabelSize,
-                color = com.sphynxs.mydatabases.ui.theme.DesignTokens.TextSecondary,
+                fontSize = LocalDesignTokens.current.labelSize,
+                color = LocalDesignTokens.current.textSecondary,
                 modifier = Modifier.padding(start = 16.dp)
             )
             
@@ -245,9 +246,9 @@ fun AddDatabaseFormContent(
                                 if (collation.isDefault) {
                                     Text(
                                         text = stringResource(R.string.default_option),
-                                        fontSize = com.sphynxs.mydatabases.ui.theme.DesignTokens.LabelSize,
-                                        color = com.sphynxs.mydatabases.ui.theme.DesignTokens.AccentPrimary,
-                                        fontWeight = com.sphynxs.mydatabases.ui.theme.DesignTokens.LabelWeight
+                                        fontSize = LocalDesignTokens.current.labelSize,
+                                        color = LocalDesignTokens.current.accentPrimary,
+                                        fontWeight = LocalDesignTokens.current.labelWeight
                                     )
                                 }
                             }
@@ -283,7 +284,7 @@ fun AddDatabaseFormContent(
             if (!nameValidation.isValid && name.isNotEmpty()) {
                 Text(
                     text = nameValidation.errorMessage ?: "",
-                    fontSize = com.sphynxs.mydatabases.ui.theme.DesignTokens.LabelSize,
+                    fontSize = LocalDesignTokens.current.labelSize,
                     color = MaterialTheme.colorScheme.error,
                     modifier = Modifier.padding(start = 16.dp)
                 )
@@ -323,7 +324,7 @@ fun AddDatabaseFormContent(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(com.sphynxs.mydatabases.ui.theme.DesignTokens.BackdropScrim),
+                    .background(LocalDesignTokens.current.backdropScrim),
                 contentAlignment = Alignment.Center
             ) {
                 Column(
@@ -331,7 +332,7 @@ fun AddDatabaseFormContent(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     androidx.compose.material3.CircularProgressIndicator(
-                        color = com.sphynxs.mydatabases.ui.theme.DesignTokens.AccentPrimary
+                        color = LocalDesignTokens.current.accentPrimary
                     )
                     Text(
                         text = stringResource(R.string.add_database_creating),

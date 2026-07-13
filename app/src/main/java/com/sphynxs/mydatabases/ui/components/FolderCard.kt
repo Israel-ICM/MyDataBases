@@ -34,7 +34,7 @@ import com.sphynxs.mydatabases.R
 import com.sphynxs.mydatabases.core.database.models.ConnectionFolder
 import com.sphynxs.mydatabases.ui.components.ios.IOSCard
 import com.sphynxs.mydatabases.ui.components.ios.IOSDropdownMenu
-import com.sphynxs.mydatabases.ui.theme.DesignTokens
+import com.sphynxs.mydatabases.ui.theme.LocalDesignTokens
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ChevronRight
 import compose.icons.tablericons.Folder
@@ -85,9 +85,9 @@ fun FolderCard(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(DesignTokens.CardPadding),
+                .padding(LocalDesignTokens.current.cardPadding),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(DesignTokens.InnerSpacing)
+            horizontalArrangement = Arrangement.spacedBy(LocalDesignTokens.current.innerSpacing)
         ) {
             // Ícono de folder con gradiente
             Box(
