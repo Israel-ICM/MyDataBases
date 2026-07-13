@@ -15,7 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.sphynxs.mydatabases.ui.theme.DesignTokens
+import com.sphynxs.mydatabases.ui.theme.LocalDesignTokens
 
 @Composable
 fun IOSButton(
@@ -26,14 +26,14 @@ fun IOSButton(
     style: IOSButtonStyle = IOSButtonStyle.Primary
 ) {
     val backgroundColor = when (style) {
-        IOSButtonStyle.Primary -> if (enabled) DesignTokens.AccentPrimary else DesignTokens.AccentPrimary.copy(alpha = 0.3f)
+        IOSButtonStyle.Primary -> if (enabled) LocalDesignTokens.current.accentPrimary else LocalDesignTokens.current.accentPrimary.copy(alpha = 0.3f)
         IOSButtonStyle.Secondary -> Color.Transparent
         IOSButtonStyle.Destructive -> if (enabled) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.error.copy(alpha = 0.3f)
     }
     
     val textColor = when (style) {
         IOSButtonStyle.Primary -> Color.White
-        IOSButtonStyle.Secondary -> DesignTokens.AccentPrimary
+        IOSButtonStyle.Secondary -> LocalDesignTokens.current.accentPrimary
         IOSButtonStyle.Destructive -> Color.White
     }
     
@@ -44,7 +44,7 @@ fun IOSButton(
         shape = RoundedCornerShape(12.dp),
         color = backgroundColor,
         border = if (style == IOSButtonStyle.Secondary) 
-            BorderStroke(1.dp, DesignTokens.AccentPrimary) else null
+            BorderStroke(1.dp, LocalDesignTokens.current.accentPrimary) else null
     ) {
         Box(
             modifier = Modifier.padding(vertical = 14.dp),
