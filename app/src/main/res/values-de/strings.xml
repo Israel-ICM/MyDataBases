@@ -149,6 +149,10 @@
     <string name="settings_title">Einstellungen</string>
     <string name="settings_branded_palette_title">Markenpalette</string>
     <string name="settings_branded_palette_description">Benutzerdefinierte Markenfarben anstelle des dynamischen Designs verwenden</string>
+    <string name="theme_mode_label">Design</string>
+    <string name="theme_mode_system">System</string>
+    <string name="theme_mode_light">Hell</string>
+    <string name="theme_mode_dark">Dunkel</string>
     
     <!-- Loading states -->
     <string name="loading">Laden…</string>
