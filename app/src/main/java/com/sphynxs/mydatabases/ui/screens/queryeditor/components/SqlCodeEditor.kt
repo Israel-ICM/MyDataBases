@@ -308,7 +308,7 @@ fun SqlCodeEditor(
                 Text(
                     text = (1..lineCount).joinToString("\n") { it.toString() },
                     style = textStyle.copy(
-                        color = Color(0xFF858585)
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     ),
                     onTextLayout = { layoutResult ->
                         textLayoutResult = layoutResult
@@ -434,7 +434,7 @@ fun SqlCodeEditor(
                                 Text(
                                     text = placeholder,
                                     style = textStyle.copy(
-                                        color = Color(0xFF008000)
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                 )
                             }
@@ -451,6 +451,10 @@ fun SqlCodeEditor(
                                             val cursorBottom = boundingBox.bottom
                                             
                                             // Dibujar línea vertical (cursor)
+                                            // decorative, deferred: dark-mode — indicador de
+                                            // multi-cursor, azul fijo funciona en ambos temas
+                                            // (alto contraste sobre superficie clara u oscura,
+                                            // igual que un cursor de IDE convencional).
                                             drawLine(
                                                 color = Color(0xFF0066CC).copy(alpha = cursorAlpha),
                                                 start = Offset(cursorX, cursorTop),

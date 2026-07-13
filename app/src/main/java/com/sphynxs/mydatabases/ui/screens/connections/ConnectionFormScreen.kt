@@ -55,6 +55,7 @@ import com.sphynxs.mydatabases.ui.components.ios.IOSButton
 import com.sphynxs.mydatabases.ui.components.ios.IOSButtonStyle
 import com.sphynxs.mydatabases.ui.components.ios.IOSGroupedCard
 import com.sphynxs.mydatabases.ui.components.ios.IOSTextField
+import com.sphynxs.mydatabases.ui.theme.LocalDesignTokens
 
 /**
  * Pantalla de formulario de conexión (crear/editar).
@@ -226,13 +227,13 @@ fun ConnectionFormScreen(
     }
 
     Scaffold(
-        modifier = modifier.background(Color(0xFFF2F2F7)),
+        modifier = modifier.background(LocalDesignTokens.current.backgroundPrimary),
         topBar = {
             // iOS-style header
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color(0xFFF2F2F7))
+                    .background(LocalDesignTokens.current.backgroundPrimary)
                     .padding(16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
@@ -241,7 +242,7 @@ fun ConnectionFormScreen(
                     Icon(
                         Icons.Default.Close,
                         contentDescription = "Cancelar",
-                        tint = Color(0xFF007AFF)
+                        tint = LocalDesignTokens.current.accentPrimary
                     )
                 }
                 Text(
@@ -251,7 +252,7 @@ fun ConnectionFormScreen(
                     ),
                     fontSize = 17.sp,
                     fontWeight = FontWeight.SemiBold,
-                    color = Color.Black
+                    color = LocalDesignTokens.current.textPrimary
                 )
                 IconButton(
                     onClick = {
@@ -285,7 +286,7 @@ fun ConnectionFormScreen(
                         Icons.Default.Check,
                         contentDescription = "Guardar",
                         tint = if (formState != ConnectionFormUiState.Saving) 
-                            Color(0xFF007AFF) else Color(0xFF007AFF).copy(alpha = 0.3f)
+                            LocalDesignTokens.current.accentPrimary else LocalDesignTokens.current.accentPrimary.copy(alpha = 0.3f)
                     )
                 }
             }
@@ -295,7 +296,7 @@ fun ConnectionFormScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFFF2F2F7))
+                .background(LocalDesignTokens.current.backgroundPrimary)
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp),
@@ -306,7 +307,7 @@ fun ConnectionFormScreen(
                 Text(
                     "IDENTIDAD",
                     fontSize = 13.sp,
-                    color = Color(0xFF8E8E93),
+                    color = LocalDesignTokens.current.textSecondary,
                     modifier = Modifier.padding(start = 16.dp)
                 )
                 IOSGroupedCard {
@@ -324,7 +325,7 @@ fun ConnectionFormScreen(
                 Text(
                     "CONEXIÓN",
                     fontSize = 13.sp,
-                    color = Color(0xFF8E8E93),
+                    color = LocalDesignTokens.current.textSecondary,
                     modifier = Modifier.padding(start = 16.dp)
                 )
                 IOSGroupedCard {
@@ -348,7 +349,7 @@ fun ConnectionFormScreen(
                 Text(
                     "AUTENTICACIÓN",
                     fontSize = 13.sp,
-                    color = Color(0xFF8E8E93),
+                    color = LocalDesignTokens.current.textSecondary,
                     modifier = Modifier.padding(start = 16.dp)
                 )
                 IOSGroupedCard {
@@ -373,7 +374,7 @@ fun ConnectionFormScreen(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(Color.White)
+                            .background(LocalDesignTokens.current.surfacePrimary)
                             .padding(horizontal = 16.dp, vertical = 12.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
@@ -381,16 +382,16 @@ fun ConnectionFormScreen(
                         Text(
                             "Conexión avanzada",
                             fontSize = 17.sp,
-                            color = Color.Black
+                            color = LocalDesignTokens.current.textPrimary
                         )
                         Switch(
                             checked = showAdvancedConnection,
                             onCheckedChange = { showAdvancedConnection = it },
                             colors = SwitchDefaults.colors(
                                 checkedThumbColor = Color.White,
-                                checkedTrackColor = Color(0xFF007AFF),
+                                checkedTrackColor = LocalDesignTokens.current.accentPrimary,
                                 uncheckedThumbColor = Color.White,
-                                uncheckedTrackColor = Color(0xFFE5E5EA)
+                                uncheckedTrackColor = LocalDesignTokens.current.separator
                             )
                         )
                     }
@@ -404,7 +405,7 @@ fun ConnectionFormScreen(
                     Text(
                         "SSL/TLS",
                         fontSize = 13.sp,
-                        color = Color(0xFF8E8E93),
+                        color = LocalDesignTokens.current.textSecondary,
                         modifier = Modifier.padding(start = 16.dp)
                     )
                     IOSGroupedCard {
@@ -412,7 +413,7 @@ fun ConnectionFormScreen(
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .background(Color.White)
+                                .background(LocalDesignTokens.current.surfacePrimary)
                                 .padding(horizontal = 16.dp, vertical = 12.dp),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
@@ -420,16 +421,16 @@ fun ConnectionFormScreen(
                             Text(
                                 "Usar SSL/TLS",
                                 fontSize = 17.sp,
-                                color = Color.Black
+                                color = LocalDesignTokens.current.textPrimary
                             )
                             Switch(
                                 checked = useSSL,
                                 onCheckedChange = { useSSL = it },
                                 colors = SwitchDefaults.colors(
                                     checkedThumbColor = Color.White,
-                                    checkedTrackColor = Color(0xFF34C759),
+                                    checkedTrackColor = LocalDesignTokens.current.accentSuccess,
                                     uncheckedThumbColor = Color.White,
-                                    uncheckedTrackColor = Color(0xFFE5E5EA)
+                                    uncheckedTrackColor = LocalDesignTokens.current.separator
                                 )
                             )
                         }
@@ -440,13 +441,13 @@ fun ConnectionFormScreen(
                             Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .background(Color.White)
+                                    .background(LocalDesignTokens.current.surfacePrimary)
                                     .padding(horizontal = 16.dp, vertical = 12.dp)
                             ) {
                                 Text(
                                     "Modo SSL",
                                     fontSize = 13.sp,
-                                    color = Color(0xFF8E8E93),
+                                    color = LocalDesignTokens.current.textSecondary,
                                     modifier = Modifier.padding(bottom = 8.dp)
                                 )
                                 Row(
@@ -479,7 +480,7 @@ fun ConnectionFormScreen(
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .background(Color.White)
+                                        .background(LocalDesignTokens.current.surfacePrimary)
                                         .padding(horizontal = 16.dp, vertical = 12.dp),
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically
@@ -488,13 +489,13 @@ fun ConnectionFormScreen(
                                         Text(
                                             "CA Certificate",
                                             fontSize = 17.sp,
-                                            color = Color.Black
+                                            color = LocalDesignTokens.current.textPrimary
                                         )
                                         if (caCertificateName != null) {
                                             Text(
                                                 text = caCertificateName ?: "",
                                                 fontSize = 13.sp,
-                                                color = Color(0xFF8E8E93)
+                                                color = LocalDesignTokens.current.textSecondary
                                             )
                                         }
                                     }
@@ -503,7 +504,7 @@ fun ConnectionFormScreen(
                                     ) {
                                         Text(
                                             if (caCertificateName == null) "Seleccionar" else "Cambiar",
-                                            color = Color(0xFF007AFF)
+                                            color = LocalDesignTokens.current.accentPrimary
                                         )
                                     }
                                 }
@@ -520,7 +521,7 @@ fun ConnectionFormScreen(
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .background(Color.White)
+                                        .background(LocalDesignTokens.current.surfacePrimary)
                                         .padding(horizontal = 16.dp, vertical = 12.dp),
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically
@@ -529,13 +530,13 @@ fun ConnectionFormScreen(
                                         Text(
                                             "Client Certificate (opcional)",
                                             fontSize = 17.sp,
-                                            color = Color.Black
+                                            color = LocalDesignTokens.current.textPrimary
                                         )
                                         if (clientCertificateName != null) {
                                             Text(
                                                 text = clientCertificateName ?: "",
                                                 fontSize = 13.sp,
-                                                color = Color(0xFF8E8E93)
+                                                color = LocalDesignTokens.current.textSecondary
                                             )
                                         }
                                     }
@@ -544,7 +545,7 @@ fun ConnectionFormScreen(
                                     ) {
                                         Text(
                                             if (clientCertificateName == null) "Seleccionar" else "Cambiar",
-                                            color = Color(0xFF007AFF)
+                                            color = LocalDesignTokens.current.accentPrimary
                                         )
                                     }
                                 }
@@ -561,7 +562,7 @@ fun ConnectionFormScreen(
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .background(Color.White)
+                                        .background(LocalDesignTokens.current.surfacePrimary)
                                         .padding(horizontal = 16.dp, vertical = 12.dp),
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically
@@ -570,13 +571,13 @@ fun ConnectionFormScreen(
                                         Text(
                                             "Client Key (opcional)",
                                             fontSize = 17.sp,
-                                            color = Color.Black
+                                            color = LocalDesignTokens.current.textPrimary
                                         )
                                         if (clientKeyName != null) {
                                             Text(
                                                 text = clientKeyName ?: "",
                                                 fontSize = 13.sp,
-                                                color = Color(0xFF8E8E93)
+                                                color = LocalDesignTokens.current.textSecondary
                                             )
                                         }
                                     }
@@ -585,7 +586,7 @@ fun ConnectionFormScreen(
                                     ) {
                                         Text(
                                             if (clientKeyName == null) "Seleccionar" else "Cambiar",
-                                            color = Color(0xFF007AFF)
+                                            color = LocalDesignTokens.current.accentPrimary
                                         )
                                     }
                                 }
@@ -599,7 +600,7 @@ fun ConnectionFormScreen(
                     Text(
                         "TÚNEL SSH",
                         fontSize = 13.sp,
-                        color = Color(0xFF8E8E93),
+                        color = LocalDesignTokens.current.textSecondary,
                         modifier = Modifier.padding(start = 16.dp)
                     )
                     IOSGroupedCard {
@@ -666,7 +667,7 @@ fun ConnectionFormScreen(
                     Text(
                         "CONNECTION STRING",
                         fontSize = 13.sp,
-                        color = Color(0xFF8E8E93),
+                        color = LocalDesignTokens.current.textSecondary,
                         modifier = Modifier.padding(start = 16.dp)
                     )
                     IOSGroupedCard {
@@ -685,7 +686,7 @@ fun ConnectionFormScreen(
                     Text(
                         "Si se proporciona, sobreescribe host, port, user y password",
                         fontSize = 13.sp,
-                        color = Color(0xFF8E8E93),
+                        color = LocalDesignTokens.current.textSecondary,
                         modifier = Modifier.padding(start = 16.dp)
                     )
                 }

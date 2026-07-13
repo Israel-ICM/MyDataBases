@@ -20,6 +20,11 @@ import com.sphynxs.mydatabases.core.database.engine.DatabaseType
  * )
  * ```
  *
+ * decorative, deferred: dark-mode — colores de identidad de marca de cada motor de DB
+ * (logos), intencionalmente theme-INVARIANTES. Mismo tratamiento que `accentPrimary`/
+ * `accentSecondary`/`destructiveAction` en `DesignTokens.kt` (PR-2): son identidad visual
+ * reconocible, no roles semánticos de superficie/texto — no deben derivar del ColorScheme.
+ *
  * @author israel-icm
  * @date 2026-06-15
  */

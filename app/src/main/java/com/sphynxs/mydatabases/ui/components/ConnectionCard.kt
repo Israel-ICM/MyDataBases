@@ -24,7 +24,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -124,14 +123,16 @@ fun ConnectionCard(
                             .align(Alignment.TopEnd)
                             .size(14.dp)
                             .clip(RoundedCornerShape(7.dp))
-                            .background(Color.White)
+                            .background(LocalDesignTokens.current.surfacePrimary)
                             .padding(2.dp)
                     ) {
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .clip(RoundedCornerShape(5.dp))
-                                .background(Color(0xFF34C759)) // Verde iOS success
+                                // accentSuccess: mismo rol semántico "success" que el verde
+                                // iOS literal reemplazado; ver DesignTokens.kt.
+                                .background(LocalDesignTokens.current.accentSuccess)
                         )
                     }
                 }

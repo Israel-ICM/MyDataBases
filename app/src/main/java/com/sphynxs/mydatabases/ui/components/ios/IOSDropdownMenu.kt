@@ -8,7 +8,6 @@ import androidx.compose.material3.MenuDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
@@ -48,11 +47,11 @@ fun IOSDropdownMenu(
                 spotColor = LocalDesignTokens.current.cardShadowColor
             )
             .background(
-                color = Color.White,
+                color = LocalDesignTokens.current.surfacePrimary,
                 shape = RoundedCornerShape(16.dp)
             ),
         shape = RoundedCornerShape(16.dp),
-        containerColor = Color.White,
+        containerColor = LocalDesignTokens.current.surfacePrimary,
         properties = PopupProperties(
             focusable = true,
             dismissOnBackPress = true,

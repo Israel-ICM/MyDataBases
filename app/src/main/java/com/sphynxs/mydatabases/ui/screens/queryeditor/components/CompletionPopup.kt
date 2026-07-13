@@ -35,6 +35,7 @@ import androidx.compose.ui.window.Popup
 import com.sphynxs.mydatabases.R
 import com.sphynxs.mydatabases.domain.completion.CompletionKind
 import com.sphynxs.mydatabases.domain.completion.CompletionSuggestion
+import com.sphynxs.mydatabases.ui.theme.LocalDesignTokens
 
 /**
  * Completion popup anchored at cursor position.
@@ -78,7 +79,7 @@ fun CompletionPopup(
                 .semantics { contentDescription = "Code completion popup" },
             shape = RoundedCornerShape(12.dp),
             colors = CardDefaults.cardColors(
-                containerColor = Color.White
+                containerColor = LocalDesignTokens.current.surfacePrimary
             ),
             elevation = CardDefaults.cardElevation(defaultElevation = 16.dp)
         ) {
@@ -133,13 +134,14 @@ private fun CompletionRow(
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
+    val tokens = LocalDesignTokens.current
     val backgroundColor = if (isSelected) {
-        Color(0xFFF0F4FF)  // Azul muy suave para selección
+        tokens.accentPrimary.copy(alpha = 0.12f)
     } else {
         Color.Transparent
     }
-    
-    val textColor = Color(0xFF2C3E50)  // Gris oscuro para texto principal
+
+    val textColor = tokens.textPrimary
 
     Row(
         modifier = Modifier
@@ -160,6 +162,10 @@ private fun CompletionRow(
             },
             style = MaterialTheme.typography.labelSmall,
             fontWeight = FontWeight.Bold,
+            // decorative, deferred: dark-mode — Nord-palette semantic type badges (K/T/C),
+            // mid-tone/full-alpha, sanity-checked to stay legible on both light and dark
+            // row backgrounds; not app-brand identity, low risk to defer per design.md
+            // triage heuristic.
             color = when (suggestion.kind) {
                 CompletionKind.KEYWORD -> Color(0xFF5E81AC)  // Azul suave
                 CompletionKind.TABLE -> Color(0xFFA3BE8C)    // Verde suave

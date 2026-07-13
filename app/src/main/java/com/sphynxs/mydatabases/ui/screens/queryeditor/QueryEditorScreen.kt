@@ -65,6 +65,7 @@ import com.sphynxs.mydatabases.ui.screens.queryeditor.components.CompletionBar
 import com.sphynxs.mydatabases.ui.screens.queryeditor.components.SqlTokenizer
 import com.sphynxs.mydatabases.ui.screens.queryeditor.components.FindReplaceBar
 import com.sphynxs.mydatabases.ui.screens.queryeditor.components.TokenKind
+import com.sphynxs.mydatabases.ui.theme.LocalDesignTokens
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -305,7 +306,7 @@ fun QueryEditorScreen(
                 Card(
                     modifier = Modifier.fillMaxSize(),
                     colors = CardDefaults.cardColors(
-                        containerColor = Color.White
+                        containerColor = LocalDesignTokens.current.surfacePrimary
                     ),
                     elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
                 ) {
@@ -1043,6 +1044,10 @@ fun QueryEditorToolbarRow(
                         Icon(
                             Icons.Default.Stop,
                             contentDescription = "Cancel",
+                            // decorative, deferred: dark-mode — universal stop/red semantic
+                            // on a MaterialTheme.colorScheme.surface bg; sanity-checked
+                            // (relative luminance) to clear the 3:1 WCAG non-text threshold
+                            // against both BrandedLight/DarkColorScheme surfaces.
                             tint = Color(0xFFF44336),
                             modifier = Modifier.size(32.dp)
                         )
@@ -1055,6 +1060,8 @@ fun QueryEditorToolbarRow(
                         Icon(
                             Icons.Default.PlayArrow,
                             contentDescription = "Execute",
+                            // decorative, deferred: dark-mode — universal play/green
+                            // semantic, same rationale as the Stop icon above.
                             tint = if (sqlText.isNotBlank()) Color(0xFF4CAF50) 
                                   else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
                             modifier = Modifier.size(32.dp)

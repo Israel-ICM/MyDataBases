@@ -46,7 +46,12 @@ class MatchHighlightTransformation(
                 }
 
                 addStyle(
-                    style = SpanStyle(background = backgroundColor),
+                    // Fuerza texto oscuro sobre el highlight amarillo: sin esto, en dark
+                    // mode el color de texto del editor (theme-aware, casi blanco) queda
+                    // ilegible sobre fondo amarillo — bug estructural, no solo cosmético
+                    // (ver design.md R6 heuristic: fondo literal + texto que sí cambia con
+                    // el tema = contraste roto). El amarillo en sí queda decorativo/deferred.
+                    style = SpanStyle(background = backgroundColor, color = Color(0xFF1A1A1A)),
                     start = range.start,
                     end = range.end
                 )

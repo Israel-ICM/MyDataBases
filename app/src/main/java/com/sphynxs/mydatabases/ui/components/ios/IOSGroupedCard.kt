@@ -7,8 +7,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.sphynxs.mydatabases.ui.theme.LocalDesignTokens
 
 @Composable
 fun IOSGroupedCard(
@@ -18,7 +18,7 @@ fun IOSGroupedCard(
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
-        color = Color.White,
+        color = LocalDesignTokens.current.surfacePrimary,
         shadowElevation = 0.dp
     ) {
         Column {
