@@ -627,12 +627,12 @@ fun ConnectionsListScreen(
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 androidx.compose.material3.CircularProgressIndicator(
-                    color = Color(0xFF007AFF)
+                    color = LocalDesignTokens.current.accentPrimary
                 )
                 Spacer(Modifier.height(16.dp))
                 Text(
                     "Conectando...",
-                    color = Color.Black,
+                    color = LocalDesignTokens.current.textPrimary,
                     fontSize = 17.sp
                 )
             }
@@ -649,7 +649,7 @@ fun ConnectionsListScreen(
                 }
             },
             sheetState = typeSelectorSheetState,
-            containerColor = Color(0xFFF2F2F7),
+            containerColor = LocalDesignTokens.current.backgroundPrimary,
             scrimColor = LocalDesignTokens.current.backdropScrim,
             tonalElevation = 16.dp
         ) {
@@ -700,7 +700,7 @@ fun ConnectionsListScreen(
                 }
             },
             sheetState = formSheetState,
-            containerColor = Color(0xFFF2F2F7),
+            containerColor = LocalDesignTokens.current.backgroundPrimary,
             sheetMaxWidth = 10000.dp,
             scrimColor = LocalDesignTokens.current.backdropScrim,
             tonalElevation = 16.dp
@@ -806,7 +806,7 @@ private fun DatabaseTypeSelectorCard(
                 Text(
                     text = getDescriptionForType(type),
                     fontSize = 14.sp,
-                    color = Color(0xFF8E8E93)
+                    color = LocalDesignTokens.current.textSecondary
                 )
             }
         }
