@@ -3,7 +3,7 @@ package com.sphynxs.mydatabases.ui.navigation
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.sphynxs.mydatabases.ui.theme.MyDataBasesTheme
+import com.sphynxs.mydatabases.ui.theme.AppTheme
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -28,7 +28,7 @@ class MyDataBasesNavHostTest {
     @Test
     fun navHost_debe_mostrar_pantalla_connections_por_defecto() {
         composeTestRule.setContent {
-            MyDataBasesTheme {
+            AppTheme {
                 MyDataBasesNavHost()
             }
         }
@@ -45,7 +45,7 @@ class MyDataBasesNavHostTest {
     @Test
     fun navHost_debe_tener_placeholders_para_todas_las_rutas() {
         composeTestRule.setContent {
-            MyDataBasesTheme {
+            AppTheme {
                 MyDataBasesNavHost()
             }
         }

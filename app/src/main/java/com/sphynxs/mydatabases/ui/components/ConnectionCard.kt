@@ -38,7 +38,7 @@ import com.sphynxs.mydatabases.ui.components.ios.IOSCard
 import com.sphynxs.mydatabases.ui.components.ios.IOSDropdownMenu
 import com.sphynxs.mydatabases.ui.theme.DbAccents
 import com.sphynxs.mydatabases.ui.theme.DesignTokens
-import com.sphynxs.mydatabases.ui.theme.MyDataBasesTheme
+import com.sphynxs.mydatabases.ui.theme.AppTheme
 import compose.icons.TablerIcons
 import compose.icons.tablericons.Folder
 
@@ -266,7 +266,7 @@ fun ConnectionCard(
 @Preview(showBackground = true, backgroundColor = 0xFFF2F2F7)
 @Composable
 private fun ConnectionCardPreview() {
-    MyDataBasesTheme {
+    AppTheme {
         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
             // Conexión normal
             ConnectionCard(

@@ -30,7 +30,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.sphynxs.mydatabases.R
-import com.sphynxs.mydatabases.ui.theme.MyDataBasesTheme
+import com.sphynxs.mydatabases.ui.theme.AppTheme
 import com.sphynxs.mydatabases.ui.theme.tokens.LocalAppElevation
 import com.sphynxs.mydatabases.ui.theme.tokens.LocalAppShapes
 import com.sphynxs.mydatabases.ui.theme.tokens.LocalAppSpacing
@@ -132,7 +132,7 @@ fun ErrorCard(
 @Preview(showBackground = true)
 @Composable
 private fun ErrorCardWithRetryPreview() {
-    MyDataBasesTheme {
+    AppTheme {
         ErrorCard(
             message = "No se pudo conectar al servidor. Verificá tu conexión a internet.",
             onRetry = {}
@@ -146,7 +146,7 @@ private fun ErrorCardWithRetryPreview() {
 @Preview(showBackground = true)
 @Composable
 private fun ErrorCardNoRetryPreview() {
-    MyDataBasesTheme {
+    AppTheme {
         ErrorCard(
             message = "El archivo de base de datos está corrupto y no se puede recuperar.",
             onRetry = null

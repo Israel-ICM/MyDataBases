@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import com.sphynxs.mydatabases.core.database.models.Database
 import com.sphynxs.mydatabases.ui.components.ios.IOSCard
 import com.sphynxs.mydatabases.ui.theme.DesignTokens
-import com.sphynxs.mydatabases.ui.theme.MyDataBasesTheme
+import com.sphynxs.mydatabases.ui.theme.AppTheme
 
 /**
  * Card de base de datos con diseño iOS unificado.
@@ -105,7 +105,7 @@ fun DatabaseCard(
 @Preview(showBackground = true, backgroundColor = 0xFFF2F2F7)
 @Composable
 private fun DatabaseCardPreview() {
-    MyDataBasesTheme {
+    AppTheme {
         DatabaseCard(
             database = Database(
                 name = "my_database",

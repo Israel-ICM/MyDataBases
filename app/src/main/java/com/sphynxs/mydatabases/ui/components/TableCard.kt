@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import com.sphynxs.mydatabases.core.database.models.Table as TableModel
 import com.sphynxs.mydatabases.ui.components.ios.IOSCard
 import com.sphynxs.mydatabases.ui.theme.DesignTokens
-import com.sphynxs.mydatabases.ui.theme.MyDataBasesTheme
+import com.sphynxs.mydatabases.ui.theme.AppTheme
 
 /**
  * Card de tabla con diseño iOS unificado.
@@ -115,7 +115,7 @@ fun TableCard(
 @Preview(showBackground = true, backgroundColor = 0xFFF2F2F7)
 @Composable
 private fun TableCardPreview() {
-    MyDataBasesTheme {
+    AppTheme {
         TableCard(
             table = TableModel(
                 name = "users",
