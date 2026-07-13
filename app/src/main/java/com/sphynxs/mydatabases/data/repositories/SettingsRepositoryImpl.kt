@@ -4,6 +4,8 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
+import com.sphynxs.mydatabases.domain.models.ThemeMode
 import com.sphynxs.mydatabases.domain.repositories.SettingsRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -25,6 +27,7 @@ class SettingsRepositoryImpl @Inject constructor(
     
     companion object {
         private val BRANDED_PALETTE_KEY = booleanPreferencesKey("branded_palette_enabled")
+        private val THEME_MODE_KEY = stringPreferencesKey("theme_mode")
     }
     
     override fun observeBrandedPaletteEnabled(): Flow<Boolean> =
@@ -35,6 +38,19 @@ class SettingsRepositoryImpl @Inject constructor(
     override suspend fun setBrandedPaletteEnabled(enabled: Boolean) {
         dataStore.edit { prefs ->
             prefs[BRANDED_PALETTE_KEY] = enabled
+        }
+    }
+
+    override fun observeThemeMode(): Flow<ThemeMode> =
+        dataStore.data.map { prefs ->
+            prefs[THEME_MODE_KEY]?.let { storedName ->
+                runCatching { ThemeMode.valueOf(storedName) }.getOrDefault(ThemeMode.SYSTEM)
+            } ?: ThemeMode.SYSTEM  // Default: SYSTEM cuando no hay preferencia guardada
+        }
+
+    override suspend fun setThemeMode(mode: ThemeMode) {
+        dataStore.edit { prefs ->
+            prefs[THEME_MODE_KEY] = mode.name
         }
     }
 }
