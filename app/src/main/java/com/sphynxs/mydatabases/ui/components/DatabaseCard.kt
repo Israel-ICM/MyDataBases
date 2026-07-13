@@ -56,10 +56,13 @@ fun DatabaseCard(
                     .size(56.dp)
                     .clip(RoundedCornerShape(16.dp))
                     .background(
+                        // accentSecondary = brand_tertiary (0xFF8EE3D3); accentSuccess = el
+                        // mismo turquesa oscuro (0xFF006B63) — ambos exact-match a los
+                        // literales previos, ahora vía token theme-invariant (DesignTokens.kt).
                         brush = androidx.compose.ui.graphics.Brush.linearGradient(
                             colors = listOf(
-                                androidx.compose.ui.graphics.Color(0xFF8EE3D3).copy(alpha = 0.20f),  // Turquesa branded
-                                androidx.compose.ui.graphics.Color(0xFF006B63).copy(alpha = 0.12f)   // Turquesa oscuro branded
+                                LocalDesignTokens.current.accentSecondary.copy(alpha = 0.20f),
+                                LocalDesignTokens.current.accentSuccess.copy(alpha = 0.12f)
                             )
                         )
                     ),
@@ -68,7 +71,7 @@ fun DatabaseCard(
                 Icon(
                     imageVector = PhosphorAppIcons.Db.mysql,  // Usa Database genérico
                     contentDescription = null,
-                    tint = androidx.compose.ui.graphics.Color(0xFF006B63),  // Turquesa oscuro branded
+                    tint = LocalDesignTokens.current.accentSuccess,
                     modifier = Modifier.size(32.dp)
                 )
             }

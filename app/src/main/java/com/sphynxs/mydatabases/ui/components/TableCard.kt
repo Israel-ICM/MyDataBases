@@ -56,10 +56,13 @@ fun TableCard(
                     .size(56.dp)
                     .clip(RoundedCornerShape(16.dp))
                     .background(
+                        // accentSuccessLight (0xFFA3F2E6) / accentSuccess (0xFF006B63) —
+                        // exact-match a los literales previos, ahora vía token
+                        // theme-invariant (DesignTokens.kt).
                         brush = androidx.compose.ui.graphics.Brush.linearGradient(
                             colors = listOf(
-                                androidx.compose.ui.graphics.Color(0xFFA3F2E6).copy(alpha = 0.20f),  // Turquesa claro branded
-                                androidx.compose.ui.graphics.Color(0xFF006B63).copy(alpha = 0.12f)   // Turquesa oscuro branded
+                                LocalDesignTokens.current.accentSuccessLight.copy(alpha = 0.20f),
+                                LocalDesignTokens.current.accentSuccess.copy(alpha = 0.12f)
                             )
                         )
                     ),
@@ -68,7 +71,7 @@ fun TableCard(
                 Icon(
                     imageVector = PhosphorAppIcons.Nav.tables,
                     contentDescription = null,
-                    tint = androidx.compose.ui.graphics.Color(0xFF006B63),  // Turquesa oscuro branded
+                    tint = LocalDesignTokens.current.accentSuccess,
                     modifier = Modifier.size(32.dp)
                 )
             }

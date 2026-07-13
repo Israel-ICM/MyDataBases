@@ -25,7 +25,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -37,6 +36,7 @@ import com.sphynxs.mydatabases.core.database.models.ConnectionConfig
 import com.sphynxs.mydatabases.ui.components.ios.IOSGroupedCard
 import com.sphynxs.mydatabases.ui.components.ios.IOSListItem
 import com.sphynxs.mydatabases.ui.theme.DbAccents
+import com.sphynxs.mydatabases.ui.theme.LocalDesignTokens
 
 /**
  * Card expandible para un tipo de base de datos.
@@ -52,6 +52,7 @@ fun DatabaseTypeCard(
     modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
+    val tokens = LocalDesignTokens.current
     
     IOSGroupedCard(modifier = modifier) {
         // Header con título y chevron
@@ -67,21 +68,21 @@ fun DatabaseTypeCard(
                 text = "${type.name} Connections",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.Black
+                color = tokens.textPrimary
             )
             
             Icon(
                 imageVector = if (expanded) Icons.Rounded.KeyboardArrowUp 
                              else Icons.Rounded.KeyboardArrowDown,
                 contentDescription = if (expanded) "Colapsar" else "Expandir",
-                tint = Color(0xFF8E8E93)
+                tint = tokens.iconNormal
             )
         }
         
         // Contenido expandible
         AnimatedVisibility(visible = expanded) {
             Column {
-                HorizontalDivider(color = Color(0xFFC6C6C8), thickness = 0.5.dp)
+                HorizontalDivider(color = tokens.separator, thickness = 0.5.dp)
                 
                 // Header con icono + descripción
                 Row(
@@ -102,19 +103,19 @@ fun DatabaseTypeCard(
                     Text(
                         text = getDescription(type),
                         fontSize = 15.sp,
-                        color = Color(0xFF8E8E93),
+                        color = tokens.textSecondary,
                         lineHeight = 20.sp
                     )
                 }
                 
-                HorizontalDivider(color = Color(0xFFC6C6C8), thickness = 0.5.dp)
+                HorizontalDivider(color = tokens.separator, thickness = 0.5.dp)
                 
                 // Lista de conexiones
                 if (connections.isEmpty()) {
                     Text(
                         "No hay conexiones ${type.name}",
                         fontSize = 15.sp,
-                        color = Color(0xFF8E8E93),
+                        color = tokens.textSecondary,
                         modifier = Modifier.padding(16.dp)
                     )
                 } else {
@@ -131,7 +132,7 @@ fun DatabaseTypeCard(
                                     Icon(
                                         imageVector = PhosphorAppIcons.Action.edit,
                                         contentDescription = "Editar",
-                                        tint = Color(0xFF007AFF),
+                                        tint = tokens.accentPrimary,
                                         modifier = Modifier.size(20.dp)
                                     )
                                 }
@@ -140,7 +141,7 @@ fun DatabaseTypeCard(
                         )
                     }
                     
-                    HorizontalDivider(color = Color(0xFFC6C6C8), thickness = 0.5.dp)
+                    HorizontalDivider(color = tokens.separator, thickness = 0.5.dp)
                 }
                 
                 // Botón agregar conexión de este tipo
@@ -150,9 +151,9 @@ fun DatabaseTypeCard(
                         .align(Alignment.End)
                         .padding(end = 16.dp, bottom = 8.dp, top = 8.dp)
                 ) {
-                    Icon(PhosphorAppIcons.Action.add, contentDescription = null, tint = Color(0xFF007AFF))
+                    Icon(PhosphorAppIcons.Action.add, contentDescription = null, tint = tokens.accentPrimary)
                     Spacer(Modifier.width(4.dp))
-                    Text(stringResource(R.string.add_connection, type.name), color = Color(0xFF007AFF))
+                    Text(stringResource(R.string.add_connection, type.name), color = tokens.accentPrimary)
                 }
             }
         }
