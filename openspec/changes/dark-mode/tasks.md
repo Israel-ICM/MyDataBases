@@ -68,3 +68,30 @@ Chain strategy: stacked-to-main (resolved — PR-1 targets `master`, PR-2 target
 - [x] 3.6 GREEN: confirm smoke test passes against 3.1
 - [x] 3.7 Manual/visual: NOT performed (no emulator/device available in this session, same gap as PR-2 2.8) — compile + unit test + assembleDebug verification done instead. Flagged as residual manual-QA gap for a human reviewer before merge.
 - [x] 3.8 Run `./gradlew test` + `./gradlew assembleDebug`; confirm no regressions — 157 tests (154 + 3 new), same 23 pre-existing/unrelated failures, 0 new failures; assembleDebug BUILD SUCCESSFUL
+
+## Verify Fix-Round (PR-4): R3 Test Coverage & Contrast Regressions
+
+Not part of the original 32-task plan — added after `sdd-verify` returned **PASS WITH
+WARNINGS** with 1 CRITICAL blocking archive (`verify-report.md`). Stacks on top of PR-3's
+branch (`feature/dark-mode-custom-draw`) as a 4th slice, same `stacked-to-main` chain
+strategy. Numbered independently (`4.x`) to avoid renumbering the existing 32 tasks.
+
+- [x] 4.1 RED: `AppThemeTest` — write tests for `resolveColorScheme` (doesn't exist yet) covering all 5 R3 spec scenarios (Dark+branded, Light+branded, Dark+non-branded, System+OS-dark+branded, axes independent) + 1 fallback triangulation case
+- [x] 4.2 GREEN: extract `resolveColorScheme(darkTheme, brandedPaletteEnabled, dynamicColorAvailable, dynamicScheme)` pure fn out of `AppTheme`'s inline `when` block; wire the composable to call it with a lazily-resolved `dynamicScheme` — closes verify-report.md **CRITICAL #1**
+- [x] 4.3 RED: `ContrastUtilsTest` — write sanity tests for `contrastRatio(a, b)` (doesn't exist yet): black/white = 21.00:1, identical colors = 1.00:1, symmetry, matches verify-report.md's hand-computed 2.30:1/2.37:1 anchors
+- [x] 4.4 GREEN: implement `contrastRatio` in new `ContrastUtils.kt` — pure WCAG relative-luminance formula, no Compose runtime/Context dependency beyond `Color`
+- [x] 4.5 RED: `DesignTokensTest` — write regression tests asserting `accentSuccess`/`textTertiary` (dark) contrast against `surfacePrimary` via `contrastRatio()`, calling the not-yet-updated `buildDesignTokens(scheme, darkTheme)` signature
+- [x] 4.6 GREEN: add `darkTheme: Boolean` param to `buildDesignTokens`; add `brand_success_light`/`brand_success_dark`/`brand_text_tertiary_dark` to `Color.kt`; make `accentSuccess` theme-aware (dark: 2.30:1 → 4.32:1) and `textTertiary` (dark) stop reusing `scheme.outline` (2.37:1 → 4.61:1) — closes verify-report.md **WARNING #3** and **WARNING #4**
+- [x] 4.7 Run `./gradlew testDebugUnitTest compileDebugKotlin assembleDebug`; confirm 172 tests (157 + 15 new), same 23 pre-existing/unrelated failures, 0 new failures, `assembleDebug` BUILD SUCCESSFUL
+
+**Explicitly out of scope for this round** (per orchestrator instruction, unrelated to
+dark-mode): the `androidTest` module compile failure (3 unrelated pre-existing broken test
+files: `MyDataBasesNavHostTest.kt`, `QueryEditorScreenTest.kt`, `WorkspaceCarouselTest.kt`).
+Confirmed pre-existing on `master` in `sdd-verify`'s session. Not touched here — flagged to
+the orchestrator as a candidate for a separate infra-repair SDD change.
+
+**Discovered, not fixed** (flagged for follow-up, not silently patched): `textTertiary` in
+LIGHT mode (`scheme.outline` = `0xFF75788C`) computes to 4.36:1 against
+`brand_light_surface` — also technically sub-AA (4.5:1 minimum), though a much smaller gap
+than dark's 2.37:1. This round's scope (per the fix-round prompt) was the dark-mode value
+only; the light-mode near-miss is documented in `DesignTokens.kt`'s KDoc for a future pass.

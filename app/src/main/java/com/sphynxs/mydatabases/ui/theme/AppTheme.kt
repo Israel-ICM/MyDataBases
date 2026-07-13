@@ -76,11 +76,20 @@ fun AppTheme(
     }
 
     val dynamicColorAvailable = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
-    val colorScheme: ColorScheme = when {
-        brandedPaletteEnabled -> if (darkTheme) BrandedDarkColorScheme else BrandedLightColorScheme
-        dynamicColorAvailable -> if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        else -> if (darkTheme) BrandedDarkColorScheme else BrandedLightColorScheme
+    // dynamicDarkColorScheme/dynamicLightColorScheme requieren un Context real y no son
+    // puras — se resuelven acá, perezosamente (solo cuando branded está OFF y hace
+    // falta), y se inyectan ya resueltas en resolveColorScheme, que sí es pura y testeada.
+    val dynamicScheme: ColorScheme? = if (dynamicColorAvailable && !brandedPaletteEnabled) {
+        if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+    } else {
+        null
     }
+    val colorScheme: ColorScheme = resolveColorScheme(
+        darkTheme = darkTheme,
+        brandedPaletteEnabled = brandedPaletteEnabled,
+        dynamicColorAvailable = dynamicColorAvailable,
+        dynamicScheme = dynamicScheme
+    )
     
     // Detectar reduced motion
     val isReducedMotion by rememberReducedMotion(context)
@@ -134,3 +143,44 @@ internal fun resolveDarkTheme(themeMode: ThemeMode, systemInDarkTheme: Boolean):
         ThemeMode.DARK -> true
         ThemeMode.SYSTEM -> systemInDarkTheme
     }
+
+/**
+ * Resuelve el `ColorScheme` M3 efectivo a partir de AMBOS ejes descriptos en el spec
+ * `theme-mode`, Requirement "Effective ColorScheme Resolution": `darkTheme` (ya resuelto
+ * desde `theme_mode` vía [resolveDarkTheme]) y `brandedPaletteEnabled`. Función pura —
+ * sin dependencias de Compose/Context — extraída para test unitario directo (ver
+ * `AppThemeTest`, que cubre los 5 escenarios del spec). Antes de esta extracción, esta
+ * lógica vivía inline en el cuerpo `@Composable` de `AppTheme` sin ningún test (ver
+ * `openspec/changes/dark-mode/verify-report.md`, CRITICAL #1).
+ *
+ * El caller resuelve `dynamicScheme` perezosamente (invocando
+ * `dynamicDarkColorScheme(context)`/`dynamicLightColorScheme(context)`, que requieren un
+ * `Context` real y NO son puras) SOLO cuando branded está OFF y dynamic color está
+ * disponible, y lo inyecta ya resuelto acá. Esta función únicamente decide QUÉ scheme
+ * corresponde, no CÓMO obtenerlo — eso es lo que la hace testeable sin Compose/Context.
+ *
+ * Precedencia: `brandedPaletteEnabled` siempre gana sobre dynamic color cuando ambos
+ * aplicarían (branded es un override manual del usuario). Si dynamic color no está
+ * disponible o no fue resuelto (`dynamicScheme == null`), cae al esquema branded
+ * correspondiente — comportamiento pre-existente y documentado (ver verify-report.md,
+ * tabla de Coherencia), no introducido por este fix.
+ *
+ * @param darkTheme true si el tema oscuro resuelto está activo
+ * @param brandedPaletteEnabled true si el usuario activó branded palette
+ * @param dynamicColorAvailable true si el dispositivo soporta dynamic color (Android 12+)
+ * @param dynamicScheme el `ColorScheme` dinámico ya resuelto por el caller para el lado
+ *   (`darkTheme`) correspondiente, o `null` si no aplica/no está disponible
+ * @return el `ColorScheme` efectivo a aplicar
+ *
+ * @author gentle-ai (TDD GREEN, verify fix-round — closes verify-report.md CRITICAL #1)
+ */
+internal fun resolveColorScheme(
+    darkTheme: Boolean,
+    brandedPaletteEnabled: Boolean,
+    dynamicColorAvailable: Boolean,
+    dynamicScheme: ColorScheme?
+): ColorScheme = when {
+    brandedPaletteEnabled -> if (darkTheme) BrandedDarkColorScheme else BrandedLightColorScheme
+    dynamicColorAvailable && dynamicScheme != null -> dynamicScheme
+    else -> if (darkTheme) BrandedDarkColorScheme else BrandedLightColorScheme
+}

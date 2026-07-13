@@ -107,10 +107,10 @@ data class DesignTokens(
 val LocalDesignTokens = staticCompositionLocalOf { LightDesignTokens }
 
 /** Instancia de [DesignTokens] para tema claro, derivada de [BrandedLightColorScheme]. */
-val LightDesignTokens: DesignTokens = buildDesignTokens(BrandedLightColorScheme)
+val LightDesignTokens: DesignTokens = buildDesignTokens(BrandedLightColorScheme, darkTheme = false)
 
 /** Instancia de [DesignTokens] para tema oscuro, derivada de [BrandedDarkColorScheme]. */
-val DarkDesignTokens: DesignTokens = buildDesignTokens(BrandedDarkColorScheme)
+val DarkDesignTokens: DesignTokens = buildDesignTokens(BrandedDarkColorScheme, darkTheme = true)
 
 /**
  * Deriva un [DesignTokens] completo a partir de un [ColorScheme] branded resuelto
@@ -140,16 +140,43 @@ val DarkDesignTokens: DesignTokens = buildDesignTokens(BrandedDarkColorScheme)
  * - `backdropScrim` deriva de `scheme.background` (antes hardcoded a `Color.White`, lo
  *   que en dark mode habría producido un velo blanco brillante sobre fondo oscuro).
  *
+ * Fix-round (verify-report.md WARNING #3 / #4 — ver `contrastRatio()` en
+ * `ContrastUtils.kt` y la regresión ejecutable en `DesignTokensTest`):
+ * - `accentSuccess` ahora es theme-aware (antes era un literal único
+ *   `Color(0xFF006B63)` reusado sin adaptar en dark, dando solo 2.30:1 contra
+ *   `brand_surface` — bajo el mínimo no-textual 3:1 de WCAG 1.4.11). Light mantiene el
+ *   literal original (`brand_success_light`, 6.40:1, ya cumplía); dark usa
+ *   `brand_success_dark` (4.32:1).
+ * - `textTertiary` en dark ya NO deriva de `scheme.outline` (`brand_outline`, 2.37:1 —
+ *   bajo el mínimo 4.5:1 de WCAG AA para texto). Usa `brand_text_tertiary_dark`
+ *   (4.61:1). Light sigue derivando de `scheme.outline` sin cambios (no tocado en este
+ *   fix-round — ver Nota abajo). `brand_outline` en sí NO se modificó: sigue
+ *   alimentando `iconNormal`/`onSurfaceVariant`/bordes M3 nativos sin cambios, para no
+ *   ampliar el radio de impacto de este fix más allá de lo pedido.
+ *
+ * **Nota (descubrimiento, no corregido acá)**: recalculando con `contrastRatio()`,
+ * `textTertiary` en LIGHT (`scheme.outline` = `0xFF75788C`) da 4.36:1 contra
+ * `brand_light_surface` — también por debajo de 4.5:1, aunque de forma mucho más leve
+ * que el gap de dark (2.37:1). Este fix-round solo tenía scope para el valor dark
+ * (ver prompt del fix-round); el gap leve en light queda flagged como seguimiento, no
+ * corregido silenciosamente.
+ *
  * @param scheme El `ColorScheme` branded resuelto (light o dark) del cual derivar roles
+ * @param darkTheme true si `scheme` es el branded DARK scheme — necesario porque
+ *   `accentSuccess`/`textTertiary` (dark) ya no se derivan puramente de `scheme`, sino
+ *   de literales dedicados definidos para cumplir WCAG (ver arriba). Deviation de
+ *   design.md's snippet abreviado de `buildDesignTokens(scheme)` de un solo parámetro
+ *   — necesaria para la corrección real de contraste, documentada acá y en
+ *   apply-progress.md.
  * @return Un [DesignTokens] completo, coherente con el tema activo
  *
- * @author gentle-ai (TDD GREEN, PR-2)
+ * @author gentle-ai (TDD GREEN, PR-2; contrast fix-round)
  * @date 2026-07-13
  */
-internal fun buildDesignTokens(scheme: ColorScheme): DesignTokens {
+internal fun buildDesignTokens(scheme: ColorScheme, darkTheme: Boolean): DesignTokens {
     val textPrimary = scheme.onBackground
     val textSecondary = scheme.secondary
-    val textTertiary = scheme.outline
+    val textTertiary = if (darkTheme) brand_text_tertiary_dark else scheme.outline
 
     return DesignTokens(
         // ============ COLORES ============
@@ -165,7 +192,7 @@ internal fun buildDesignTokens(scheme: ColorScheme): DesignTokens {
         accentPrimaryDark = Color(0xFF5B5EC8),
         accentSecondary = brand_tertiary,
         accentSecondaryLight = Color(0xFFB3F5EA),
-        accentSuccess = Color(0xFF006B63),
+        accentSuccess = if (darkTheme) brand_success_dark else brand_success_light,
         accentSuccessLight = Color(0xFFA3F2E6),
         separator = scheme.surfaceVariant,
         iconBackground = Color(0xFFF0F1FF),
