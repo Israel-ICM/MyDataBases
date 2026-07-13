@@ -44,6 +44,7 @@ import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
@@ -53,6 +54,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.sphynxs.mydatabases.R
+import com.sphynxs.mydatabases.ui.theme.LocalDesignTokens
 import kotlin.math.abs
 
 /**
@@ -112,9 +114,17 @@ fun WorkspaceCarousel(
         exit = fadeOut() + scaleOut(),
         modifier = modifier
     ) {
+        // Capturado ANTES del Canvas: drawRect corre en un DrawScope no-composable,
+        // no puede leer LocalDesignTokens.current directamente (ver design.md Gotcha).
+        val backdropScrimColor = LocalDesignTokens.current.backdropScrim
+
         Box(modifier = Modifier.fillMaxSize()) {
             // Backdrop scrim — tap descarta SIN mutar activeIndex (DECISION D3).
-            // Mismo patrón que TopSheet.kt: Canvas + detectTapGestures, alpha fijo 0.4f.
+            // Mismo patrón que TopSheet.kt: Canvas + detectTapGestures. Antes hardcoded
+            // Color.White.copy(alpha=0.4f) — en dark mode eso pintaba un velo BLANCO
+            // brillante sobre un fondo oscuro (mismo bug que backdropScrim ya arregló
+            // en PR-2 para AddDatabaseScreen/ConnectionsListScreen). Ahora usa el token
+            // real (scheme.background.copy(alpha=0.4f)), coherente en ambos temas.
             Canvas(
                 modifier = Modifier
                     .fillMaxSize()
@@ -122,7 +132,7 @@ fun WorkspaceCarousel(
                         detectTapGestures { onDismiss() }
                     }
             ) {
-                drawRect(Color.White.copy(alpha = 0.4f))
+                drawRect(backdropScrimColor)
             }
 
             val itemWidth = 220.dp // ancho de la card VISIBLE (lo que ve el usuario)
@@ -270,6 +280,20 @@ fun WorkspaceCarousel(
  * como `RenderEffect`) vía `drawBehind`, dando control total y predecible sobre qué tan
  * grande/suave es, sin depender de un tope interno de la plataforma.
  */
+/**
+ * Deriva el ARGB de la sombra dibujada a mano del carousel (`BlurMaskFilter`) a partir
+ * de [onSurfaceColor] del `ColorScheme` activo. Reemplaza `android.graphics.Color.BLACK`
+ * — negro puro es invisible sobre fondos oscuros — por la técnica de "lighter-overlay"
+ * de Material para elevación en dark mode (misma decisión que `WorkspaceCarousel`'s
+ * backdrop scrim y design.md Architecture Decisions: "Carousel shadow tint").
+ *
+ * Función pura extraída para test unitario directo, sin dependencias de Compose
+ * runtime más allá de `Color` (ver `WorkspaceCarouselShadowTest`).
+ *
+ * @author gentle-ai (TDD GREEN, PR-3)
+ */
+internal fun carouselShadowColorArgb(onSurfaceColor: Color): Int = onSurfaceColor.toArgb()
+
 @Composable
 private fun WorkspaceCarouselItem(
     card: WorkspaceCard,
@@ -288,6 +312,8 @@ private fun WorkspaceCarouselItem(
     }
     val proximityToCenter = 1f - abs(depthFraction).coerceIn(0f, 1f)
     val density = LocalDensity.current
+    // Capturado ANTES de drawBehind (DrawScope no-composable) — ver Gotcha en design.md.
+    val shadowColorArgb = carouselShadowColorArgb(MaterialTheme.colorScheme.onSurface)
 
     // Parámetros de la sombra dibujada a mano (BlurMaskFilter), todos en px ya convertidos.
     // shadowClearance/2 (20dp con clearance=80dp) da de sobra para blur (hasta 26dp) + offset
@@ -306,7 +332,7 @@ private fun WorkspaceCarouselItem(
         modifier = modifier.drawBehind {
             val paint = android.graphics.Paint().apply {
                 isAntiAlias = true
-                color = android.graphics.Color.BLACK
+                color = shadowColorArgb
                 alpha = (shadowAlpha * 255).toInt().coerceIn(0, 255)
                 maskFilter = android.graphics.BlurMaskFilter(
                     blurRadiusPx,
