@@ -10,6 +10,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -22,14 +25,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.sphynxs.mydatabases.R
+import com.sphynxs.mydatabases.domain.models.ThemeMode
 import com.sphynxs.mydatabases.ui.components.PhosphorAppIcons
 
 /**
- * Pantalla de Settings (mínima — solo branded palette).
+ * Pantalla de Settings — branded palette + selector de theme mode (System/Light/Dark).
  *
- * Permite al usuario activar/desactivar la paleta branded de colores.
- * La configuración completa (theme mode, language, etc.) se implementará en
- * el cambio #6 del roadmap.
+ * La configuración de language, etc. se implementará en el cambio #6 del roadmap.
  *
  * @param viewModel SettingsViewModel inyectado por Hilt
  *
@@ -43,6 +45,7 @@ fun SettingsScreen(
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
     val brandedPaletteEnabled by viewModel.brandedPaletteEnabled.collectAsState()
+    val themeMode by viewModel.themeMode.collectAsState()
     
     Scaffold(
         topBar = {
@@ -92,6 +95,62 @@ fun SettingsScreen(
                     }
                 )
             }
+
+            Spacer(modifier = Modifier.padding(vertical = 12.dp))
+
+            // Theme Mode Selector
+            Text(
+                text = stringResource(R.string.theme_mode_label),
+                style = MaterialTheme.typography.titleMedium
+            )
+
+            Spacer(modifier = Modifier.padding(vertical = 4.dp))
+
+            ThemeModeSelector(
+                selected = themeMode,
+                onSelect = { mode -> viewModel.setThemeMode(mode) },
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     }
+}
+
+/**
+ * Selector segmentado System/Light/Dark para `theme_mode`.
+ *
+ * Composable interno sin ViewModel — testeable directamente sin depender de Hilt,
+ * siguiendo la convención del proyecto (ver `WorkspaceCarouselTest`).
+ *
+ * @param selected Modo de tema actualmente activo
+ * @param onSelect Callback invocado con el modo elegido al tocar una opción
+ * @param modifier Modifier del layout raíz
+ *
+ * @author gentle-ai (TDD GREEN)
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+internal fun ThemeModeSelector(
+    selected: ThemeMode,
+    onSelect: (ThemeMode) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val options = listOf(ThemeMode.SYSTEM, ThemeMode.LIGHT, ThemeMode.DARK)
+
+    SingleChoiceSegmentedButtonRow(modifier = modifier) {
+        options.forEachIndexed { index, mode ->
+            SegmentedButton(
+                selected = mode == selected,
+                onClick = { onSelect(mode) },
+                shape = SegmentedButtonDefaults.itemShape(index = index, count = options.size)
+            ) {
+                Text(text = stringResource(mode.labelRes()))
+            }
+        }
+    }
+}
+
+private fun ThemeMode.labelRes(): Int = when (this) {
+    ThemeMode.SYSTEM -> R.string.theme_mode_system
+    ThemeMode.LIGHT -> R.string.theme_mode_light
+    ThemeMode.DARK -> R.string.theme_mode_dark
 }
