@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.sphynxs.mydatabases.ui.theme.DesignTokens
+import com.sphynxs.mydatabases.ui.theme.LocalDesignTokens
 
 /**
  * Título de pantalla estilo iOS con botón de navegación opcional.
@@ -37,7 +37,7 @@ fun ScreenTitle(
     modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = modifier.padding(horizontal = DesignTokens.ScreenPaddingHorizontal),
+        modifier = modifier.padding(horizontal = LocalDesignTokens.current.screenPaddingHorizontal),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -49,7 +49,7 @@ fun ScreenTitle(
                 Icon(
                     imageVector = PhosphorAppIcons.Action.back,
                     contentDescription = "Back",
-                    tint = DesignTokens.LargeTitleColor
+                    tint = LocalDesignTokens.current.largeTitleColor
                 )
             }
         }
@@ -57,17 +57,17 @@ fun ScreenTitle(
         Column {
             Text(
                 text = title,
-                fontSize = DesignTokens.LargeTitleSize,
-                fontWeight = DesignTokens.LargeTitleWeight,
-                color = DesignTokens.LargeTitleColor
+                fontSize = LocalDesignTokens.current.largeTitleSize,
+                fontWeight = LocalDesignTokens.current.largeTitleWeight,
+                color = LocalDesignTokens.current.largeTitleColor
             )
             
             if (subtitle != null) {
                 Text(
                     text = subtitle,
-                    fontSize = DesignTokens.CardSubtitleSize,
-                    fontWeight = DesignTokens.CardSubtitleWeight,
-                    color = DesignTokens.TextSecondary,
+                    fontSize = LocalDesignTokens.current.cardSubtitleSize,
+                    fontWeight = LocalDesignTokens.current.cardSubtitleWeight,
+                    color = LocalDesignTokens.current.textSecondary,
                     modifier = Modifier.padding(top = 4.dp)
                 )
             }

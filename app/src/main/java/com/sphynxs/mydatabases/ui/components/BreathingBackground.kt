@@ -9,7 +9,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import com.sphynxs.mydatabases.ui.theme.DesignTokens
+import com.sphynxs.mydatabases.ui.theme.LocalDesignTokens
 
 /**
  * Fondo con gradiente animado que "respira" suavemente.
@@ -45,11 +45,11 @@ fun BreathingBackground(
     )
     
     // Interpolamos entre dos gradientes diferentes
-    val startColor1 = DesignTokens.BackgroundGradientStart
-    val endColor1 = DesignTokens.BackgroundGradientEnd
+    val startColor1 = LocalDesignTokens.current.backgroundGradientStart
+    val endColor1 = LocalDesignTokens.current.backgroundGradientEnd
     
-    val startColor2 = DesignTokens.BackgroundGradientEnd
-    val endColor2 = DesignTokens.BackgroundGradientStart
+    val startColor2 = LocalDesignTokens.current.backgroundGradientEnd
+    val endColor2 = LocalDesignTokens.current.backgroundGradientStart
     
     // Mezclamos los colores según el progreso de la animación
     val currentStartColor = lerpColor(startColor1, startColor2, animatedProgress)

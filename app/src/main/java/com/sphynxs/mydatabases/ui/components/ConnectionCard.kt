@@ -37,7 +37,7 @@ import com.sphynxs.mydatabases.core.database.models.ConnectionConfig
 import com.sphynxs.mydatabases.ui.components.ios.IOSCard
 import com.sphynxs.mydatabases.ui.components.ios.IOSDropdownMenu
 import com.sphynxs.mydatabases.ui.theme.DbAccents
-import com.sphynxs.mydatabases.ui.theme.DesignTokens
+import com.sphynxs.mydatabases.ui.theme.LocalDesignTokens
 import com.sphynxs.mydatabases.ui.theme.AppTheme
 import compose.icons.TablerIcons
 import compose.icons.tablericons.Folder
@@ -80,9 +80,9 @@ fun ConnectionCard(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(DesignTokens.CardPadding),
+                .padding(LocalDesignTokens.current.cardPadding),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(DesignTokens.InnerSpacing)
+            horizontalArrangement = Arrangement.spacedBy(LocalDesignTokens.current.innerSpacing)
         ) {
             // Ícono con gradiente vibrante + indicador de conexión activa
             Box(
@@ -145,9 +145,9 @@ fun ConnectionCard(
                 // Nombre de la conexión
                 Text(
                     text = connection.name,
-                    fontSize = DesignTokens.CardTitleSize,
-                    fontWeight = DesignTokens.CardTitleWeight,
-                    color = DesignTokens.CardTitleColor,
+                    fontSize = LocalDesignTokens.current.cardTitleSize,
+                    fontWeight = LocalDesignTokens.current.cardTitleWeight,
+                    color = LocalDesignTokens.current.cardTitleColor,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -155,9 +155,9 @@ fun ConnectionCard(
                 // Host:Puerto
                 Text(
                     text = "${connection.host}:${connection.port}",
-                    fontSize = DesignTokens.CardSubtitleSize,
-                    fontWeight = DesignTokens.CardSubtitleWeight,
-                    color = DesignTokens.CardSubtitleColor,
+                    fontSize = LocalDesignTokens.current.cardSubtitleSize,
+                    fontWeight = LocalDesignTokens.current.cardSubtitleWeight,
+                    color = LocalDesignTokens.current.cardSubtitleColor,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -172,7 +172,7 @@ fun ConnectionCard(
                     Icon(
                         imageVector = PhosphorAppIcons.Action.dragHandle,
                         contentDescription = "Drag to reorder",
-                        tint = DesignTokens.IconNormal,
+                        tint = LocalDesignTokens.current.iconNormal,
                         modifier = Modifier.size(20.dp)
                     )
                 }
@@ -182,8 +182,8 @@ fun ConnectionCard(
                         Icon(
                             imageVector = PhosphorAppIcons.Action.more,
                             contentDescription = "More options",
-                            tint = DesignTokens.IconNormal,
-                            modifier = Modifier.size(DesignTokens.IconSmall)
+                            tint = LocalDesignTokens.current.iconNormal,
+                            modifier = Modifier.size(LocalDesignTokens.current.iconSmall)
                         )
                     }
 
@@ -198,7 +198,7 @@ fun ConnectionCard(
                             Icon(
                                 imageVector = PhosphorAppIcons.Action.edit,
                                 contentDescription = null,
-                                tint = DesignTokens.IconNormal
+                                tint = LocalDesignTokens.current.iconNormal
                             )
                         },
                         onClick = {
@@ -214,7 +214,7 @@ fun ConnectionCard(
                             Icon(
                                 imageVector = TablerIcons.Folder,
                                 contentDescription = null,
-                                tint = DesignTokens.IconNormal
+                                tint = LocalDesignTokens.current.iconNormal
                             )
                         },
                         onClick = {
@@ -231,7 +231,7 @@ fun ConnectionCard(
                                 Icon(
                                     imageVector = PhosphorAppIcons.Action.power,
                                     contentDescription = null,
-                                    tint = DesignTokens.IconNormal
+                                    tint = LocalDesignTokens.current.iconNormal
                                 )
                             },
                             onClick = {
@@ -248,7 +248,7 @@ fun ConnectionCard(
                             Icon(
                                 imageVector = PhosphorAppIcons.Action.delete,
                                 contentDescription = null,
-                                tint = DesignTokens.DestructiveAction
+                                tint = LocalDesignTokens.current.destructiveAction
                             )
                         },
                         onClick = {

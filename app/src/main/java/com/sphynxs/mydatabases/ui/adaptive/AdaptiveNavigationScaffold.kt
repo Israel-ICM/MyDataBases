@@ -44,7 +44,7 @@ import com.sphynxs.mydatabases.ui.navigation.NavigationContext
 import com.sphynxs.mydatabases.ui.navigation.NavigationDestination
 import com.sphynxs.mydatabases.ui.navigation.Routes
 import com.sphynxs.mydatabases.ui.navigation.destinationsForContext
-import com.sphynxs.mydatabases.ui.theme.DesignTokens
+import com.sphynxs.mydatabases.ui.theme.LocalDesignTokens
 
 /**
  * Scaffold adaptativo que switchea entre BottomBar, Rail, y Drawer según WindowSizeClass.
@@ -215,7 +215,7 @@ private fun LiquidGlassBottomBar(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .padding(start = DesignTokens.ScreenPaddingHorizontal, end = DesignTokens.ScreenPaddingHorizontal, bottom = 24.dp),
+            .padding(start = LocalDesignTokens.current.screenPaddingHorizontal, end = LocalDesignTokens.current.screenPaddingHorizontal, bottom = 24.dp),
         contentAlignment = Alignment.BottomCenter
     ) {
         // Bottom bar estilo iOS unificado (GitHub mobile style - pill completo + backdrop translúcido)
@@ -303,7 +303,7 @@ private fun LiquidGlassBottomBar(
                                 imageVector = destination.icon,
                                 contentDescription = stringResource(destination.labelRes),
                                 modifier = Modifier.size(24.dp),
-                                tint = DesignTokens.IconNormal
+                                tint = LocalDesignTokens.current.iconNormal
                             )
                         }
                     }
