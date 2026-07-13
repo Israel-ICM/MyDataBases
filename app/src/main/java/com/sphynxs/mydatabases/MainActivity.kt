@@ -9,15 +9,14 @@ import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.compositionLocalOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.tooling.preview.Preview
-import com.sphynxs.mydatabases.domain.models.ThemeMode
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.sphynxs.mydatabases.ui.navigation.MyDataBasesNavHost
+import com.sphynxs.mydatabases.ui.screens.settings.SettingsViewModel
 import com.sphynxs.mydatabases.ui.theme.AppTheme
-import com.sphynxs.mydatabases.ui.theme.MyDataBasesTheme
 import com.sphynxs.mydatabases.ui.workspace.WorkspaceManager
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -54,11 +53,12 @@ class MainActivity : ComponentActivity() {
             // Calcular WindowSizeClass para adaptación de UI
             val windowSizeClass = calculateWindowSizeClass(this)
             
-            // ThemeMode hardcodeado a SYSTEM por ahora (será dinámico en PR #2)
-            val themeMode = remember { mutableStateOf(ThemeMode.SYSTEM) }
+            // themeMode leído del SettingsViewModel (persistido en DataStore)
+            val settingsViewModel: SettingsViewModel = hiltViewModel()
+            val themeMode by settingsViewModel.themeMode.collectAsState()
             
             CompositionLocalProvider(LocalWindowSizeClass provides windowSizeClass) {
-                AppTheme(themeMode = themeMode.value) {
+                AppTheme(themeMode = themeMode) {
                     MyDataBasesNavHost(workspaceManager = workspaceManager)
                 }
             }
@@ -69,7 +69,7 @@ class MainActivity : ComponentActivity() {
 @Preview(showBackground = true)
 @Composable
 fun MainActivityPreview() {
-    MyDataBasesTheme {
+    AppTheme {
         MyDataBasesNavHost(workspaceManager = WorkspaceManager())
     }
 }
