@@ -11,10 +11,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.sphynxs.mydatabases.ui.theme.LocalDesignTokens
 
 @Composable
 fun IOSListItem(
@@ -27,11 +27,13 @@ fun IOSListItem(
     showChevron: Boolean = true,
     showDivider: Boolean = true
 ) {
+    val tokens = LocalDesignTokens.current
+
     Column(modifier = modifier) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color.White)
+                .background(tokens.surfacePrimary)
                 .clickable(onClick = onClick)
                 .padding(horizontal = 16.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically
@@ -45,7 +47,7 @@ fun IOSListItem(
                 Text(
                     text = title,
                     fontSize = 17.sp,
-                    color = Color.Black,
+                    color = tokens.textPrimary,
                     fontWeight = FontWeight.Normal
                 )
                 
@@ -54,7 +56,7 @@ fun IOSListItem(
                     Text(
                         text = it,
                         fontSize = 15.sp,
-                        color = Color(0xFF8E8E93)
+                        color = tokens.textSecondary
                     )
                 }
             }
@@ -68,7 +70,7 @@ fun IOSListItem(
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                     contentDescription = null,
-                    tint = Color(0xFFC7C7CC),
+                    tint = tokens.separator,
                     modifier = Modifier.size(16.dp)
                 )
             }
@@ -76,7 +78,7 @@ fun IOSListItem(
         
         if (showDivider) {
             HorizontalDivider(
-                color = Color(0xFFC6C6C8),
+                color = tokens.separator,
                 thickness = 0.5.dp,
                 modifier = Modifier.padding(start = if (leadingIcon != null) 60.dp else 16.dp)
             )

@@ -20,13 +20,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sphynxs.mydatabases.ui.components.PhosphorAppIcons
+import com.sphynxs.mydatabases.ui.theme.LocalDesignTokens
 
 /**
  * Search bar estilo iOS 26 — ultra minimalista, sin fondo de color.
@@ -48,17 +48,22 @@ fun IOSSearchBar(
     placeholder: String,
     modifier: Modifier = Modifier
 ) {
+    // textPrimary = scheme.onBackground — usado tanto para el texto/ícono como base de
+    // la sombra ambient/spot (antes Color.Black fijo, invisible sobre fondo ya oscuro en
+    // dark mode; mismo criterio que WorkspaceCarousel — ver design.md R6).
+    val tokens = LocalDesignTokens.current
+
     Box(
         modifier = modifier
             .fillMaxWidth()
             .shadow(
                 elevation = 2.dp,
                 shape = RoundedCornerShape(26.dp),  // CASI REDONDO (la mitad de la altura aprox)
-                ambientColor = Color.Black.copy(alpha = 0.04f),
-                spotColor = Color.Black.copy(alpha = 0.06f)
+                ambientColor = tokens.textPrimary.copy(alpha = 0.04f),
+                spotColor = tokens.textPrimary.copy(alpha = 0.06f)
             )
             .clip(RoundedCornerShape(26.dp))
-            .background(Color.White)  // BLANCO
+            .background(tokens.surfacePrimary)
             .padding(horizontal = 16.dp, vertical = 14.dp)
     ) {
         Box(
@@ -68,11 +73,11 @@ fun IOSSearchBar(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                // Lupa GRANDE y NEGRA
+                // Lupa GRANDE, theme-aware
                 Icon(
                     imageVector = PhosphorAppIcons.Action.search,
                     contentDescription = null,
-                    tint = Color(0xFF000000),  // NEGRO PROFUNDO
+                    tint = tokens.textPrimary,
                     modifier = Modifier.size(24.dp)  // MÁS GRANDE
                 )
 
@@ -86,11 +91,11 @@ fun IOSSearchBar(
                         value = query,
                         onValueChange = onQueryChange,
                         textStyle = TextStyle(
-                            color = Color(0xFF000000),  // NEGRO PROFUNDO
+                            color = tokens.textPrimary,
                             fontSize = 17.sp,  // PROLIJO con el ícono
                             fontWeight = FontWeight.Normal
                         ),
-                        cursorBrush = SolidColor(Color(0xFF007AFF)),
+                        cursorBrush = SolidColor(tokens.accentPrimary),
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -98,7 +103,7 @@ fun IOSSearchBar(
                     if (query.isEmpty()) {
                         Text(
                             text = placeholder,
-                            color = Color(0xFF000000).copy(alpha = 0.4f),  // Negro con transparencia
+                            color = tokens.textPrimary.copy(alpha = 0.4f),
                             fontSize = 17.sp,
                             fontWeight = FontWeight.Normal
                         )
@@ -118,7 +123,7 @@ fun IOSSearchBar(
                         Icon(
                             imageVector = PhosphorAppIcons.Action.close,
                             contentDescription = "Clear",
-                            tint = Color(0xFF000000).copy(alpha = 0.5f),
+                            tint = tokens.textPrimary.copy(alpha = 0.5f),
                             modifier = Modifier.size(18.dp)
                         )
                     }

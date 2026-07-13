@@ -12,8 +12,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.sphynxs.mydatabases.ui.theme.LocalDesignTokens
 
 /**
  * Card moderno con sombras suaves y sin bordes.
@@ -39,15 +39,18 @@ fun IOSCard(
             .shadow(
                 elevation = 12.dp,
                 shape = RoundedCornerShape(24.dp),
-                ambientColor = Color(0xFF7C80E8).copy(alpha = 0.15f),  // Violeta branded
-                spotColor = Color(0xFF7C80E8).copy(alpha = 0.25f)
+                // cardShadowColor ya es brand_primary.copy(alpha=0.15f) — mismo valor que
+                // el literal reemplazado, ahora vía token (theme-invariant por diseño, ver
+                // DesignTokens.kt buildDesignTokens).
+                ambientColor = LocalDesignTokens.current.cardShadowColor,
+                spotColor = LocalDesignTokens.current.accentPrimary.copy(alpha = 0.25f)
             )
             .clip(RoundedCornerShape(24.dp))
-            .background(Color.White)
+            .background(LocalDesignTokens.current.surfacePrimary)
             .clickable(
                 interactionSource = interactionSource,
                 indication = ripple(
-                    color = Color(0xFF7C80E8).copy(alpha = 0.08f)  // Violeta branded
+                    color = LocalDesignTokens.current.accentPrimary.copy(alpha = 0.08f)
                 ),
                 onClick = onClick
             )

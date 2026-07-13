@@ -18,7 +18,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -157,7 +156,7 @@ fun <T> IOSDropdownField(
                     .fillMaxWidth(0.9f)
                     .heightIn(max = 400.dp)
                     .shadow(8.dp, RoundedCornerShape(20.dp))
-                    .background(Color.White, RoundedCornerShape(20.dp))
+                    .background(LocalDesignTokens.current.surfacePrimary, RoundedCornerShape(20.dp))
                     .padding(top = 8.dp)
             ) {
                 // Search filter (optional)
@@ -191,8 +190,8 @@ fun <T> IOSDropdownField(
                             focusedBorderColor = LocalDesignTokens.current.accentPrimary,
                             unfocusedBorderColor = LocalDesignTokens.current.separator,
                             cursorColor = LocalDesignTokens.current.accentPrimary,
-                            focusedContainerColor = Color.White,
-                            unfocusedContainerColor = Color.White
+                            focusedContainerColor = LocalDesignTokens.current.surfacePrimary,
+                            unfocusedContainerColor = LocalDesignTokens.current.surfacePrimary
                         ),
                         shape = RoundedCornerShape(12.dp),
                         singleLine = true,

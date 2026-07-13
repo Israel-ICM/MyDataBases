@@ -11,7 +11,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -19,6 +18,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.sphynxs.mydatabases.ui.theme.LocalDesignTokens
 
 @Composable
 fun IOSTextField(
@@ -31,12 +31,13 @@ fun IOSTextField(
     keyboardType: KeyboardType = KeyboardType.Text
 ) {
     var passwordVisible by remember { mutableStateOf(false) }
+    val tokens = LocalDesignTokens.current
     
     Column(modifier = modifier) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color.White)
+                .background(tokens.surfacePrimary)
                 .padding(horizontal = 16.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -46,7 +47,7 @@ fun IOSTextField(
                 modifier = Modifier.weight(1f),
                 textStyle = TextStyle(
                     fontSize = 17.sp,
-                    color = Color.Black,
+                    color = tokens.textPrimary,
                     fontWeight = FontWeight.Normal
                 ),
                 visualTransformation = if (isPassword && !passwordVisible) 
@@ -57,7 +58,7 @@ fun IOSTextField(
                         if (value.isEmpty()) {
                             Text(
                                 text = placeholder,
-                                color = Color(0xFFC7C7CC),
+                                color = tokens.textTertiary,
                                 fontSize = 17.sp
                             )
                         }
@@ -72,7 +73,7 @@ fun IOSTextField(
                         imageVector = if (passwordVisible) Icons.Default.Visibility 
                                      else Icons.Default.VisibilityOff,
                         contentDescription = null,
-                        tint = Color(0xFF8E8E93),
+                        tint = tokens.iconNormal,
                         modifier = Modifier.size(20.dp)
                     )
                 }
@@ -81,7 +82,7 @@ fun IOSTextField(
         
         if (showDivider) {
             HorizontalDivider(
-                color = Color(0xFFC6C6C8),
+                color = tokens.separator,
                 thickness = 0.5.dp,
                 modifier = Modifier.padding(start = 16.dp)
             )
