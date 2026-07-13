@@ -149,6 +149,10 @@
     <string name="settings_title">الإعدادات</string>
     <string name="settings_branded_palette_title">لوحة العلامة التجارية</string>
     <string name="settings_branded_palette_description">استخدام ألوان العلامة التجارية المخصصة بدلاً من المظهر الديناميكي</string>
+    <string name="theme_mode_label">المظهر</string>
+    <string name="theme_mode_system">النظام</string>
+    <string name="theme_mode_light">فاتح</string>
+    <string name="theme_mode_dark">داكن</string>
     
     <!-- Loading states -->
     <string name="loading">جارٍ التحميل…</string>

@@ -149,6 +149,10 @@
     <string name="settings_title">Configurações</string>
     <string name="settings_branded_palette_title">Paleta de marca</string>
     <string name="settings_branded_palette_description">Usar cores de marca personalizadas em vez do tema dinâmico</string>
+    <string name="theme_mode_label">Tema</string>
+    <string name="theme_mode_system">Sistema</string>
+    <string name="theme_mode_light">Claro</string>
+    <string name="theme_mode_dark">Escuro</string>
     
     <!-- Loading states -->
     <string name="loading">Carregando…</string>

@@ -16,7 +16,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.sphynxs.mydatabases.ui.theme.MyDataBasesTheme
+import com.sphynxs.mydatabases.ui.theme.AppTheme
 import com.sphynxs.mydatabases.ui.theme.tokens.LocalAppSpacing
 
 /**
@@ -83,7 +83,7 @@ private fun TableCardPlaceholder() {
 @Preview(showBackground = true)
 @Composable
 private fun TableListSkeletonPreview() {
-    MyDataBasesTheme {
+    AppTheme {
         TableListSkeleton()
     }
 }

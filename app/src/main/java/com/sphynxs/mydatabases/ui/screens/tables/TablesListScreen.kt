@@ -36,7 +36,7 @@ import com.sphynxs.mydatabases.ui.components.TableCard
 import com.sphynxs.mydatabases.ui.components.ios.IOSSearchBar
 import com.sphynxs.mydatabases.ui.components.skeleton.TableListSkeleton
 import com.sphynxs.mydatabases.ui.theme.DesignTokens
-import com.sphynxs.mydatabases.ui.theme.MyDataBasesTheme
+import com.sphynxs.mydatabases.ui.theme.AppTheme
 import com.sphynxs.mydatabases.ui.workspace.WorkspaceCard
 import com.sphynxs.mydatabases.ui.workspace.WorkspaceManager
 
@@ -168,7 +168,7 @@ fun TablesListScreen(
 @Preview(showBackground = true)
 @Composable
 private fun TablesListScreenPreview() {
-    MyDataBasesTheme {
+    AppTheme {
         Box(modifier = Modifier.fillMaxSize()) {
             Text("Preview: Lista de tablas")
         }

@@ -14,7 +14,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.sphynxs.mydatabases.core.database.engine.DatabaseType
 import com.sphynxs.mydatabases.ui.theme.DbAccents
-import com.sphynxs.mydatabases.ui.theme.MyDataBasesTheme
+import com.sphynxs.mydatabases.ui.theme.AppTheme
 
 /**
  * Database type selector — SegmentedButton M3 para elegir tipo de DB.
@@ -94,7 +94,7 @@ fun DatabaseTypeSelector(
 @Preview(name = "MySQL selected", showBackground = true)
 @Composable
 private fun DatabaseTypeSelectorPreview_MySQL() {
-    MyDataBasesTheme {
+    AppTheme {
         DatabaseTypeSelector(
             selected = DatabaseType.MYSQL,
             onSelect = {}
@@ -108,7 +108,7 @@ private fun DatabaseTypeSelectorPreview_MySQL() {
 @Preview(name = "PostgreSQL selected", showBackground = true)
 @Composable
 private fun DatabaseTypeSelectorPreview_Postgres() {
-    MyDataBasesTheme {
+    AppTheme {
         DatabaseTypeSelector(
             selected = DatabaseType.POSTGRESQL,
             onSelect = {}
@@ -122,7 +122,7 @@ private fun DatabaseTypeSelectorPreview_Postgres() {
 @Preview(name = "MariaDB selected", showBackground = true)
 @Composable
 private fun DatabaseTypeSelectorPreview_MariaDB() {
-    MyDataBasesTheme {
+    AppTheme {
         DatabaseTypeSelector(
             selected = DatabaseType.MARIADB,
             onSelect = {}
@@ -136,7 +136,7 @@ private fun DatabaseTypeSelectorPreview_MariaDB() {
 @Preview(name = "SQLite selected", showBackground = true)
 @Composable
 private fun DatabaseTypeSelectorPreview_SQLite() {
-    MyDataBasesTheme {
+    AppTheme {
         DatabaseTypeSelector(
             selected = DatabaseType.SQLITE,
             onSelect = {}

@@ -188,6 +188,10 @@
     <string name="settings_title">Configuración</string>
     <string name="settings_branded_palette_title">Paleta branded</string>
     <string name="settings_branded_palette_description">Usar colores branded personalizados en lugar del tema dinámico</string>
+    <string name="theme_mode_label">Tema</string>
+    <string name="theme_mode_system">Sistema</string>
+    <string name="theme_mode_light">Claro</string>
+    <string name="theme_mode_dark">Oscuro</string>
     
     <!-- Loading states -->
     <string name="loading">Cargando…</string>

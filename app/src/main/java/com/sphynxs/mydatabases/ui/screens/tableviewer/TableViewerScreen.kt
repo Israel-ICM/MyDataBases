@@ -45,7 +45,7 @@ import com.sphynxs.mydatabases.ui.components.PhosphorAppIcons
 import com.sphynxs.mydatabases.ui.components.ErrorCard
 import com.sphynxs.mydatabases.ui.components.LoadingIndicator
 import com.sphynxs.mydatabases.ui.components.skeleton.TableViewerSkeleton
-import com.sphynxs.mydatabases.ui.theme.MyDataBasesTheme
+import com.sphynxs.mydatabases.ui.theme.AppTheme
 import com.sphynxs.mydatabases.ui.workspace.TableCardContent
 
 /**
@@ -280,7 +280,7 @@ private fun SchemaTab(
 @Preview(showBackground = true)
 @Composable
 private fun TableViewerScreenPreview() {
-    MyDataBasesTheme {
+    AppTheme {
         Box(modifier = Modifier.fillMaxSize()) {
             Text("Preview: Visor de tabla")
         }

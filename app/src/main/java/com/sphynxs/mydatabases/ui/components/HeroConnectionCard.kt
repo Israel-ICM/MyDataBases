@@ -32,7 +32,7 @@ import com.sphynxs.mydatabases.R
 import com.sphynxs.mydatabases.core.database.engine.DatabaseType
 import com.sphynxs.mydatabases.core.database.models.ConnectionConfig
 import com.sphynxs.mydatabases.ui.theme.DbAccents
-import com.sphynxs.mydatabases.ui.theme.MyDataBasesTheme
+import com.sphynxs.mydatabases.ui.theme.AppTheme
 import com.sphynxs.mydatabases.ui.theme.tokens.LocalAppShapes
 import com.sphynxs.mydatabases.ui.theme.tokens.LocalAppSpacing
 
@@ -180,7 +180,7 @@ fun HeroConnectionCard(
 @Preview(name = "MySQL", showBackground = true)
 @Composable
 private fun HeroConnectionCardPreview_MySQL() {
-    MyDataBasesTheme {
+    AppTheme {
         HeroConnectionCard(
             connection = ConnectionConfig(
                 id = "1",
@@ -204,7 +204,7 @@ private fun HeroConnectionCardPreview_MySQL() {
 @Preview(name = "PostgreSQL", showBackground = true)
 @Composable
 private fun HeroConnectionCardPreview_Postgres() {
-    MyDataBasesTheme {
+    AppTheme {
         HeroConnectionCard(
             connection = ConnectionConfig(
                 id = "2",
@@ -228,7 +228,7 @@ private fun HeroConnectionCardPreview_Postgres() {
 @Preview(name = "MariaDB", showBackground = true)
 @Composable
 private fun HeroConnectionCardPreview_MariaDB() {
-    MyDataBasesTheme {
+    AppTheme {
         HeroConnectionCard(
             connection = ConnectionConfig(
                 id = "3",
@@ -252,7 +252,7 @@ private fun HeroConnectionCardPreview_MariaDB() {
 @Preview(name = "SQLite", showBackground = true)
 @Composable
 private fun HeroConnectionCardPreview_SQLite() {
-    MyDataBasesTheme {
+    AppTheme {
         HeroConnectionCard(
             connection = ConnectionConfig(
                 id = "4",

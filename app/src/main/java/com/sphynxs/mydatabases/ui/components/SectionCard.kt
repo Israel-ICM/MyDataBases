@@ -15,7 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.sphynxs.mydatabases.ui.theme.MyDataBasesTheme
+import com.sphynxs.mydatabases.ui.theme.AppTheme
 import com.sphynxs.mydatabases.ui.theme.tokens.LocalAppShapes
 import com.sphynxs.mydatabases.ui.theme.tokens.LocalAppSpacing
 
@@ -79,7 +79,7 @@ fun SectionCard(
 @Preview(name = "Section Card", showBackground = true)
 @Composable
 private fun SectionCardPreview() {
-    MyDataBasesTheme {
+    AppTheme {
         SectionCard(
             title = "Configuración de Conexión"
         ) {

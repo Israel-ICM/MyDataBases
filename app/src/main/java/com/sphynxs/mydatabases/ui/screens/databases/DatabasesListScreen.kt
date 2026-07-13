@@ -48,7 +48,7 @@ import com.sphynxs.mydatabases.ui.components.ScreenTitle
 import com.sphynxs.mydatabases.ui.components.ios.IOSSearchBar
 import com.sphynxs.mydatabases.ui.components.skeleton.DatabaseListSkeleton
 import com.sphynxs.mydatabases.ui.theme.DesignTokens
-import com.sphynxs.mydatabases.ui.theme.MyDataBasesTheme
+import com.sphynxs.mydatabases.ui.theme.AppTheme
 import kotlinx.coroutines.launch
 
 /**
@@ -247,7 +247,7 @@ fun DatabasesListScreen(
 @Preview(showBackground = true)
 @Composable
 private fun DatabasesListScreenPreview() {
-    MyDataBasesTheme {
+    AppTheme {
         // Preview estático con estado Success simulado
         Box(modifier = Modifier.fillMaxSize()) {
             Text("Preview: Lista de bases de datos")
