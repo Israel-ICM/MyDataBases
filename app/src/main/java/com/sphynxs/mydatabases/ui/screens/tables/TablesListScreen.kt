@@ -35,7 +35,7 @@ import com.sphynxs.mydatabases.ui.components.ScreenTitle
 import com.sphynxs.mydatabases.ui.components.TableCard
 import com.sphynxs.mydatabases.ui.components.ios.IOSSearchBar
 import com.sphynxs.mydatabases.ui.components.skeleton.TableListSkeleton
-import com.sphynxs.mydatabases.ui.theme.DesignTokens
+import com.sphynxs.mydatabases.ui.theme.LocalDesignTokens
 import com.sphynxs.mydatabases.ui.theme.AppTheme
 import com.sphynxs.mydatabases.ui.workspace.WorkspaceCard
 import com.sphynxs.mydatabases.ui.workspace.WorkspaceManager
@@ -105,10 +105,10 @@ fun TablesListScreen(
                             query = searchQuery,
                             onQueryChange = viewModel::setSearchQuery,
                             placeholder = stringResource(R.string.tables_search_hint),
-                            modifier = Modifier.padding(horizontal = DesignTokens.ScreenPaddingHorizontal)
+                            modifier = Modifier.padding(horizontal = LocalDesignTokens.current.screenPaddingHorizontal)
                         )
 
-                        Spacer(modifier = Modifier.height(DesignTokens.CardSpacing))
+                        Spacer(modifier = Modifier.height(LocalDesignTokens.current.cardSpacing))
 
                         LazyColumn(modifier = Modifier.weight(1f)) {
                             items(tables, key = { it.name }) { table ->
@@ -126,8 +126,8 @@ fun TablesListScreen(
                                         )
                                     },
                                     modifier = Modifier.padding(
-                                        horizontal = DesignTokens.ScreenPaddingHorizontal,
-                                        vertical = DesignTokens.CardSpacing / 2
+                                        horizontal = LocalDesignTokens.current.screenPaddingHorizontal,
+                                        vertical = LocalDesignTokens.current.cardSpacing / 2
                                     )
                                 )
                             }
