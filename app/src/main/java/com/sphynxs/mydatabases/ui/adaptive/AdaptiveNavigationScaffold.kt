@@ -29,7 +29,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Brush
 import com.skydoves.cloudy.cloudy
 import androidx.compose.ui.res.painterResource
@@ -218,7 +217,11 @@ private fun LiquidGlassBottomBar(
             .padding(start = LocalDesignTokens.current.screenPaddingHorizontal, end = LocalDesignTokens.current.screenPaddingHorizontal, bottom = 24.dp),
         contentAlignment = Alignment.BottomCenter
     ) {
-        // Bottom bar estilo iOS unificado (GitHub mobile style - pill completo + backdrop translúcido)
+        // Bottom bar estilo iOS unificado (GitHub mobile style - pill completo + backdrop
+        // translúcido). Antes usaba Color.White/Color.Black fijos — en dark mode eso
+        // pintaba una pill BLANCA brillante sobre fondo oscuro y una sombra negra
+        // invisible; ahora deriva de MaterialTheme.colorScheme (mismo criterio "R6" que
+        // WorkspaceCarousel/TopSheet — ver design.md).
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -226,18 +229,18 @@ private fun LiquidGlassBottomBar(
                 .shadow(
                     elevation = 32.dp,
                     shape = RoundedCornerShape(40.dp),
-                    ambientColor = Color.Black.copy(alpha = 0.3f),
-                    spotColor = Color.Black.copy(alpha = 0.4f)
+                    ambientColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
+                    spotColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
                 )
                 .clip(RoundedCornerShape(40.dp))
-                .background(Color.White.copy(alpha = 0.75f))  // Blanco semi-transparente (el contenido de atrás ya tiene blur)
+                .background(LocalDesignTokens.current.surfacePrimary.copy(alpha = 0.75f))  // Superficie semi-transparente (el contenido de atrás ya tiene blur)
         ) {
             // Separator superior sutil (divide visualmente del contenido de arriba)
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(0.5.dp)
-                    .background(Color(0x0D000000))  // Negro 5% — línea ultra sutil
+                    .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f))  // línea ultra sutil, adapta con el tema
                     .align(Alignment.TopCenter)
             )
 

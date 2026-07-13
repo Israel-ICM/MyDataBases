@@ -36,7 +36,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
@@ -46,6 +45,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import com.sphynxs.mydatabases.ui.theme.LocalDesignTokens
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -130,7 +130,12 @@ fun TopSheet(
     // Alpha del backdrop proporcional al progreso (0 cuando minimizado, 0.4 cuando expandido)
     // Usamos el alpha del token BackdropScrim (0.4f) como máximo
     val backdropAlpha = expansionProgress * 0.4f
-    
+    // Capturado ANTES del Canvas (DrawScope no-composable) — mismo color base que
+    // LocalDesignTokens.current.backdropScrim (scheme.background), con alpha variable en
+    // vez del 0.4f fijo del token. Antes hardcoded Color.White — velo blanco brillante
+    // sobre fondo oscuro en dark mode (mismo bug que WorkspaceCarousel, ver design.md R6).
+    val backdropBaseColor = LocalDesignTokens.current.backgroundPrimary
+
     Box(modifier = modifier.fillMaxSize()) {
         // Backdrop - siempre visible pero con alpha variable
         if (backdropAlpha > 0.01f) {
@@ -143,8 +148,7 @@ fun TopSheet(
                         }
                     }
             ) {
-                // Fondo claro semitransparente usando el color base de BackdropScrim
-                drawRect(Color.White.copy(alpha = backdropAlpha))
+                drawRect(backdropBaseColor.copy(alpha = backdropAlpha))
             }
         }
         
