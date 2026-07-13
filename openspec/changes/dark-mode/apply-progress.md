@@ -231,7 +231,186 @@ Review Workload Forecast estimate (~280-360, at the high end but not over), desp
 discoveries (Color.White/Black sweep, AdaptiveNavigationScaffold, ConnectionFormScreen full
 retrofit) that were not itemized in the original PR-3 estimate.
 
-### This closes out the `dark-mode` change
+### This closes out the initial 3-PR plan
 
 All 3 planned PRs (Plumbing → Theme-Aware Design Tokens → Custom-Draw Dark-Safety & Literal Sweep)
-are now implementation-complete. tasks.md is 32/32 tasks across all 3 phases. Ready for `sdd-verify`.
+were implementation-complete. tasks.md was 32/32 tasks across all 3 phases. Sent to `sdd-verify`.
+
+## PR-4 (Verify Fix-Round: R3 Test Coverage & Contrast Regressions) — Status: Complete, ready for PR
+
+Branch: `feature/dark-mode-verify-fixes` (stacked-to-main chain strategy, targets
+`feature/dark-mode-custom-draw`) — **4th slice**, added after `sdd-verify` returned
+**PASS WITH WARNINGS** with 1 CRITICAL blocking archive. Maintainer explicitly requested a
+**complete solution, not a patch** (real extraction + real tests + real WCAG recalculation).
+
+### Verify Fix-Round Tasks (7/7 complete — see tasks.md `## Verify Fix-Round (PR-4)` for detail)
+
+- [x] 4.1 RED: `AppThemeTest` — 6 new tests for `resolveColorScheme` (didn't exist), covering all 5 R3 spec scenarios + 1 fallback triangulation
+- [x] 4.2 GREEN: extracted `resolveColorScheme(darkTheme, brandedPaletteEnabled, dynamicColorAvailable, dynamicScheme)` out of `AppTheme`'s inline `when` block
+- [x] 4.3 RED: `ContrastUtilsTest` — 5 new sanity tests for `contrastRatio` (didn't exist)
+- [x] 4.4 GREEN: implemented `contrastRatio` in new `ContrastUtils.kt`
+- [x] 4.5 RED: `DesignTokensTest` — 4 new regression tests for `accentSuccess`/`textTertiary` dark contrast, against the not-yet-updated `buildDesignTokens` signature
+- [x] 4.6 GREEN: `buildDesignTokens(scheme, darkTheme)` + `brand_success_light`/`brand_success_dark`/`brand_text_tertiary_dark` in `Color.kt`
+- [x] 4.7 Full suite + `assembleDebug` verification
+
+### Item 1 — R3 "Effective ColorScheme Resolution" (was CRITICAL #1, now closed)
+
+Extracted `resolveColorScheme` from `AppTheme.kt`'s inline `when` block into a standalone
+pure function (`darkTheme: Boolean, brandedPaletteEnabled: Boolean, dynamicColorAvailable:
+Boolean, dynamicScheme: ColorScheme?`) — mirrors `resolveDarkTheme`'s existing pattern
+exactly. The composable now resolves `dynamicScheme` lazily (only calls
+`dynamicDarkColorScheme(context)`/`dynamicLightColorScheme(context)` — which require a real
+`Context` and are NOT pure — when branded is OFF and dynamic color is available) and injects
+it already-resolved into the pure function.
+
+`AppThemeTest` now has 6 new tests covering, by exact spec scenario name:
+
+| # | Spec scenario | Test |
+|---|---|---|
+| 1 | Dark + branded | `Dark + branded resolves to BrandedDarkColorScheme (R3 scenario 1)` |
+| 2 | Light + branded | `Light + branded resolves to BrandedLightColorScheme (R3 scenario 2)` |
+| 3 | Dark + non-branded | `Dark + non-branded resolves to the dynamic dark scheme when available (R3 scenario 3)` |
+| 4 | System defers to OS then applies branded axis | `System defers to OS-dark then applies branded axis (R3 scenario 4, composed with resolveDarkTheme)` — composes `resolveDarkTheme` + `resolveColorScheme` end-to-end, no Compose needed |
+| 5 | Axes are independent | `Axes are independent - toggling branded_palette never changes the resolved dark-vs-light base (R3 scenario 5)` — asserts toggling each axis independently while holding the other fixed |
+| — | (triangulation) | `Dark + non-branded falls back to BrandedDarkColorScheme when dynamic color is unavailable` — proves the dynamic branch isn't hardcoded; exercises the pre-existing documented fallback |
+
+Fake "dynamic scheme" stand-ins use `androidx.compose.material3.lightColorScheme()`/
+`darkColorScheme()` defaults (distinct object references from `BrandedLightColorScheme`/
+`BrandedDarkColorScheme`), asserted via `assertSame` (reference identity, not `equals`,
+since M3's `ColorScheme` equality semantics weren't worth relying on for this).
+
+**Result**: 10/10 `AppThemeTest` (was 4/4), all 5 R3 scenarios + fallback now genuinely
+covered and executed — not just "code reads correctly by inspection."
+
+### Item 2 — `accentSuccess` contrast regression (was WARNING #3, now closed)
+
+Built `ContrastUtils.kt`: a pure `contrastRatio(a: Color, b: Color): Double` implementing
+the WCAG 2.0 relative-luminance formula by hand (sRGB gamma correction, `0.2126R + 0.7152G +
+0.0722B`), with zero Compose runtime/Context dependency beyond `Color` itself — runs in pure
+JVM unit tests. Sanity-checked in `ContrastUtilsTest` against mathematically-known anchors
+BEFORE trusting it for real tokens (same discipline PR-2 used when hand-computing contrast,
+now made executable):
+
+| Check | Expected | Computed |
+|---|---|---|
+| Black vs White | 21.00:1 (WCAG max) | 21.00:1 ✅ |
+| Same color vs itself | 1.00:1 (WCAG min) | 1.00:1 ✅ |
+| Symmetry (`contrastRatio(a,b) == contrastRatio(b,a)`) | equal | equal ✅ |
+| `0xFF006B63` vs `0xFF222837` (verify-report's hand-computed `accentSuccess` regression) | 2.30:1 | 2.30:1 ✅ |
+| `0xFF5B5F7D` vs `0xFF222837` (verify-report's hand-computed `textTertiary` regression) | 2.37:1 | 2.37:1 ✅ |
+
+The formula independently reproduces verify-report's hand-computed values exactly — high
+confidence it's correct before using it to pick new values.
+
+**`accentSuccess` before/after**:
+
+| | Before | After |
+|---|---|---|
+| Dark vs `brand_surface` | **2.30:1** ❌ (< 3:1 WCAG 1.4.11 non-text minimum) | **4.32:1** ✅ |
+| Light vs `brand_light_surface` | 6.40:1 ✅ (already compliant, untouched) | 6.40:1 ✅ (unchanged) |
+| Value (dark) | `0xFF006B63` (same literal as light, unadapted) | `0xFF4D9792` (`brand_success_dark`) |
+| Value (light) | `0xFF006B63` | `0xFF006B63` (`brand_success_light`, unchanged) |
+
+Made `accentSuccess` genuinely theme-aware (it was a single hardcoded literal reused as-is
+in both themes — the actual root cause of the regression). Kept the same teal-green hue
+family (only lightened) so the "success" semantic accent doesn't visually clash with
+`accentSecondary` (`brand_tertiary`, a distinctly brighter/cooler turquoise) — spot-checked
+by comparing RGB components, not just contrast math. `accentSuccessLight` (the low-alpha
+gradient tint variant) was NOT touched — it's used at `alpha=0.12–0.20f` as a decorative
+overlay, not a solid fill, so the 3:1 non-text threshold doesn't strictly apply the same way;
+out of the assigned scope.
+
+`DesignTokensTest` gained 2 new tests: a contrast-ratio regression guard (`>= 3.0` in both
+themes) and a triangulation guard proving dark no longer reuses the light literal.
+
+### Item 3 — `textTertiary` sub-AA gap (was WARNING #4, now closed for dark)
+
+**`textTertiary` before/after**:
+
+| | Before | After |
+|---|---|---|
+| Dark vs `brand_surface` | **2.37:1** ❌ (< 4.5:1 WCAG AA text minimum) | **4.61:1** ✅ |
+| Light vs `brand_light_surface` | 4.36:1 ⚠️ (also sub-AA, smaller gap — NOT in this round's scope, see below) | 4.36:1 (unchanged) |
+| Value (dark) | `scheme.outline` (`brand_outline`, `0xFF5B5F7D`) | `brand_text_tertiary_dark` (`0xFF8C8FA4`) |
+| Value (light) | `scheme.outline` (`0xFF75788C`) | `scheme.outline` (unchanged) |
+
+Deliberately did **not** touch `brand_outline` itself — it's still used by `iconNormal`,
+`onSurfaceVariant`, and native M3 `outline` roles (borders, dividers) which were not part of
+this fix-round's assigned scope, and changing the shared constant would have rippled into
+all of those without any test coverage for that blast radius. Instead, added a dedicated
+`brand_text_tertiary_dark` literal and switched `textTertiary`'s dark-mode derivation to it
+via the new `darkTheme: Boolean` parameter on `buildDesignTokens` (also used by the
+`accentSuccess` fix above — same parameter serves both).
+
+Picked `0xFF8C8FA4` deliberately **darker/dimmer than `textSecondary`** (`0xFF9DA1C0`,
+5.81:1) to preserve the visual hierarchy `textPrimary > textSecondary > textTertiary` (each
+tier progressively less prominent) while still clearing 4.5:1.
+
+**Discovery, not silently fixed**: recomputing with the new `contrastRatio()`, LIGHT-mode
+`textTertiary` (still `scheme.outline` = `0xFF75788C`) is **4.36:1** against
+`brand_light_surface` — also technically sub-AA, though a much smaller gap than dark's
+2.37:1. The fix-round prompt scoped this item to "a compliant **dark-mode** value"
+specifically; I did not expand scope to silently patch light too. Documented in
+`DesignTokens.kt`'s KDoc and `tasks.md`'s addendum as a flagged follow-up, not fixed here —
+per the "don't silently deviate from the assigned scope" rule.
+
+`DesignTokensTest` gained 2 new tests: a contrast-ratio regression guard (`>= 4.5` in dark)
+and a triangulation guard proving dark no longer reuses `scheme.outline`.
+
+### Architecture Deviation from design.md
+
+design.md's abbreviated `Interfaces/Contracts` snippet shows `buildDesignTokens(scheme:
+ColorScheme)` with a single parameter. This fix-round adds a required `darkTheme: Boolean`
+second parameter. This was necessary because `accentSuccess`/`textTertiary` (dark) no longer
+derive purely from `scheme` — they need dedicated per-theme literals to genuinely clear
+WCAG thresholds, and `ColorScheme` alone doesn't expose "am I the dark scheme" as a queryable
+property. No default value was given to `darkTheme` (deliberately) — an accidental default
+could silently mismatch `LightDesignTokens`/`DarkDesignTokens`' actual scheme, which would be
+a much worse bug than a compile-time-enforced explicit argument.
+
+### Test Results
+
+- `compileDebugKotlin` / `compileDebugUnitTestKotlin`: BUILD SUCCESSFUL
+- `testDebugUnitTest` (full suite): **172 tests, 23 failed** — same 23 **pre-existing**
+  failures as PR-1/2/3 (`SSHTunnelManagerTest` ×8, `SSHTunnelConfigConverterTest` ×7,
+  `SSLConfigConverterTest` ×6, `EditorHistoryTest` ×2), **zero new failures**. 15 new tests
+  all pass: 6 `AppThemeTest` (R3) + 5 `ContrastUtilsTest` (sanity) + 4 `DesignTokensTest`
+  (contrast regression) = 157 PR-3 baseline + 15 = 172.
+- `assembleDebug`: BUILD SUCCESSFUL
+
+### Commits (3 code, docs pending)
+
+1. `fix(theme): extraer resolveColorScheme y cubrir R3 con tests (RED-GREEN)` — `AppTheme.kt`, `AppThemeTest.kt`
+2. `feat(theme): agregar contrastRatio WCAG puro con tests de sanity (RED-GREEN)` — `ContrastUtils.kt`, `ContrastUtilsTest.kt`
+3. `fix(theme): corregir contraste dark de accentSuccess y textTertiary (RED-GREEN)` — `Color.kt`, `DesignTokens.kt`, `DesignTokensTest.kt`
+
+Note: the assigned split was "one commit for accentSuccess fix+test, one for textTertiary
+fix+test" — these two were merged into a single commit (#3) because both are fixed via the
+same `buildDesignTokens(scheme, darkTheme)` signature change in the same file; splitting
+them would have required an artificial intermediate state (half-added parameter) with no
+clean rollback boundary. Flagged here rather than silently deviating from the requested
+commit shape.
+
+### Diff size
+
+`git diff --stat feature/dark-mode-custom-draw..feature/dark-mode-verify-fixes`: 7 files
+changed, 408 insertions(+), 18 deletions(-) ≈ **426 changed lines** — above the shared-skill
+400-line default, but within the `dark-mode` change's session-cached **800-line** budget
+(see tasks.md Review Workload Forecast). This is a legitimate 4th stacked slice, autonomous
+in scope (test-coverage/contrast fix round only), with its own verification and clear
+rollback boundary (revert this branch, PR-3's tip is unaffected).
+
+### Excluded from this round (per orchestrator instruction)
+
+- `androidTest` module compile failure (3 unrelated pre-existing broken test files:
+  `MyDataBasesNavHostTest.kt`, `QueryEditorScreenTest.kt`, `WorkspaceCarouselTest.kt`) —
+  confirmed pre-existing on `master` in `sdd-verify`'s session, unrelated to `dark-mode`. Not
+  touched. Flagged to the orchestrator as a candidate for a separate infra-repair SDD change.
+- `temp_drag_changes.patch` at repo root — same unrelated leftover carried over from PR-1/2/3,
+  still untouched, not staged, not committed.
+
+### This closes the `dark-mode` change's outstanding verify gaps
+
+The CRITICAL (R3 test coverage) and both contrast WARNINGs (`accentSuccess`, `textTertiary`
+dark) from `verify-report.md` are now genuinely closed with real RED→GREEN tests, not
+superficial patches. Ready for a re-verify pass (`sdd-verify`).
