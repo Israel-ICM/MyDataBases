@@ -35,7 +35,10 @@ import com.sphynxs.mydatabases.ui.theme.tokens.rememberReducedMotion
  * tema de la app — el tema legacy fue removido (ver `openspec/changes/dark-mode`).
  *
  * Integra:
- * - Design tokens (Spacing, Shapes, Elevation, Motion) vía CompositionLocals
+ * - Design tokens (Spacing, Shapes, Elevation, Motion, `LocalDesignTokens`) vía
+ *   CompositionLocals — `LocalDesignTokens` sigue anclado a la paleta branded
+ *   (Light/DarkDesignTokens) independientemente del eje dynamic color (ver
+ *   `DesignTokens.kt` — `buildDesignTokens`)
  * - Branded color palette con toggle dinámico (leído de `SettingsViewModel`)
  * - Dynamic color support (Android 12+)
  * - Reduced motion detection
@@ -97,7 +100,8 @@ fun AppTheme(
         LocalAppShapes provides AppShapes(),
         LocalAppElevation provides AppElevation(),
         LocalAppMotion provides AppMotion(),
-        LocalReducedMotion provides isReducedMotion
+        LocalReducedMotion provides isReducedMotion,
+        LocalDesignTokens provides if (darkTheme) DarkDesignTokens else LightDesignTokens
     ) {
         MaterialTheme(
             colorScheme = colorScheme,
