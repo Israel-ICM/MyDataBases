@@ -115,3 +115,36 @@ val brand_on_bg = Color(0xFFE6E8F0)        // onBackground y onSurface
 val brand_light_bg = Color(0xFFF5F6FA)         // Background claro (inverso)
 val brand_light_surface = Color(0xFFFFFFFF)    // Surface clara (blanco puro)
 val brand_light_on_bg = Color(0xFF1A1F2E)      // onBackground oscuro (inverso)
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Success accent & tertiary-text — theme-aware dark-mode contrast fix
+// (verify-report.md WARNING #3 / WARNING #4 — recomputado con `contrastRatio()`
+// en `ContrastUtils.kt`, no a ojo; ver `DesignTokensTest` para la regresión.)
+// ══════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Acento semántico "success" — modo claro. Sin cambios respecto al literal previo
+ * (`0xFF006B63`); 6.40:1 contra `brand_light_surface` (blanco), ya cumple AA.
+ */
+val brand_success_light = Color(0xFF006B63)
+
+/**
+ * Acento semántico "success" — modo oscuro. Reemplaza el literal previo
+ * (`0xFF006B63`, mismo valor light usado sin adaptar), que daba solo 2.30:1 contra
+ * `brand_surface` — bajo el mínimo no-textual 3:1 de WCAG 1.4.11. Este valor da
+ * 4.32:1, con margen. Mantiene la familia de tono turquesa-verde (mismo hue que el
+ * literal previo, solo aclarado) para no romper la identidad visual del rol "success".
+ */
+val brand_success_dark = Color(0xFF4D9792)
+
+/**
+ * `textTertiary`/`captionColor` — modo oscuro. Reemplaza `scheme.outline`
+ * (`brand_outline`, `0xFF5B5F7D`), que da 2.37:1 contra `brand_surface` — bajo el
+ * mínimo 4.5:1 de WCAG AA para texto normal. Deliberadamente NO se tocó
+ * `brand_outline` en sí (usado también por `iconNormal`, `onSurfaceVariant` y bordes
+ * M3 nativos — cambiarlo ahí tendría un radio de impacto mucho mayor, fuera de
+ * scope de este fix). Este valor da 4.61:1, y se mantiene más oscuro que
+ * `textSecondary` (`0xFF9DA1C0`, 5.81:1) para preservar la jerarquía visual
+ * primary > secondary > tertiary.
+ */
+val brand_text_tertiary_dark = Color(0xFF8C8FA4)
