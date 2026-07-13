@@ -60,11 +60,11 @@ Chain strategy: stacked-to-main (resolved — PR-1 targets `master`, PR-2 target
 
 ## Phase 3 (PR-3): Custom-Draw Dark-Safety & Literal Sweep
 
-- [ ] 3.1 GREEN: `WorkspaceCarousel.kt` `BlurMaskFilter` shadow — `Color.BLACK` → `colorScheme.onSurface`-derived tint
-- [ ] 3.2 Dark-tune IOS shadows/scrims: `IOSDropdownField`, `IOSDropdownMenu`, `IOSButton`, `IOSCard`, `IOSSearchBar`, `CompletionPopup`
-- [ ] 3.3 Dark-tune `BackdropScrim`, `BackgroundGradient*`, `CardShadowColor` usages
-- [ ] 3.4 Triage ~70 stray `Color(0x...)` literals: structural (backgrounds/surfaces/scrims/body text) → fix onto tokens/`colorScheme`; decorative (low-alpha accents/glows) → defer with `// decorative, deferred: dark-mode` comment
-- [ ] 3.5 RED: golden/smoke test — `WorkspaceCarousel` shadow visible on dark surface (one test, per design.md budget)
-- [ ] 3.6 GREEN: confirm smoke test passes against 3.1
-- [ ] 3.7 Manual/visual: verify light theme unaffected across all touched components (spec scenario)
-- [ ] 3.8 Run `./gradlew test` + `./gradlew assembleDebug`; confirm no regressions
+- [x] 3.1 GREEN: `WorkspaceCarousel.kt` `BlurMaskFilter` shadow — `Color.BLACK` → `colorScheme.onSurface`-derived tint
+- [x] 3.2 Dark-tune IOS shadows/scrims: `IOSDropdownField`, `IOSDropdownMenu`, `IOSButton`, `IOSCard`, `IOSSearchBar`, `CompletionPopup`
+- [x] 3.3 Dark-tune `BackdropScrim`, `BackgroundGradient*`, `CardShadowColor` usages — includes `AdaptiveNavigationScaffold` bottom bar (Color.White/Black custom-draw, discovered mid-implementation, same R6 bug class) and `TopSheet` backdrop scrim
+- [x] 3.4 Triage ~70 (found: 74) stray `Color(0x...)` literals + ~20 `Color.White`/`Color.Black` (found mid-implementation, same bug class): structural → fixed onto `LocalDesignTokens`/`colorScheme` across 16 files (including `ConnectionFormScreen.kt`, entirely missed by PR-2's migration list); decorative → deferred with `// decorative, deferred: dark-mode` comments (`CompletionPopup` K/T/C badges, `SqlCodeEditor` multi-cursor indicator, `QueryEditorScreen` stop/play icons, `DbAccents` vendor identity colors, `MatchHighlightTransformation` yellow highlight base — its readability bug WAS fixed by forcing dark text in the SpanStyle). Full list in apply-progress.md.
+- [x] 3.5 RED: golden/smoke test — `WorkspaceCarouselShadowTest` (pure `carouselShadowColorArgb` fn, extracted for testability; asserts dark-theme derivation is never pure black)
+- [x] 3.6 GREEN: confirm smoke test passes against 3.1
+- [x] 3.7 Manual/visual: NOT performed (no emulator/device available in this session, same gap as PR-2 2.8) — compile + unit test + assembleDebug verification done instead. Flagged as residual manual-QA gap for a human reviewer before merge.
+- [x] 3.8 Run `./gradlew test` + `./gradlew assembleDebug`; confirm no regressions — 157 tests (154 + 3 new), same 23 pre-existing/unrelated failures, 0 new failures; assembleDebug BUILD SUCCESSFUL
