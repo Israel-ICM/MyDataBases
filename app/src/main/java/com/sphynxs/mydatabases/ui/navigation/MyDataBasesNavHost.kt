@@ -60,6 +60,9 @@ fun MyDataBasesNavHost(
     // Estado para controlar el sheet de agregar database
     var showAddDatabaseSheet by remember { mutableStateOf(false) }
     
+    // Estado para controlar el sheet de crear tabla (change `create-table`)
+    var showAddTableSheet by remember { mutableStateOf(false) }
+    
     // Obtener WindowSizeClass desde CompositionLocal provisto por MainActivity
     val windowSizeClass = LocalWindowSizeClass.current
         ?: throw IllegalStateException("WindowSizeClass no disponible — MainActivity debe proveerlo vía LocalWindowSizeClass")
@@ -82,6 +85,7 @@ fun MyDataBasesNavHost(
             onModalAction = { destinationId ->
                 when (destinationId) {
                     "add_database" -> showAddDatabaseSheet = true
+                    "new_table" -> showAddTableSheet = true
                     "new_query" -> {
                         // Extraer connectionId del contexto actual
                         val connectionId = when (navigationContext) {
@@ -191,11 +195,16 @@ fun MyDataBasesNavHost(
                 val databaseName = it.arguments?.getString("databaseName") ?: ""
                 TablesListScreen(
                     databaseName = databaseName,
+                    connectionId = connectionId,
                     onNavigateToTableViewer = { tableName ->
                         navController.navigate(Routes.TableViewer.createRoute(databaseName, tableName))
                     },
                     onNavigateBack = { navController.popBackStack() },
-                    workspaceManager = workspaceManager
+                    workspaceManager = workspaceManager,
+                    showAddTableSheet = showAddTableSheet,
+                    onDismissAddTableSheet = {
+                        showAddTableSheet = false
+                    }
                 )
             }
             

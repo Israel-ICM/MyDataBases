@@ -60,6 +60,27 @@ sealed class Routes(val route: String) {
     }
     
     /**
+     * Acción modal para crear una nueva tabla dentro de una base de datos (change `create-table`).
+     *
+     * No se registra como destino navegable real en el `NavHost` — al igual que [AddDatabase],
+     * solo se usa como identificador de ruta para [NavigationDestination]; la acción modal
+     * (`new_table`) abre un `ModalBottomSheet` en vez de navegar.
+     *
+     * @property route Template con argumento `connectionId`
+     */
+    data object NewTable : Routes("connection/{connectionId}/new_table") {
+        /**
+         * Crea la ruta completa reemplazando el argumento connectionId.
+         *
+         * @param connectionId ID de la conexión activa
+         * @return Ruta navegable (ej: "connection/abc-123/new_table")
+         */
+        fun createRoute(connectionId: String): String {
+            return "connection/$connectionId/new_table"
+        }
+    }
+    
+    /**
      * Pantalla del editor de consultas SQL (placeholder para nueva query).
      * 
      * @property route Template con argumento `connectionId`
