@@ -119,6 +119,14 @@
     <string name="error_invalid_database_name">Invalid database name. Use only letters, numbers, and underscores (max 64 characters).</string>
     <string name="error_connection_lost">Connection lost. Please reconnect and try again.</string>
     
+    <!-- Create Table screen (parent sheet, change `create-table` PR-2) -->
+    <string name="create_table_title">Create Table</string>
+    <string name="create_table_field_name_hint">my_table</string>
+    <string name="create_table_add_field">+ Add Field</string>
+    <string name="create_table_button_create">Create Table</string>
+    <string name="create_table_success">Table created</string>
+    <string name="create_table_error_generic">Could not create the table. Please try again.</string>
+    
     <!-- Monitor screen -->
     <string name="monitor_title">Server Monitor</string>
     <string name="monitor_tab_metrics">Metrics</string>

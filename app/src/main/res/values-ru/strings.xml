@@ -82,6 +82,14 @@
     <string name="error_invalid_database_name">Недопустимое имя базы данных. Используйте только буквы, цифры и подчёркивания (макс. 64 символа).</string>
     <string name="error_connection_lost">Подключение потеряно. Переподключитесь и попробуйте снова.</string>
     
+    <!-- Create Table screen (parent sheet, change `create-table` PR-2) -->
+    <string name="create_table_title">Создать таблицу</string>
+    <string name="create_table_field_name_hint">my_table</string>
+    <string name="create_table_add_field">+ Добавить поле</string>
+    <string name="create_table_button_create">Создать таблицу</string>
+    <string name="create_table_success">Таблица создана</string>
+    <string name="create_table_error_generic">Не удалось создать таблицу. Попробуйте снова.</string>
+    
     <!-- Monitor screen -->
     <string name="monitor_title">Монитор сервера</string>
     <string name="monitor_tab_metrics">Метрики</string>

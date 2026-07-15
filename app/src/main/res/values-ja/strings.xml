@@ -82,6 +82,14 @@
     <string name="error_invalid_database_name">無効なデータベース名です。英字、数字、アンダースコアのみを使用してください（最大64文字）。</string>
     <string name="error_connection_lost">接続が失われました。再接続してもう一度お試しください。</string>
     
+    <!-- Create Table screen (parent sheet, change `create-table` PR-2) -->
+    <string name="create_table_title">テーブルを作成</string>
+    <string name="create_table_field_name_hint">my_table</string>
+    <string name="create_table_add_field">+ フィールドを追加</string>
+    <string name="create_table_button_create">テーブルを作成</string>
+    <string name="create_table_success">テーブルを作成しました</string>
+    <string name="create_table_error_generic">テーブルを作成できませんでした。もう一度お試しください。</string>
+    
     <!-- Monitor screen -->
     <string name="monitor_title">サーバーモニター</string>
     <string name="monitor_tab_metrics">メトリクス</string>

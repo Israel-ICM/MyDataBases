@@ -82,6 +82,14 @@
     <string name="error_invalid_database_name">اسم قاعدة بيانات غير صالح. استخدم الحروف والأرقام والشرطات السفلية فقط (بحد أقصى 64 حرفًا).</string>
     <string name="error_connection_lost">فقد الاتصال. يرجى إعادة الاتصال والمحاولة مرة أخرى.</string>
     
+    <!-- Create Table screen (parent sheet, change `create-table` PR-2) -->
+    <string name="create_table_title">إنشاء جدول</string>
+    <string name="create_table_field_name_hint">my_table</string>
+    <string name="create_table_add_field">+ إضافة حقل</string>
+    <string name="create_table_button_create">إنشاء جدول</string>
+    <string name="create_table_success">تم إنشاء الجدول</string>
+    <string name="create_table_error_generic">تعذر إنشاء الجدول. يرجى المحاولة مرة أخرى.</string>
+    
     <!-- Monitor screen -->
     <string name="monitor_title">مراقب الخادم</string>
     <string name="monitor_tab_metrics">المقاييس</string>
