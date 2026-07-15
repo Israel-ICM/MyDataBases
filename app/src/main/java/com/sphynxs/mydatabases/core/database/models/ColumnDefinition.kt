@@ -74,8 +74,11 @@ enum class GeneratedStorageMode(val sqlKeyword: String) {
  */
 sealed class SqlColumnType(
     val sqlName: String,
-    val supportsLength: Boolean,
-    val supportsDecimals: Boolean,
+    // NOTA: calificado como `kotlin.Boolean` a propósito. Sin esto, el compilador
+    // resuelve `Boolean` al `data object Boolean` anidado más abajo (el tipo SQL
+    // BOOLEAN) en vez del tipo primitivo, por scoping de miembros de la clase.
+    val supportsLength: kotlin.Boolean,
+    val supportsDecimals: kotlin.Boolean,
 ) {
     data object Int : SqlColumnType("INT", supportsLength = false, supportsDecimals = false)
     data object TinyInt : SqlColumnType("TINYINT", supportsLength = false, supportsDecimals = false)
