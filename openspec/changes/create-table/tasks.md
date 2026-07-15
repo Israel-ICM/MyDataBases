@@ -52,13 +52,21 @@ Chain strategy: feature-branch-chain (maintainer-approved)
 
 ## Phase 2 (PR-2): Nav Wiring & Parent Sheet
 
-- [ ] 2.1 Add `NewTable` route to `ui/navigation/Routes.kt`, replacing the TODO placeholder
-- [ ] 2.2 `ui/navigation/MyDataBasesNavHost.kt` — add `showAddTableSheet` state + `"new_table"` branch in `onModalAction` (mirrors `showAddDatabaseSheet`/`"add_database"`); pass `connectionId`/`showAddTableSheet`/`onDismissAddTableSheet` down to `TablesListScreen`
-- [ ] 2.3 `ui/screens/tables/CreateTableViewModel.kt` — `StateFlow<List<ColumnDefinition>>`, `CreateTableState` sealed class (Idle/Loading/Success/Error), `addField()`, `createTable(connectionId, name, fields)` calling `CreateTableUseCase`, `reset()`
-- [ ] 2.4 `ui/screens/tables/CreateTableFormContent.kt` — pure sheet content in exact spec order (table-name field → fields list → "+ Agregar campo" → OK/Cancel); OK enabled only when name non-blank AND fields non-empty
-- [ ] 2.5 Wire `ui/screens/tables/TablesListScreen.kt` — new params `connectionId`/`showAddTableSheet`/`onDismissAddTableSheet`; host `ModalBottomSheet(CreateTableFormContent)`; fix hardcoded `"current"` connectionId → real value; on success dismiss+refresh; on error show message, keep sheet open with entered data intact
-- [ ] 2.6 Verify: sheet reopens with cleared state after a prior dismiss (spec scenario "Sheet opens fresh after prior dismiss")
-- [ ] 2.7 Run `./gradlew compileDebugKotlin` — confirm nav+VM+sheet wiring compiles, no regressions
+> **Deviation note**: added 6 new `create_table_*` string keys (title, name-field hint,
+> "+ Agregar campo" label, create-button label, success/error snackbar text) across all 10
+> locales in this PR, ahead of the ~18 `create_table_*`/`field_def_*` keys originally scoped
+> to task 3.4/3.5 (PR-3). Required by the `android-dev` skill's hard no-hardcoded-`Text()`
+> rule: `CreateTableFormContent` introduces new UI text that cannot ship unlocalized. These 6
+> keys are distinct from PR-3's `FieldDefinitionDialog`-specific keys (Nombre/Tipo/Longitud/
+> etc.) — no overlap, no duplicate work for PR-3.
+
+- [x] 2.1 Add `NewTable` route to `ui/navigation/Routes.kt`, replacing the TODO placeholder
+- [x] 2.2 `ui/navigation/MyDataBasesNavHost.kt` — add `showAddTableSheet` state + `"new_table"` branch in `onModalAction` (mirrors `showAddDatabaseSheet`/`"add_database"`); pass `connectionId`/`showAddTableSheet`/`onDismissAddTableSheet` down to `TablesListScreen`
+- [x] 2.3 `ui/screens/tables/CreateTableViewModel.kt` — `StateFlow<List<ColumnDefinition>>`, `CreateTableState` sealed class (Idle/Submitting/Success/Error), `addField()`, `createTable(connectionId, name, fields)` calling `CreateTableUseCase`, `reset()`
+- [x] 2.4 `ui/screens/tables/CreateTableFormContent.kt` — pure sheet content in exact spec order (table-name field → fields list → "+ Agregar campo" → OK/Cancel); OK enabled only when name non-blank AND fields non-empty
+- [x] 2.5 Wire `ui/screens/tables/TablesListScreen.kt` — new params `connectionId`/`showAddTableSheet`/`onDismissAddTableSheet`; host `ModalBottomSheet(CreateTableFormContent)`; fix hardcoded `"current"` connectionId → real value; on success dismiss+refresh; on error show message, keep sheet open with entered data intact
+- [x] 2.6 Verify: sheet reopens with cleared state after a prior dismiss (spec scenario "Sheet opens fresh after prior dismiss") — verified by manual trace: `CreateTableFormContent`'s `name` is a local `remember` disposed when the `if (showAddTableSheet)` subtree leaves composition, and both Cancel and the Success path explicitly call `viewModel.reset()` (clearing `fields`/`createTableState`) before/around dismissal, since `CreateTableViewModel` (via `hiltViewModel()`) is scoped to the `TableList` NavBackStackEntry and would otherwise survive sheet close/reopen — no `./gradlew` execution performed (HARD RULE)
+- [ ] 2.7 Run `./gradlew compileDebugKotlin` — confirm nav+VM+sheet wiring compiles, no regressions — **NOT executed by sdd-apply per project HARD RULE (manual compilation only); maintainer must run this manually and report results**
 
 ## Phase 3 (PR-3): Nested Field Dialog & i18n
 
