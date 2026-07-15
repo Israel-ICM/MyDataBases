@@ -10,14 +10,23 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -39,6 +48,7 @@ import com.sphynxs.mydatabases.ui.theme.LocalDesignTokens
 import com.sphynxs.mydatabases.ui.theme.AppTheme
 import com.sphynxs.mydatabases.ui.workspace.WorkspaceCard
 import com.sphynxs.mydatabases.ui.workspace.WorkspaceManager
+import kotlinx.coroutines.launch
 
 /**
  * Pantalla de lista de tablas.
@@ -47,24 +57,47 @@ import com.sphynxs.mydatabases.ui.workspace.WorkspaceManager
  * Al seleccionar una tabla, navega al visor de tabla.
  *
  * @param databaseName Nombre de la base de datos
+ * @param connectionId ID de la conexión activa (change `create-table`: reemplaza el
+ *   `connectionId = "current"` hardcodeado previo, ver design.md)
  * @param onNavigateToTableViewer Callback para navegar al visor de tabla
+ * @param showAddTableSheet Si se debe mostrar el sheet de crear tabla (controlado externamente)
+ * @param onDismissAddTableSheet Callback cuando se cierra el sheet
  * @param viewModel El ViewModel con la lógica de estado
  * @param modifier Modificador opcional
  *
  * @author israel-icm
- * @date 2026-06-12
+ * @date 2026-06-12 (updated 2026-07-15 para sheet de crear tabla, change `create-table`)
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TablesListScreen(
     databaseName: String,
+    connectionId: String,
     onNavigateToTableViewer: (tableName: String) -> Unit,
     onNavigateBack: () -> Unit,
     workspaceManager: WorkspaceManager,
+    showAddTableSheet: Boolean = false,
+    onDismissAddTableSheet: () -> Unit = {},
     viewModel: TablesListViewModel = hiltViewModel(),
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val searchQuery by viewModel.searchQuery.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+
+    // Estado del bottom sheet de crear tabla
+    val addTableSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    // Altura real del status bar (incluye notch/cutout) — mirrors DatabasesListScreen
+    val statusBarHeightDp = with(LocalDensity.current) {
+        LocalContext.current.resources
+            .getIdentifier("status_bar_height", "dimen", "android")
+            .takeIf { it > 0 }
+            ?.let { resourceId ->
+                LocalContext.current.resources.getDimensionPixelSize(resourceId).toDp()
+            } ?: 24.dp
+    }
 
     // Cargar tables al montar la pantalla
     LaunchedEffect(databaseName) {
@@ -72,7 +105,8 @@ fun TablesListScreen(
     }
 
     Scaffold(
-        modifier = modifier
+        modifier = modifier,
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
         BreathingBackground(
             modifier = Modifier
@@ -119,7 +153,7 @@ fun TablesListScreen(
                                             WorkspaceCard.Table(
                                                 id = "table:${databaseName}:${table.name}",
                                                 title = table.name,
-                                                connectionId = "current",
+                                                connectionId = connectionId,
                                                 databaseName = databaseName,
                                                 tableName = table.name
                                             )
@@ -160,6 +194,51 @@ fun TablesListScreen(
             }
         }
     } // Cierre del Scaffold
+
+    // Bottom Sheet para crear tabla (change `create-table`)
+    if (showAddTableSheet) {
+        ModalBottomSheet(
+            onDismissRequest = {
+                scope.launch {
+                    addTableSheetState.hide()
+                    onDismissAddTableSheet()
+                }
+            },
+            sheetState = addTableSheetState,
+            containerColor = LocalDesignTokens.current.backgroundPrimary,
+            sheetMaxWidth = 10000.dp,
+            scrimColor = LocalDesignTokens.current.backdropScrim,
+            tonalElevation = 16.dp
+        ) {
+            Scaffold(
+                snackbarHost = { SnackbarHost(snackbarHostState) },
+                containerColor = Color.Transparent
+            ) { innerPadding ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                        .padding(start = 16.dp, end = 16.dp, top = statusBarHeightDp)
+                ) {
+                    CreateTableFormContent(
+                        connectionId = connectionId,
+                        onDismiss = {
+                            scope.launch {
+                                addTableSheetState.hide()
+                                onDismissAddTableSheet()
+                            }
+                        },
+                        onTableCreated = {
+                            // Refrescar la lista de tablas tras crear una nueva
+                            viewModel.loadTables(databaseName)
+                        },
+                        snackbarHostState = snackbarHostState,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+            }
+        }
+    }
 }
 
 /**
