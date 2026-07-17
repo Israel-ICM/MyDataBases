@@ -97,6 +97,7 @@
     <string name="field_def_type_filter_hint">प्रकार खोजें…</string>
     <string name="field_def_length_hint">लंबाई (जैसे 255)</string>
     <string name="field_def_decimals_hint">दशमलव (जैसे 2)</string>
+    <string name="field_def_values_hint">मान, कॉमा से अलग करें (जैसे सक्रिय, निष्क्रिय)</string>
     <string name="field_def_nullable_label">नल हो सकता है</string>
     <string name="field_def_virtual_label">वर्चुअल (जनरेटेड कॉलम)</string>
     <string name="field_def_expression_hint">एक्सप्रेशन (जैसे price * quantity)</string>
@@ -107,6 +108,15 @@
     <string name="field_def_error_name_invalid">अमान्य पहचानकर्ता। केवल अक्षर, अंक और अंडरस्कोर उपयोग करें (अधिकतम 64 वर्ण)।</string>
     <string name="field_def_error_type_required">कॉलम प्रकार चुनें</string>
     <string name="field_def_error_expression_required">जनरेटेड (वर्चुअल) कॉलम के लिए एक्सप्रेशन आवश्यक है</string>
+    <string name="field_def_error_values_required">कम से कम एक गैर-रिक्त, अद्वितीय मान आवश्यक है</string>
+
+    <!-- Field Definition Dialog: विस्तारित फ़ील्ड विशेषताएं (change `create-table`, extended field attributes addendum) -->
+    <string name="field_def_default_value_hint">डिफ़ॉल्ट मान (जैसे CURRENT_TIMESTAMP, 0, \'टेक्स्ट\')</string>
+    <string name="field_def_autoincrement_label">ऑटो इंक्रीमेंट</string>
+    <string name="field_def_zerofill_label">शून्य से भरें</string>
+    <string name="field_def_charset_hint">कैरेक्टर सेट (जैसे utf8mb4)</string>
+    <string name="field_def_collation_hint">कोलेशन (जैसे utf8mb4_general_ci)</string>
+    <string name="field_def_auto_update_timestamp_label">बदलाव पर स्वतः अपडेट करें (ON UPDATE CURRENT_TIMESTAMP)</string>
     
     <!-- Monitor screen -->
     <string name="monitor_title">सर्वर मॉनिटर</string>

@@ -97,6 +97,7 @@
     <string name="field_def_type_filter_hint">型を検索…</string>
     <string name="field_def_length_hint">長さ(例: 255)</string>
     <string name="field_def_decimals_hint">小数点以下の桁数(例: 2)</string>
+    <string name="field_def_values_hint">値をカンマ区切りで入力(例: 有効, 無効)</string>
     <string name="field_def_nullable_label">NULL許可</string>
     <string name="field_def_virtual_label">仮想(生成列)</string>
     <string name="field_def_expression_hint">式(例: 価格 * 数量)</string>
@@ -107,6 +108,15 @@
     <string name="field_def_error_name_invalid">無効な識別子です。使用できるのは英数字とアンダースコアのみです(最大64文字)。</string>
     <string name="field_def_error_type_required">列の型を選択してください</string>
     <string name="field_def_error_expression_required">生成(仮想)列には式が必須です</string>
+    <string name="field_def_error_values_required">空でない一意の値が少なくとも1つ必要です</string>
+
+    <!-- Field Definition Dialog: 拡張フィールド属性 (change `create-table`, extended field attributes addendum) -->
+    <string name="field_def_default_value_hint">デフォルト値(例: CURRENT_TIMESTAMP, 0, \'テキスト\')</string>
+    <string name="field_def_autoincrement_label">自動増分</string>
+    <string name="field_def_zerofill_label">ゼロ埋め</string>
+    <string name="field_def_charset_hint">文字セット(例: utf8mb4)</string>
+    <string name="field_def_collation_hint">照合順序(例: utf8mb4_general_ci)</string>
+    <string name="field_def_auto_update_timestamp_label">変更時に自動更新(ON UPDATE CURRENT_TIMESTAMP)</string>
     
     <!-- Monitor screen -->
     <string name="monitor_title">サーバーモニター</string>

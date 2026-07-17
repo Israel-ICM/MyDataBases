@@ -132,6 +132,7 @@
     <string name="field_def_type_filter_hint">Buscar tipos…</string>
     <string name="field_def_length_hint">Longitud (ej. 255)</string>
     <string name="field_def_decimals_hint">Decimales (ej. 2)</string>
+    <string name="field_def_values_hint">Valores, separados por coma (ej. activo, inactivo)</string>
     <string name="field_def_nullable_label">Nulo</string>
     <string name="field_def_virtual_label">Virtual (columna generada)</string>
     <string name="field_def_expression_hint">Expresión (ej. precio * cantidad)</string>
@@ -142,6 +143,15 @@
     <string name="field_def_error_name_invalid">Identificador inválido. Use solo letras, números y guiones bajos (máx. 64 caracteres).</string>
     <string name="field_def_error_type_required">Seleccione un tipo de columna</string>
     <string name="field_def_error_expression_required">La expresión es obligatoria para columnas generadas (virtuales)</string>
+    <string name="field_def_error_values_required">Se requiere al menos un valor no vacío y sin duplicados</string>
+
+    <!-- Field Definition Dialog: atributos extendidos (change `create-table`, extended field attributes addendum) -->
+    <string name="field_def_default_value_hint">Valor predeterminado (ej. CURRENT_TIMESTAMP, 0, \'texto\')</string>
+    <string name="field_def_autoincrement_label">Autoincrement</string>
+    <string name="field_def_zerofill_label">Rellenar con ceros</string>
+    <string name="field_def_charset_hint">Conjunto de caracteres (ej. utf8mb4)</string>
+    <string name="field_def_collation_hint">Collation (ej. utf8mb4_general_ci)</string>
+    <string name="field_def_auto_update_timestamp_label">Actualizar automáticamente al modificar (ON UPDATE CURRENT_TIMESTAMP)</string>
     
     <!-- Monitor screen -->
     <string name="monitor_title">Monitor del servidor</string>

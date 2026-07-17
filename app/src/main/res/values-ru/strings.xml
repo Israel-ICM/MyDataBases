@@ -97,6 +97,7 @@
     <string name="field_def_type_filter_hint">Поиск типов…</string>
     <string name="field_def_length_hint">Длина (напр. 255)</string>
     <string name="field_def_decimals_hint">Десятичные знаки (напр. 2)</string>
+    <string name="field_def_values_hint">Значения через запятую (напр. активен, неактивен)</string>
     <string name="field_def_nullable_label">Допускает NULL</string>
     <string name="field_def_virtual_label">Виртуальный (вычисляемый столбец)</string>
     <string name="field_def_expression_hint">Выражение (напр. цена * количество)</string>
@@ -107,6 +108,15 @@
     <string name="field_def_error_name_invalid">Недопустимый идентификатор. Используйте только буквы, цифры и подчёркивания (макс. 64 символа).</string>
     <string name="field_def_error_type_required">Выберите тип столбца</string>
     <string name="field_def_error_expression_required">Выражение обязательно для вычисляемых (виртуальных) столбцов</string>
+    <string name="field_def_error_values_required">Требуется как минимум одно непустое уникальное значение</string>
+
+    <!-- Field Definition Dialog: расширенные атрибуты поля (change `create-table`, extended field attributes addendum) -->
+    <string name="field_def_default_value_hint">Значение по умолчанию (напр. CURRENT_TIMESTAMP, 0, \'текст\')</string>
+    <string name="field_def_autoincrement_label">Автоинкремент</string>
+    <string name="field_def_zerofill_label">Заполнение нулями</string>
+    <string name="field_def_charset_hint">Кодировка (напр. utf8mb4)</string>
+    <string name="field_def_collation_hint">Сортировка (напр. utf8mb4_general_ci)</string>
+    <string name="field_def_auto_update_timestamp_label">Автообновление при изменении (ON UPDATE CURRENT_TIMESTAMP)</string>
     
     <!-- Monitor screen -->
     <string name="monitor_title">Монитор сервера</string>

@@ -97,6 +97,7 @@
     <string name="field_def_type_filter_hint">搜索类型…</string>
     <string name="field_def_length_hint">长度(例如 255)</string>
     <string name="field_def_decimals_hint">小数位数(例如 2)</string>
+    <string name="field_def_values_hint">值,用逗号分隔(例如 启用, 禁用)</string>
     <string name="field_def_nullable_label">可为空</string>
     <string name="field_def_virtual_label">虚拟(生成列)</string>
     <string name="field_def_expression_hint">表达式(例如 价格 * 数量)</string>
@@ -107,6 +108,15 @@
     <string name="field_def_error_name_invalid">标识符无效。只能使用字母、数字和下划线(最多 64 个字符)。</string>
     <string name="field_def_error_type_required">请选择列类型</string>
     <string name="field_def_error_expression_required">生成(虚拟)列必须填写表达式</string>
+    <string name="field_def_error_values_required">至少需要一个非空且不重复的值</string>
+
+    <!-- Field Definition Dialog: 扩展字段属性 (change `create-table`, extended field attributes addendum) -->
+    <string name="field_def_default_value_hint">默认值(例如 CURRENT_TIMESTAMP、0、\'文本\')</string>
+    <string name="field_def_autoincrement_label">自动递增</string>
+    <string name="field_def_zerofill_label">零填充</string>
+    <string name="field_def_charset_hint">字符集(例如 utf8mb4)</string>
+    <string name="field_def_collation_hint">排序规则(例如 utf8mb4_general_ci)</string>
+    <string name="field_def_auto_update_timestamp_label">修改时自动更新(ON UPDATE CURRENT_TIMESTAMP)</string>
     
     <!-- Monitor screen -->
     <string name="monitor_title">服务器监控</string>

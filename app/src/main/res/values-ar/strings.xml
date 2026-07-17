@@ -97,6 +97,7 @@
     <string name="field_def_type_filter_hint">البحث عن الأنواع…</string>
     <string name="field_def_length_hint">الطول (مثال 255)</string>
     <string name="field_def_decimals_hint">الأرقام العشرية (مثال 2)</string>
+    <string name="field_def_values_hint">القيم، مفصولة بفواصل (مثال: نشط، غير نشط)</string>
     <string name="field_def_nullable_label">قابل للقيمة الفارغة</string>
     <string name="field_def_virtual_label">افتراضي (عمود مُولّد)</string>
     <string name="field_def_expression_hint">التعبير (مثال السعر * الكمية)</string>
@@ -107,6 +108,15 @@
     <string name="field_def_error_name_invalid">معرّف غير صالح. استخدم الأحرف والأرقام والشرطة السفلية فقط (بحد أقصى 64 حرفًا).</string>
     <string name="field_def_error_type_required">اختر نوع العمود</string>
     <string name="field_def_error_expression_required">التعبير مطلوب للأعمدة المُولّدة (الافتراضية)</string>
+    <string name="field_def_error_values_required">مطلوب قيمة واحدة على الأقل غير فارغة وغير مكررة</string>
+
+    <!-- Field Definition Dialog: extended field attributes (change `create-table`, extended field attributes addendum) -->
+    <string name="field_def_default_value_hint">القيمة الافتراضية (مثال CURRENT_TIMESTAMP، 0، \'نص\')</string>
+    <string name="field_def_autoincrement_label">زيادة تلقائية</string>
+    <string name="field_def_zerofill_label">التعبئة بالأصفار</string>
+    <string name="field_def_charset_hint">مجموعة الأحرف (مثال utf8mb4)</string>
+    <string name="field_def_collation_hint">الترتيب (مثال utf8mb4_general_ci)</string>
+    <string name="field_def_auto_update_timestamp_label">تحديث تلقائي عند التعديل (ON UPDATE CURRENT_TIMESTAMP)</string>
     
     <!-- Monitor screen -->
     <string name="monitor_title">مراقب الخادم</string>

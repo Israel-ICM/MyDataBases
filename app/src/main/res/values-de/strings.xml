@@ -97,6 +97,7 @@
     <string name="field_def_type_filter_hint">Typen suchen…</string>
     <string name="field_def_length_hint">Länge (z. B. 255)</string>
     <string name="field_def_decimals_hint">Dezimalstellen (z. B. 2)</string>
+    <string name="field_def_values_hint">Werte, durch Komma getrennt (z. B. aktiv, inaktiv)</string>
     <string name="field_def_nullable_label">Nullable</string>
     <string name="field_def_virtual_label">Virtuell (generierte Spalte)</string>
     <string name="field_def_expression_hint">Ausdruck (z. B. preis * menge)</string>
@@ -107,6 +108,15 @@
     <string name="field_def_error_name_invalid">Ungültiger Bezeichner. Verwenden Sie nur Buchstaben, Zahlen und Unterstriche (max. 64 Zeichen).</string>
     <string name="field_def_error_type_required">Wählen Sie einen Spaltentyp aus</string>
     <string name="field_def_error_expression_required">Ausdruck ist für generierte (virtuelle) Spalten erforderlich</string>
+    <string name="field_def_error_values_required">Mindestens ein nicht leerer, eindeutiger Wert ist erforderlich</string>
+
+    <!-- Field Definition Dialog: erweiterte Feldattribute (change `create-table`, extended field attributes addendum) -->
+    <string name="field_def_default_value_hint">Standardwert (z. B. CURRENT_TIMESTAMP, 0, \'text\')</string>
+    <string name="field_def_autoincrement_label">Auto-Inkrement</string>
+    <string name="field_def_zerofill_label">Mit Nullen auffüllen</string>
+    <string name="field_def_charset_hint">Zeichensatz (z. B. utf8mb4)</string>
+    <string name="field_def_collation_hint">Kollation (z. B. utf8mb4_general_ci)</string>
+    <string name="field_def_auto_update_timestamp_label">Automatisch bei Änderung aktualisieren (ON UPDATE CURRENT_TIMESTAMP)</string>
     
     <!-- Monitor screen -->
     <string name="monitor_title">Server-Monitor</string>
