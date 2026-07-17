@@ -82,6 +82,14 @@
     <string name="error_invalid_database_name">数据库名称无效。仅使用字母、数字和下划线（最多64个字符）。</string>
     <string name="error_connection_lost">连接丢失。请重新连接并重试。</string>
     
+    <!-- Create Table screen (parent sheet, change `create-table` PR-2) -->
+    <string name="create_table_title">创建表</string>
+    <string name="create_table_field_name_hint">my_table</string>
+    <string name="create_table_add_field">+ 添加字段</string>
+    <string name="create_table_button_create">创建表</string>
+    <string name="create_table_success">表已创建</string>
+    <string name="create_table_error_generic">无法创建表。请重试。</string>
+    
     <!-- Monitor screen -->
     <string name="monitor_title">服务器监控</string>
     <string name="monitor_tab_metrics">指标</string>

@@ -82,6 +82,14 @@
     <string name="error_invalid_database_name">अमान्य डेटाबेस नाम। केवल अक्षर, संख्या और अंडरस्कोर का उपयोग करें (अधिकतम 64 वर्ण)।</string>
     <string name="error_connection_lost">कनेक्शन टूट गया। कृपया पुनः कनेक्ट करें और पुनः प्रयास करें।</string>
     
+    <!-- Create Table screen (parent sheet, change `create-table` PR-2) -->
+    <string name="create_table_title">टेबल बनाएं</string>
+    <string name="create_table_field_name_hint">my_table</string>
+    <string name="create_table_add_field">+ फ़ील्ड जोड़ें</string>
+    <string name="create_table_button_create">टेबल बनाएं</string>
+    <string name="create_table_success">टेबल बन गई</string>
+    <string name="create_table_error_generic">टेबल नहीं बनाई जा सकी। कृपया पुनः प्रयास करें।</string>
+    
     <!-- Monitor screen -->
     <string name="monitor_title">सर्वर मॉनिटर</string>
     <string name="monitor_tab_metrics">मेट्रिक्स</string>

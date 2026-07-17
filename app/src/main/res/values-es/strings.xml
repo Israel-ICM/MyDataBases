@@ -117,6 +117,14 @@
     <string name="error_invalid_database_name">Nombre de base de datos inválido. Usá solo letras, números y guiones bajos (máx 64 caracteres).</string>
     <string name="error_connection_lost">Conexión perdida. Reconectá e intentá de nuevo.</string>
     
+    <!-- Create Table screen (parent sheet, change `create-table` PR-2) -->
+    <string name="create_table_title">Crear tabla</string>
+    <string name="create_table_field_name_hint">mi_tabla</string>
+    <string name="create_table_add_field">+ Agregar campo</string>
+    <string name="create_table_button_create">Crear tabla</string>
+    <string name="create_table_success">Tabla creada</string>
+    <string name="create_table_error_generic">No se pudo crear la tabla. Intentá de nuevo.</string>
+    
     <!-- Monitor screen -->
     <string name="monitor_title">Monitor del servidor</string>
     <string name="monitor_tab_metrics">Métricas</string>

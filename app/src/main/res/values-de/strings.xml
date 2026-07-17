@@ -82,6 +82,14 @@
     <string name="error_invalid_database_name">Ungültiger Datenbankname. Verwenden Sie nur Buchstaben, Zahlen und Unterstriche (max. 64 Zeichen).</string>
     <string name="error_connection_lost">Verbindung verloren. Bitte erneut verbinden und wiederholen.</string>
     
+    <!-- Create Table screen (parent sheet, change `create-table` PR-2) -->
+    <string name="create_table_title">Tabelle erstellen</string>
+    <string name="create_table_field_name_hint">meine_tabelle</string>
+    <string name="create_table_add_field">+ Feld hinzufügen</string>
+    <string name="create_table_button_create">Tabelle erstellen</string>
+    <string name="create_table_success">Tabelle erstellt</string>
+    <string name="create_table_error_generic">Tabelle konnte nicht erstellt werden. Bitte versuchen Sie es erneut.</string>
+    
     <!-- Monitor screen -->
     <string name="monitor_title">Server-Monitor</string>
     <string name="monitor_tab_metrics">Metriken</string>

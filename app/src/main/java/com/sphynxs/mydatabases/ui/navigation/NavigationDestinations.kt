@@ -145,7 +145,7 @@ private fun destinationsForTablesList(connectionId: String): List<NavigationDest
             id = "new_table",
             labelRes = R.string.nav_new_table,
             icon = com.sphynxs.mydatabases.ui.components.PhosphorAppIcons.Nav.newTable,
-            route = Routes.NewQuery.createRoute(connectionId), // TODO: Crear Routes.NewTable cuando esté listo
+            route = Routes.NewTable.createRoute(connectionId),
             isModal = true, // Abre ModalBottomSheet en vez de navegar
         ),
         NavigationDestination(
