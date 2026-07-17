@@ -78,6 +78,11 @@ fun CreateTableFormContent(
     val fields by viewModel.fields.collectAsState()
     val createTableState by viewModel.createTableState.collectAsState()
 
+    // Estado de carga de character sets/collations para el Field Definition Dialog (change
+    // `create-table`, extended field attributes addendum)
+    val fieldCharsetState by viewModel.fieldCharsetState.collectAsState()
+    val fieldCollationState by viewModel.fieldCollationState.collectAsState()
+
     // Estado local del nombre de tabla (mirrors AddDatabaseFormContent's `name`)
     var name by remember { mutableStateOf("") }
 
@@ -254,12 +259,22 @@ fun CreateTableFormContent(
     // Diálogo anidado "Agregar campo" (PR-3). Montado solo mientras showFieldDialog es
     // true; su estado de formulario interno se descarta naturalmente al desmontarse.
     if (showFieldDialog) {
+        val charsets = (fieldCharsetState as? FieldCharsetLoadState.Success)?.charsets ?: emptyList()
+        val charsetsLoading = fieldCharsetState is FieldCharsetLoadState.Loading
+        val collations = (fieldCollationState as? FieldCollationLoadState.Success)?.collations ?: emptyList()
+        val collationsLoading = fieldCollationState is FieldCollationLoadState.Loading
+
         FieldDefinitionDialog(
             onDismiss = { showFieldDialog = false },
             onFieldConfirmed = { field ->
                 viewModel.addField(field)
                 showFieldDialog = false
-            }
+            },
+            charsets = charsets,
+            charsetsLoading = charsetsLoading,
+            collations = collations,
+            collationsLoading = collationsLoading,
+            onCharsetSelected = { charset -> viewModel.loadCollations(charset) },
         )
     }
 }
