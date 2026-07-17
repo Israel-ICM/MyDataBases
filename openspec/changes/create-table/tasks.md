@@ -70,10 +70,10 @@ Chain strategy: feature-branch-chain (maintainer-approved)
 
 ## Phase 3 (PR-3): Nested Field Dialog & i18n
 
-- [ ] 3.1 `ui/components/tables/FieldDefinitionDialog.kt` — sheet-styled `Dialog`, local form state (Nombre/Tipo/Longitud/Decimales/Nulo/Virtual/Expresión/Llave/Comentario) in spec order; Longitud/Decimales enabled per `SqlColumnType` flags; Nulo hidden when Virtual=true; Expresión shown+required only when Virtual=true; Llave forces Nulo=false when non-virtual
-- [ ] 3.2 Wire dialog OK — reuse Phase 1 validation fns; on success `onFieldConfirmed(ColumnDefinition)` → `viewModel.addField()`; close dialog, reveal parent sheet with new field, no SQL executed
-- [ ] 3.3 Wire dialog Cancel/dismiss — discard in-progress input, parent list unchanged
-- [ ] 3.4 Add ~18 `create_table_*`/`field_def_*` keys (labels, validation errors, Expresión required-error, generated-column helper text) to `res/values/strings.xml`
-- [ ] 3.5 Add the same ~18 keys to all 9 remaining locales: `values-es`, `values-ar`, `values-de`, `values-fr`, `values-hi`, `values-ja`, `values-pt-rBR`, `values-ru`, `values-zh-rCN`
-- [ ] 3.6 Audit: grep source tree for hardcoded `Text("...")` literals in `FieldDefinitionDialog.kt`/`CreateTableFormContent.kt` (android-dev skill rule) — confirm zero matches
-- [ ] 3.7 Run `./gradlew testDebugUnitTest compileDebugKotlin assembleDebug` — confirm full feature suite green, no regressions
+- [x] 3.1 `ui/components/tables/FieldDefinitionDialog.kt` — sheet-styled `Dialog`, local form state (Nombre/Tipo/Longitud/Decimales/Nulo/Virtual/Expresión/Llave/Comentario) in spec order; Longitud/Decimales enabled per `SqlColumnType` flags; Nulo hidden when Virtual=true; Expresión shown+required only when Virtual=true; Llave forces Nulo=false when non-virtual
+- [x] 3.2 Wire dialog OK — reuse Phase 1 validation fns; on success `onFieldConfirmed(ColumnDefinition)` → `viewModel.addField()`; close dialog, reveal parent sheet with new field, no SQL executed
+- [x] 3.3 Wire dialog Cancel/dismiss — discard in-progress input, parent list unchanged
+- [x] 3.4 Add ~18 `create_table_*`/`field_def_*` keys (labels, validation errors, Expresión required-error, generated-column helper text) to `res/values/strings.xml` — **deviation**: landed as 15 `field_def_*` keys (dialog title, 9 field labels/hints, OK button, 4 validation errors); dropdown option labels for `SqlColumnType` reuse `it.sqlName` (raw SQL keyword, e.g. "VARCHAR") mirroring the already-shipped, maintainer-approved `column_type` precedent from PR-2 — SQL type keywords are technical identifiers, not natural-language content, so no separate `sql_type_*` key set was added; see apply-progress for full rationale
+- [x] 3.5 Add the same ~18 keys to all 9 remaining locales: `values-es`, `values-ar`, `values-de`, `values-fr`, `values-hi`, `values-ja`, `values-pt-rBR`, `values-ru`, `values-zh-rCN`
+- [x] 3.6 Audit: grep source tree for hardcoded `Text("...")` literals in `FieldDefinitionDialog.kt`/`CreateTableFormContent.kt` (android-dev skill rule) — confirmed zero matches (manual `Select-String` sweep, all `Text()` calls use `stringResource()` or data-derived values)
+- [ ] 3.7 Run `./gradlew testDebugUnitTest compileDebugKotlin assembleDebug` — confirm full feature suite green, no regressions — **NOT executed by sdd-apply per project HARD RULE (manual compilation only); maintainer must run this manually and report results**
