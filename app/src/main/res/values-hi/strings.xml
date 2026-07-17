@@ -89,6 +89,23 @@
     <string name="create_table_button_create">टेबल बनाएं</string>
     <string name="create_table_success">टेबल बन गई</string>
     <string name="create_table_error_generic">टेबल नहीं बनाई जा सकी। कृपया पुनः प्रयास करें।</string>
+
+    <!-- Field Definition Dialog (change `create-table` PR-3) -->
+    <string name="field_def_dialog_title">फ़ील्ड परिभाषा</string>
+    <string name="field_def_name_hint">फ़ील्ड_नाम</string>
+    <string name="field_def_type_hint">प्रकार चुनें</string>
+    <string name="field_def_length_hint">लंबाई (जैसे 255)</string>
+    <string name="field_def_decimals_hint">दशमलव (जैसे 2)</string>
+    <string name="field_def_nullable_label">नल हो सकता है</string>
+    <string name="field_def_virtual_label">वर्चुअल (जनरेटेड कॉलम)</string>
+    <string name="field_def_expression_hint">एक्सप्रेशन (जैसे price * quantity)</string>
+    <string name="field_def_primary_key_label">प्राइमरी की</string>
+    <string name="field_def_comment_hint">टिप्पणी (वैकल्पिक)</string>
+    <string name="field_def_button_ok">ठीक है</string>
+    <string name="field_def_error_name_required">नाम आवश्यक है</string>
+    <string name="field_def_error_name_invalid">अमान्य पहचानकर्ता। केवल अक्षर, अंक और अंडरस्कोर उपयोग करें (अधिकतम 64 वर्ण)।</string>
+    <string name="field_def_error_type_required">कॉलम प्रकार चुनें</string>
+    <string name="field_def_error_expression_required">जनरेटेड (वर्चुअल) कॉलम के लिए एक्सप्रेशन आवश्यक है</string>
     
     <!-- Monitor screen -->
     <string name="monitor_title">सर्वर मॉनिटर</string>

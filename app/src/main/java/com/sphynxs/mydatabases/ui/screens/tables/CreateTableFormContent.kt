@@ -35,21 +35,23 @@ import com.sphynxs.mydatabases.ui.components.ios.IOSButton
 import com.sphynxs.mydatabases.ui.components.ios.IOSButtonStyle
 import com.sphynxs.mydatabases.ui.components.ios.IOSGroupedCard
 import com.sphynxs.mydatabases.ui.components.ios.IOSTextField
+import com.sphynxs.mydatabases.ui.components.tables.FieldDefinitionDialog
 import com.sphynxs.mydatabases.ui.theme.LocalDesignTokens
 import kotlinx.coroutines.launch
 
 /**
- * Contenido del sheet "Crear tabla" (change `create-table`, PR-2).
+ * Contenido del sheet "Crear tabla" (change `create-table`, PR-2 + PR-3).
  *
  * Diseñado para usarse dentro de un `ModalBottomSheet` (mirrors `AddDatabaseFormContent`).
  * Orden vertical exacto por spec (Requirement: Sheet Layout Order): (1) campo nombre de
  * tabla, (2) lista de campos/columnas, (3) botón "+ Agregar campo", (4) acciones OK/Cancel.
  *
- * El botón "+ Agregar campo" queda sin wireado en este PR — abrir `FieldDefinitionDialog`
- * es responsabilidad de PR-3 (ver tasks.md Phase 3).
+ * El botón "+ Agregar campo" abre `FieldDefinitionDialog` (PR-3, ver tasks.md Phase 3);
+ * su `onFieldConfirmed` llama a `viewModel.addField(...)` para agregar el campo a la
+ * lista en construcción, ya renderizada arriba.
  *
  * Spec: create-table
- * Phase: 2 (Nav Wiring & Parent Sheet)
+ * Phase: 2+3 (Nav Wiring & Parent Sheet; Nested Field Dialog)
  *
  * @param connectionId ID de la conexión activa
  * @param onDismiss Callback para cerrar el bottom sheet
@@ -59,7 +61,7 @@ import kotlinx.coroutines.launch
  * @param modifier Modificador opcional
  *
  * @author sdd-apply
- * @date 2026-07-15
+ * @date 2026-07-17
  */
 @Composable
 fun CreateTableFormContent(
@@ -78,6 +80,11 @@ fun CreateTableFormContent(
 
     // Estado local del nombre de tabla (mirrors AddDatabaseFormContent's `name`)
     var name by remember { mutableStateOf("") }
+
+    // Controla la visibilidad de FieldDefinitionDialog (PR-3). El estado del formulario
+    // del diálogo vive dentro de FieldDefinitionDialog y se descarta al salir de
+    // composición — este booleano solo decide si el diálogo está montado o no.
+    var showFieldDialog by remember { mutableStateOf(false) }
 
     // Strings localizados (extraídos para usar en LaunchedEffect)
     val successMessage = stringResource(R.string.create_table_success)
@@ -174,13 +181,10 @@ fun CreateTableFormContent(
                 }
             }
 
-            // (3) Botón "+ Agregar campo" — sin wireado en PR-2 (PR-3 abre FieldDefinitionDialog)
+            // (3) Botón "+ Agregar campo" — abre FieldDefinitionDialog (PR-3)
             IOSButton(
                 text = stringResource(R.string.create_table_add_field),
-                onClick = {
-                    // TODO(PR-3): abrir FieldDefinitionDialog y llamar viewModel.addField(...)
-                    // en onFieldConfirmed. Sin wireado en PR-2 por diseño (ver tasks.md Phase 3).
-                },
+                onClick = { showFieldDialog = true },
                 style = IOSButtonStyle.Secondary,
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
@@ -245,5 +249,17 @@ fun CreateTableFormContent(
                 }
             }
         }
+    }
+
+    // Diálogo anidado "Agregar campo" (PR-3). Montado solo mientras showFieldDialog es
+    // true; su estado de formulario interno se descarta naturalmente al desmontarse.
+    if (showFieldDialog) {
+        FieldDefinitionDialog(
+            onDismiss = { showFieldDialog = false },
+            onFieldConfirmed = { field ->
+                viewModel.addField(field)
+                showFieldDialog = false
+            }
+        )
     }
 }

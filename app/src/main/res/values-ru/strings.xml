@@ -89,6 +89,23 @@
     <string name="create_table_button_create">Создать таблицу</string>
     <string name="create_table_success">Таблица создана</string>
     <string name="create_table_error_generic">Не удалось создать таблицу. Попробуйте снова.</string>
+
+    <!-- Field Definition Dialog (change `create-table` PR-3) -->
+    <string name="field_def_dialog_title">Определение поля</string>
+    <string name="field_def_name_hint">имя_поля</string>
+    <string name="field_def_type_hint">Выберите тип</string>
+    <string name="field_def_length_hint">Длина (напр. 255)</string>
+    <string name="field_def_decimals_hint">Десятичные знаки (напр. 2)</string>
+    <string name="field_def_nullable_label">Допускает NULL</string>
+    <string name="field_def_virtual_label">Виртуальный (вычисляемый столбец)</string>
+    <string name="field_def_expression_hint">Выражение (напр. цена * количество)</string>
+    <string name="field_def_primary_key_label">Первичный ключ</string>
+    <string name="field_def_comment_hint">Комментарий (необязательно)</string>
+    <string name="field_def_button_ok">ОК</string>
+    <string name="field_def_error_name_required">Имя обязательно</string>
+    <string name="field_def_error_name_invalid">Недопустимый идентификатор. Используйте только буквы, цифры и подчёркивания (макс. 64 символа).</string>
+    <string name="field_def_error_type_required">Выберите тип столбца</string>
+    <string name="field_def_error_expression_required">Выражение обязательно для вычисляемых (виртуальных) столбцов</string>
     
     <!-- Monitor screen -->
     <string name="monitor_title">Монитор сервера</string>

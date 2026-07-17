@@ -124,6 +124,23 @@
     <string name="create_table_button_create">Crear tabla</string>
     <string name="create_table_success">Tabla creada</string>
     <string name="create_table_error_generic">No se pudo crear la tabla. Intentá de nuevo.</string>
+
+    <!-- Field Definition Dialog (change `create-table` PR-3) -->
+    <string name="field_def_dialog_title">Definición de campo</string>
+    <string name="field_def_name_hint">nombre_campo</string>
+    <string name="field_def_type_hint">Seleccionar tipo</string>
+    <string name="field_def_length_hint">Longitud (ej. 255)</string>
+    <string name="field_def_decimals_hint">Decimales (ej. 2)</string>
+    <string name="field_def_nullable_label">Nulo</string>
+    <string name="field_def_virtual_label">Virtual (columna generada)</string>
+    <string name="field_def_expression_hint">Expresión (ej. precio * cantidad)</string>
+    <string name="field_def_primary_key_label">Llave primaria</string>
+    <string name="field_def_comment_hint">Comentario (opcional)</string>
+    <string name="field_def_button_ok">Aceptar</string>
+    <string name="field_def_error_name_required">El nombre es obligatorio</string>
+    <string name="field_def_error_name_invalid">Identificador inválido. Use solo letras, números y guiones bajos (máx. 64 caracteres).</string>
+    <string name="field_def_error_type_required">Seleccione un tipo de columna</string>
+    <string name="field_def_error_expression_required">La expresión es obligatoria para columnas generadas (virtuales)</string>
     
     <!-- Monitor screen -->
     <string name="monitor_title">Monitor del servidor</string>

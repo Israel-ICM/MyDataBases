@@ -89,6 +89,23 @@
     <string name="create_table_button_create">Tabelle erstellen</string>
     <string name="create_table_success">Tabelle erstellt</string>
     <string name="create_table_error_generic">Tabelle konnte nicht erstellt werden. Bitte versuchen Sie es erneut.</string>
+
+    <!-- Field Definition Dialog (change `create-table` PR-3) -->
+    <string name="field_def_dialog_title">Feld definieren</string>
+    <string name="field_def_name_hint">feldname</string>
+    <string name="field_def_type_hint">Typ auswählen</string>
+    <string name="field_def_length_hint">Länge (z. B. 255)</string>
+    <string name="field_def_decimals_hint">Dezimalstellen (z. B. 2)</string>
+    <string name="field_def_nullable_label">Nullable</string>
+    <string name="field_def_virtual_label">Virtuell (generierte Spalte)</string>
+    <string name="field_def_expression_hint">Ausdruck (z. B. preis * menge)</string>
+    <string name="field_def_primary_key_label">Primärschlüssel</string>
+    <string name="field_def_comment_hint">Kommentar (optional)</string>
+    <string name="field_def_button_ok">OK</string>
+    <string name="field_def_error_name_required">Name ist erforderlich</string>
+    <string name="field_def_error_name_invalid">Ungültiger Bezeichner. Verwenden Sie nur Buchstaben, Zahlen und Unterstriche (max. 64 Zeichen).</string>
+    <string name="field_def_error_type_required">Wählen Sie einen Spaltentyp aus</string>
+    <string name="field_def_error_expression_required">Ausdruck ist für generierte (virtuelle) Spalten erforderlich</string>
     
     <!-- Monitor screen -->
     <string name="monitor_title">Server-Monitor</string>

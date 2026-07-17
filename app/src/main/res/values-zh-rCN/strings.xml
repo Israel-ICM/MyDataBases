@@ -89,6 +89,23 @@
     <string name="create_table_button_create">创建表</string>
     <string name="create_table_success">表已创建</string>
     <string name="create_table_error_generic">无法创建表。请重试。</string>
+
+    <!-- Field Definition Dialog (change `create-table` PR-3) -->
+    <string name="field_def_dialog_title">字段定义</string>
+    <string name="field_def_name_hint">字段名</string>
+    <string name="field_def_type_hint">选择类型</string>
+    <string name="field_def_length_hint">长度(例如 255)</string>
+    <string name="field_def_decimals_hint">小数位数(例如 2)</string>
+    <string name="field_def_nullable_label">可为空</string>
+    <string name="field_def_virtual_label">虚拟(生成列)</string>
+    <string name="field_def_expression_hint">表达式(例如 价格 * 数量)</string>
+    <string name="field_def_primary_key_label">主键</string>
+    <string name="field_def_comment_hint">备注(可选)</string>
+    <string name="field_def_button_ok">确定</string>
+    <string name="field_def_error_name_required">名称为必填项</string>
+    <string name="field_def_error_name_invalid">标识符无效。只能使用字母、数字和下划线(最多 64 个字符)。</string>
+    <string name="field_def_error_type_required">请选择列类型</string>
+    <string name="field_def_error_expression_required">生成(虚拟)列必须填写表达式</string>
     
     <!-- Monitor screen -->
     <string name="monitor_title">服务器监控</string>

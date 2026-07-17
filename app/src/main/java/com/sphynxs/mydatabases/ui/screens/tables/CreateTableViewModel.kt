@@ -37,8 +37,8 @@ class CreateTableViewModel @Inject constructor(
     /**
      * Agrega un campo al final de la lista en construcción.
      *
-     * Invocado desde `FieldDefinitionDialog.onFieldConfirmed` (PR-3). No usado todavía
-     * en PR-2, ya que el diálogo anidado aún no está wireado.
+     * Invocado desde `CreateTableFormContent`'s `FieldDefinitionDialog.onFieldConfirmed`
+     * (PR-3).
      */
     fun addField(field: ColumnDefinition) {
         _fields.value = _fields.value + field

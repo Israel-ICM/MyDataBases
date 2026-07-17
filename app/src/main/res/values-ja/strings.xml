@@ -89,6 +89,23 @@
     <string name="create_table_button_create">テーブルを作成</string>
     <string name="create_table_success">テーブルを作成しました</string>
     <string name="create_table_error_generic">テーブルを作成できませんでした。もう一度お試しください。</string>
+
+    <!-- Field Definition Dialog (change `create-table` PR-3) -->
+    <string name="field_def_dialog_title">フィールド定義</string>
+    <string name="field_def_name_hint">フィールド名</string>
+    <string name="field_def_type_hint">型を選択</string>
+    <string name="field_def_length_hint">長さ(例: 255)</string>
+    <string name="field_def_decimals_hint">小数点以下の桁数(例: 2)</string>
+    <string name="field_def_nullable_label">NULL許可</string>
+    <string name="field_def_virtual_label">仮想(生成列)</string>
+    <string name="field_def_expression_hint">式(例: 価格 * 数量)</string>
+    <string name="field_def_primary_key_label">主キー</string>
+    <string name="field_def_comment_hint">コメント(任意)</string>
+    <string name="field_def_button_ok">OK</string>
+    <string name="field_def_error_name_required">名前は必須です</string>
+    <string name="field_def_error_name_invalid">無効な識別子です。使用できるのは英数字とアンダースコアのみです(最大64文字)。</string>
+    <string name="field_def_error_type_required">列の型を選択してください</string>
+    <string name="field_def_error_expression_required">生成(仮想)列には式が必須です</string>
     
     <!-- Monitor screen -->
     <string name="monitor_title">サーバーモニター</string>

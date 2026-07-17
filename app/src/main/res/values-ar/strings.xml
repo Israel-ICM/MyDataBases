@@ -89,6 +89,23 @@
     <string name="create_table_button_create">إنشاء جدول</string>
     <string name="create_table_success">تم إنشاء الجدول</string>
     <string name="create_table_error_generic">تعذر إنشاء الجدول. يرجى المحاولة مرة أخرى.</string>
+
+    <!-- Field Definition Dialog (change `create-table` PR-3) -->
+    <string name="field_def_dialog_title">تعريف الحقل</string>
+    <string name="field_def_name_hint">اسم_الحقل</string>
+    <string name="field_def_type_hint">اختر النوع</string>
+    <string name="field_def_length_hint">الطول (مثال 255)</string>
+    <string name="field_def_decimals_hint">الأرقام العشرية (مثال 2)</string>
+    <string name="field_def_nullable_label">قابل للقيمة الفارغة</string>
+    <string name="field_def_virtual_label">افتراضي (عمود مُولّد)</string>
+    <string name="field_def_expression_hint">التعبير (مثال السعر * الكمية)</string>
+    <string name="field_def_primary_key_label">المفتاح الأساسي</string>
+    <string name="field_def_comment_hint">تعليق (اختياري)</string>
+    <string name="field_def_button_ok">موافق</string>
+    <string name="field_def_error_name_required">الاسم مطلوب</string>
+    <string name="field_def_error_name_invalid">معرّف غير صالح. استخدم الأحرف والأرقام والشرطة السفلية فقط (بحد أقصى 64 حرفًا).</string>
+    <string name="field_def_error_type_required">اختر نوع العمود</string>
+    <string name="field_def_error_expression_required">التعبير مطلوب للأعمدة المُولّدة (الافتراضية)</string>
     
     <!-- Monitor screen -->
     <string name="monitor_title">مراقب الخادم</string>

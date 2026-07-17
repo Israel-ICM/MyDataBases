@@ -126,6 +126,23 @@
     <string name="create_table_button_create">Create Table</string>
     <string name="create_table_success">Table created</string>
     <string name="create_table_error_generic">Could not create the table. Please try again.</string>
+
+    <!-- Field Definition Dialog (change `create-table` PR-3) -->
+    <string name="field_def_dialog_title">Field Definition</string>
+    <string name="field_def_name_hint">field_name</string>
+    <string name="field_def_type_hint">Select type</string>
+    <string name="field_def_length_hint">Length (e.g. 255)</string>
+    <string name="field_def_decimals_hint">Decimals (e.g. 2)</string>
+    <string name="field_def_nullable_label">Nullable</string>
+    <string name="field_def_virtual_label">Virtual (generated column)</string>
+    <string name="field_def_expression_hint">Expression (e.g. price * quantity)</string>
+    <string name="field_def_primary_key_label">Primary Key</string>
+    <string name="field_def_comment_hint">Comment (optional)</string>
+    <string name="field_def_button_ok">OK</string>
+    <string name="field_def_error_name_required">Name is required</string>
+    <string name="field_def_error_name_invalid">Invalid identifier. Use only letters, numbers, and underscores (max 64 characters).</string>
+    <string name="field_def_error_type_required">Select a column type</string>
+    <string name="field_def_error_expression_required">Expression is required for generated (virtual) columns</string>
     
     <!-- Monitor screen -->
     <string name="monitor_title">Server Monitor</string>
