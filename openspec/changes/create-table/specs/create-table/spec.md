@@ -318,6 +318,124 @@ in-progress table name and fields list; no SQL MUST be executed.
 - WHEN the user taps Cancel or dismisses the sheet
 - THEN the sheet MUST close, all draft data MUST be discarded, and no SQL executed
 
+### Requirement: Values Field Applicability (ENUM/SET)
+
+<!-- ADDED in change `create-table` (ENUM/SET support). -->
+
+The Valores input MUST be shown only for value-list types (ENUM, SET), occupying the same
+position where Longitud/Decimales would otherwise appear, since ENUM/SET support neither.
+For all other types Valores MUST be hidden and its value ignored. Input is free-text,
+comma-separated; on OK it is parsed into a values list by trimming each segment and dropping
+blank segments. Valores MUST be required and valid only when applicable: at least one value,
+no duplicate values (case-sensitive), and every value non-blank after trimming.
+
+#### Scenario: Values enabled for ENUM
+
+- GIVEN Tipo is set to ENUM
+- THEN Valores MUST be enabled and editable, and Longitud/Decimales MUST remain hidden
+
+#### Scenario: Values disabled for non value-list type
+
+- GIVEN Tipo is set to a non value-list type (e.g. INT, VARCHAR)
+- THEN Valores MUST be disabled/hidden and excluded from the field definition
+
+#### Scenario: Blank or duplicate values rejected
+
+- GIVEN Tipo is ENUM or SET and Valores is blank, or contains a case-sensitive duplicate
+- WHEN the user taps OK
+- THEN a localized validation error MUST be shown on Valores and no field appended
+
+#### Scenario: ENUM/SET DDL emits parenthesized value list
+
+- GIVEN a field with Tipo = ENUM (or SET) and a valid, non-blank Valores list
+- WHEN the table DDL is built
+- THEN the column MUST render as `ENUM('v1','v2',...)` (or `SET('v1','v2',...)`), with each
+  value trimmed and single-quote-escaped the same way Comentario already is
+- AND the normal nullable/virtual/comment DDL rules MUST still apply unchanged
+
+### Requirement: Extended Field Attributes
+
+<!-- ADDED in change `create-table` (extended field attributes addendum). -->
+
+The field-definition dialog MUST support six additional attributes, each gated by its own
+applicability rule: Valor predeterminado (Default value), Autoincrement, Rellenar con ceros
+(ZeroFill), Conjunto de caracteres (Character Set) + Collation, and Actualización automática
+de fecha/hora (`ON UPDATE CURRENT_TIMESTAMP`).
+
+Valor predeterminado MUST be shown only when Virtual = false AND Autoincrement = false; it is
+free-text and OPAQUE (same philosophy as Expresión — the client MUST NOT parse or quote the
+value). Autoincrement MUST be shown only for base integer types (Int, TinyInt, SmallInt,
+MediumInt, BigInt) with Virtual = false, and MUST be hidden/disabled when Virtual = true
+(mutually exclusive with generated columns). Activating Autoincrement MUST force Llave to
+true. Rellenar con ceros MUST be shown only for numeric types (the 5 integer types plus
+Decimal, Numeric, Float, Double). Conjunto de caracteres and Collation MUST be shown only for
+string types (Char, VarChar, Text, TinyText, MediumText, LongText, Enum, Set), MUST be loaded
+live from the connected server, and selecting a Conjunto de caracteres MUST clear the selected
+Collation and trigger a reload of Collation options filtered by that charset. Actualización
+automática de fecha/hora MUST be shown only for Timestamp and DateTime (not Date, Time, or
+Year).
+
+#### Scenario: Default value hidden when Virtual or Autoincrement is true
+
+- GIVEN the field-definition dialog with Virtual = true OR Autoincrement = true
+- THEN Valor predeterminado MUST be hidden and its value excluded from the field definition
+
+#### Scenario: Autoincrement enabled only for base integer types
+
+- GIVEN Tipo is set to Int, TinyInt, SmallInt, MediumInt, or BigInt with Virtual = false
+- THEN Autoincrement MUST be enabled and editable
+
+#### Scenario: Autoincrement hidden for generated columns
+
+- GIVEN Tipo is a base integer type
+- WHEN the user sets Virtual = true
+- THEN Autoincrement MUST be hidden/disabled and its value cleared
+
+#### Scenario: Enabling Autoincrement forces Llave
+
+- GIVEN the dialog has Llave = false
+- WHEN the user sets Autoincrement = true
+- THEN Llave MUST be forced to true (and Nulo MUST be forced to false via the existing
+  Llave→Nulo rule)
+
+#### Scenario: ZeroFill enabled for numeric types
+
+- GIVEN Tipo is set to a numeric type (integer or Decimal/Numeric/Float/Double)
+- THEN Rellenar con ceros MUST be enabled and editable
+
+#### Scenario: Charset/Collation enabled for string types and loaded live
+
+- GIVEN Tipo is set to a string type (e.g. VARCHAR, ENUM)
+- THEN Conjunto de caracteres and Collation MUST be enabled, populated from the connected
+  server, and Collation MUST reset when a new Conjunto de caracteres is selected
+
+#### Scenario: Auto-update timestamp enabled only for Timestamp/DateTime
+
+- GIVEN Tipo is set to Timestamp or DateTime
+- THEN Actualización automática de fecha/hora MUST be enabled and editable
+
+#### Scenario: Auto-update timestamp disabled for Date, Time, and Year
+
+- GIVEN Tipo is set to Date, Time, or Year
+- THEN Actualización automática de fecha/hora MUST be disabled/hidden
+
+#### Scenario: Extended attributes DDL emits in the documented clause order
+
+- GIVEN a field with ZeroFill = true, a Conjunto de caracteres and Collation set, Nulo forcing
+  `NOT NULL`, a non-blank Valor predeterminado, Actualización automática de fecha/hora = true,
+  and Autoincrement = true
+- WHEN the table DDL is built
+- THEN the column MUST render `UNSIGNED ZEROFILL` before `CHARACTER SET x COLLATE y`, followed
+  by `NOT NULL`, then `DEFAULT <valor>` (raw, unquoted), then `ON UPDATE CURRENT_TIMESTAMP`,
+  then `AUTO_INCREMENT`, in that exact order
+
+#### Scenario: Generated columns never emit the new attributes
+
+- GIVEN a field with Virtual = true and Valor predeterminado/Autoincrement/Actualización
+  automática de fecha/hora all set
+- WHEN the table DDL is built
+- THEN none of `DEFAULT`, `AUTO_INCREMENT`, or `ON UPDATE CURRENT_TIMESTAMP` MUST appear
+
 ### Requirement: Localized Strings In All Locales
 
 All new user-facing strings MUST have entries in all 10 supported locales (en, es, fr, de,

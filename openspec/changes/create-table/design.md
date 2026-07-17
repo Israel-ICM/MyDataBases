@@ -130,3 +130,113 @@ No migration required — all new files are additive; nav/screen edits are local
 
 - [x] ~~**Virtual column DDL**~~ — Resolved: the amended spec adds an Expresión free-text input; `CreateTableUseCase` now emits real `GENERATED ALWAYS AS (<expresión>) [VIRTUAL|STORED]` DDL (see DDL build order above). No longer open.
 - [ ] Confirm chained-PR slice boundaries against the refined ~1,330 LOC estimate in `sdd-tasks` (proposal suggested 3 slices: domain+use case+tests / nav+parent sheet / nested dialog+i18n).
+
+## Addendum: ENUM/SET Support
+
+ENUM and SET are string types that take a parenthesized list of allowed literal values instead
+of a length/decimals pair, so they don't fit the existing `supportsLength`/`supportsDecimals`
+model. A new `supportsValues: Boolean` capability was added to `SqlColumnType` (default `false`
+for all pre-existing entries), set to `true` only for the new `SqlColumnType.Enum` (`"ENUM"`) and
+`SqlColumnType.Set` (`"SET"`) entries. `ColumnDefinition` gained a `values: List<String> = emptyList()`
+property holding the permitted literal values, ignored for all other types.
+
+`ColumnDefinitionValidation` gained `isValuesApplicable(type)` (mirrors `isLengthApplicable`/
+`isDecimalsApplicable`) and `isValuesValid(values, type)`: always valid when not applicable;
+when applicable, requires at least one value, no case-sensitive duplicates, and every value
+non-blank after `trim()`.
+
+In `CreateTableUseCase.buildColumnClause`, when `column.type.supportsValues` is true the type
+clause is built as `TYPE('v1','v2',...)` (each value trimmed and single-quote-escaped the same
+way `comment` already is) instead of `sqlName + buildLengthAndDecimalsSuffix(...)`. This only
+replaces the type-clause construction — the surrounding nullable/virtual/comment DDL logic is
+unchanged and applies identically to ENUM/SET columns.
+
+In `FieldDefinitionDialog`, a new "Valores" `IOSTextField` renders in the same slot as
+Longitud/Decimales (mutually exclusive with them, since ENUM/SET support neither), gated by
+`ColumnDefinitionValidation.isValuesApplicable(type)`. Input is free-text, comma-separated
+(e.g. `activo, inactivo, pendiente`), parsed via `split(",").map { trim() }.filter { isNotBlank() }`
+into the `values` list on confirm; a `valuesError` inline error (same pattern as `nameError`/
+`typeError`/`expressionError`) is shown at OK-press time when applicable and invalid.
+
+**Pre-existing defect found and fixed while implementing this addendum**: the uncommitted,
+unconfirmed direct edits that added 12 other new `SqlColumnType` entries (MediumInt, Bit,
+TinyText, MediumText, Binary, VarBinary, TinyBlob, Blob, MediumBlob, LongBlob, Json, Year) to
+`FieldDefinitionDialog.kt`'s `ALL_SQL_COLUMN_TYPES` list left `ColumnDefinition.kt` in a
+non-compiling state: none of those 12 sealed `data object` entries exist in `SqlColumnType`
+(the dialog referenced undefined symbols), and a corrupted identifier (`SqlColsetumnType`
+instead of `SqlColumnType`) had been introduced on the `VarChar` entry. The typo was fixed as
+part of this change since it sat directly adjacent to the `supportsValues` edit and blocked the
+whole file from parsing. The 12 missing sealed entries were intentionally left unadded — they
+are out of scope for ENUM/SET support and belong to whatever unconfirmed work introduced them;
+see the apply-progress/report for the maintainer decision needed there.
+
+## Addendum: Extended Field Attributes
+
+Six new field-definition attributes were added: Valor predeterminado (Default value),
+Autoincrement, Rellenar con ceros (ZeroFill), Conjunto de caracteres (Character Set) +
+Collation, and Actualización automática de fecha/hora (`ON UPDATE CURRENT_TIMESTAMP`). Each
+new attribute follows the existing capability-flag pattern on `SqlColumnType`
+(`supportsAutoIncrement`, `supportsZeroFill`, `supportsCharset`, `supportsAutoUpdateTimestamp`,
+all default `false`) rather than introducing a parallel gating mechanism.
+
+### Applicability rules
+
+| Attribute | Applicable when | Types |
+|---|---|---|
+| Valor predeterminado | `!isVirtual && !autoIncrement` (cross-field rule, not type-gated) | all |
+| Autoincrement | `type.supportsAutoIncrement && !isVirtual` | Int, TinyInt, SmallInt, MediumInt, BigInt |
+| ZeroFill | `type.supportsZeroFill` | the 5 integer types above + Decimal, Numeric, Float, Double |
+| Charset/Collation | `type.supportsCharset` | Char, VarChar, Text, TinyText, MediumText, LongText, Enum, Set |
+| Auto-update timestamp | `type.supportsAutoUpdateTimestamp` | Timestamp, DateTime only (per MySQL/MariaDB docs — NOT Date/Time/Year) |
+
+### Cross-field forcing
+
+Autoincrement forces Llave (`isPrimaryKey`) to `true` via a new
+`ColumnDefinitionValidation.resolvePrimaryKeyForAutoIncrement(currentIsPrimaryKey, autoIncrement)`
+resolver, mirroring the existing `resolveNullable` pattern. Forcing Llave=true then re-triggers
+the pre-existing Llave→Nulo=false rule, so AUTO_INCREMENT columns end up NOT NULL without a
+separate rule (MySQL requires AUTO_INCREMENT columns to be indexed and NOT NULL). Autoincrement
+is hidden/disabled and force-cleared when Virtual is toggled on (mutually exclusive — generated
+columns cannot be AUTO_INCREMENT).
+
+### DDL clause order (`CreateTableUseCase.buildColumnClause`)
+
+Extends the existing build order (name → type+suffix → virtual/comment) by inserting three new
+steps between the type suffix and the existing virtual/nullable branch:
+
+1. `` `name` ``
+2. type + length/decimals-or-values suffix (unchanged)
+3. `UNSIGNED ZEROFILL` if `zeroFill == true` (numeric attribute, immediately after the type)
+4. `CHARACTER SET x COLLATE y` if `type.supportsCharset` and either `characterSet`/`collation`
+   is non-null (emits `CHARACTER SET x` alone, `COLLATE y` alone, or both space-separated)
+5. Branch on `isVirtual` (unchanged generated-column path — never emits DEFAULT/AUTO_INCREMENT/
+   ON UPDATE) or, for non-generated columns: `NOT NULL` (existing) → `DEFAULT <valor>` (raw,
+   unquoted/uncited) → `ON UPDATE CURRENT_TIMESTAMP` → `AUTO_INCREMENT`
+6. `COMMENT '...'` (unchanged, always last)
+
+Valor predeterminado is OPAQUE, following the same philosophy as `expression`: no client-side
+SQL parsing/quoting. The user types `'text'` themselves for string literals, or an unquoted
+`CURRENT_TIMESTAMP`/`0`/etc. as appropriate.
+
+### Charset/Collation live-loading
+
+`CreateTableViewModel` gained its own `FieldCharsetLoadState`/`FieldCollationLoadState` sealed
+states, `loadCharacterSets()` (called from `init`), `loadCollations(charset)`, and
+`clearCollations()` — mirroring `AddDatabaseViewModel`'s existing charset/collation pattern
+(same `GetCharacterSetsUseCase`, same in-memory collation cache keyed by charset). These are
+duplicated locally rather than reused from `AddDatabaseViewModel` (even though the latter's
+sealed states aren't Kotlin-`private`) to avoid a cross-feature dependency between
+`ui/screens/databases` and `ui/screens/tables` — the two features should stay independently
+evolvable. `FieldDefinitionDialog` receives `charsets`/`charsetsLoading`/`collations`/
+`collationsLoading`/`onCharsetSelected` as plain parameters (lists + booleans + a callback),
+not the sealed states themselves, keeping the dialog decoupled from any particular ViewModel
+shape. Selecting a charset clears the selected collation and invokes `onCharsetSelected`, which
+`CreateTableFormContent` wires to `viewModel.loadCollations(charset)`.
+
+### UI placement
+
+New controls are inserted at these points in `FieldDefinitionDialog`'s existing vertical order
+(Nombre, Tipo, Longitud, Decimales, Nulo, Virtual, Expresión, Llave, Comentario — plus Valores
+from the ENUM/SET addendum): ZeroFill switch immediately after Decimales; Charset/Collation
+dropdowns immediately after Longitud/Decimales/Valores; Valor predeterminado text field before
+Nulo; Actualización automática de fecha/hora switch near Nulo; Autoincrement switch near Llave.
