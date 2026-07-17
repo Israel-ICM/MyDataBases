@@ -94,6 +94,7 @@
     <string name="field_def_dialog_title">字段定义</string>
     <string name="field_def_name_hint">字段名</string>
     <string name="field_def_type_hint">选择类型</string>
+    <string name="field_def_type_filter_hint">搜索类型…</string>
     <string name="field_def_length_hint">长度(例如 255)</string>
     <string name="field_def_decimals_hint">小数位数(例如 2)</string>
     <string name="field_def_nullable_label">可为空</string>

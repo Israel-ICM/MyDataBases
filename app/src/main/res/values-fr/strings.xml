@@ -94,6 +94,7 @@
     <string name="field_def_dialog_title">Définition du champ</string>
     <string name="field_def_name_hint">nom_champ</string>
     <string name="field_def_type_hint">Sélectionner le type</string>
+    <string name="field_def_type_filter_hint">Rechercher des types…</string>
     <string name="field_def_length_hint">Longueur (ex. 255)</string>
     <string name="field_def_decimals_hint">Décimales (ex. 2)</string>
     <string name="field_def_nullable_label">Nullable</string>

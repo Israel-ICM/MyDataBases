@@ -94,6 +94,7 @@
     <string name="field_def_dialog_title">Определение поля</string>
     <string name="field_def_name_hint">имя_поля</string>
     <string name="field_def_type_hint">Выберите тип</string>
+    <string name="field_def_type_filter_hint">Поиск типов…</string>
     <string name="field_def_length_hint">Длина (напр. 255)</string>
     <string name="field_def_decimals_hint">Десятичные знаки (напр. 2)</string>
     <string name="field_def_nullable_label">Допускает NULL</string>

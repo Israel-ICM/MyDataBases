@@ -129,6 +129,7 @@
     <string name="field_def_dialog_title">Definición de campo</string>
     <string name="field_def_name_hint">nombre_campo</string>
     <string name="field_def_type_hint">Seleccionar tipo</string>
+    <string name="field_def_type_filter_hint">Buscar tipos…</string>
     <string name="field_def_length_hint">Longitud (ej. 255)</string>
     <string name="field_def_decimals_hint">Decimales (ej. 2)</string>
     <string name="field_def_nullable_label">Nulo</string>

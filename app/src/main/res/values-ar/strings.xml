@@ -94,6 +94,7 @@
     <string name="field_def_dialog_title">تعريف الحقل</string>
     <string name="field_def_name_hint">اسم_الحقل</string>
     <string name="field_def_type_hint">اختر النوع</string>
+    <string name="field_def_type_filter_hint">البحث عن الأنواع…</string>
     <string name="field_def_length_hint">الطول (مثال 255)</string>
     <string name="field_def_decimals_hint">الأرقام العشرية (مثال 2)</string>
     <string name="field_def_nullable_label">قابل للقيمة الفارغة</string>

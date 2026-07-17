@@ -186,6 +186,8 @@ fun FieldDefinitionDialog(
                         items = ALL_SQL_COLUMN_TYPES,
                         itemLabel = { it.sqlName },
                         showDivider = false,
+                        showFilter = true,
+                        filterPlaceholder = stringResource(R.string.field_def_type_filter_hint),
                     )
                     typeError?.let { FieldErrorText(it) }
                 }

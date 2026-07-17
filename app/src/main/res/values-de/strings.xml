@@ -94,6 +94,7 @@
     <string name="field_def_dialog_title">Feld definieren</string>
     <string name="field_def_name_hint">feldname</string>
     <string name="field_def_type_hint">Typ auswählen</string>
+    <string name="field_def_type_filter_hint">Typen suchen…</string>
     <string name="field_def_length_hint">Länge (z. B. 255)</string>
     <string name="field_def_decimals_hint">Dezimalstellen (z. B. 2)</string>
     <string name="field_def_nullable_label">Nullable</string>

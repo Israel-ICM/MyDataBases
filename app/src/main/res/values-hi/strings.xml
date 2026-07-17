@@ -94,6 +94,7 @@
     <string name="field_def_dialog_title">फ़ील्ड परिभाषा</string>
     <string name="field_def_name_hint">फ़ील्ड_नाम</string>
     <string name="field_def_type_hint">प्रकार चुनें</string>
+    <string name="field_def_type_filter_hint">प्रकार खोजें…</string>
     <string name="field_def_length_hint">लंबाई (जैसे 255)</string>
     <string name="field_def_decimals_hint">दशमलव (जैसे 2)</string>
     <string name="field_def_nullable_label">नल हो सकता है</string>

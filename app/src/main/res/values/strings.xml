@@ -131,6 +131,7 @@
     <string name="field_def_dialog_title">Field Definition</string>
     <string name="field_def_name_hint">field_name</string>
     <string name="field_def_type_hint">Select type</string>
+    <string name="field_def_type_filter_hint">Search types…</string>
     <string name="field_def_length_hint">Length (e.g. 255)</string>
     <string name="field_def_decimals_hint">Decimals (e.g. 2)</string>
     <string name="field_def_nullable_label">Nullable</string>
