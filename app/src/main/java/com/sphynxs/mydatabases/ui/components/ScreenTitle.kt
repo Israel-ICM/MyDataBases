@@ -58,6 +58,11 @@ fun ScreenTitle(
             Text(
                 text = title,
                 fontSize = LocalDesignTokens.current.largeTitleSize,
+                // lineHeight explícito — sin esto Compose usa el line-height por defecto
+                // de la fuente a 34sp/Bold, que queda muy comprimido cuando el título
+                // envuelve a 2+ líneas (ej. "¿Qué quieres hacer?" en pantallas angostas).
+                // 1.2x el fontSize es la convención iOS large-title estándar.
+                lineHeight = 41.sp,
                 fontWeight = LocalDesignTokens.current.largeTitleWeight,
                 color = LocalDesignTokens.current.largeTitleColor
             )

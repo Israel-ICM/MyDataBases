@@ -108,11 +108,17 @@ fun AdaptiveNavigationScaffold(
                 // Contenido principal ocupa toda la pantalla
                 content()
 
-                // Mostrar menú solo en pantallas "dentro" de la app
+                // Mostrar menú solo en pantallas "dentro" de la app. Se excluye
+                // explícitamente el menú de acciones de base de datos (`Routes
+                // .DatabaseActionMenu`, termina en "/menu") — esa pantalla YA ES un menú
+                // de navegación (Tablas/Vistas/Query's/Funciones/Automatizaciones/Backups),
+                // mostrar además el bottom nav ahí sería redundante y no cumpliría ningún
+                // propósito (feedback del usuario, change `database-action-menu`).
                 val showMenu = currentRoute != null &&
                     currentRoute != Routes.Connections.route &&
                     currentRoute != Routes.Settings.route &&
-                    !currentRoute.startsWith("connection_form")
+                    !currentRoute.startsWith("connection_form") &&
+                    !currentRoute.endsWith("/menu")
 
                 AnimatedVisibility(
                     visible = showMenu,
@@ -131,57 +137,67 @@ fun AdaptiveNavigationScaffold(
         }
         
         WindowWidthSizeClass.Medium -> {
-            // Medium: NavigationRail
+            // Medium: NavigationRail — misma exclusión que Compact para el menú de
+            // acciones de base de datos (ver comentario en la rama Compact).
+            val showRail = currentRoute?.endsWith("/menu") != true
+
             Row(modifier = Modifier.fillMaxSize()) {
-                // NavigationRail a la izquierda
-                NavigationRail {
-                    destinations.forEach { destination ->
-                        NavigationRailItem(
-                            selected = currentRoute == destination.route,
-                            onClick = { onNavigate(destination.route) },
-                            icon = {
-                                Icon(
-                                    imageVector = destination.icon,
-                                    contentDescription = stringResource(destination.labelRes)
-                                )
-                            },
-                            label = {
-                                Text(text = stringResource(destination.labelRes))
-                            }
-                        )
-                    }
-                }
-                
-                // Contenido principal
-                content()
-            }
-        }
-        
-        WindowWidthSizeClass.Expanded -> {
-            // Expanded: PermanentNavigationDrawer
-            PermanentNavigationDrawer(
-                drawerContent = {
-                    PermanentDrawerSheet {
+                // NavigationRail a la izquierda, solo si no estamos en el menú de acciones
+                if (showRail) {
+                    NavigationRail {
                         destinations.forEach { destination ->
-                            NavigationDrawerItem(
-                                label = {
-                                    Text(text = stringResource(destination.labelRes))
-                                },
+                            NavigationRailItem(
+                                selected = currentRoute == destination.route,
+                                onClick = { onNavigate(destination.route) },
                                 icon = {
                                     Icon(
                                         imageVector = destination.icon,
                                         contentDescription = stringResource(destination.labelRes)
                                     )
                                 },
-                                selected = currentRoute == destination.route,
-                                onClick = { onNavigate(destination.route) }
+                                label = {
+                                    Text(text = stringResource(destination.labelRes))
+                                }
                             )
                         }
                     }
                 }
-            ) {
+
                 // Contenido principal
                 content()
+            }
+        }
+        
+        WindowWidthSizeClass.Expanded -> {
+            // Expanded: PermanentNavigationDrawer — misma exclusión que Compact/Medium
+            // para el menú de acciones de base de datos (ver comentario en la rama Compact).
+            if (currentRoute?.endsWith("/menu") == true) {
+                content()
+            } else {
+                PermanentNavigationDrawer(
+                    drawerContent = {
+                        PermanentDrawerSheet {
+                            destinations.forEach { destination ->
+                                NavigationDrawerItem(
+                                    label = {
+                                        Text(text = stringResource(destination.labelRes))
+                                    },
+                                    icon = {
+                                        Icon(
+                                            imageVector = destination.icon,
+                                            contentDescription = stringResource(destination.labelRes)
+                                        )
+                                    },
+                                    selected = currentRoute == destination.route,
+                                    onClick = { onNavigate(destination.route) }
+                                )
+                            }
+                        }
+                    }
+                ) {
+                    // Contenido principal
+                    content()
+                }
             }
         }
         
