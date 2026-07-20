@@ -136,6 +136,99 @@ sealed class Routes(val route: String) {
     }
     
     /**
+     * Pantalla del menú de acciones tras seleccionar una base de datos ("¿Qué quieres hacer?").
+     *
+     * Punto de entrada intermedio entre [Databases] y las secciones de una base de datos
+     * concreta (Tablas, Vistas, Query's, Funciones, Automatizaciones, Backups).
+     *
+     * @property route Template con argumentos `connectionId` y `databaseName`
+     */
+    data object DatabaseActionMenu : Routes("connection/{connectionId}/db/{databaseName}/menu") {
+        /**
+         * Crea la ruta completa reemplazando los argumentos.
+         *
+         * @param connectionId ID de la conexión activa
+         * @param databaseName Nombre de la base de datos
+         * @return Ruta navegable (ej: "connection/abc-123/db/my_db/menu")
+         */
+        fun createRoute(connectionId: String, databaseName: String): String {
+            return "connection/$connectionId/db/$databaseName/menu"
+        }
+    }
+
+    /**
+     * Pantalla de vistas (views) de una base de datos específica (placeholder).
+     *
+     * @property route Template con argumentos `connectionId` y `databaseName`
+     */
+    data object DatabaseViews : Routes("connection/{connectionId}/db/{databaseName}/views") {
+        /**
+         * Crea la ruta completa reemplazando los argumentos.
+         *
+         * @param connectionId ID de la conexión activa
+         * @param databaseName Nombre de la base de datos
+         * @return Ruta navegable (ej: "connection/abc-123/db/my_db/views")
+         */
+        fun createRoute(connectionId: String, databaseName: String): String {
+            return "connection/$connectionId/db/$databaseName/views"
+        }
+    }
+
+    /**
+     * Pantalla de funciones/stored procedures de una base de datos específica (placeholder).
+     *
+     * @property route Template con argumentos `connectionId` y `databaseName`
+     */
+    data object DatabaseFunctions : Routes("connection/{connectionId}/db/{databaseName}/functions") {
+        /**
+         * Crea la ruta completa reemplazando los argumentos.
+         *
+         * @param connectionId ID de la conexión activa
+         * @param databaseName Nombre de la base de datos
+         * @return Ruta navegable (ej: "connection/abc-123/db/my_db/functions")
+         */
+        fun createRoute(connectionId: String, databaseName: String): String {
+            return "connection/$connectionId/db/$databaseName/functions"
+        }
+    }
+
+    /**
+     * Pantalla de automatizaciones de una base de datos específica (placeholder).
+     *
+     * @property route Template con argumentos `connectionId` y `databaseName`
+     */
+    data object DatabaseAutomations : Routes("connection/{connectionId}/db/{databaseName}/automations") {
+        /**
+         * Crea la ruta completa reemplazando los argumentos.
+         *
+         * @param connectionId ID de la conexión activa
+         * @param databaseName Nombre de la base de datos
+         * @return Ruta navegable (ej: "connection/abc-123/db/my_db/automations")
+         */
+        fun createRoute(connectionId: String, databaseName: String): String {
+            return "connection/$connectionId/db/$databaseName/automations"
+        }
+    }
+
+    /**
+     * Pantalla de backups de una base de datos específica (placeholder).
+     *
+     * @property route Template con argumentos `connectionId` y `databaseName`
+     */
+    data object DatabaseBackups : Routes("connection/{connectionId}/db/{databaseName}/backups") {
+        /**
+         * Crea la ruta completa reemplazando los argumentos.
+         *
+         * @param connectionId ID de la conexión activa
+         * @param databaseName Nombre de la base de datos
+         * @return Ruta navegable (ej: "connection/abc-123/db/my_db/backups")
+         */
+        fun createRoute(connectionId: String, databaseName: String): String {
+            return "connection/$connectionId/db/$databaseName/backups"
+        }
+    }
+
+    /**
      * Pantalla de visualización de datos de una tabla específica.
      *
      * @property route Template con argumentos `databaseName` y `tableName`

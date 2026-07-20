@@ -64,6 +64,11 @@
     <string name="databases_empty">لا توجد قواعد بيانات متاحة</string>
     <string name="databases_search_hint">البحث عن قواعد البيانات…</string>
     
+    <!-- Database Action Menu screen -->
+    <string name="database_action_menu_title">ماذا تريد أن تفعل؟</string>
+    <string name="database_action_queries">الاستعلامات</string>
+    <string name="database_action_automations">الأتمتة</string>
+    
     <!-- Add Database screen -->
     <string name="add_database_title">إضافة قاعدة بيانات</string>
     <string name="add_database_field_name">اسم قاعدة البيانات</string>

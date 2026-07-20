@@ -99,6 +99,11 @@
     <string name="databases_empty">No hay bases de datos disponibles</string>
     <string name="databases_search_hint">Buscar bases de datos…</string>
     
+    <!-- Database Action Menu screen -->
+    <string name="database_action_menu_title">¿Qué quieres hacer?</string>
+    <string name="database_action_queries">Consultas</string>
+    <string name="database_action_automations">Automatizaciones</string>
+    
     <!-- Add Database screen -->
     <string name="add_database_title">Agregar base de datos</string>
     <string name="add_database_field_name">Nombre de la base de datos</string>

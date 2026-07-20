@@ -64,6 +64,11 @@
     <string name="databases_empty">Нет доступных баз данных</string>
     <string name="databases_search_hint">Поиск баз данных…</string>
     
+    <!-- Database Action Menu screen -->
+    <string name="database_action_menu_title">Что вы хотите сделать?</string>
+    <string name="database_action_queries">Запросы</string>
+    <string name="database_action_automations">Автоматизации</string>
+    
     <!-- Add Database screen -->
     <string name="add_database_title">Добавить базу данных</string>
     <string name="add_database_field_name">Имя базы данных</string>

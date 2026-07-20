@@ -64,6 +64,11 @@
     <string name="databases_empty">कोई डेटाबेस उपलब्ध नहीं</string>
     <string name="databases_search_hint">डेटाबेस खोजें…</string>
     
+    <!-- Database Action Menu screen -->
+    <string name="database_action_menu_title">आप क्या करना चाहते हैं?</string>
+    <string name="database_action_queries">क्वेरीज़</string>
+    <string name="database_action_automations">स्वचालन</string>
+    
     <!-- Add Database screen -->
     <string name="add_database_title">डेटाबेस जोड़ें</string>
     <string name="add_database_field_name">डेटाबेस का नाम</string>

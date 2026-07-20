@@ -64,6 +64,11 @@
     <string name="databases_empty">没有可用的数据库</string>
     <string name="databases_search_hint">搜索数据库…</string>
     
+    <!-- Database Action Menu screen -->
+    <string name="database_action_menu_title">你想做什么？</string>
+    <string name="database_action_queries">查询</string>
+    <string name="database_action_automations">自动化</string>
+    
     <!-- Add Database screen -->
     <string name="add_database_title">添加数据库</string>
     <string name="add_database_field_name">数据库名称</string>

@@ -101,6 +101,11 @@
     <string name="databases_empty">No databases available</string>
     <string name="databases_search_hint">Search databases…</string>
     
+    <!-- Database Action Menu screen -->
+    <string name="database_action_menu_title">What do you want to do?</string>
+    <string name="database_action_queries">Queries</string>
+    <string name="database_action_automations">Automations</string>
+    
     <!-- Add Database screen -->
     <string name="add_database_title">Add Database</string>
     <string name="add_database_field_name">Database Name</string>

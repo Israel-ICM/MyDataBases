@@ -147,14 +147,47 @@ fun MyDataBasesNavHost(
                 val connectionId = it.arguments?.getString("connectionId") ?: ""
                 DatabasesListScreen(
                     connectionId = connectionId,
-                    onNavigateToTables = { databaseName ->
-                        navController.navigate(Routes.TableList.createRoute(connectionId, databaseName))
+                    onNavigateToDatabaseMenu = { databaseName ->
+                        navController.navigate(Routes.DatabaseActionMenu.createRoute(connectionId, databaseName))
                     },
                     onNavigateBack = { navController.popBackStack() },
                     showAddDatabaseSheet = showAddDatabaseSheet,
                     onDismissAddDatabaseSheet = {
                         showAddDatabaseSheet = false
                     }
+                )
+            }
+
+            composable(
+                route = Routes.DatabaseActionMenu.route,
+                arguments = listOf(
+                    navArgument("connectionId") { type = NavType.StringType },
+                    navArgument("databaseName") { type = NavType.StringType }
+                )
+            ) {
+                val connectionId = it.arguments?.getString("connectionId") ?: ""
+                val databaseName = it.arguments?.getString("databaseName") ?: ""
+                com.sphynxs.mydatabases.ui.screens.databases.DatabaseActionMenuScreen(
+                    databaseName = databaseName,
+                    onNavigateToTables = {
+                        navController.navigate(Routes.TableList.createRoute(connectionId, databaseName))
+                    },
+                    onNavigateToViews = {
+                        navController.navigate(Routes.DatabaseViews.createRoute(connectionId, databaseName))
+                    },
+                    onNavigateToQueries = {
+                        navController.navigate(Routes.NewQuery.createRoute(connectionId))
+                    },
+                    onNavigateToFunctions = {
+                        navController.navigate(Routes.DatabaseFunctions.createRoute(connectionId, databaseName))
+                    },
+                    onNavigateToAutomations = {
+                        navController.navigate(Routes.DatabaseAutomations.createRoute(connectionId, databaseName))
+                    },
+                    onNavigateToBackups = {
+                        navController.navigate(Routes.DatabaseBackups.createRoute(connectionId, databaseName))
+                    },
+                    onNavigateBack = { navController.popBackStack() }
                 )
             }
             
@@ -206,6 +239,54 @@ fun MyDataBasesNavHost(
                         showAddTableSheet = false
                     }
                 )
+            }
+
+            // --- Placeholders del menú de acciones de base de datos (Vistas, Funciones,
+            // Automatizaciones, Backups) — cada uno scoped por connectionId + databaseName.
+            // TODO: reemplazar por pantallas reales cuando estén implementadas.
+
+            composable(
+                route = Routes.DatabaseViews.route,
+                arguments = listOf(
+                    navArgument("connectionId") { type = NavType.StringType },
+                    navArgument("databaseName") { type = NavType.StringType }
+                )
+            ) {
+                val databaseName = it.arguments?.getString("databaseName") ?: ""
+                PlaceholderScreen("Views — $databaseName")
+            }
+
+            composable(
+                route = Routes.DatabaseFunctions.route,
+                arguments = listOf(
+                    navArgument("connectionId") { type = NavType.StringType },
+                    navArgument("databaseName") { type = NavType.StringType }
+                )
+            ) {
+                val databaseName = it.arguments?.getString("databaseName") ?: ""
+                PlaceholderScreen("Functions — $databaseName")
+            }
+
+            composable(
+                route = Routes.DatabaseAutomations.route,
+                arguments = listOf(
+                    navArgument("connectionId") { type = NavType.StringType },
+                    navArgument("databaseName") { type = NavType.StringType }
+                )
+            ) {
+                val databaseName = it.arguments?.getString("databaseName") ?: ""
+                PlaceholderScreen("Automations — $databaseName")
+            }
+
+            composable(
+                route = Routes.DatabaseBackups.route,
+                arguments = listOf(
+                    navArgument("connectionId") { type = NavType.StringType },
+                    navArgument("databaseName") { type = NavType.StringType }
+                )
+            ) {
+                val databaseName = it.arguments?.getString("databaseName") ?: ""
+                PlaceholderScreen("Backups — $databaseName")
             }
             
             composable(

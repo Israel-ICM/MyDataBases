@@ -64,6 +64,11 @@
     <string name="databases_empty">Nenhum banco de dados disponível</string>
     <string name="databases_search_hint">Pesquisar bancos de dados…</string>
     
+    <!-- Database Action Menu screen -->
+    <string name="database_action_menu_title">O que você quer fazer?</string>
+    <string name="database_action_queries">Consultas</string>
+    <string name="database_action_automations">Automações</string>
+    
     <!-- Add Database screen -->
     <string name="add_database_title">Adicionar banco de dados</string>
     <string name="add_database_field_name">Nome do banco de dados</string>

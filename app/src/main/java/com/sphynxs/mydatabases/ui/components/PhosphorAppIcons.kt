@@ -41,6 +41,13 @@ object PhosphorAppIcons {
         val editor: ImageVector get() = TablerIcons.Code
         val functions: ImageVector get() = TablerIcons.Math
         val backup: ImageVector get() = TablerIcons.DeviceFloppy
+
+        // Chosen for the "Automatizaciones" database action menu tile: TablerIcons
+        // exposes `SettingsAutomation` (a gear + flow-arrow glyph) as the closest
+        // purpose-built match for automation in this icon set — no dedicated
+        // `Bolt`/`Robot`/`Cpu` "automation" variant exists, and `SettingsAutomation`
+        // reads clearly as "automated settings/workflow" at tile size.
+        val automations: ImageVector get() = TablerIcons.SettingsAutomation
     }
     
     /**

@@ -55,10 +55,11 @@ import kotlinx.coroutines.launch
  * Pantalla de lista de bases de datos.
  *
  * Muestra todas las bases de datos disponibles en el servidor conectado.
- * Al seleccionar una base de datos, navega a la lista de tablas.
+ * Al seleccionar una base de datos, navega al menú de acciones ("¿Qué quieres hacer?").
  *
  * @param connectionId ID de la conexión activa
- * @param onNavigateToTables Callback para navegar a la lista de tablas
+ * @param onNavigateToDatabaseMenu Callback para navegar al menú de acciones de la base de datos
+ *   seleccionada (change `database-action-menu`; reemplaza la navegación directa a Tablas)
  * @param showAddDatabaseSheet Si se debe mostrar el sheet de agregar database (controlado externamente)
  * @param onDismissAddDatabaseSheet Callback cuando se cierra el sheet
  * @param viewModel El ViewModel con la lógica de estado
@@ -71,7 +72,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun DatabasesListScreen(
     connectionId: String,
-    onNavigateToTables: (databaseName: String) -> Unit,
+    onNavigateToDatabaseMenu: (databaseName: String) -> Unit,
     onNavigateBack: () -> Unit,
     showAddDatabaseSheet: Boolean = false,
     onDismissAddDatabaseSheet: () -> Unit = {},
@@ -153,7 +154,7 @@ fun DatabasesListScreen(
                             items(databases, key = { it.name }) { database ->
                                 DatabaseCard(
                                     database = database,
-                                    onCardClick = { onNavigateToTables(database.name) },
+                                    onCardClick = { onNavigateToDatabaseMenu(database.name) },
                                     modifier = Modifier.padding(
                                         horizontal = LocalDesignTokens.current.screenPaddingHorizontal,
                                         vertical = LocalDesignTokens.current.cardSpacing / 2
@@ -229,8 +230,8 @@ fun DatabasesListScreen(
                         onDatabaseCreated = { databaseName ->
                             // Refresh the database list
                             viewModel.loadDatabases()
-                            // Navigate directly to the newly created database's tables
-                            onNavigateToTables(databaseName)
+                            // Navigate to the newly created database's action menu
+                            onNavigateToDatabaseMenu(databaseName)
                         },
                         snackbarHostState = snackbarHostState,
                         modifier = Modifier.fillMaxSize()

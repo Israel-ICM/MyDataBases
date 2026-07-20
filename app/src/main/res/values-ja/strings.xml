@@ -64,6 +64,11 @@
     <string name="databases_empty">利用可能なデータベースがありません</string>
     <string name="databases_search_hint">データベースを検索…</string>
     
+    <!-- Database Action Menu screen -->
+    <string name="database_action_menu_title">何をしますか？</string>
+    <string name="database_action_queries">クエリ</string>
+    <string name="database_action_automations">自動化</string>
+    
     <!-- Add Database screen -->
     <string name="add_database_title">データベースを追加</string>
     <string name="add_database_field_name">データベース名</string>
