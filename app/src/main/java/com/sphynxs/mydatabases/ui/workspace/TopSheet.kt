@@ -70,7 +70,7 @@ fun TopSheet(
     isExpanded: Boolean,
     onExpandedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
-    peekHeight: Dp = 60.dp,
+    peekHeight: Dp = WorkspaceConstants.PEEK_HEIGHT,
     onProgressChange: ((progress: Float, isDragging: Boolean) -> Unit)? = null,
     sheetContent: @Composable ColumnScope.() -> Unit
 ) {
@@ -80,14 +80,21 @@ fun TopSheet(
     
     // Altura de la barra de estado (cámara/notch incluido)
     val statusBarHeightPx = with(density) { WindowInsets.statusBars.getTop(density).toFloat() }
+
+    // Buffer extra entre la barra de estado y el peek — ver WorkspaceConstants
+    // .TOP_GESTURE_BUFFER (evita que el drag-to-expand compita con el swipe-down
+    // de notificaciones del sistema).
+    val topGestureBufferPx = with(density) { WorkspaceConstants.TOP_GESTURE_BUFFER.toPx() }
     
     // Altura del panel: 92% de la pantalla menos espacio para toolbar
     val screenHeightDp = configuration.screenHeightDp.dp
     val sheetHeight = (screenHeightDp * 0.92f) - WorkspaceConstants.TOOLBAR_SPACING
     val sheetHeightPx = with(density) { sheetHeight.toPx() }
     
-    // Offset colapsado: el sheet se esconde dejando solo peekHeight visible DEBAJO de la barra de estado
-    val collapsedOffsetPx = -sheetHeightPx + peekHeightPx + statusBarHeightPx
+    // Offset colapsado: el sheet se esconde dejando solo peekHeight visible DEBAJO
+    // de la barra de estado + el buffer de gesto (empuja todo el peek — fondo e
+    // íconos — hacia abajo esa distancia extra).
+    val collapsedOffsetPx = -sheetHeightPx + peekHeightPx + statusBarHeightPx + topGestureBufferPx
     
     // Target offset según estado
     val targetOffset = if (isExpanded) 0f else collapsedOffsetPx

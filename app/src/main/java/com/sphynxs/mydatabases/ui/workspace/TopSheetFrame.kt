@@ -66,7 +66,7 @@ fun TopSheetFrame(
     onShowCarousel: () -> Unit,
     modifier: Modifier = Modifier,
     speedMultiplier: Float = 1.8f,
-    peekHeight: Dp = 60.dp
+    peekHeight: Dp = WorkspaceConstants.PEEK_HEIGHT
 ) {
     val configuration = LocalConfiguration.current
     val density = LocalDensity.current
@@ -74,6 +74,11 @@ fun TopSheetFrame(
     
     // Altura de la barra de estado
     val statusBarHeightPx = with(density) { WindowInsets.statusBars.getTop(density).toFloat() }
+
+    // Buffer extra entre la barra de estado y el peek — debe coincidir con el
+    // usado en TopSheet.kt (misma constante) para que ambas capas queden
+    // sincronizadas en la posición colapsada.
+    val topGestureBufferPx = with(density) { WorkspaceConstants.TOP_GESTURE_BUFFER.toPx() }
     
     // Altura del panel (92% menos espacio para toolbar, igual que el base)
     val screenHeightDp = configuration.screenHeightDp.dp
@@ -81,7 +86,7 @@ fun TopSheetFrame(
     val sheetHeightPx = with(density) { sheetHeight.toPx() }
     
     // Offset colapsado del base (referencia)
-    val baseCollapsedOffsetPx = -sheetHeightPx + peekHeightPx + statusBarHeightPx
+    val baseCollapsedOffsetPx = -sheetHeightPx + peekHeightPx + statusBarHeightPx + topGestureBufferPx
     
     // Offset expandido (mismo que el base: 0)
     val frameExpandedOffsetPx = 0f
