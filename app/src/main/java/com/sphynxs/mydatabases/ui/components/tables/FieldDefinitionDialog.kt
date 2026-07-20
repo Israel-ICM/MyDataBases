@@ -39,6 +39,7 @@ import com.sphynxs.mydatabases.core.database.models.SqlColumnType
 import com.sphynxs.mydatabases.ui.components.ios.IOSButton
 import com.sphynxs.mydatabases.ui.components.ios.IOSButtonStyle
 import com.sphynxs.mydatabases.ui.components.ios.IOSDropdownField
+import com.sphynxs.mydatabases.ui.components.ios.IOSGroupedCard
 import com.sphynxs.mydatabases.ui.components.ios.IOSTextField
 import com.sphynxs.mydatabases.ui.theme.LocalDesignTokens
 
@@ -187,7 +188,12 @@ fun FieldDefinitionDialog(
                 .fillMaxWidth(0.94f)
                 .heightIn(max = 640.dp)
                 .shadow(8.dp, RoundedCornerShape(20.dp))
-                .background(tokens.surfacePrimary, RoundedCornerShape(20.dp))
+                // NOTA: fondo backgroundPrimary (no surfacePrimary) a propósito — los campos
+                // de adentro (IOSTextField/IOSDropdownField/FieldSwitchRow, agrupados en
+                // IOSGroupedCard) usan surfacePrimary para su propia fila; si el contenedor
+                // usara el mismo token, los campos quedan invisibles (mismo color = sin
+                // contraste, se ven como texto plano). Mismo patrón que CreateTableFormContent.
+                .background(tokens.backgroundPrimary, RoundedCornerShape(20.dp))
                 .padding(20.dp),
         ) {
             Text(
@@ -203,249 +209,279 @@ fun FieldDefinitionDialog(
                 modifier = Modifier
                     .weight(1f, fill = false)
                     .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
+                verticalArrangement = Arrangement.spacedBy(20.dp),
             ) {
-                // (1) Nombre
-                Column {
-                    IOSTextField(
-                        value = name,
-                        onValueChange = {
-                            name = it
-                            nameError = null
-                        },
-                        placeholder = stringResource(R.string.field_def_name_hint),
-                        showDivider = false,
-                    )
-                    nameError?.let { FieldErrorText(it) }
+                // Card "Identidad": Nombre, Tipo (change `create-table`, visual polish —
+                // agrupado en IOSGroupedCard para que los campos tengan contraste real contra
+                // el fondo del diálogo; antes ambos compartían el mismo token surfacePrimary
+                // que el contenedor y se veían como texto plano, sin apariencia de input).
+                IOSGroupedCard {
+                    // (1) Nombre
+                    Column {
+                        IOSTextField(
+                            value = name,
+                            onValueChange = {
+                                name = it
+                                nameError = null
+                            },
+                            placeholder = stringResource(R.string.field_def_name_hint),
+                            showDivider = true,
+                        )
+                        nameError?.let { FieldErrorText(it, Modifier.padding(horizontal = 16.dp)) }
+                    }
+
+                    // (2) Tipo
+                    Column {
+                        IOSDropdownField(
+                            value = type,
+                            onValueChange = { selected ->
+                                type = selected
+                                typeError = null
+                                if (!ColumnDefinitionValidation.isLengthApplicable(selected)) length = ""
+                                if (!ColumnDefinitionValidation.isDecimalsApplicable(selected)) decimals = ""
+                                if (!ColumnDefinitionValidation.isValuesApplicable(selected)) valuesText = ""
+                                if (!ColumnDefinitionValidation.isZeroFillApplicable(selected)) zeroFill = false
+                                if (!ColumnDefinitionValidation.isCharsetApplicable(selected)) {
+                                    selectedCharset = null
+                                    selectedCollation = null
+                                }
+                                if (!ColumnDefinitionValidation.isAutoIncrementApplicable(selected, isVirtual)) {
+                                    autoIncrement = false
+                                }
+                                if (!ColumnDefinitionValidation.isAutoUpdateTimestampApplicable(selected)) {
+                                    autoUpdateTimestamp = false
+                                }
+                            },
+                            placeholder = stringResource(R.string.field_def_type_hint),
+                            items = ALL_SQL_COLUMN_TYPES,
+                            itemLabel = { it.sqlName },
+                            showDivider = false,
+                            showFilter = true,
+                            filterPlaceholder = stringResource(R.string.field_def_type_filter_hint),
+                        )
+                        typeError?.let { FieldErrorText(it, Modifier.padding(horizontal = 16.dp)) }
+                    }
                 }
 
-                // (2) Tipo
-                Column {
-                    IOSDropdownField(
-                        value = type,
-                        onValueChange = { selected ->
-                            type = selected
-                            typeError = null
-                            if (!ColumnDefinitionValidation.isLengthApplicable(selected)) length = ""
-                            if (!ColumnDefinitionValidation.isDecimalsApplicable(selected)) decimals = ""
-                            if (!ColumnDefinitionValidation.isValuesApplicable(selected)) valuesText = ""
-                            if (!ColumnDefinitionValidation.isZeroFillApplicable(selected)) zeroFill = false
-                            if (!ColumnDefinitionValidation.isCharsetApplicable(selected)) {
-                                selectedCharset = null
-                                selectedCollation = null
+                // Card "Atributos de tipo": Longitud/Decimales/ZeroFill/Valores/Charset/
+                // Collation — todos condicionados al tipo seleccionado. Solo se renderiza si
+                // al menos uno aplica, para no dejar una card vacía.
+                if (lengthApplicable || decimalsApplicable || zeroFillApplicable || valuesApplicable || charsetApplicable) {
+                    IOSGroupedCard {
+                        // (3) Longitud — solo visible para tipos con supportsLength
+                        if (lengthApplicable) {
+                            IOSTextField(
+                                value = length,
+                                onValueChange = { length = it.filter { ch -> ch.isDigit() } },
+                                placeholder = stringResource(R.string.field_def_length_hint),
+                                showDivider = true,
+                                keyboardType = KeyboardType.Number,
+                            )
+                        }
+
+                        // (4) Decimales — solo visible para tipos con supportsDecimals
+                        if (decimalsApplicable) {
+                            IOSTextField(
+                                value = decimals,
+                                onValueChange = { decimals = it.filter { ch -> ch.isDigit() } },
+                                placeholder = stringResource(R.string.field_def_decimals_hint),
+                                showDivider = true,
+                                keyboardType = KeyboardType.Number,
+                            )
+                        }
+
+                        // (ZeroFill) — solo visible para tipos numéricos con supportsZeroFill
+                        // (los 5 tipos enteros + DECIMAL/NUMERIC/FLOAT/DOUBLE). Sin forzado
+                        // cruzado: solo afecta el DDL emitido (`UNSIGNED ZEROFILL`, change
+                        // `create-table` extended field attributes).
+                        if (zeroFillApplicable) {
+                            FieldSwitchRow(
+                                label = stringResource(R.string.field_def_zerofill_label),
+                                checked = zeroFill,
+                                onCheckedChange = { zeroFill = it },
+                                showDivider = true,
+                            )
+                        }
+
+                        // (Valores) — solo visible para tipos con supportsValues (ENUM/SET);
+                        // ocupa el mismo lugar que Longitud/Decimales ya que estos no aplican
+                        // para estos tipos. Texto libre separado por comas.
+                        if (valuesApplicable) {
+                            Column {
+                                IOSTextField(
+                                    value = valuesText,
+                                    onValueChange = {
+                                        valuesText = it
+                                        valuesError = null
+                                    },
+                                    placeholder = stringResource(R.string.field_def_values_hint),
+                                    showDivider = true,
+                                )
+                                valuesError?.let { FieldErrorText(it, Modifier.padding(horizontal = 16.dp)) }
                             }
-                            if (!ColumnDefinitionValidation.isAutoIncrementApplicable(selected, isVirtual)) {
+                        }
+
+                        // (Charset/Collation) — solo visible para tipos con supportsCharset
+                        // (CHAR, VARCHAR, TEXT/TINYTEXT/MEDIUMTEXT/LONGTEXT, ENUM, SET).
+                        // Cargados en vivo desde el servidor vía CreateTableViewModel
+                        // .loadCollations (mirrors AddDatabaseViewModel's charset/collation
+                        // live-loading pattern, change `create-table` extended field
+                        // attributes addendum). Seleccionar un charset limpia la Collation
+                        // seleccionada y dispara [onCharsetSelected] para recargar collations
+                        // filtradas por ese charset.
+                        if (charsetApplicable) {
+                            IOSDropdownField(
+                                value = selectedCharset,
+                                onValueChange = { selected ->
+                                    selectedCharset = selected
+                                    selectedCollation = null
+                                    onCharsetSelected(selected.name)
+                                },
+                                placeholder = stringResource(R.string.field_def_charset_hint),
+                                items = charsets,
+                                itemLabel = { it.name },
+                                itemSubtitle = { it.description },
+                                showDivider = true,
+                                isLoading = charsetsLoading,
+                            )
+                            IOSDropdownField(
+                                value = selectedCollation,
+                                onValueChange = { selectedCollation = it },
+                                placeholder = stringResource(R.string.field_def_collation_hint),
+                                items = collations,
+                                itemLabel = { it.name },
+                                showDivider = false,
+                                isLoading = collationsLoading,
+                                enabled = selectedCharset != null,
+                            )
+                        }
+                    }
+                }
+
+                // Card "Comportamiento": Valor predeterminado, Nulo, Actualización automática,
+                // Virtual, Expresión, Llave, Autoincrement.
+                IOSGroupedCard {
+                    // (Valor predeterminado) — visible cuando !Virtual && !Autoincrement
+                    // (regla nueva, no gateada por tipo). Texto libre OPAQUO: el cliente NUNCA
+                    // cita/parsea el valor (el usuario escribe 'texto' o CURRENT_TIMESTAMP/0/
+                    // etc. según corresponda), mismo principio que Expresión (change
+                    // `create-table` extended field attributes addendum).
+                    if (defaultApplicable) {
+                        IOSTextField(
+                            value = defaultValue,
+                            onValueChange = { defaultValue = it },
+                            placeholder = stringResource(R.string.field_def_default_value_hint),
+                            showDivider = true,
+                        )
+                    }
+
+                    // (5) Nulo — oculto por completo cuando Virtual=true; deshabilitado
+                    // (no oculto) cuando Llave=true con Virtual=false
+                    if (!isVirtual) {
+                        FieldSwitchRow(
+                            label = stringResource(R.string.field_def_nullable_label),
+                            checked = nullable,
+                            onCheckedChange = { nullable = it },
+                            enabled = nuloEditable,
+                            showDivider = true,
+                        )
+                    }
+
+                    // (Actualización automática de fecha/hora) — solo visible para TIMESTAMP/
+                    // DATETIME (`ON UPDATE CURRENT_TIMESTAMP`, change `create-table` extended
+                    // field attributes addendum).
+                    if (autoUpdateTimestampApplicable) {
+                        FieldSwitchRow(
+                            label = stringResource(R.string.field_def_auto_update_timestamp_label),
+                            checked = autoUpdateTimestamp,
+                            onCheckedChange = { autoUpdateTimestamp = it },
+                            showDivider = true,
+                        )
+                    }
+
+                    // (6) Virtual
+                    FieldSwitchRow(
+                        label = stringResource(R.string.field_def_virtual_label),
+                        checked = isVirtual,
+                        onCheckedChange = { checked ->
+                            isVirtual = checked
+                            nullable = ColumnDefinitionValidation.resolveNullable(nullable, isPrimaryKey, checked)
+                            if (!checked) {
+                                expressionError = null
+                            } else {
+                                // Autoincrement es mutuamente excluyente con columnas generadas
+                                // (change `create-table` extended field attributes addendum)
                                 autoIncrement = false
                             }
-                            if (!ColumnDefinitionValidation.isAutoUpdateTimestampApplicable(selected)) {
-                                autoUpdateTimestamp = false
-                            }
                         },
-                        placeholder = stringResource(R.string.field_def_type_hint),
-                        items = ALL_SQL_COLUMN_TYPES,
-                        itemLabel = { it.sqlName },
-                        showDivider = false,
-                        showFilter = true,
-                        filterPlaceholder = stringResource(R.string.field_def_type_filter_hint),
+                        showDivider = true,
                     )
-                    typeError?.let { FieldErrorText(it) }
-                }
 
-                // (3) Longitud — solo visible para tipos con supportsLength
-                if (lengthApplicable) {
-                    IOSTextField(
-                        value = length,
-                        onValueChange = { length = it.filter { ch -> ch.isDigit() } },
-                        placeholder = stringResource(R.string.field_def_length_hint),
-                        showDivider = false,
-                        keyboardType = KeyboardType.Number,
-                    )
-                }
-
-                // (4) Decimales — solo visible para tipos con supportsDecimals
-                if (decimalsApplicable) {
-                    IOSTextField(
-                        value = decimals,
-                        onValueChange = { decimals = it.filter { ch -> ch.isDigit() } },
-                        placeholder = stringResource(R.string.field_def_decimals_hint),
-                        showDivider = false,
-                        keyboardType = KeyboardType.Number,
-                    )
-                }
-
-                // (ZeroFill) — solo visible para tipos numéricos con supportsZeroFill (los 5
-                // tipos enteros + DECIMAL/NUMERIC/FLOAT/DOUBLE); ubicado justo después de
-                // Decimales (sección numérica). Sin forzado cruzado: solo afecta el DDL
-                // emitido (`UNSIGNED ZEROFILL`, change `create-table` extended field attributes).
-                if (zeroFillApplicable) {
-                    FieldSwitchRow(
-                        label = stringResource(R.string.field_def_zerofill_label),
-                        checked = zeroFill,
-                        onCheckedChange = { zeroFill = it },
-                    )
-                }
-
-                // (Valores) — solo visible para tipos con supportsValues (ENUM/SET); ocupa el
-                // mismo lugar que Longitud/Decimales ya que estos no aplican para estos tipos.
-                // Texto libre separado por comas (ej. "activo, inactivo, pendiente").
-                if (valuesApplicable) {
-                    Column {
-                        IOSTextField(
-                            value = valuesText,
-                            onValueChange = {
-                                valuesText = it
-                                valuesError = null
-                            },
-                            placeholder = stringResource(R.string.field_def_values_hint),
-                            showDivider = false,
-                        )
-                        valuesError?.let { FieldErrorText(it) }
-                    }
-                }
-
-                // (Charset/Collation) — solo visible para tipos con supportsCharset (CHAR,
-                // VARCHAR, TEXT/TINYTEXT/MEDIUMTEXT/LONGTEXT, ENUM, SET); ubicado justo después
-                // de Longitud/Decimales/Valores (sección de tipos de cadena). Cargados en vivo
-                // desde el servidor vía CreateTableViewModel.loadCollations (mirrors
-                // AddDatabaseViewModel's charset/collation live-loading pattern, change
-                // `create-table` extended field attributes addendum). Seleccionar un charset
-                // limpia la Collation seleccionada y dispara [onCharsetSelected] para recargar
-                // collations filtradas por ese charset.
-                if (charsetApplicable) {
-                    IOSDropdownField(
-                        value = selectedCharset,
-                        onValueChange = { selected ->
-                            selectedCharset = selected
-                            selectedCollation = null
-                            onCharsetSelected(selected.name)
-                        },
-                        placeholder = stringResource(R.string.field_def_charset_hint),
-                        items = charsets,
-                        itemLabel = { it.name },
-                        itemSubtitle = { it.description },
-                        showDivider = false,
-                        isLoading = charsetsLoading,
-                    )
-                    IOSDropdownField(
-                        value = selectedCollation,
-                        onValueChange = { selectedCollation = it },
-                        placeholder = stringResource(R.string.field_def_collation_hint),
-                        items = collations,
-                        itemLabel = { it.name },
-                        showDivider = false,
-                        isLoading = collationsLoading,
-                        enabled = selectedCharset != null,
-                    )
-                }
-
-                // (Valor predeterminado) — visible cuando !Virtual && !Autoincrement (regla
-                // nueva, no gateada por tipo); ubicado antes de Nulo. Texto libre OPAQUO: el
-                // cliente NUNCA cita/parsea el valor (el usuario escribe 'texto' o
-                // CURRENT_TIMESTAMP/0/etc. según corresponda), mismo principio que Expresión
-                // (change `create-table` extended field attributes addendum).
-                if (defaultApplicable) {
-                    IOSTextField(
-                        value = defaultValue,
-                        onValueChange = { defaultValue = it },
-                        placeholder = stringResource(R.string.field_def_default_value_hint),
-                        showDivider = false,
-                    )
-                }
-
-                // (5) Nulo — oculto por completo cuando Virtual=true; deshabilitado
-                // (no oculto) cuando Llave=true con Virtual=false
-                if (!isVirtual) {
-                    FieldSwitchRow(
-                        label = stringResource(R.string.field_def_nullable_label),
-                        checked = nullable,
-                        onCheckedChange = { nullable = it },
-                        enabled = nuloEditable,
-                    )
-                }
-
-                // (Actualización automática de fecha/hora) — solo visible para TIMESTAMP/
-                // DATETIME (`ON UPDATE CURRENT_TIMESTAMP`); ubicado cerca de Nulo (change
-                // `create-table` extended field attributes addendum).
-                if (autoUpdateTimestampApplicable) {
-                    FieldSwitchRow(
-                        label = stringResource(R.string.field_def_auto_update_timestamp_label),
-                        checked = autoUpdateTimestamp,
-                        onCheckedChange = { autoUpdateTimestamp = it },
-                    )
-                }
-
-                // (6) Virtual
-                FieldSwitchRow(
-                    label = stringResource(R.string.field_def_virtual_label),
-                    checked = isVirtual,
-                    onCheckedChange = { checked ->
-                        isVirtual = checked
-                        nullable = ColumnDefinitionValidation.resolveNullable(nullable, isPrimaryKey, checked)
-                        if (!checked) {
-                            expressionError = null
-                        } else {
-                            // Autoincrement es mutuamente excluyente con columnas generadas
-                            // (change `create-table` extended field attributes addendum)
-                            autoIncrement = false
-                        }
-                    },
-                )
-
-                // (7) Expresión — solo visible y requerida cuando Virtual=true
-                if (isVirtual) {
-                    Column {
-                        IOSTextField(
-                            value = expression,
-                            onValueChange = {
-                                expression = it
-                                expressionError = null
-                            },
-                            placeholder = stringResource(R.string.field_def_expression_hint),
-                            showDivider = false,
-                        )
-                        expressionError?.let { FieldErrorText(it) }
-                    }
-                }
-
-                // (8) Llave — fuerza Nulo=false cuando Virtual=false (design.md: el modo
-                // de almacenamiento STORED/VIRTUAL se deriva automáticamente, sin control propio)
-                FieldSwitchRow(
-                    label = stringResource(R.string.field_def_primary_key_label),
-                    checked = isPrimaryKey,
-                    onCheckedChange = { checked ->
-                        isPrimaryKey = checked
-                        nullable = ColumnDefinitionValidation.resolveNullable(nullable, checked, isVirtual)
-                    },
-                )
-
-                // (Autoincrement) — solo visible para los 5 tipos enteros base con Virtual=false
-                // (mutuamente excluyente con columnas generadas); ubicado cerca de Llave. Al
-                // activarse fuerza Llave=true (resolvePrimaryKeyForAutoIncrement), que a su vez
-                // ya fuerza Nulo=false vía la regla Llave→Nulo existente (change `create-table`
-                // extended field attributes addendum).
-                if (autoIncrementApplicable) {
-                    FieldSwitchRow(
-                        label = stringResource(R.string.field_def_autoincrement_label),
-                        checked = autoIncrement,
-                        onCheckedChange = { checked ->
-                            autoIncrement = checked
-                            val resolvedPrimaryKey = ColumnDefinitionValidation.resolvePrimaryKeyForAutoIncrement(
-                                isPrimaryKey,
-                                checked,
+                    // (7) Expresión — solo visible y requerida cuando Virtual=true
+                    if (isVirtual) {
+                        Column {
+                            IOSTextField(
+                                value = expression,
+                                onValueChange = {
+                                    expression = it
+                                    expressionError = null
+                                },
+                                placeholder = stringResource(R.string.field_def_expression_hint),
+                                showDivider = true,
                             )
-                            isPrimaryKey = resolvedPrimaryKey
-                            nullable = ColumnDefinitionValidation.resolveNullable(nullable, resolvedPrimaryKey, isVirtual)
+                            expressionError?.let { FieldErrorText(it, Modifier.padding(horizontal = 16.dp)) }
+                        }
+                    }
+
+                    // (8) Llave — fuerza Nulo=false cuando Virtual=false (design.md: el modo
+                    // de almacenamiento STORED/VIRTUAL se deriva automáticamente, sin control
+                    // propio)
+                    FieldSwitchRow(
+                        label = stringResource(R.string.field_def_primary_key_label),
+                        checked = isPrimaryKey,
+                        onCheckedChange = { checked ->
+                            isPrimaryKey = checked
+                            nullable = ColumnDefinitionValidation.resolveNullable(nullable, checked, isVirtual)
                         },
+                        showDivider = autoIncrementApplicable,
                     )
+
+                    // (Autoincrement) — solo visible para los 5 tipos enteros base con
+                    // Virtual=false (mutuamente excluyente con columnas generadas). Al
+                    // activarse fuerza Llave=true (resolvePrimaryKeyForAutoIncrement), que a
+                    // su vez ya fuerza Nulo=false vía la regla Llave→Nulo existente (change
+                    // `create-table` extended field attributes addendum).
+                    if (autoIncrementApplicable) {
+                        FieldSwitchRow(
+                            label = stringResource(R.string.field_def_autoincrement_label),
+                            checked = autoIncrement,
+                            onCheckedChange = { checked ->
+                                autoIncrement = checked
+                                val resolvedPrimaryKey = ColumnDefinitionValidation.resolvePrimaryKeyForAutoIncrement(
+                                    isPrimaryKey,
+                                    checked,
+                                )
+                                isPrimaryKey = resolvedPrimaryKey
+                                nullable = ColumnDefinitionValidation.resolveNullable(
+                                    nullable,
+                                    resolvedPrimaryKey,
+                                    isVirtual,
+                                )
+                            },
+                            showDivider = false,
+                        )
+                    }
                 }
 
-                // (9) Comentario — opcional
-                IOSTextField(
-                    value = comment,
-                    onValueChange = { comment = it },
-                    placeholder = stringResource(R.string.field_def_comment_hint),
-                    showDivider = false,
-                )
+                // Card "Comentario" — opcional, siempre visible
+                IOSGroupedCard {
+                    IOSTextField(
+                        value = comment,
+                        onValueChange = { comment = it },
+                        placeholder = stringResource(R.string.field_def_comment_hint),
+                        showDivider = false,
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -601,30 +637,44 @@ private fun FieldSwitchRow(
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    showDivider: Boolean = true,
 ) {
     val tokens = LocalDesignTokens.current
 
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            text = label,
-            fontSize = 17.sp,
-            color = tokens.textPrimary,
-        )
-        Switch(
-            checked = checked,
-            onCheckedChange = onCheckedChange,
-            enabled = enabled,
-            colors = SwitchDefaults.colors(
-                checkedThumbColor = Color.White,
-                checkedTrackColor = tokens.accentPrimary,
-                uncheckedThumbColor = Color.White,
-                uncheckedTrackColor = tokens.separator,
-            ),
-        )
+    Column(modifier = modifier) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(tokens.surfacePrimary)
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = label,
+                fontSize = 17.sp,
+                color = tokens.textPrimary,
+            )
+            Switch(
+                checked = checked,
+                onCheckedChange = onCheckedChange,
+                enabled = enabled,
+                colors = SwitchDefaults.colors(
+                    checkedThumbColor = Color.White,
+                    checkedTrackColor = tokens.accentPrimary,
+                    uncheckedThumbColor = Color.White,
+                    uncheckedTrackColor = tokens.separator,
+                ),
+            )
+        }
+
+        if (showDivider) {
+            androidx.compose.material3.HorizontalDivider(
+                color = tokens.separator,
+                thickness = 0.5.dp,
+                modifier = Modifier.padding(start = 16.dp),
+            )
+        }
     }
 }
 
