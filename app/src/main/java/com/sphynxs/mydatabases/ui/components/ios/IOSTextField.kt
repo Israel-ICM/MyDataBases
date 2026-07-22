@@ -20,6 +20,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sphynxs.mydatabases.ui.theme.LocalDesignTokens
 
+/**
+ * @param enabled Si es `false`, el campo se muestra deshabilitado: no acepta foco ni edición
+ *   y el texto se atenúa (`textTertiary`) para comunicar visualmente que es de solo lectura,
+ *   en vez de renderizar un `Text` suelto sin la apariencia de input (change `edit-database-menu`).
+ */
 @Composable
 fun IOSTextField(
     value: String,
@@ -28,7 +33,8 @@ fun IOSTextField(
     modifier: Modifier = Modifier,
     showDivider: Boolean = true,
     isPassword: Boolean = false,
-    keyboardType: KeyboardType = KeyboardType.Text
+    keyboardType: KeyboardType = KeyboardType.Text,
+    enabled: Boolean = true
 ) {
     var passwordVisible by remember { mutableStateOf(false) }
     val tokens = LocalDesignTokens.current
@@ -44,10 +50,11 @@ fun IOSTextField(
             BasicTextField(
                 value = value,
                 onValueChange = onValueChange,
+                enabled = enabled,
                 modifier = Modifier.weight(1f),
                 textStyle = TextStyle(
                     fontSize = 17.sp,
-                    color = tokens.textPrimary,
+                    color = if (enabled) tokens.textPrimary else tokens.textTertiary,
                     fontWeight = FontWeight.Normal
                 ),
                 visualTransformation = if (isPassword && !passwordVisible) 

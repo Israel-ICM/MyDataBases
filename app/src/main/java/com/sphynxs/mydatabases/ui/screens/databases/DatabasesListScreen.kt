@@ -84,8 +84,32 @@ fun DatabasesListScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
+    // Popup menu de acciones de base de datos (change `database-row-actions-menu`): las
+    // acciones sin lógica de negocio todavía confirman la interacción con un snackbar
+    // "próximamente". "Editar" ya tiene funcionamiento real (change `edit-database-menu`) —
+    // ver `databaseBeingEdited` más abajo.
+    val comingSoonLabel = stringResource(R.string.feature_coming_soon)
+    val newQueryActionLabel = stringResource(R.string.database_row_action_new_query)
+    val openConsoleActionLabel = stringResource(R.string.database_row_action_open_console)
+    val searchActionLabel = stringResource(R.string.database_row_action_search)
+    val backupActionLabel = stringResource(R.string.database_row_action_backup)
+    val shareActionLabel = stringResource(R.string.database_row_action_share)
+    val deleteActionLabel = stringResource(R.string.database_row_action_delete)
+
+    fun showComingSoon(actionLabel: String) {
+        scope.launch {
+            snackbarHostState.showSnackbar("$actionLabel: $comingSoonLabel")
+        }
+    }
+
+    // Database seleccionada para editar (no-null muestra el bottom sheet de edición)
+    var databaseBeingEdited by remember { mutableStateOf<Database?>(null) }
+
     // Estado para el bottom sheet de agregar database
     val addDatabaseSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    // Estado para el bottom sheet de editar database
+    val editDatabaseSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     
     // Altura real del status bar (incluye notch/cutout)
     val statusBarHeightDp = with(LocalDensity.current) {
@@ -155,6 +179,13 @@ fun DatabasesListScreen(
                                 DatabaseCard(
                                     database = database,
                                     onCardClick = { onNavigateToDatabaseMenu(database.name) },
+                                    onEditClick = { databaseBeingEdited = database },
+                                    onNewQueryClick = { showComingSoon(newQueryActionLabel) },
+                                    onOpenConsoleClick = { showComingSoon(openConsoleActionLabel) },
+                                    onSearchClick = { showComingSoon(searchActionLabel) },
+                                    onBackupClick = { showComingSoon(backupActionLabel) },
+                                    onShareClick = { showComingSoon(shareActionLabel) },
+                                    onDeleteClick = { showComingSoon(deleteActionLabel) },
                                     modifier = Modifier.padding(
                                         horizontal = LocalDesignTokens.current.screenPaddingHorizontal,
                                         vertical = LocalDesignTokens.current.cardSpacing / 2
@@ -232,6 +263,53 @@ fun DatabasesListScreen(
                             viewModel.loadDatabases()
                             // Navigate to the newly created database's action menu
                             onNavigateToDatabaseMenu(databaseName)
+                        },
+                        snackbarHostState = snackbarHostState,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+            }
+        }
+    }
+
+    // Bottom Sheet para editar database (change `edit-database-menu`)
+    databaseBeingEdited?.let { database ->
+        ModalBottomSheet(
+            onDismissRequest = {
+                scope.launch {
+                    editDatabaseSheetState.hide()
+                    databaseBeingEdited = null
+                }
+            },
+            sheetState = editDatabaseSheetState,
+            containerColor = LocalDesignTokens.current.backgroundPrimary,
+            sheetMaxWidth = 10000.dp,
+            scrimColor = LocalDesignTokens.current.backdropScrim,
+            tonalElevation = 16.dp
+        ) {
+            Scaffold(
+                snackbarHost = { SnackbarHost(snackbarHostState) },
+                containerColor = Color.Transparent
+            ) { innerPadding ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                        .padding(start = 16.dp, end = 16.dp, top = statusBarHeightDp)
+                ) {
+                    EditDatabaseFormContent(
+                        databaseName = database.name,
+                        currentCharset = database.charset,
+                        currentCollation = database.collation,
+                        onDismiss = {
+                            scope.launch {
+                                editDatabaseSheetState.hide()
+                                databaseBeingEdited = null
+                            }
+                        },
+                        onDatabaseUpdated = {
+                            // Refrescar la lista de databases tras editar charset/collation
+                            viewModel.loadDatabases()
                         },
                         snackbarHostState = snackbarHostState,
                         modifier = Modifier.fillMaxSize()
