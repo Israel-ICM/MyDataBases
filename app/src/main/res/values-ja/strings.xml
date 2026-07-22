@@ -63,6 +63,15 @@
     <string name="databases_title">データベース</string>
     <string name="databases_empty">利用可能なデータベースがありません</string>
     <string name="databases_search_hint">データベースを検索…</string>
+
+    <!-- Database row action popup menu (long-press) -->
+    <string name="database_row_action_edit">編集</string>
+    <string name="database_row_action_new_query">新しいクエリ</string>
+    <string name="database_row_action_open_console">コンソールを開く</string>
+    <string name="database_row_action_search">データベース内を検索</string>
+    <string name="database_row_action_backup">バックアップ</string>
+    <string name="database_row_action_share">共有</string>
+    <string name="database_row_action_delete">削除</string>
     
     <!-- Database Action Menu screen -->
     <string name="database_action_menu_title">何をしますか？</string>
@@ -86,6 +95,14 @@
     <string name="error_create_database_failed">データベースを作成できませんでした。もう一度お試しください。</string>
     <string name="error_invalid_database_name">無効なデータベース名です。英字、数字、アンダースコアのみを使用してください（最大64文字）。</string>
     <string name="error_connection_lost">接続が失われました。再接続してもう一度お試しください。</string>
+
+    <!-- Edit Database screen (charset/collation only — database name is not renamable) -->
+    <string name="edit_database_title">データベースを編集</string>
+    <string name="edit_database_button_save">変更を保存</string>
+    <string name="edit_database_updating">データベースを更新中...</string>
+    <string name="update_database_success">データベースを更新しました</string>
+    <string name="error_update_permission_denied">データベースを編集する権限がありません</string>
+    <string name="error_update_database_failed">データベースを更新できませんでした。もう一度お試しください。</string>
     
     <!-- Create Table screen (parent sheet, change `create-table` PR-2) -->
     <string name="create_table_title">テーブルを作成</string>
@@ -175,6 +192,18 @@
     <string name="tables_title">テーブル - %1$s</string>
     <string name="tables_empty">このデータベースにはテーブルがありません</string>
     <string name="tables_search_hint">テーブルを検索…</string>
+
+    <!-- Table row action popup menu (long-press) -->
+    <string name="table_action_edit">編集</string>
+    <string name="table_action_delete">削除</string>
+    <string name="table_action_duplicate">複製</string>
+    <string name="table_action_truncate">空にする</string>
+    <string name="table_action_export">エクスポート</string>
+    <string name="table_action_copy">コピー</string>
+    <string name="table_action_share">共有</string>
+    <string name="table_action_rename">名前を変更</string>
+    <string name="table_action_add_shortcut">ショートカットに追加</string>
+    <string name="feature_coming_soon">近日公開</string>
     
     <!-- Table viewer screen -->
     <string name="table_viewer_title">テーブル: %1$s</string>

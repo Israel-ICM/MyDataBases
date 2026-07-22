@@ -86,6 +86,26 @@ fun TablesListScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
+    // Popup menu de acciones de tabla (change `table-row-actions-menu`): por ahora
+    // ninguna acción tiene lógica de negocio, solo se confirma la interacción con un
+    // snackbar "próximamente" hasta que cada acción se implemente en cambios posteriores.
+    val comingSoonLabel = stringResource(R.string.feature_coming_soon)
+    val editActionLabel = stringResource(R.string.table_action_edit)
+    val deleteActionLabel = stringResource(R.string.table_action_delete)
+    val duplicateActionLabel = stringResource(R.string.table_action_duplicate)
+    val truncateActionLabel = stringResource(R.string.table_action_truncate)
+    val exportActionLabel = stringResource(R.string.table_action_export)
+    val copyActionLabel = stringResource(R.string.table_action_copy)
+    val shareActionLabel = stringResource(R.string.table_action_share)
+    val renameActionLabel = stringResource(R.string.table_action_rename)
+    val addShortcutActionLabel = stringResource(R.string.table_action_add_shortcut)
+
+    fun showComingSoon(actionLabel: String) {
+        scope.launch {
+            snackbarHostState.showSnackbar("$actionLabel: $comingSoonLabel")
+        }
+    }
+
     // Estado del bottom sheet de crear tabla
     val addTableSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
@@ -159,6 +179,15 @@ fun TablesListScreen(
                                             )
                                         )
                                     },
+                                    onEditClick = { showComingSoon(editActionLabel) },
+                                    onRenameClick = { showComingSoon(renameActionLabel) },
+                                    onDuplicateClick = { showComingSoon(duplicateActionLabel) },
+                                    onCopyClick = { showComingSoon(copyActionLabel) },
+                                    onExportClick = { showComingSoon(exportActionLabel) },
+                                    onShareClick = { showComingSoon(shareActionLabel) },
+                                    onAddShortcutClick = { showComingSoon(addShortcutActionLabel) },
+                                    onTruncateClick = { showComingSoon(truncateActionLabel) },
+                                    onDeleteClick = { showComingSoon(deleteActionLabel) },
                                     modifier = Modifier.padding(
                                         horizontal = LocalDesignTokens.current.screenPaddingHorizontal,
                                         vertical = LocalDesignTokens.current.cardSpacing / 2

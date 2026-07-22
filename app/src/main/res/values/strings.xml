@@ -100,6 +100,15 @@
     <string name="databases_title">Databases</string>
     <string name="databases_empty">No databases available</string>
     <string name="databases_search_hint">Search databases…</string>
+
+    <!-- Database row action popup menu (long-press) -->
+    <string name="database_row_action_edit">Edit</string>
+    <string name="database_row_action_new_query">New query</string>
+    <string name="database_row_action_open_console">Open console</string>
+    <string name="database_row_action_search">Search in database</string>
+    <string name="database_row_action_backup">Backup</string>
+    <string name="database_row_action_share">Share</string>
+    <string name="database_row_action_delete">Delete</string>
     
     <!-- Database Action Menu screen -->
     <string name="database_action_menu_title">What do you want to do?</string>
@@ -123,6 +132,14 @@
     <string name="error_create_database_failed">Could not create the database. Please try again.</string>
     <string name="error_invalid_database_name">Invalid database name. Use only letters, numbers, and underscores (max 64 characters).</string>
     <string name="error_connection_lost">Connection lost. Please reconnect and try again.</string>
+
+    <!-- Edit Database screen (charset/collation only — database name is not renamable) -->
+    <string name="edit_database_title">Edit Database</string>
+    <string name="edit_database_button_save">Save Changes</string>
+    <string name="edit_database_updating">Updating database...</string>
+    <string name="update_database_success">Database updated</string>
+    <string name="error_update_permission_denied">You don\'t have permission to edit databases</string>
+    <string name="error_update_database_failed">Could not update the database. Please try again.</string>
     
     <!-- Create Table screen (parent sheet, change `create-table` PR-2) -->
     <string name="create_table_title">Create Table</string>
@@ -216,6 +233,18 @@
     <string name="tables_title">Tables - %1$s</string>
     <string name="tables_empty">No tables in this database</string>
     <string name="tables_search_hint">Search tables…</string>
+
+    <!-- Table row action popup menu (long-press) -->
+    <string name="table_action_edit">Edit</string>
+    <string name="table_action_delete">Delete</string>
+    <string name="table_action_duplicate">Duplicate</string>
+    <string name="table_action_truncate">Truncate</string>
+    <string name="table_action_export">Export</string>
+    <string name="table_action_copy">Copy</string>
+    <string name="table_action_share">Share</string>
+    <string name="table_action_rename">Rename</string>
+    <string name="table_action_add_shortcut">Add to shortcuts</string>
+    <string name="feature_coming_soon">Coming soon</string>
     
     <!-- Table viewer screen -->
     <string name="table_viewer_title">Table: %1$s</string>

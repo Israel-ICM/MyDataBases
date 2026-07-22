@@ -63,6 +63,15 @@
     <string name="databases_title">डेटाबेस</string>
     <string name="databases_empty">कोई डेटाबेस उपलब्ध नहीं</string>
     <string name="databases_search_hint">डेटाबेस खोजें…</string>
+
+    <!-- Database row action popup menu (long-press) -->
+    <string name="database_row_action_edit">संपादित करें</string>
+    <string name="database_row_action_new_query">नया क्वेरी</string>
+    <string name="database_row_action_open_console">कंसोल खोलें</string>
+    <string name="database_row_action_search">डेटाबेस में खोजें</string>
+    <string name="database_row_action_backup">बैकअप</string>
+    <string name="database_row_action_share">साझा करें</string>
+    <string name="database_row_action_delete">हटाएं</string>
     
     <!-- Database Action Menu screen -->
     <string name="database_action_menu_title">आप क्या करना चाहते हैं?</string>
@@ -86,6 +95,14 @@
     <string name="error_create_database_failed">डेटाबेस नहीं बनाया जा सका। कृपया पुनः प्रयास करें।</string>
     <string name="error_invalid_database_name">अमान्य डेटाबेस नाम। केवल अक्षर, संख्या और अंडरस्कोर का उपयोग करें (अधिकतम 64 वर्ण)।</string>
     <string name="error_connection_lost">कनेक्शन टूट गया। कृपया पुनः कनेक्ट करें और पुनः प्रयास करें।</string>
+
+    <!-- Edit Database screen (charset/collation only — database name is not renamable) -->
+    <string name="edit_database_title">डेटाबेस संपादित करें</string>
+    <string name="edit_database_button_save">परिवर्तन सहेजें</string>
+    <string name="edit_database_updating">डेटाबेस अपडेट हो रहा है...</string>
+    <string name="update_database_success">डेटाबेस अपडेट हो गया</string>
+    <string name="error_update_permission_denied">आपके पास डेटाबेस संपादित करने की अनुमति नहीं है</string>
+    <string name="error_update_database_failed">डेटाबेस अपडेट नहीं किया जा सका। कृपया पुनः प्रयास करें।</string>
     
     <!-- Create Table screen (parent sheet, change `create-table` PR-2) -->
     <string name="create_table_title">टेबल बनाएं</string>
@@ -175,6 +192,18 @@
     <string name="tables_title">टेबल - %1$s</string>
     <string name="tables_empty">इस डेटाबेस में कोई टेबल नहीं</string>
     <string name="tables_search_hint">टेबल खोजें…</string>
+
+    <!-- Table row action popup menu (long-press) -->
+    <string name="table_action_edit">संपादित करें</string>
+    <string name="table_action_delete">हटाएं</string>
+    <string name="table_action_duplicate">डुप्लिकेट करें</string>
+    <string name="table_action_truncate">खाली करें</string>
+    <string name="table_action_export">निर्यात करें</string>
+    <string name="table_action_copy">कॉपी करें</string>
+    <string name="table_action_share">साझा करें</string>
+    <string name="table_action_rename">नाम बदलें</string>
+    <string name="table_action_add_shortcut">शॉर्टकट में जोड़ें</string>
+    <string name="feature_coming_soon">जल्द आ रहा है</string>
     
     <!-- Table viewer screen -->
     <string name="table_viewer_title">टेबल: %1$s</string>

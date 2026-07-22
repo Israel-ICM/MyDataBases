@@ -63,6 +63,15 @@
     <string name="databases_title">Базы данных</string>
     <string name="databases_empty">Нет доступных баз данных</string>
     <string name="databases_search_hint">Поиск баз данных…</string>
+
+    <!-- Database row action popup menu (long-press) -->
+    <string name="database_row_action_edit">Редактировать</string>
+    <string name="database_row_action_new_query">Новый запрос</string>
+    <string name="database_row_action_open_console">Открыть консоль</string>
+    <string name="database_row_action_search">Поиск в базе данных</string>
+    <string name="database_row_action_backup">Резервная копия</string>
+    <string name="database_row_action_share">Поделиться</string>
+    <string name="database_row_action_delete">Удалить</string>
     
     <!-- Database Action Menu screen -->
     <string name="database_action_menu_title">Что вы хотите сделать?</string>
@@ -86,6 +95,14 @@
     <string name="error_create_database_failed">Не удалось создать базу данных. Попробуйте снова.</string>
     <string name="error_invalid_database_name">Недопустимое имя базы данных. Используйте только буквы, цифры и подчёркивания (макс. 64 символа).</string>
     <string name="error_connection_lost">Подключение потеряно. Переподключитесь и попробуйте снова.</string>
+
+    <!-- Edit Database screen (charset/collation only — database name is not renamable) -->
+    <string name="edit_database_title">Редактировать базу данных</string>
+    <string name="edit_database_button_save">Сохранить изменения</string>
+    <string name="edit_database_updating">Обновление базы данных...</string>
+    <string name="update_database_success">База данных обновлена</string>
+    <string name="error_update_permission_denied">У вас нет прав для редактирования баз данных</string>
+    <string name="error_update_database_failed">Не удалось обновить базу данных. Попробуйте снова.</string>
     
     <!-- Create Table screen (parent sheet, change `create-table` PR-2) -->
     <string name="create_table_title">Создать таблицу</string>
@@ -175,6 +192,18 @@
     <string name="tables_title">Таблицы - %1$s</string>
     <string name="tables_empty">В этой базе данных нет таблиц</string>
     <string name="tables_search_hint">Поиск таблиц…</string>
+
+    <!-- Table row action popup menu (long-press) -->
+    <string name="table_action_edit">Редактировать</string>
+    <string name="table_action_delete">Удалить</string>
+    <string name="table_action_duplicate">Дублировать</string>
+    <string name="table_action_truncate">Очистить</string>
+    <string name="table_action_export">Экспортировать</string>
+    <string name="table_action_copy">Копировать</string>
+    <string name="table_action_share">Поделиться</string>
+    <string name="table_action_rename">Переименовать</string>
+    <string name="table_action_add_shortcut">Добавить в ярлыки</string>
+    <string name="feature_coming_soon">Скоро появится</string>
     
     <!-- Table viewer screen -->
     <string name="table_viewer_title">Таблица: %1$s</string>

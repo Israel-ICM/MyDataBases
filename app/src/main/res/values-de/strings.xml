@@ -63,6 +63,15 @@
     <string name="databases_title">Datenbanken</string>
     <string name="databases_empty">Keine Datenbanken verfügbar</string>
     <string name="databases_search_hint">Datenbanken durchsuchen…</string>
+
+    <!-- Database row action popup menu (long-press) -->
+    <string name="database_row_action_edit">Bearbeiten</string>
+    <string name="database_row_action_new_query">Neue Abfrage</string>
+    <string name="database_row_action_open_console">Konsole öffnen</string>
+    <string name="database_row_action_search">In Datenbank suchen</string>
+    <string name="database_row_action_backup">Sicherung</string>
+    <string name="database_row_action_share">Teilen</string>
+    <string name="database_row_action_delete">Löschen</string>
     
     <!-- Database Action Menu screen -->
     <string name="database_action_menu_title">Was möchten Sie tun?</string>
@@ -86,6 +95,14 @@
     <string name="error_create_database_failed">Datenbank konnte nicht erstellt werden. Bitte versuchen Sie es erneut.</string>
     <string name="error_invalid_database_name">Ungültiger Datenbankname. Verwenden Sie nur Buchstaben, Zahlen und Unterstriche (max. 64 Zeichen).</string>
     <string name="error_connection_lost">Verbindung verloren. Bitte erneut verbinden und wiederholen.</string>
+
+    <!-- Edit Database screen (charset/collation only — database name is not renamable) -->
+    <string name="edit_database_title">Datenbank bearbeiten</string>
+    <string name="edit_database_button_save">Änderungen speichern</string>
+    <string name="edit_database_updating">Datenbank wird aktualisiert...</string>
+    <string name="update_database_success">Datenbank aktualisiert</string>
+    <string name="error_update_permission_denied">Sie haben keine Berechtigung, Datenbanken zu bearbeiten</string>
+    <string name="error_update_database_failed">Datenbank konnte nicht aktualisiert werden. Bitte versuchen Sie es erneut.</string>
     
     <!-- Create Table screen (parent sheet, change `create-table` PR-2) -->
     <string name="create_table_title">Tabelle erstellen</string>
@@ -175,6 +192,18 @@
     <string name="tables_title">Tabellen - %1$s</string>
     <string name="tables_empty">Keine Tabellen in dieser Datenbank</string>
     <string name="tables_search_hint">Tabellen durchsuchen…</string>
+
+    <!-- Table row action popup menu (long-press) -->
+    <string name="table_action_edit">Bearbeiten</string>
+    <string name="table_action_delete">Löschen</string>
+    <string name="table_action_duplicate">Duplizieren</string>
+    <string name="table_action_truncate">Leeren</string>
+    <string name="table_action_export">Exportieren</string>
+    <string name="table_action_copy">Kopieren</string>
+    <string name="table_action_share">Teilen</string>
+    <string name="table_action_rename">Umbenennen</string>
+    <string name="table_action_add_shortcut">Zu Verknüpfungen hinzufügen</string>
+    <string name="feature_coming_soon">Demnächst verfügbar</string>
     
     <!-- Table viewer screen -->
     <string name="table_viewer_title">Tabelle: %1$s</string>

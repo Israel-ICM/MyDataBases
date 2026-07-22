@@ -92,5 +92,23 @@ object PhosphorAppIcons {
         val more: ImageVector get() = TablerIcons.DotsVertical
         val power: ImageVector get() = TablerIcons.Power
         val dragHandle: ImageVector get() = TablerIcons.GripVertical
+
+        // Popup menu de acciones de tabla (change `table-row-actions-menu`):
+        val duplicate: ImageVector get() = TablerIcons.Files
+
+        // Eraser en vez de Trash (ya usado por `delete`): truncar borra todas las filas
+        // pero conserva la estructura de la tabla, a diferencia de eliminar la tabla entera.
+        val truncate: ImageVector get() = TablerIcons.Eraser
+
+        // Download representa sacar/guardar los datos fuera de la app.
+        val export: ImageVector get() = TablerIcons.Download
+        val copy: ImageVector get() = TablerIcons.Copy
+        val share: ImageVector get() = TablerIcons.Share
+
+        // Tag representa la acción de re-etiquetar/renombrar.
+        val rename: ImageVector get() = TablerIcons.Tag
+
+        // Pin representa "fijar" un acceso directo/atajo rápido.
+        val addShortcut: ImageVector get() = TablerIcons.Pin
     }
 }

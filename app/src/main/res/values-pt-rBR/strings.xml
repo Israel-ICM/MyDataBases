@@ -63,6 +63,15 @@
     <string name="databases_title">Bancos de Dados</string>
     <string name="databases_empty">Nenhum banco de dados disponível</string>
     <string name="databases_search_hint">Pesquisar bancos de dados…</string>
+
+    <!-- Database row action popup menu (long-press) -->
+    <string name="database_row_action_edit">Editar</string>
+    <string name="database_row_action_new_query">Nova consulta</string>
+    <string name="database_row_action_open_console">Abrir console</string>
+    <string name="database_row_action_search">Pesquisar no banco de dados</string>
+    <string name="database_row_action_backup">Backup</string>
+    <string name="database_row_action_share">Compartilhar</string>
+    <string name="database_row_action_delete">Excluir</string>
     
     <!-- Database Action Menu screen -->
     <string name="database_action_menu_title">O que você quer fazer?</string>
@@ -86,6 +95,14 @@
     <string name="error_create_database_failed">Não foi possível criar o banco de dados. Tente novamente.</string>
     <string name="error_invalid_database_name">Nome de banco de dados inválido. Use apenas letras, números e sublinhados (máx. 64 caracteres).</string>
     <string name="error_connection_lost">Conexão perdida. Reconecte e tente novamente.</string>
+
+    <!-- Edit Database screen (charset/collation only — database name is not renamable) -->
+    <string name="edit_database_title">Editar banco de dados</string>
+    <string name="edit_database_button_save">Salvar alterações</string>
+    <string name="edit_database_updating">Atualizando banco de dados...</string>
+    <string name="update_database_success">Banco de dados atualizado</string>
+    <string name="error_update_permission_denied">Você não tem permissão para editar bancos de dados</string>
+    <string name="error_update_database_failed">Não foi possível atualizar o banco de dados. Tente novamente.</string>
     
     <!-- Create Table screen (parent sheet, change `create-table` PR-2) -->
     <string name="create_table_title">Criar tabela</string>
@@ -175,6 +192,18 @@
     <string name="tables_title">Tabelas - %1$s</string>
     <string name="tables_empty">Nenhuma tabela neste banco de dados</string>
     <string name="tables_search_hint">Pesquisar tabelas…</string>
+
+    <!-- Table row action popup menu (long-press) -->
+    <string name="table_action_edit">Editar</string>
+    <string name="table_action_delete">Excluir</string>
+    <string name="table_action_duplicate">Duplicar</string>
+    <string name="table_action_truncate">Truncar</string>
+    <string name="table_action_export">Exportar</string>
+    <string name="table_action_copy">Copiar</string>
+    <string name="table_action_share">Compartilhar</string>
+    <string name="table_action_rename">Renomear</string>
+    <string name="table_action_add_shortcut">Adicionar aos atalhos</string>
+    <string name="feature_coming_soon">Em breve</string>
     
     <!-- Table viewer screen -->
     <string name="table_viewer_title">Tabela: %1$s</string>

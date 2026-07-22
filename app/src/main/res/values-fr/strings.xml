@@ -63,6 +63,15 @@
     <string name="databases_title">Bases de données</string>
     <string name="databases_empty">Aucune base de données disponible</string>
     <string name="databases_search_hint">Rechercher des bases de données…</string>
+
+    <!-- Database row action popup menu (long-press) -->
+    <string name="database_row_action_edit">Modifier</string>
+    <string name="database_row_action_new_query">Nouvelle requête</string>
+    <string name="database_row_action_open_console">Ouvrir la console</string>
+    <string name="database_row_action_search">Rechercher dans la base de données</string>
+    <string name="database_row_action_backup">Sauvegarde</string>
+    <string name="database_row_action_share">Partager</string>
+    <string name="database_row_action_delete">Supprimer</string>
     
     <!-- Database Action Menu screen -->
     <string name="database_action_menu_title">Que voulez-vous faire ?</string>
@@ -86,6 +95,14 @@
     <string name="error_create_database_failed">Impossible de créer la base de données. Veuillez réessayer.</string>
     <string name="error_invalid_database_name">Nom de base de données invalide. Utilisez uniquement des lettres, chiffres et underscores (max 64 caractères).</string>
     <string name="error_connection_lost">Connexion perdue. Veuillez vous reconnecter et réessayer.</string>
+
+    <!-- Edit Database screen (charset/collation only — database name is not renamable) -->
+    <string name="edit_database_title">Modifier la base de données</string>
+    <string name="edit_database_button_save">Enregistrer les modifications</string>
+    <string name="edit_database_updating">Mise à jour de la base de données...</string>
+    <string name="update_database_success">Base de données mise à jour</string>
+    <string name="error_update_permission_denied">Vous n\'avez pas la permission de modifier des bases de données</string>
+    <string name="error_update_database_failed">Impossible de mettre à jour la base de données. Veuillez réessayer.</string>
     
     <!-- Create Table screen (parent sheet, change `create-table` PR-2) -->
     <string name="create_table_title">Créer une table</string>
@@ -175,6 +192,18 @@
     <string name="tables_title">Tables - %1$s</string>
     <string name="tables_empty">Aucune table dans cette base de données</string>
     <string name="tables_search_hint">Rechercher des tables…</string>
+
+    <!-- Table row action popup menu (long-press) -->
+    <string name="table_action_edit">Modifier</string>
+    <string name="table_action_delete">Supprimer</string>
+    <string name="table_action_duplicate">Dupliquer</string>
+    <string name="table_action_truncate">Vider</string>
+    <string name="table_action_export">Exporter</string>
+    <string name="table_action_copy">Copier</string>
+    <string name="table_action_share">Partager</string>
+    <string name="table_action_rename">Renommer</string>
+    <string name="table_action_add_shortcut">Ajouter aux raccourcis</string>
+    <string name="feature_coming_soon">Bientôt disponible</string>
     
     <!-- Table viewer screen -->
     <string name="table_viewer_title">Table : %1$s</string>

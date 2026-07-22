@@ -63,6 +63,15 @@
     <string name="databases_title">数据库</string>
     <string name="databases_empty">没有可用的数据库</string>
     <string name="databases_search_hint">搜索数据库…</string>
+
+    <!-- Database row action popup menu (long-press) -->
+    <string name="database_row_action_edit">编辑</string>
+    <string name="database_row_action_new_query">新建查询</string>
+    <string name="database_row_action_open_console">打开控制台</string>
+    <string name="database_row_action_search">在数据库中搜索</string>
+    <string name="database_row_action_backup">备份</string>
+    <string name="database_row_action_share">分享</string>
+    <string name="database_row_action_delete">删除</string>
     
     <!-- Database Action Menu screen -->
     <string name="database_action_menu_title">你想做什么？</string>
@@ -86,6 +95,14 @@
     <string name="error_create_database_failed">无法创建数据库。请重试。</string>
     <string name="error_invalid_database_name">数据库名称无效。仅使用字母、数字和下划线（最多64个字符）。</string>
     <string name="error_connection_lost">连接丢失。请重新连接并重试。</string>
+
+    <!-- Edit Database screen (charset/collation only — database name is not renamable) -->
+    <string name="edit_database_title">编辑数据库</string>
+    <string name="edit_database_button_save">保存更改</string>
+    <string name="edit_database_updating">正在更新数据库...</string>
+    <string name="update_database_success">数据库已更新</string>
+    <string name="error_update_permission_denied">您没有编辑数据库的权限</string>
+    <string name="error_update_database_failed">无法更新数据库。请重试。</string>
     
     <!-- Create Table screen (parent sheet, change `create-table` PR-2) -->
     <string name="create_table_title">创建表</string>
@@ -175,6 +192,18 @@
     <string name="tables_title">表 - %1$s</string>
     <string name="tables_empty">此数据库中没有表</string>
     <string name="tables_search_hint">搜索表…</string>
+
+    <!-- Table row action popup menu (long-press) -->
+    <string name="table_action_edit">编辑</string>
+    <string name="table_action_delete">删除</string>
+    <string name="table_action_duplicate">复制</string>
+    <string name="table_action_truncate">截断</string>
+    <string name="table_action_export">导出</string>
+    <string name="table_action_copy">拷贝</string>
+    <string name="table_action_share">分享</string>
+    <string name="table_action_rename">重命名</string>
+    <string name="table_action_add_shortcut">添加到快捷方式</string>
+    <string name="feature_coming_soon">即将推出</string>
     
     <!-- Table viewer screen -->
     <string name="table_viewer_title">表：%1$s</string>

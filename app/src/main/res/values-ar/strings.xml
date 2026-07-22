@@ -63,6 +63,15 @@
     <string name="databases_title">قواعد البيانات</string>
     <string name="databases_empty">لا توجد قواعد بيانات متاحة</string>
     <string name="databases_search_hint">البحث عن قواعد البيانات…</string>
+
+    <!-- Database row action popup menu (long-press) -->
+    <string name="database_row_action_edit">تعديل</string>
+    <string name="database_row_action_new_query">استعلام جديد</string>
+    <string name="database_row_action_open_console">فتح وحدة التحكم</string>
+    <string name="database_row_action_search">البحث في قاعدة البيانات</string>
+    <string name="database_row_action_backup">النسخ الاحتياطي</string>
+    <string name="database_row_action_share">مشاركة</string>
+    <string name="database_row_action_delete">حذف</string>
     
     <!-- Database Action Menu screen -->
     <string name="database_action_menu_title">ماذا تريد أن تفعل؟</string>
@@ -86,6 +95,14 @@
     <string name="error_create_database_failed">تعذر إنشاء قاعدة البيانات. يرجى المحاولة مرة أخرى.</string>
     <string name="error_invalid_database_name">اسم قاعدة بيانات غير صالح. استخدم الحروف والأرقام والشرطات السفلية فقط (بحد أقصى 64 حرفًا).</string>
     <string name="error_connection_lost">فقد الاتصال. يرجى إعادة الاتصال والمحاولة مرة أخرى.</string>
+
+    <!-- Edit Database screen (charset/collation only — database name is not renamable) -->
+    <string name="edit_database_title">تعديل قاعدة البيانات</string>
+    <string name="edit_database_button_save">حفظ التغييرات</string>
+    <string name="edit_database_updating">جارٍ تحديث قاعدة البيانات...</string>
+    <string name="update_database_success">تم تحديث قاعدة البيانات</string>
+    <string name="error_update_permission_denied">ليس لديك إذن لتعديل قواعد البيانات</string>
+    <string name="error_update_database_failed">تعذر تحديث قاعدة البيانات. يرجى المحاولة مرة أخرى.</string>
     
     <!-- Create Table screen (parent sheet, change `create-table` PR-2) -->
     <string name="create_table_title">إنشاء جدول</string>
@@ -175,6 +192,18 @@
     <string name="tables_title">الجداول - %1$s</string>
     <string name="tables_empty">لا توجد جداول في قاعدة البيانات هذه</string>
     <string name="tables_search_hint">البحث عن الجداول…</string>
+
+    <!-- Table row action popup menu (long-press) -->
+    <string name="table_action_edit">تعديل</string>
+    <string name="table_action_delete">حذف</string>
+    <string name="table_action_duplicate">تكرار</string>
+    <string name="table_action_truncate">إفراغ</string>
+    <string name="table_action_export">تصدير</string>
+    <string name="table_action_copy">نسخ</string>
+    <string name="table_action_share">مشاركة</string>
+    <string name="table_action_rename">إعادة تسمية</string>
+    <string name="table_action_add_shortcut">إضافة إلى الاختصارات</string>
+    <string name="feature_coming_soon">قريباً</string>
     
     <!-- Table viewer screen -->
     <string name="table_viewer_title">الجدول: %1$s</string>
