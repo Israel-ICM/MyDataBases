@@ -55,30 +55,30 @@ User must choose (or confirm) the chain strategy before `sdd-apply` proceeds (de
 
 Highest-risk component (R4): a mis-split silently corrupts execution. Tests MUST precede implementation.
 
-- [ ] 4.1 Write `SqlStatementStreamSplitterTest.kt` — Streaming Contract: whole file never materialized as `String` (assert on a large `Reader`), token spanning a read-buffer boundary is preserved intact
-- [ ] 4.2 Add tests — Statement Termination: top-level `;` splits statements with correct line numbers, consecutive/whitespace-surrounded `;` produce no empty statements
-- [ ] 4.3 Add tests — String/Identifier Awareness: `;` inside `'...'` is not a boundary, backslash-escaped quote (`\'`) does not close the string, doubled quote (`''`) is a literal, `;` inside backtick identifier is not a boundary, `--` inside a string literal is inert
-- [ ] 4.4 Add tests — Comment Awareness: `--` line comment skipped, `#` line comment skipped, `/* ... */` block comment spanning lines skipped with correct post-comment line number
-- [ ] 4.5 Add tests — DELIMITER Directive: `DELIMITER $$ ... $$ DELIMITER ;` emits exactly one statement (stored procedure body) with inner `;` preserved, default terminator restored after `DELIMITER ;`, two consecutive DELIMITER blocks handled sequentially, unparseable DELIMITER (no token after keyword) raises `ScriptError.MalformedDelimiterDirective` and emits nothing further
-- [ ] 4.6 Add tests — Line Number Reporting: correct line number after a multi-line block comment, correct line number after a statement containing a multi-line string literal
-- [ ] 4.7 Add tests — Top-Level WHERE Detection: `UPDATE ... WHERE` → `true`, `UPDATE` with no WHERE → `false`, WHERE only inside a subquery → outer statement reports `false` for the outer-only case / `true` when an outer WHERE wraps the subquery, WHERE inside a string literal → `false`
-- [ ] 4.8 Add tests — Edge Cases: empty file → zero statements no error, comments-only file → zero statements no error, final statement without trailing terminator is still emitted, single giant statement with no terminator anywhere is emitted once at EOF
+- [x] 4.1 Write `SqlStatementStreamSplitterTest.kt` — Streaming Contract: whole file never materialized as `String` (assert on a large `Reader`), token spanning a read-buffer boundary is preserved intact
+- [x] 4.2 Add tests — Statement Termination: top-level `;` splits statements with correct line numbers, consecutive/whitespace-surrounded `;` produce no empty statements
+- [x] 4.3 Add tests — String/Identifier Awareness: `;` inside `'...'` is not a boundary, backslash-escaped quote (`\'`) does not close the string, doubled quote (`''`) is a literal, `;` inside backtick identifier is not a boundary, `--` inside a string literal is inert
+- [x] 4.4 Add tests — Comment Awareness: `--` line comment skipped, `#` line comment skipped, `/* ... */` block comment spanning lines skipped with correct post-comment line number
+- [x] 4.5 Add tests — DELIMITER Directive: `DELIMITER $$ ... $$ DELIMITER ;` emits exactly one statement (stored procedure body) with inner `;` preserved, default terminator restored after `DELIMITER ;`, two consecutive DELIMITER blocks handled sequentially, unparseable DELIMITER (no token after keyword) raises `ScriptError.MalformedDelimiterDirective` and emits nothing further
+- [x] 4.6 Add tests — Line Number Reporting: correct line number after a multi-line block comment, correct line number after a statement containing a multi-line string literal
+- [x] 4.7 Add tests — Top-Level WHERE Detection: `UPDATE ... WHERE` → `true`, `UPDATE` with no WHERE → `false`, WHERE only inside a subquery → outer statement reports `false` for the outer-only case / `true` when an outer WHERE wraps the subquery, WHERE inside a string literal → `false`
+- [x] 4.8 Add tests — Edge Cases: empty file → zero statements no error, comments-only file → zero statements no error, final statement without trailing terminator is still emitted, single giant statement with no terminator anywhere is emitted once at EOF (also added: unterminated block comment at EOF fails loud, not in original scope but required by 5.4)
 
 ## Phase 5: Splitter — GREEN (implementation)
 
-- [ ] 5.1 Create `domain/sql/SqlStatementStreamSplitter.kt`: `split(reader: Reader): Flow<ScriptStatement>` char-by-char state machine over `BufferedReader`, one `StringBuilder` per in-progress statement (never the whole file), `flow { }` builder emitting lazily
-- [ ] 5.2 Implement `NORMAL` state: `parenDepth` tracking, active-terminator match (length-aware, not hardcoded `;`) triggers emission + buffer/`parenDepth`/`hasTopLevelWhere` reset, keeps line counter and active terminator across statements
-- [ ] 5.3 Implement `SINGLE_QUOTE`/`DOUBLE_QUOTE`/`BACKTICK` states: verbatim char append, backslash-escape and doubled-quote handling, correct across internal buffer refills
-- [ ] 5.4 Implement `LINE_COMMENT` (`--`, `#`) and `BLOCK_COMMENT` (`/* */`) states: chars ignored (not appended), line counter still advances, unterminated block comment at EOF throws `ScriptError.UnterminatedToken`
-- [ ] 5.5 Implement `DELIMITER` directive parsing: recognized only as first token on a line in `NORMAL` state, updates active terminator string, directive line itself never emitted as a statement, malformed directive throws `ScriptError.MalformedDelimiterDirective` and halts further emission
-- [ ] 5.6 Implement top-level `WHERE` keyword detection: case-insensitive match only at `parenDepth == 0`, sets `hasTopLevelWhere = true` on the in-progress `ScriptStatement`
-- [ ] 5.7 Implement 1-based line number tracking: constant-per-character newline counting, correct across comments, multi-line strings, and DELIMITER blocks
-- [ ] 5.8 Run Phase 4 test suite, confirm all green; fix implementation gaps until every scenario in `sql-statement-stream-splitting/spec.md` passes
+- [x] 5.1 Create `domain/sql/SqlStatementStreamSplitter.kt`: `split(reader: Reader): Flow<ScriptStatement>` char-by-char state machine over `BufferedReader`, one `StringBuilder` per in-progress statement (never the whole file), `flow { }` builder emitting lazily
+- [x] 5.2 Implement `NORMAL` state: `parenDepth` tracking, active-terminator match (length-aware, not hardcoded `;`) triggers emission + buffer/`parenDepth`/`hasTopLevelWhere` reset, keeps line counter and active terminator across statements
+- [x] 5.3 Implement `SINGLE_QUOTE`/`DOUBLE_QUOTE`/`BACKTICK` states: verbatim char append, backslash-escape and doubled-quote handling, correct across internal buffer refills
+- [x] 5.4 Implement `LINE_COMMENT` (`--`, `#`) and `BLOCK_COMMENT` (`/* */`) states: chars ignored (not appended), line counter still advances, unterminated block comment at EOF throws `ScriptError.UnterminatedToken`
+- [x] 5.5 Implement `DELIMITER` directive parsing: recognized via `BufferedReader.mark`/`reset` line-sniff at the start of any physical line with no accumulated statement content, updates active terminator string, directive line itself never emitted as a statement, malformed directive throws `ScriptError.MalformedDelimiterDirective` and halts further emission
+- [x] 5.6 Implement top-level `WHERE` keyword detection: case-insensitive match only at `parenDepth == 0`, sets `hasTopLevelWhere = true` on the in-progress `ScriptStatement`
+- [x] 5.7 Implement 1-based line number tracking: constant-per-character newline counting, correct across comments, multi-line strings, and DELIMITER blocks
+- [x] 5.8 Run Phase 4 test suite, confirm all green; fix implementation gaps until every scenario in `sql-statement-stream-splitting/spec.md` passes — 29/29 passing on first real implementation pass
 
 ## Phase 6: Splitter — REFACTOR
 
-- [ ] 6.1 Extract the state machine's states into a named `private enum class LexState` (or sealed class) for readability; no behavior change — re-run Phase 4 tests to confirm still green
-- [ ] 6.2 Review for O(statement length) per-statement work and constant-per-character line tracking (Non-Functional: Performance requirement); no unbounded allocation on the ~600k-line target
+- [x] 6.1 States are a named `private enum class LexState` from the initial implementation (not a separate refactor step — no behavior change needed)
+- [x] 6.2 Reviewed: single streaming pass, one `StringBuilder` per in-progress statement cleared on each emission, constant-per-character line tracking; no unbounded allocation. The `DELIMITER` line-sniff mark/reset holds at most one physical line at a time, consistent with the "bounded by the largest single statement" NFR
 
 ## Phase 7: Engine — `executeScript` Primitive
 
