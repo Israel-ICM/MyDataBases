@@ -39,17 +39,17 @@ User must choose (or confirm) the chain strategy before `sdd-apply` proceeds (de
 
 ## Phase 1: Foundation — Domain Models
 
-- [ ] 1.1 Create `domain/sql/ScriptModels.kt`: `ScriptStatement(sql, lineNumber, hasTopLevelWhere)`, `RiskCategory` enum (`DDL`, `DELETE`, `UPDATE_NO_WHERE`), `RiskReport(totalStatements, counts, lineNumbers)` with `isRisky` computed property, `ScriptExecutionProgress(statementIndex, lineNumber, totalStatements)`, `ScriptExecutionSummary(statementsExecuted, stoppedAtStatement, selectRowsDiscarded)`, sealed `ScriptError(message): Throwable` with `MalformedDelimiterDirective(lineNumber)` and `UnterminatedToken(lineNumber, kind)`
+- [x] 1.1 Create `domain/sql/ScriptModels.kt`: `ScriptStatement(sql, lineNumber, hasTopLevelWhere)`, `RiskCategory` enum (`DDL`, `DELETE`, `UPDATE_NO_WHERE`), `RiskReport(totalStatements, counts, lineNumbers)` with `isRisky` computed property, `ScriptExecutionProgress(statementIndex, lineNumber, totalStatements)`, `ScriptExecutionSummary(statementsExecuted, stoppedAtStatement, selectRowsDiscarded)`, sealed `ScriptError(message): Throwable` with `MalformedDelimiterDirective(lineNumber)` and `UnterminatedToken(lineNumber, kind)`
 
 ## Phase 2: Foundation — Line Threshold Guard (TDD)
 
-- [ ] 2.1 RED: write `LineThresholdGuardTest.kt` — exceeds threshold at 50,001+ lines, does NOT exceed at exactly 50,000 lines, does NOT exceed for an 8,000-line file, early-exit does not read past line 50,001
-- [ ] 2.2 GREEN: create `domain/sql/LineThresholdGuard.kt` with early-exit newline counter (`exceedsThreshold(reader): Boolean`, threshold = 50,000 as a hardcoded `private const val`, strictly-greater-than comparison). No Settings UI entry, no configurable parameter — v1 fixed constant per locked decision.
+- [x] 2.1 RED: write `LineThresholdGuardTest.kt` — exceeds threshold at 50,001+ lines, does NOT exceed at exactly 50,000 lines, does NOT exceed for an 8,000-line file, early-exit does not read past line 50,001
+- [x] 2.2 GREEN: create `domain/sql/LineThresholdGuard.kt` with early-exit newline counter (`exceedsThreshold(reader): Boolean`, threshold = 50,000 as a hardcoded `private const val`, strictly-greater-than comparison). No Settings UI entry, no configurable parameter — v1 fixed constant per locked decision.
 
 ## Phase 3: Foundation — Statement Risk Classifier (TDD)
 
-- [ ] 3.1 RED: write `StatementRiskClassifierTest.kt` — parameterized cases for the full rule table: DDL (`CREATE`/`ALTER`/`DROP`/`TRUNCATE`/`RENAME`) → CONFIRM; `DELETE` with/without WHERE → CONFIRM; `UPDATE` without top-level WHERE → CONFIRM; `UPDATE` with top-level WHERE → CLEAN; `INSERT`/`SELECT` → CLEAN; `CREATE PROCEDURE` (DELIMITER body) classifies by leading DDL keyword → CONFIRM
-- [ ] 3.2 GREEN: create `domain/sql/StatementRiskClassifier.kt` as a pure `object` with `classify(statement: ScriptStatement): RiskCategory?` (null = clean), case-insensitive on leading keyword
+- [x] 3.1 RED: write `StatementRiskClassifierTest.kt` — parameterized cases for the full rule table: DDL (`CREATE`/`ALTER`/`DROP`/`TRUNCATE`/`RENAME`) → CONFIRM; `DELETE` with/without WHERE → CONFIRM; `UPDATE` without top-level WHERE → CONFIRM; `UPDATE` with top-level WHERE → CLEAN; `INSERT`/`SELECT` → CLEAN; `CREATE PROCEDURE` (DELIMITER body) classifies by leading DDL keyword → CONFIRM
+- [x] 3.2 GREEN: create `domain/sql/StatementRiskClassifier.kt` as a pure `object` with `classify(statement: ScriptStatement): RiskCategory?` (null = clean), case-insensitive on leading keyword
 
 ## Phase 4: Splitter — RED (write failing tests first)
 
