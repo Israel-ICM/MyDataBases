@@ -1,6 +1,10 @@
 package com.sphynxs.mydatabases.core.database.engine
 
 import com.sphynxs.mydatabases.core.database.models.*
+import com.sphynxs.mydatabases.domain.sql.ScriptExecutionProgress
+import com.sphynxs.mydatabases.domain.sql.ScriptExecutionSummary
+import com.sphynxs.mydatabases.domain.sql.ScriptStatement
+import kotlinx.coroutines.flow.Flow
 
 /**
  * Interface que define las operaciones comunes para todos los motores de bases de datos.
@@ -68,6 +72,31 @@ interface DatabaseEngine {
     suspend fun executeBatch(
         statements: List<String>
     ): Result<List<com.sphynxs.mydatabases.domain.usecases.BatchStatementResult>>
+
+    /**
+     * Executes an already-split stream of SQL statements sequentially on a SINGLE held-open
+     * connection, without buffering the source script or any SELECT result set in memory.
+     *
+     * Unlike [executeBatch], this is a streaming primitive intended for very large scripts
+     * (change `large-sql-script-execution`): the caller supplies an already-lexed
+     * [Flow] of [ScriptStatement] (see `domain/sql/SqlStatementStreamSplitter`), and this
+     * function never materializes the full statement list or full result sets — SELECT rows
+     * are counted and discarded via a minimal-fetch-size streaming read.
+     *
+     * Execution is best-effort: on the first failing statement, execution stops (no rollback
+     * attempted — DDL statements cause implicit commits in MySQL/MariaDB, so a whole-script
+     * rollback cannot be honored) and the failure is returned as [Result.failure] with the
+     * statement index and line number embedded in the error's reason text.
+     *
+     * @param statements Already-split, already-classified-elsewhere stream of statements
+     * @param onProgress Invoked after each statement completes successfully
+     * @return Result with [ScriptExecutionSummary] on full completion, or a failure carrying
+     *   the native error plus "stopped at statement N (line L)" context
+     */
+    suspend fun executeScript(
+        statements: Flow<ScriptStatement>,
+        onProgress: suspend (ScriptExecutionProgress) -> Unit
+    ): Result<ScriptExecutionSummary>
 
     /**
      * Lista todas las bases de datos disponibles en el servidor.

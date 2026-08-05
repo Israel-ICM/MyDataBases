@@ -2,6 +2,10 @@ package com.sphynxs.mydatabases.core.database.repository
 
 import com.sphynxs.mydatabases.core.database.engine.DatabaseFeature
 import com.sphynxs.mydatabases.core.database.models.*
+import com.sphynxs.mydatabases.domain.sql.ScriptExecutionProgress
+import com.sphynxs.mydatabases.domain.sql.ScriptExecutionSummary
+import com.sphynxs.mydatabases.domain.sql.ScriptStatement
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
 /**
@@ -66,7 +70,22 @@ interface DatabaseRepository {
      * @throws DatabaseError.ConnectionFailed si no hay motor conectado
      */
     suspend fun executeBatch(statements: List<String>): Result<List<com.sphynxs.mydatabases.domain.usecases.BatchStatementResult>>
-    
+
+    /**
+     * Executes an already-split stream of SQL statements sequentially on the connected engine's
+     * single held-open connection, without buffering the source script or result sets
+     * (change `large-sql-script-execution`). See [com.sphynxs.mydatabases.core.database.engine.DatabaseEngine.executeScript].
+     *
+     * @param statements Already-split stream of statements to execute in order
+     * @param onProgress Invoked after each statement completes successfully
+     * @return Result with the execution summary, or a failure with stopped-at context
+     * @throws DatabaseError.ConnectionFailed si no hay motor conectado
+     */
+    suspend fun executeScript(
+        statements: Flow<ScriptStatement>,
+        onProgress: suspend (ScriptExecutionProgress) -> Unit
+    ): Result<ScriptExecutionSummary>
+
     /**
      * Lista todas las bases de datos disponibles en el servidor.
      * 

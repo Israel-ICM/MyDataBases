@@ -5,7 +5,11 @@ import com.sphynxs.mydatabases.core.database.engine.DatabaseEngine
 import com.sphynxs.mydatabases.core.database.engine.DatabaseEngineFactory
 import com.sphynxs.mydatabases.core.database.engine.DatabaseFeature
 import com.sphynxs.mydatabases.core.database.models.*
+import com.sphynxs.mydatabases.domain.sql.ScriptExecutionProgress
+import com.sphynxs.mydatabases.domain.sql.ScriptExecutionSummary
+import com.sphynxs.mydatabases.domain.sql.ScriptStatement
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -71,6 +75,14 @@ class DatabaseRepositoryImpl @Inject constructor(
     
     override suspend fun executeBatch(statements: List<String>): Result<List<com.sphynxs.mydatabases.domain.usecases.BatchStatementResult>> {
         return currentEngine?.executeBatch(statements)
+            ?: Result.failure(DatabaseError.ConnectionFailed("No conectado"))
+    }
+
+    override suspend fun executeScript(
+        statements: Flow<ScriptStatement>,
+        onProgress: suspend (ScriptExecutionProgress) -> Unit
+    ): Result<ScriptExecutionSummary> {
+        return currentEngine?.executeScript(statements, onProgress)
             ?: Result.failure(DatabaseError.ConnectionFailed("No conectado"))
     }
     

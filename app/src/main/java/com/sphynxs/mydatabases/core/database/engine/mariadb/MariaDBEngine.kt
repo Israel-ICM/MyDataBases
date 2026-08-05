@@ -6,6 +6,10 @@ import com.sphynxs.mydatabases.core.database.engine.DatabaseFeature
 import com.sphynxs.mydatabases.core.database.engine.DatabaseType
 import com.sphynxs.mydatabases.core.database.engine.mysql.MySQLEngine
 import com.sphynxs.mydatabases.core.database.models.*
+import com.sphynxs.mydatabases.domain.sql.ScriptExecutionProgress
+import com.sphynxs.mydatabases.domain.sql.ScriptExecutionSummary
+import com.sphynxs.mydatabases.domain.sql.ScriptStatement
+import kotlinx.coroutines.flow.Flow
 
 /**
  * Implementación concreta de DatabaseEngine para MariaDB 10.5+.
@@ -74,6 +78,19 @@ class MariaDBEngine(context: Context) : DatabaseEngine {
      */
     override suspend fun executeBatch(statements: List<String>): Result<List<com.sphynxs.mydatabases.domain.usecases.BatchStatementResult>> =
         delegate.executeBatch(statements)
+
+    /**
+     * Executes a streamed script the same way as MySQL — MariaDB uses the identical JDBC
+     * driver/protocol, delegated to a single implementation point (change `large-sql-script-execution`).
+     *
+     * @param statements Already-split stream of statements to execute in order
+     * @param onProgress Invoked after each statement completes successfully
+     * @return Result with the execution summary, or a failure with stopped-at context
+     */
+    override suspend fun executeScript(
+        statements: Flow<ScriptStatement>,
+        onProgress: suspend (ScriptExecutionProgress) -> Unit
+    ): Result<ScriptExecutionSummary> = delegate.executeScript(statements, onProgress)
     
     /**
      * Lista todas las bases de datos disponibles en el servidor MariaDB.

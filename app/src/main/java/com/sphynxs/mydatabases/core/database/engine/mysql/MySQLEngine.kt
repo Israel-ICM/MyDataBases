@@ -5,11 +5,21 @@ import com.sphynxs.mydatabases.core.database.engine.DatabaseEngine
 import com.sphynxs.mydatabases.core.database.engine.DatabaseFeature
 import com.sphynxs.mydatabases.core.database.engine.DatabaseType
 import com.sphynxs.mydatabases.core.database.models.*
+import com.sphynxs.mydatabases.domain.sql.ScriptExecutionProgress
+import com.sphynxs.mydatabases.domain.sql.ScriptExecutionSummary
+import com.sphynxs.mydatabases.domain.sql.ScriptStatement
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import java.net.SocketTimeoutException
 import java.sql.SQLException
 import java.sql.SQLNonTransientConnectionException
+import java.sql.Statement
+import java.util.concurrent.atomic.AtomicReference
 
 /**
  * Implementación concreta de DatabaseEngine para MySQL 5.7+, 8.0+.
@@ -264,6 +274,97 @@ class MySQLEngine(private val context: Context) : DatabaseEngine {
         }
     }
     
+    /**
+     * Executes an already-split [Flow] of statements sequentially on ONE held-open connection,
+     * never buffering the source script or SELECT result sets (change `large-sql-script-execution`).
+     *
+     * SELECT-like statements use a minimal fetch size and only count rows (never `getObject`).
+     * The first `SQLException` stops execution immediately (no rollback — DDL causes implicit
+     * commits in MySQL/MariaDB, a whole-script rollback would be a lie) and is returned as
+     * [Result.failure] with "stopped at statement N (line L)" embedded in the reason text.
+     * Cancellation calls [Statement.cancel] on the in-flight JDBC statement from the cancelling
+     * coroutine's completion handler, since plain coroutine cancellation cannot interrupt a
+     * blocking JDBC call.
+     *
+     * @param statements Already-split stream of statements to execute in order
+     * @param onProgress Invoked after each statement completes successfully
+     * @return Result with [ScriptExecutionSummary] on completion, failure with embedded
+     *   stopped-at context otherwise
+     */
+    @OptIn(InternalCoroutinesApi::class)
+    override suspend fun executeScript(
+        statements: Flow<ScriptStatement>,
+        onProgress: suspend (ScriptExecutionProgress) -> Unit
+    ): Result<ScriptExecutionSummary> = withContext(Dispatchers.IO) {
+        val currentStatement = AtomicReference<Statement?>()
+        val cancellationHandle = currentCoroutineContext()[Job]?.invokeOnCompletion(onCancelling = true) { cause ->
+            if (cause is CancellationException) {
+                runCatching { currentStatement.get()?.cancel() }
+            }
+        }
+        try {
+            val connection = connectionPool?.getConnection()
+                ?: throw DatabaseError.ConnectionFailed("No conectado")
+
+            var statementIndex = 0
+            var executed = 0
+            var selectRowsDiscarded = 0L
+
+            connection.use { conn ->
+                statements.collect { scriptStatement ->
+                    statementIndex++
+                    val trimmed = scriptStatement.sql.trim()
+                    if (trimmed.isEmpty()) return@collect
+
+                    val jdbcStatement = conn.createStatement()
+                    currentStatement.set(jdbcStatement)
+                    try {
+                        val isSelectLike = trimmed.uppercase().let {
+                            it.startsWith("SELECT") || it.startsWith("SHOW") ||
+                                it.startsWith("DESCRIBE") || it.startsWith("EXPLAIN")
+                        }
+                        if (isSelectLike) {
+                            jdbcStatement.fetchSize = Int.MIN_VALUE
+                            jdbcStatement.executeQuery(trimmed).use { rs ->
+                                while (rs.next()) selectRowsDiscarded++
+                            }
+                        } else {
+                            jdbcStatement.executeUpdate(trimmed)
+                        }
+                        executed++
+                        onProgress(ScriptExecutionProgress(statementIndex - 1, scriptStatement.lineNumber, null))
+                    } catch (e: SQLException) {
+                        throw ScriptExecutionStopped(statementIndex, scriptStatement.lineNumber, e)
+                    } finally {
+                        currentStatement.set(null)
+                        runCatching { jdbcStatement.close() }
+                    }
+                }
+            }
+
+            Result.success(ScriptExecutionSummary(executed, null, selectRowsDiscarded))
+        } catch (e: ScriptExecutionStopped) {
+            Result.failure(
+                DatabaseError.QueryExecutionFailed(
+                    query = "statement #${e.statementIndex}",
+                    reason = "Stopped at statement ${e.statementIndex} (line ${e.lineNumber}): " +
+                        (e.cause?.message ?: "Unknown SQL error")
+                )
+            )
+        } catch (e: Exception) {
+            Result.failure(mapQueryError(e, "executeScript"))
+        } finally {
+            cancellationHandle?.dispose()
+        }
+    }
+
+    /** Internal signal carrying which statement failed, without losing the native [SQLException]. */
+    private class ScriptExecutionStopped(
+        val statementIndex: Int,
+        val lineNumber: Int,
+        cause: SQLException
+    ) : Exception(cause)
+
     /**
      * Lista todas las bases de datos disponibles en el servidor MySQL.
      * Excluye system databases (information_schema, mysql, performance_schema, sys).
