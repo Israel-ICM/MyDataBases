@@ -223,7 +223,11 @@ fun MyDataBasesNavHost(
                         navController.navigate(Routes.DatabaseViews.createRoute(connectionId, databaseName))
                     },
                     onNavigateToQueries = {
-                        navController.navigate(Routes.NewQuery.createRoute(connectionId))
+                        // Corrección post-QA (change `large-sql-script-execution`): este era el
+                        // segundo punto de entrada a "New Query", dejado fuera de alcance por
+                        // error en el diseño original — el usuario esperaba (correctamente) que
+                        // ambos puntos de entrada mostraran el mismo selector de 3 opciones.
+                        showNewQueryOptionsSheet = true
                     },
                     onNavigateToFunctions = {
                         navController.navigate(Routes.DatabaseFunctions.createRoute(connectionId, databaseName))
