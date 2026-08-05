@@ -328,4 +328,22 @@
     <!-- Workspace Carousel -->
     <string name="workspace_carousel_button">Show all open cards</string>
     <string name="workspace_carousel_close_card">Close %1$s</string>
+
+    <!-- Run Script (change large-sql-script-execution) -->
+    <string name="action_ok">OK</string>
+    <string name="run_script_prescanning_label">Analyzing script… %1$d statements scanned (line %2$d)</string>
+    <string name="run_script_executing_label">Running… statement %1$d (line %2$d)</string>
+    <string name="run_script_confirm_title">Risky statements found</string>
+    <string name="run_script_confirm_intro">This script contains statements that need your confirmation before running:</string>
+    <string name="run_script_confirm_category_row">%1$s: %2$d (lines %3$s)</string>
+    <string name="run_script_risk_category_ddl">Structure changes (CREATE/ALTER/DROP/TRUNCATE/RENAME)</string>
+    <string name="run_script_risk_category_delete">DELETE statements</string>
+    <string name="run_script_risk_category_update_no_where">UPDATE without WHERE</string>
+    <string name="run_script_confirm_button">Continue</string>
+    <string name="run_script_decline_button">Decline</string>
+    <string name="run_script_success_title">Script completed</string>
+    <string name="run_script_success_summary">%1$d statements executed</string>
+    <string name="run_script_error_title">Execution stopped</string>
+    <string name="run_script_cancelled_title">Cancelled</string>
+    <string name="run_script_partial_update_warning">The database may be partially updated.</string>
 </resources>

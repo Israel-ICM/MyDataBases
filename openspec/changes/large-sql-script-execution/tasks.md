@@ -112,15 +112,15 @@ Highest-risk component (R4): a mis-split silently corrupts execution. Tests MUST
 
 ## Phase 10: UI — `RunScriptScreen`
 
-- [ ] 10.1 Create `ui/screens/runscript/RunScriptScreen.kt` composable accepting `uri: Uri, connectionId: String`; hoist `RunScriptViewModel` via `hiltViewModel()`
-- [ ] 10.2 Render `PreScanning`: progress indicator + statements-scanned/line-number label, Cancel action (pure `Flow` cancellation, no server-side hook)
-- [ ] 10.3 Render `AwaitingConfirmation`: exactly ONE `AlertDialog` showing per-`RiskCategory` counts and affected line numbers, Confirm → `viewModel.confirm()`, Decline/dismiss → `viewModel.decline()`; dialog never re-appears per statement
-- [ ] 10.4 Render `Executing`: progress indicator + current statement index/line/total, Cancel action wired to true mid-execution `viewModel.cancel()`
-- [ ] 10.5 Render `Success`: outcome content (statements executed, elapsed time)
-- [ ] 10.6 Render `Error`: outcome content with stopped-at-statement-N (line L), native error message, and the partial-update warning
-- [ ] 10.7 Render `Cancelled`: outcome content with the same partial-update warning as `Error`
-- [ ] 10.8 Verify layout adapts across Compact / Medium / Expanded `WindowSizeClass`
-- [ ] 10.9 Write `RunScriptScreenTest.kt` Compose UI test: pre-scan → confirmation dialog → confirm → execute → success happy path renders correctly
+- [x] 10.1 Create `ui/screens/runscript/RunScriptScreen.kt` composable accepting `uri: Uri, connectionId: String`; hoist `RunScriptViewModel` via `hiltViewModel()`
+- [x] 10.2 Render `PreScanning`: progress indicator + statements-scanned/line-number label, Cancel action (pure `Flow` cancellation, no server-side hook)
+- [x] 10.3 Render `AwaitingConfirmation`: exactly ONE `AlertDialog` showing per-`RiskCategory` counts and affected line numbers, Confirm → `viewModel.confirm()`, Decline/dismiss → `viewModel.decline()`; dialog never re-appears per statement
+- [x] 10.4 Render `Executing`: progress indicator + current statement index/line/total, Cancel action wired to true mid-execution `viewModel.cancel()`
+- [x] 10.5 Render `Success`: outcome content (statements executed). Elapsed time NOT shown — `ScriptExecutionSummary` (PR-1's model) has no elapsed-time field; adding one would touch already-shipped PR-1/PR-3 models, flagged as a possible follow-up instead of silently expanding this PR's scope
+- [x] 10.6 Render `Error`: outcome content with the descriptive message (already embeds stopped-at-statement-N-line-L + native error text per PR-3/PR-4) and the partial-update warning
+- [x] 10.7 Render `Cancelled`: outcome content with the same partial-update warning as `Error`
+- [x] 10.8 Layout uses `adaptivePadding(LocalWindowSizeClass.current)` (existing project helper) for Compact/Medium/Expanded — content is a simple centered `Column`, no size-specific branching needed at this content density
+- [ ] 10.9 **BLOCKED, not written this session**: `RunScriptScreenTest.kt` Compose UI test. Found the entire `androidTest` source set already fails to compile on `master`, unrelated to this change — `./gradlew :app:compileDebugAndroidTestKotlin` fails with pre-existing errors in `MyDataBasesNavHostTest.kt` (missing `workspaceManager` param), `QueryEditorScreenTest.kt` (missing `mockk`/`coEvery` — androidTest sourceSet lacks the `mockk-android` dependency unit tests have), `WorkspaceCarouselTest.kt` (`assertExists`/`assertDoesNotExist` unresolved). No emulator/device available either (`adb devices` returned empty). Writing a new file into an already-broken, unrunnable source set risks shipping unverifiable code — flagged as a pre-existing gap for a maintainer with a working Android dev environment to close, together with Phase 13.
 
 ## Phase 11: Integration — Editor Guard
 
@@ -130,25 +130,27 @@ Highest-risk component (R4): a mis-split silently corrupts execution. Tests MUST
 
 ## Phase 12: Localization
 
-- [ ] 12.1 Add to `res/values/strings.xml`: pre-scan progress label, risk-report category labels + counts, confirmation dialog title/body/confirm/decline, execution progress label, success outcome, error outcome (stopped-at-N-line-L + native message), cancellation outcome, partial-update warning, oversized-file editor-guard message
-- [ ] 12.2 Add the same keys with Spanish translations to `res/values-es/strings.xml`
-- [ ] 12.3 Wire every string in `RunScriptScreen.kt` and the editor-guard message via `stringResource(...)` — zero hardcoded `Text()` calls (run the strings audit before commit)
+- [x] 12.1 Added to `res/values/strings.xml`: pre-scan progress label, risk-report category labels + counts, confirmation dialog title/intro/confirm/decline, execution progress label, success outcome, error/cancelled outcome titles, partial-update warning, plus `action_ok` (didn't exist yet, needed for outcome dismiss buttons). Oversized-file editor-guard message deferred to PR-6 (Phase 19) — it belongs to the entry-point selector, not this screen
+- [x] 12.2 Added the same keys with Spanish translations to `res/values-es/strings.xml`
+- [x] 12.3 Every string in `RunScriptScreen.kt` goes through `stringResource(...)` — zero hardcoded `Text()` calls. `RunScriptState.Error.message` (the ViewModel's already-dynamic native/DB-error text, see PR-4) is inherently not translatable — a MySQL syntax error comes back in whatever language the server uses, same in any real DB client — rendered as-is alongside the localized static title/warning wrapping it
 
 ## Phase 13: Manual Verification
 
-- [ ] 13.1 Run `./gradlew test` and verify every new unit test (splitter, classifier, guard, use cases, ViewModel) passes
-- [ ] 13.2 Run `./gradlew assembleDebug` and verify the build succeeds
-- [ ] 13.3 Open a > 50,000-line `.sql` file: editor refuses to load it, offers only "Run script", `readText()` is never invoked
-- [ ] 13.4 Open an exactly-50,000-line file and an 8,000-line file: both open normally in the editor
-- [ ] 13.5 Run a risky script (DDL + DELETE + UPDATE-no-WHERE) against a real MySQL/MariaDB server: one aggregated dialog shows correct counts/line numbers, confirming executes all statements
-- [ ] 13.6 Run a clean script (INSERT/SELECT/UPDATE-with-WHERE only): no dialog appears, execution starts directly
-- [ ] 13.7 Run a script containing mid-script `USE`: context switches correctly between databases for subsequent statements
-- [ ] 13.8 Run a statement requiring a database with no default DB and no prior `USE`: native error 1046 surfaces unmodified
-- [ ] 13.9 Force a mid-execution failure: execution stops, outcome reports "stopped at statement N (line L)" with the native error and the partial-update warning, no rollback of prior statements
-- [ ] 13.10 Cancel a long-running statement mid-execution: verify via the DB process list that `Statement.cancel()` actually halted it server-side; outcome reports `Cancelled`
-- [ ] 13.11 Run a script containing a large `SELECT` (millions of rows): no `OutOfMemoryError`, only a row count is reported
-- [ ] 13.12 Run a `DELIMITER $$ ... $$ DELIMITER ;` stored-procedure dump: it executes as exactly one statement
-- [ ] 13.13 Verify all new strings render correctly in both English and Spanish device locales
+> **BLOCKED, not executed this session** — 13.1-13.2 (automatable) ran; 13.3-13.13 all require a physical device/emulator (`adb devices` returned empty) and/or a live MySQL/MariaDB server, neither available in this automated session. Explicit follow-up for a maintainer with a real Android + DB test environment.
+
+- [x] 13.1 Run `./gradlew test` and verify every new unit test (splitter, classifier, guard, use cases, ViewModel) passes — confirmed, same 23 pre-existing unrelated failures as PR-2 through PR-5, nothing new broken
+- [x] 13.2 Run `./gradlew assembleDebug` and verify the build succeeds — confirmed
+- [ ] 13.3 Open a > 50,000-line `.sql` file: editor refuses to load it, offers only "Run script", `readText()` is never invoked — requires PR-6 (guard lives there) + device
+- [ ] 13.4 Open an exactly-50,000-line file and an 8,000-line file: both open normally in the editor — requires device
+- [ ] 13.5 Run a risky script (DDL + DELETE + UPDATE-no-WHERE) against a real MySQL/MariaDB server: one aggregated dialog shows correct counts/line numbers, confirming executes all statements — requires device + real server
+- [ ] 13.6 Run a clean script (INSERT/SELECT/UPDATE-with-WHERE only): no dialog appears, execution starts directly — requires device + real server
+- [ ] 13.7 Run a script containing mid-script `USE`: context switches correctly between databases for subsequent statements — requires device + real server
+- [ ] 13.8 Run a statement requiring a database with no default DB and no prior `USE`: native error 1046 surfaces unmodified — requires device + real server
+- [ ] 13.9 Force a mid-execution failure: execution stops, outcome reports "stopped at statement N (line L)" with the native error and the partial-update warning, no rollback of prior statements — requires device + real server
+- [ ] 13.10 Cancel a long-running statement mid-execution: verify via the DB process list that `Statement.cancel()` actually halted it server-side; outcome reports `Cancelled` — requires device + real server
+- [ ] 13.11 Run a script containing a large `SELECT` (millions of rows): no `OutOfMemoryError`, only a row count is reported — requires device + real server with large data
+- [ ] 13.12 Run a `DELIMITER $$ ... $$ DELIMITER ;` stored-procedure dump: it executes as exactly one statement — requires device + real server
+- [ ] 13.13 Verify all new strings render correctly in both English and Spanish device locales — requires device
 
 ## Phase 14: Entry-Point Selector — Icons & Route Foundation (Amendment)
 

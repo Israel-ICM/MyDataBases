@@ -326,4 +326,22 @@
     <!-- Workspace Carousel -->
     <string name="workspace_carousel_button">Ver todas las tarjetas abiertas</string>
     <string name="workspace_carousel_close_card">Cerrar %1$s</string>
+
+    <!-- Run Script (cambio large-sql-script-execution) -->
+    <string name="action_ok">Aceptar</string>
+    <string name="run_script_prescanning_label">Analizando script… %1$d sentencias analizadas (línea %2$d)</string>
+    <string name="run_script_executing_label">Ejecutando… sentencia %1$d (línea %2$d)</string>
+    <string name="run_script_confirm_title">Se encontraron sentencias riesgosas</string>
+    <string name="run_script_confirm_intro">Este script contiene sentencias que requieren tu confirmación antes de ejecutarse:</string>
+    <string name="run_script_confirm_category_row">%1$s: %2$d (líneas %3$s)</string>
+    <string name="run_script_risk_category_ddl">Cambios de estructura (CREATE/ALTER/DROP/TRUNCATE/RENAME)</string>
+    <string name="run_script_risk_category_delete">Sentencias DELETE</string>
+    <string name="run_script_risk_category_update_no_where">UPDATE sin WHERE</string>
+    <string name="run_script_confirm_button">Continuar</string>
+    <string name="run_script_decline_button">Rechazar</string>
+    <string name="run_script_success_title">Script completado</string>
+    <string name="run_script_success_summary">%1$d sentencias ejecutadas</string>
+    <string name="run_script_error_title">Ejecución detenida</string>
+    <string name="run_script_cancelled_title">Cancelado</string>
+    <string name="run_script_partial_update_warning">La base de datos puede haber quedado parcialmente actualizada.</string>
 </resources>
