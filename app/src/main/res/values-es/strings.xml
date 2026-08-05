@@ -344,4 +344,10 @@
     <string name="run_script_error_title">Ejecución detenida</string>
     <string name="run_script_cancelled_title">Cancelado</string>
     <string name="run_script_partial_update_warning">La base de datos puede haber quedado parcialmente actualizada.</string>
+
+    <!-- Selector de punto de entrada de New Query (cambio large-sql-script-execution, amendment) -->
+    <string name="new_query_options_title">¿Qué querés hacer?</string>
+    <string name="new_query_option_new">Consulta nueva</string>
+    <string name="new_query_option_open_file">Abrir archivo de consulta</string>
+    <string name="new_query_option_run_script">Ejecutar script (sin editar)</string>
 </resources>

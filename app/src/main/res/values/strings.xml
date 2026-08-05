@@ -346,4 +346,10 @@
     <string name="run_script_error_title">Execution stopped</string>
     <string name="run_script_cancelled_title">Cancelled</string>
     <string name="run_script_partial_update_warning">The database may be partially updated.</string>
+
+    <!-- New Query entry-point selector (change large-sql-script-execution, amendment) -->
+    <string name="new_query_options_title">What do you want to do?</string>
+    <string name="new_query_option_new">New Query</string>
+    <string name="new_query_option_open_file">Open Query File</string>
+    <string name="new_query_option_run_script">Run Script (No Edit)</string>
 </resources>

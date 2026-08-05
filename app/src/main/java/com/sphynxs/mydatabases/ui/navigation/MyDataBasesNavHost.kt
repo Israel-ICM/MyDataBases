@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,6 +31,9 @@ import com.sphynxs.mydatabases.ui.screens.settings.SettingsScreen
 import com.sphynxs.mydatabases.ui.screens.tables.TablesListScreen
 import com.sphynxs.mydatabases.ui.screens.tableviewer.TableViewerScreen
 import com.sphynxs.mydatabases.ui.workspace.WorkspaceManager
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 /**
@@ -62,6 +66,54 @@ fun MyDataBasesNavHost(
     
     // Estado para controlar el sheet de crear tabla (change `create-table`)
     var showAddTableSheet by remember { mutableStateOf(false) }
+
+    // Estado para el selector "¿Qué quieres hacer?" de New Query (change `large-sql-script-execution`)
+    var showNewQueryOptionsSheet by remember { mutableStateOf(false) }
+    var pendingScriptUri by remember { mutableStateOf<android.net.Uri?>(null) }
+    val coroutineScope = rememberCoroutineScope()
+    val contentResolver = LocalContext.current.contentResolver
+
+    // Deriva connectionId del contexto actual — reusado por ambos pickers de abajo y por
+    // el callback onNewQuery del sheet.
+    val activeConnectionId = when (navigationContext) {
+        is NavigationContext.InsideConnection -> navigationContext.connectionId
+        else -> ""
+    }
+
+    // Fase 17: picker para "Open Query File" — decide editor vs. redirect a Run Script
+    // según LineThresholdGuard (NUNCA readText() para el chequeo en sí).
+    val openQueryFileLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
+        contract = androidx.activity.result.contract.ActivityResultContracts.GetContent()
+    ) { uri ->
+        if (uri != null) {
+            coroutineScope.launch {
+                val exceedsThreshold = withContext(Dispatchers.IO) {
+                    contentResolver.openInputStream(uri)?.bufferedReader()?.use { reader ->
+                        com.sphynxs.mydatabases.domain.sql.LineThresholdGuard.exceedsThreshold(reader)
+                    } ?: false
+                }
+                if (exceedsThreshold) {
+                    pendingScriptUri = uri
+                    navController.navigate(Routes.RunScript.createRoute(activeConnectionId))
+                } else {
+                    val content = withContext(Dispatchers.IO) {
+                        contentResolver.openInputStream(uri)?.bufferedReader()?.use { it.readText() }
+                    }
+                    workspaceManager.openQueryCard(connectionId = activeConnectionId, initialSql = content)
+                }
+            }
+        }
+    }
+
+    // Picker para "Run Script (No Edit)" — siempre redirige a Run Script, sin chequear tamaño.
+    val runScriptLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
+        contract = androidx.activity.result.contract.ActivityResultContracts.GetContent()
+    ) { uri ->
+        if (uri != null) {
+            pendingScriptUri = uri
+            navController.navigate(Routes.RunScript.createRoute(activeConnectionId))
+        }
+    }
     
     // Obtener WindowSizeClass desde CompositionLocal provisto por MainActivity
     val windowSizeClass = LocalWindowSizeClass.current
@@ -87,16 +139,11 @@ fun MyDataBasesNavHost(
                     "add_database" -> showAddDatabaseSheet = true
                     "new_table" -> showAddTableSheet = true
                     "new_query" -> {
-                        // Extraer connectionId del contexto actual
-                        val connectionId = when (navigationContext) {
-                            is NavigationContext.InsideConnection -> navigationContext.connectionId
-                            else -> ""
-                        }
-                        // WorkspaceManager maneja su propio sheet/overlay
-                        workspaceManager.openQueryCard(
-                            connectionId = connectionId,
-                            initialSql = null
-                        )
+                        // Cambio `large-sql-script-execution`: en vez de abrir directo una
+                        // query en blanco, mostrar el selector "¿Qué quieres hacer?" con 3
+                        // opciones. La acción previa (openQueryCard directo) ahora vive en
+                        // el callback onNewQuery del sheet.
+                        showNewQueryOptionsSheet = true
                     }
                 }
             }
@@ -367,10 +414,46 @@ fun MyDataBasesNavHost(
                     }
                 )
             }
+
+            // Cambio `large-sql-script-execution` (amendment): destino de "Run Script".
+            // El Uri viaja por estado hoisted (pendingScriptUri), no como argumento de ruta.
+            composable(
+                route = Routes.RunScript.route,
+                arguments = listOf(
+                    navArgument("connectionId") { type = NavType.StringType }
+                )
+            ) {
+                val connectionId = it.arguments?.getString("connectionId") ?: ""
+                val uri = pendingScriptUri
+                if (uri != null) {
+                    com.sphynxs.mydatabases.ui.screens.runscript.RunScriptScreen(
+                        uri = uri,
+                        connectionId = connectionId,
+                        onFinished = { navController.popBackStack() }
+                    )
+                }
+            }
         }
         } // Cierre AdaptiveNavigationScaffold
-    } // Cierre WorkspaceOverlay
-}
+
+        // Cambio `large-sql-script-execution` (amendment): selector "¿Qué quieres hacer?" para
+        // New Query. Renderizado como sibling de AdaptiveNavigationScaffold (no threadeado en
+        // DatabasesListScreen/TablesListScreen) porque "new_query" es una acción modal declarada
+        // en AMBOS menús (destinationsForDatabaseList y destinationsForTablesList) — anidarlo en
+        // uno solo rompería el otro. Esto preserva la garantía de `2026-06-30-new-query-modal-fix`
+        // (sin cambio de ruta, sin doble sheet) porque sigue siendo un overlay, no una navegación.
+        if (showNewQueryOptionsSheet) {
+            com.sphynxs.mydatabases.ui.screens.databases.NewQueryOptionsSheet(
+                onNewQuery = {
+                    workspaceManager.openQueryCard(connectionId = activeConnectionId, initialSql = null)
+                },
+                onOpenQueryFile = { openQueryFileLauncher.launch("*/*") },
+                onRunScript = { runScriptLauncher.launch("*/*") },
+                onDismiss = { showNewQueryOptionsSheet = false }
+            )
+        }
+        } // Cierre WorkspaceOverlay
+    }
 
 /**
  * Pantalla placeholder para rutas en desarrollo.

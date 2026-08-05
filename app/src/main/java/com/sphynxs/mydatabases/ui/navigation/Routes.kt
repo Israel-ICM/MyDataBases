@@ -338,4 +338,24 @@ sealed class Routes(val route: String) {
      * Pantalla de ajustes de la aplicación (tema, idioma, etc.).
      */
     data object Settings : Routes("settings")
+
+    /**
+     * Pantalla de ejecución de un script `.sql` sin abrirlo en el editor (change
+     * `large-sql-script-execution`). El `Uri` del archivo se pasa por estado hoisted a nivel
+     * `NavHost` (`pendingScriptUri`), no como argumento de ruta — un `content://` Uri es
+     * arbitrariamente largo/opaco y no debe codificarse en un path segment.
+     *
+     * @property route Template con argumento `connectionId`
+     */
+    data object RunScript : Routes("connection/{connectionId}/run_script") {
+        /**
+         * Crea la ruta completa reemplazando el argumento connectionId.
+         *
+         * @param connectionId ID de la conexión activa
+         * @return Ruta navegable (ej: "connection/abc-123/run_script")
+         */
+        fun createRoute(connectionId: String): String {
+            return "connection/$connectionId/run_script"
+        }
+    }
 }

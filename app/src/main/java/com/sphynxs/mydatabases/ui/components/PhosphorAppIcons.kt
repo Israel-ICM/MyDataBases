@@ -34,6 +34,18 @@ object PhosphorAppIcons {
         val addDatabase: ImageVector get() = TablerIcons.Plus
         val newTable: ImageVector get() = TablerIcons.Plus
         val newQuery: ImageVector get() = TablerIcons.FileText
+
+        // Chosen for the "Open Query File" entry-point selector option (change
+        // `large-sql-script-execution`): TablerIcons exposes `FileImport` as the closest
+        // purpose-built match for "bring a file in" — no dedicated `Open`/`FileOpen` variant
+        // exists in this icon set, and `FileImport` reads clearly as importing a file for use.
+        val openQueryFile: ImageVector get() = TablerIcons.FileImport
+
+        // Chosen for the "Run Script (No Edit)" entry-point selector option (change
+        // `large-sql-script-execution`): `PlayerPlay` (a media-style play glyph) is the clearest
+        // "execute/run" signifier available in TablerIcons — no dedicated `Run`/`Execute` glyph
+        // exists, and this is already the conventional icon for "run" in most dev tools.
+        val runScript: ImageVector get() = TablerIcons.PlayerPlay
         val console: ImageVector get() = TablerIcons.Activity
         val monitor: ImageVector get() = TablerIcons.Activity
         val tables: ImageVector get() = TablerIcons.Table
