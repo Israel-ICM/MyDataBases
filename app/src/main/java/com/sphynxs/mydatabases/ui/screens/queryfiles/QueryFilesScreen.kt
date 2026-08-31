@@ -2,21 +2,21 @@ package com.sphynxs.mydatabases.ui.screens.queryfiles
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -31,11 +31,14 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import com.sphynxs.mydatabases.R
 import com.sphynxs.mydatabases.LocalWindowSizeClass
+import com.sphynxs.mydatabases.R
 import com.sphynxs.mydatabases.domain.models.QueryFileInfo
 import com.sphynxs.mydatabases.ui.adaptive.adaptivePadding
+import com.sphynxs.mydatabases.ui.components.BreathingBackground
 import com.sphynxs.mydatabases.ui.components.PhosphorAppIcons
+import com.sphynxs.mydatabases.ui.components.ScreenTitle
+import com.sphynxs.mydatabases.ui.theme.LocalDesignTokens
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -44,6 +47,11 @@ import java.util.Locale
  * Query Files list screen (change `query-files-storage`) — shows `.sql` files from the active
  * connection's engine-scoped managed folder. The FAB opens the existing `NewQueryOptionsSheet`
  * (an overlay owned by `MyDataBasesNavHost`, not rendered here) via [onOpenNewQueryOptions].
+ *
+ * Header follows the same structure as every other sub-screen in the app (`TablesListScreen`,
+ * `DatabaseActionMenuScreen`, etc.): `Scaffold` with NO `topBar` — the large iOS-style title with
+ * back button is `ScreenTitle`, placed inside the body via `BreathingBackground` + `Column`, not
+ * a Material3 `TopAppBar`. Do not diverge from this shape in this or any other screen.
  *
  * Both existing "New Query" entry points (bottom-nav modal action, `DatabaseActionMenuScreen`'s
  * "Consultas" tile) now navigate here first, replacing the old direct-to-sheet behavior.
@@ -55,7 +63,6 @@ import java.util.Locale
  * @author sdd-apply (Strict TDD)
  * @date 2026-08-05
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun QueryFilesScreen(
     connectionId: String,
@@ -85,16 +92,6 @@ fun QueryFilesScreen(
     }
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.query_files_title)) },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(imageVector = PhosphorAppIcons.Action.back, contentDescription = null)
-                    }
-                }
-            )
-        },
         floatingActionButton = {
             FloatingActionButton(onClick = onOpenNewQueryOptions) {
                 Icon(
@@ -104,38 +101,55 @@ fun QueryFilesScreen(
             }
         }
     ) { paddingValues ->
-        Column(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
-            if (showFallbackNotice) {
-                Surface(color = MaterialTheme.colorScheme.errorContainer, modifier = Modifier.fillMaxWidth()) {
-                    Text(
-                        text = stringResource(R.string.query_storage_saf_fallback_notice),
-                        color = MaterialTheme.colorScheme.onErrorContainer,
-                        modifier = Modifier.padding(12.dp)
-                    )
+        BreathingBackground(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
+            Column(modifier = Modifier.fillMaxSize()) {
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Título grande estilo iOS con botón de retroceso — misma estructura que
+                // TablesListScreen/DatabaseActionMenuScreen, nunca un TopAppBar.
+                ScreenTitle(
+                    title = stringResource(R.string.query_files_title),
+                    onBackClick = onNavigateBack
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                if (showFallbackNotice) {
+                    Surface(color = MaterialTheme.colorScheme.errorContainer, modifier = Modifier.fillMaxWidth()) {
+                        Text(
+                            text = stringResource(R.string.query_storage_saf_fallback_notice),
+                            color = MaterialTheme.colorScheme.onErrorContainer,
+                            modifier = Modifier.padding(12.dp)
+                        )
+                    }
                 }
-            }
 
-            val padding = windowSizeClass?.let { adaptivePadding(it) } ?: androidx.compose.foundation.layout.PaddingValues(16.dp)
+                val padding = windowSizeClass?.let { adaptivePadding(it) } ?: PaddingValues(16.dp)
 
-            Box(modifier = Modifier.fillMaxSize().padding(padding)) {
-                when (val current = state) {
-                    is QueryFilesUiState.Idle, is QueryFilesUiState.Loading ->
-                        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                Box(modifier = Modifier.fillMaxSize().padding(padding)) {
+                    when (val current = state) {
+                        is QueryFilesUiState.Idle, is QueryFilesUiState.Loading ->
+                            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
 
-                    is QueryFilesUiState.Success -> QueryFilesList(current.files)
+                        is QueryFilesUiState.Success -> QueryFilesList(current.files)
 
-                    is QueryFilesUiState.Empty ->
-                        Text(
-                            text = stringResource(R.string.query_files_empty_state),
-                            modifier = Modifier.align(Alignment.Center)
-                        )
+                        is QueryFilesUiState.Empty ->
+                            Text(
+                                text = stringResource(R.string.query_files_empty_state),
+                                modifier = Modifier.align(Alignment.Center)
+                            )
 
-                    is QueryFilesUiState.Error ->
-                        Text(
-                            text = current.message,
-                            color = MaterialTheme.colorScheme.error,
-                            modifier = Modifier.align(Alignment.Center)
-                        )
+                        is QueryFilesUiState.Error ->
+                            Text(
+                                text = current.message,
+                                color = MaterialTheme.colorScheme.error,
+                                modifier = Modifier.align(Alignment.Center)
+                            )
+                    }
                 }
             }
         }
@@ -147,7 +161,14 @@ private fun QueryFilesList(files: List<QueryFileInfo>) {
     val dateFormat = remember { SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()) }
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         items(files, key = { it.uri.toString() }) { file ->
-            Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp)) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        horizontal = LocalDesignTokens.current.screenPaddingHorizontal,
+                        vertical = 12.dp
+                    )
+            ) {
                 Text(text = file.name, style = MaterialTheme.typography.bodyLarge)
                 Text(
                     text = dateFormat.format(Date(file.lastModified)),
@@ -158,4 +179,3 @@ private fun QueryFilesList(files: List<QueryFileInfo>) {
         }
     }
 }
-
