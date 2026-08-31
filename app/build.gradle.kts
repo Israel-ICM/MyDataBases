@@ -110,6 +110,10 @@ dependencies {
     // DataStore
     implementation("androidx.datastore:datastore-preferences:1.0.0")
     
+    // DocumentFile - unified abstraction over private-File and SAF-tree storage roots
+    // (change `query-files-storage`)
+    implementation("androidx.documentfile:documentfile:1.0.1")
+    
     // Security
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
     
