@@ -16,11 +16,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
-import androidx.compose.material3.PermanentDrawerSheet
-import androidx.compose.material3.PermanentNavigationDrawer
 import androidx.compose.material3.Text
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
@@ -52,7 +49,9 @@ import com.sphynxs.mydatabases.ui.theme.LocalDesignTokens
  *
  * - **Compact** (< 600dp): `NavigationBar` en la parte inferior (2 o 5 destinos)
  * - **Medium** (600-840dp): `NavigationRail` en la parte izquierda (2 o 5 destinos)
- * - **Expanded** (> 840dp): `PermanentNavigationDrawer` a la izquierda (2 o 5 destinos)
+ * - **Expanded** (> 840dp): por ahora, mismo layout que Compact (bottom bar flotante).
+ *   Pendiente: en Expanded esa zona lateral va a mostrar la lista de tablas / listas
+ *   normales en un layout tipo master-detail — todavía no implementado a propósito.
  *
  * ## Destinos Contextuales
  *
@@ -111,8 +110,10 @@ fun AdaptiveNavigationScaffold(
         currentRoute?.endsWith("/query_files") == true
 
     when (windowSizeClass.widthSizeClass) {
-        WindowWidthSizeClass.Compact -> {
-            // Compact: contenido full screen + card flotando al fondo
+        WindowWidthSizeClass.Compact, WindowWidthSizeClass.Expanded -> {
+            // Compact y Expanded (por ahora): contenido full screen + card flotando al
+            // fondo. En Expanded todavia no hay un layout propio (master-detail con lista
+            // de tablas) - hasta que se implemente, se mantiene identico a Compact.
             Box(modifier = Modifier.fillMaxSize()) {
                 // Contenido principal ocupa toda la pantalla
                 content()
@@ -169,39 +170,6 @@ fun AdaptiveNavigationScaffold(
 
                 // Contenido principal
                 content()
-            }
-        }
-        
-        WindowWidthSizeClass.Expanded -> {
-            // Expanded: PermanentNavigationDrawer — misma exclusión que Compact/Medium
-            // (ver `hideNavigationChrome`).
-            if (hideNavigationChrome) {
-                content()
-            } else {
-                PermanentNavigationDrawer(
-                    drawerContent = {
-                        PermanentDrawerSheet {
-                            destinations.forEach { destination ->
-                                NavigationDrawerItem(
-                                    label = {
-                                        Text(text = stringResource(destination.labelRes))
-                                    },
-                                    icon = {
-                                        Icon(
-                                            imageVector = destination.icon,
-                                            contentDescription = stringResource(destination.labelRes)
-                                        )
-                                    },
-                                    selected = currentRoute == destination.route,
-                                    onClick = { onNavigate(destination.route) }
-                                )
-                            }
-                        }
-                    }
-                ) {
-                    // Contenido principal
-                    content()
-                }
             }
         }
         
