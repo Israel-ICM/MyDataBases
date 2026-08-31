@@ -293,5 +293,11 @@
     <string name="query_storage_migration_confirm">Копировать</string>
     <string name="query_storage_migration_decline">Не копировать</string>
     <string name="query_storage_migration_partial_failure">Некоторые файлы не удалось скопировать</string>
+    <string name="query_storage_saf_fallback_notice">Выбранная папка недоступна. Используется папка приложения по умолчанию.</string>
+
+    <!-- Query Files list screen (change query-files-storage) -->
+    <string name="query_files_title">Файлы запросов</string>
+    <string name="query_files_empty_state">Пока нет сохранённых файлов запросов</string>
+    <string name="query_files_fab_description">Новый запрос</string>
 </resources>
 

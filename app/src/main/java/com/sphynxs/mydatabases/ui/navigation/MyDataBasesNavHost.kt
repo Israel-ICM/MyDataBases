@@ -139,11 +139,10 @@ fun MyDataBasesNavHost(
                     "add_database" -> showAddDatabaseSheet = true
                     "new_table" -> showAddTableSheet = true
                     "new_query" -> {
-                        // Cambio `large-sql-script-execution`: en vez de abrir directo una
-                        // query en blanco, mostrar el selector "¿Qué quieres hacer?" con 3
-                        // opciones. La acción previa (openQueryCard directo) ahora vive en
-                        // el callback onNewQuery del sheet.
-                        showNewQueryOptionsSheet = true
+                        // Cambio `query-files-storage`: en vez de abrir directo el selector de
+                        // 3 opciones, navegar primero a la lista de Query Files. El FAB de esa
+                        // pantalla es el que ahora activa showNewQueryOptionsSheet.
+                        navController.navigate(Routes.QueryFiles.createRoute(activeConnectionId))
                     }
                 }
             }
@@ -223,11 +222,10 @@ fun MyDataBasesNavHost(
                         navController.navigate(Routes.DatabaseViews.createRoute(connectionId, databaseName))
                     },
                     onNavigateToQueries = {
-                        // Corrección post-QA (change `large-sql-script-execution`): este era el
-                        // segundo punto de entrada a "New Query", dejado fuera de alcance por
-                        // error en el diseño original — el usuario esperaba (correctamente) que
-                        // ambos puntos de entrada mostraran el mismo selector de 3 opciones.
-                        showNewQueryOptionsSheet = true
+                        // Cambio `query-files-storage`: mismo destino que el otro punto de
+                        // entrada (Fase 13) — navega a la lista de Query Files, no al selector
+                        // directamente.
+                        navController.navigate(Routes.QueryFiles.createRoute(connectionId))
                     },
                     onNavigateToFunctions = {
                         navController.navigate(Routes.DatabaseFunctions.createRoute(connectionId, databaseName))
@@ -436,6 +434,22 @@ fun MyDataBasesNavHost(
                         onFinished = { navController.popBackStack() }
                     )
                 }
+            }
+
+            // Cambio `query-files-storage`: lista de Query Files, nuevo destino intermedio
+            // entre ambos puntos de entrada de "New Query" y el NewQueryOptionsSheet (FAB).
+            composable(
+                route = Routes.QueryFiles.route,
+                arguments = listOf(
+                    navArgument("connectionId") { type = NavType.StringType }
+                )
+            ) {
+                val connectionId = it.arguments?.getString("connectionId") ?: ""
+                com.sphynxs.mydatabases.ui.screens.queryfiles.QueryFilesScreen(
+                    connectionId = connectionId,
+                    onOpenNewQueryOptions = { showNewQueryOptionsSheet = true },
+                    onNavigateBack = { navController.popBackStack() }
+                )
             }
         }
         } // Cierre AdaptiveNavigationScaffold

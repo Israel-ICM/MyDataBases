@@ -293,4 +293,10 @@
     <string name="query_storage_migration_confirm">Kopieren</string>
     <string name="query_storage_migration_decline">Nicht kopieren</string>
     <string name="query_storage_migration_partial_failure">Einige Dateien konnten nicht kopiert werden</string>
+    <string name="query_storage_saf_fallback_notice">Der ausgewählte Ordner ist nicht verfügbar. Der App-Standardordner wird stattdessen verwendet.</string>
+
+    <!-- Query Files list screen (change query-files-storage) -->
+    <string name="query_files_title">Abfragedateien</string>
+    <string name="query_files_empty_state">Noch keine gespeicherten Abfragedateien</string>
+    <string name="query_files_fab_description">Neue Abfrage</string>
 </resources>

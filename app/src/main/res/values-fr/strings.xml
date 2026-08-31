@@ -293,4 +293,10 @@
     <string name="query_storage_migration_confirm">Copier</string>
     <string name="query_storage_migration_decline">Ne pas copier</string>
     <string name="query_storage_migration_partial_failure">Certains fichiers n\'ont pas pu être copiés</string>
+    <string name="query_storage_saf_fallback_notice">Le dossier sélectionné n\'est pas disponible. Le dossier par défaut de l\'application est utilisé à la place.</string>
+
+    <!-- Query Files list screen (change query-files-storage) -->
+    <string name="query_files_title">Fichiers de requêtes</string>
+    <string name="query_files_empty_state">Aucun fichier de requête enregistré pour le moment</string>
+    <string name="query_files_fab_description">Nouvelle requête</string>
 </resources>

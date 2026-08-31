@@ -293,4 +293,10 @@
     <string name="query_storage_migration_confirm">コピー</string>
     <string name="query_storage_migration_decline">コピーしない</string>
     <string name="query_storage_migration_partial_failure">一部のファイルをコピーできませんでした</string>
+    <string name="query_storage_saf_fallback_notice">選択したフォルダは使用できません。代わりにアプリのデフォルトフォルダを使用します。</string>
+
+    <!-- Query Files list screen (change query-files-storage) -->
+    <string name="query_files_title">クエリファイル</string>
+    <string name="query_files_empty_state">保存されたクエリファイルはまだありません</string>
+    <string name="query_files_fab_description">新しいクエリ</string>
 </resources>

@@ -293,4 +293,10 @@
     <string name="query_storage_migration_confirm">复制</string>
     <string name="query_storage_migration_decline">不复制</string>
     <string name="query_storage_migration_partial_failure">部分文件无法复制</string>
+    <string name="query_storage_saf_fallback_notice">所选文件夹不可用，将改用应用默认文件夹。</string>
+
+    <!-- Query Files list screen (change query-files-storage) -->
+    <string name="query_files_title">查询文件</string>
+    <string name="query_files_empty_state">暂无已保存的查询文件</string>
+    <string name="query_files_fab_description">新建查询</string>
 </resources>

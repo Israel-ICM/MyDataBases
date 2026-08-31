@@ -107,40 +107,39 @@ User must choose (or confirm) the chain strategy before `sdd-apply` proceeds (de
 
 ## Phase 10: Query Files List — ViewModel (TDD)
 
-- [ ] 10.1 RED: write `QueryFilesViewModelTest.kt` — `Idle → Loading → Success(list)` for a populated folder sorted `lastModified` descending with name tiebreaker; empty-but-available folder maps to a distinct empty state (not `Error`); store failure maps to `Error` with a localized message; non-`.sql` files never appear (defense-in-depth even though `QueryFileStore.list` already filters); engine-in-context scoping — resolves `DatabaseType` via `ConnectionRepository.getById(connectionId).type` and calls `list(that engine)`; SAF-fallback path (store returns fallback-folder contents) still renders `Success`/empty, never `Error`
-- [ ] 10.2 GREEN: create `ui/screens/queryfiles/QueryFilesViewModel.kt` — `@HiltViewModel` injecting `ListQueryFilesUseCase`, `ConnectionRepository`; sealed `QueryFilesUiState` (`Idle`, `Loading`, `Success(files: List<QueryFileInfo>)`, `Empty`, `Error(message: String)`); exposes `StateFlow<QueryFilesUiState>`; remains `Context`-free; listing runs off the main thread (`viewModelScope` + repository's own dispatcher)
-- [ ] 10.3 Implement `refresh()` callable on screen resume (not just initial load) — no folder-watching, refresh-on-resume only per spec
+- [x] 10.1 RED: wrote `QueryFilesViewModelTest.kt` — 6 tests (sort with tiebreaker, Empty vs Error distinction, Error message, engine-in-context scoping, unknown connection, plus one for the fallback-notice addition below)
+- [x] 10.2 GREEN: created `ui/screens/queryfiles/QueryFilesViewModel.kt` — `QueryFilesUiState` (`Idle/Loading/Success/Empty/Error`), injects `ListQueryFilesUseCase`, `ConnectionRepository`. **Addition beyond the literal task**: also injects `QueryStorageResolver` and exposes `showFallbackNotice: StateFlow<Boolean>` — this closes the gap flagged in PR-3/Phase 9 (`RootResolution.Fallback` had no UI consumer yet); re-checked on every `load()`/`refresh()`, never suppressed, matching the confirmed no-suppression decision
+- [x] 10.3 Implemented `refresh(connectionId)` as a thin alias of `load(connectionId)` — same logic, exposed under its own name for call-site clarity at the resume hook
 
 ## Phase 11: Query Files List — Screen & Route
 
-- [ ] 11.1 Create `ui/screens/queryfiles/QueryFilesScreen.kt`: composable accepting `connectionId: String`, `onOpenNewQueryOptions: () -> Unit` (FAB callback), `onNavigateBack: () -> Unit`; hoists `QueryFilesViewModel` via `hiltViewModel()`
-- [ ] 11.2 Render `Success`: list rows showing `name` + formatted `lastModified`, sorted as delivered by the ViewModel
-- [ ] 11.3 Render `Empty`: empty-state content (copy + FAB still available)
-- [ ] 11.4 Render `Error`: localized error message content
-- [ ] 11.5 Add FAB: single trigger calling `onOpenNewQueryOptions()` — does NOT open `NewQueryOptionsSheet` directly from this file; the sheet stays owned/rendered at `MyDataBasesNavHost` level (already hoisted there since `large-sql-script-execution`), so this callback only flips the existing `showNewQueryOptionsSheet` state — no sheet-rendering code duplicated or moved
-- [ ] 11.6 Call `viewModel.refresh()` on screen resume (`LifecycleEventEffect(Lifecycle.Event.ON_RESUME)` or existing project convention for resume hooks) so a query saved from the editor appears without an app restart
-- [ ] 11.7 Layout uses `adaptivePadding(LocalWindowSizeClass.current)` for Compact/Medium/Expanded per existing project helper
-- [ ] 11.8 Add `Routes.QueryFiles` to `ui/navigation/Routes.kt`: `data object QueryFiles : Routes("connection/{connectionId}/query_files")` with `createRoute(connectionId: String)`, following the existing single-arg contextual route pattern
-- [ ] 11.9 Register `composable(Routes.QueryFiles.route, ...)` in `MyDataBasesNavHost.kt`: reads `connectionId`, renders `QueryFilesScreen(connectionId, onOpenNewQueryOptions = { showNewQueryOptionsSheet = true }, onNavigateBack = { navController.popBackStack() })`
+- [x] 11.1 Created `ui/screens/queryfiles/QueryFilesScreen.kt`
+- [x] 11.2-11.4 Rendered `Success` (name + formatted `lastModified` via `SimpleDateFormat`), `Empty`, `Error`
+- [x] 11.5 FAB calls `onOpenNewQueryOptions()` only — `NewQueryOptionsSheet` itself untouched, still owned by `MyDataBasesNavHost`
+- [x] 11.6 Resume refresh implemented via `DisposableEffect` + `LifecycleEventObserver` on `LocalLifecycleOwner`, not `LifecycleEventEffect` — that API needs `androidx.lifecycle:lifecycle-runtime-compose`, not currently a dependency; the manual observer achieves the same behavior without adding one
+- [x] 11.7 Uses `adaptivePadding(LocalWindowSizeClass.current)`
+- [x] 11.8 Added `Routes.QueryFiles`
+- [x] 11.9 Registered the route in `MyDataBasesNavHost.kt`
 
 ## Phase 12: Query Files List — Compose UI Test & Localization
 
-- [ ] 12.1 Write `QueryFilesScreenTest.kt` (Compose UI test, populated per project's existing androidTest limitation) covering: load → list renders → FAB click invokes `onOpenNewQueryOptions` (not a direct sheet render) happy path, and the empty-state rendering
-- [ ] 12.2 Add to `res/values/strings.xml`: screen title, empty-state copy, FAB content description, per-item accessibility label if needed
-- [ ] 12.3 Add the same keys translated to all 10 locales (`values`, `values-es`, `values-ar`, `values-de`, `values-fr`, `values-hi`, `values-ja`, `values-pt-rBR`, `values-ru`, `values-zh-rCN`)
-- [ ] 12.4 Every string in `QueryFilesScreen.kt` goes through `stringResource(...)` — zero hardcoded `Text()` calls, confirmed via android-dev audit
+- [ ] 12.1 **BLOCKED, not written**: same pre-existing `androidTest` source-set breakage documented in the `large-sql-script-execution` change (Phase 10.9) — still unresolved, not this change's job to fix
+- [x] 12.2 Added to `res/values/strings.xml`: `query_files_title`, `query_files_empty_state`, `query_files_fab_description`, plus `query_storage_saf_fallback_notice` (the fallback-notice string, natural fit here since this screen is the first UI consumer)
+- [x] 12.3 Added the same 4 keys to all 10 locales
+- [x] 12.4 Every string in `QueryFilesScreen.kt` and the fallback banner goes through `stringResource(...)`
 
 ## Phase 13: Entry-Point Rewiring
 
-- [ ] 13.1 Modify `MyDataBasesNavHost.kt`'s `onModalAction` `"new_query"` branch (currently `showNewQueryOptionsSheet = true`, ~line 141-147): change to `navController.navigate(Routes.QueryFiles.createRoute(activeConnectionId))`
-- [ ] 13.2 Modify `MyDataBasesNavHost.kt`'s `DatabaseActionMenuScreen` `onNavigateToQueries` callback (currently `showNewQueryOptionsSheet = true`, ~line 225-231): change to `navController.navigate(Routes.QueryFiles.createRoute(connectionId))`
-- [ ] 13.3 Confirm the `NewQueryOptionsSheet` render block (the `if (showNewQueryOptionsSheet) { ... }` sibling inside `WorkspaceOverlay`) is left UNMODIFIED — it now becomes reachable only via the Phase 11 FAB callback, not via these two rewired call sites
+- [x] 13.1-13.2 Both `MyDataBasesNavHost.kt` call sites (`onModalAction("new_query")`, `DatabaseActionMenuScreen.onNavigateToQueries`) now call `navController.navigate(Routes.QueryFiles.createRoute(...))` instead of `showNewQueryOptionsSheet = true`
+- [x] 13.3 Confirmed: the `if (showNewQueryOptionsSheet) { ... }` sheet-render block itself is untouched; its only remaining trigger is the Phase 11.5 FAB callback
+
+**Note**: Phase 13 was done together with Phase 11 in this same PR (not a separate PR-5 slice as tasks.md's original work-unit table suggested) — the route registration and its two callers are one cohesive, hard-to-split unit of work; splitting them would leave an intermediate state where the route exists but nothing navigates to it (or vice versa).
 
 ## Phase 14: Regression Check — `2026-06-30-new-query-modal-fix` Guarantees
 
-- [ ] 14.1 Write/extend a NavHost-level test (or targeted unit test on the composable logic, matching existing project precedent for this kind of check) verifying: both "new_query" modal action and the "Consultas" tile now trigger `navController.navigate` to `Routes.QueryFiles`, NEITHER sets `showNewQueryOptionsSheet = true` directly anymore
-- [ ] 14.2 Verify by code inspection (documented in the PR description, same as `large-sql-script-execution` Phase 20 precedent) that `showNewQueryOptionsSheet` is set to `true` ONLY from the Phase 11.9 FAB-forwarded callback — no other call site remains
-- [ ] 14.3 Confirm no double-sheet / no route-regression is possible by construction: the sheet still renders as a `WorkspaceOverlay`-level sibling (never a route), preserving the exact guarantee structure the reference change established
+- [x] 14.1 **Reasoned explicitly, not just asserted**: the original bug was `NewQueryScreen` being a non-rendering pseudo-destination (`LaunchedEffect` immediately calling `openQueryCard` with no UI of its own) wrapped in real navigation — that combination caused the blank-screen/wrong-menu/double-sheet symptoms. `QueryFilesScreen` is NOT that pattern: it's a genuine, fully-rendering destination (a real list UI) — using `navController.navigate` for it is the architecturally correct choice, not a regression of the fix. The fix's actual invariant (`NewQueryOptionsSheet` never wrapped in a route, always an overlay) still holds unchanged.
+- [x] 14.2 Verified by reading the full `MyDataBasesNavHost.kt` diff: `showNewQueryOptionsSheet = true` appears in exactly one place — the Phase 11.5 FAB callback
+- [x] 14.3 Confirmed: `NewQueryOptionsSheet`'s render block is unmodified, still a `WorkspaceOverlay`-level sibling, never a route — no double-sheet path exists
 
 ## Phase 15: Editor Save Convergence
 

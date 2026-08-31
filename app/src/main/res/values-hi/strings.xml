@@ -293,4 +293,10 @@
     <string name="query_storage_migration_confirm">कॉपी करें</string>
     <string name="query_storage_migration_decline">कॉपी न करें</string>
     <string name="query_storage_migration_partial_failure">कुछ फ़ाइलें कॉपी नहीं की जा सकीं</string>
+    <string name="query_storage_saf_fallback_notice">चयनित फ़ोल्डर उपलब्ध नहीं है। इसके बजाय ऐप के डिफ़ॉल्ट फ़ोल्डर का उपयोग किया जा रहा है।</string>
+
+    <!-- Query Files list screen (change query-files-storage) -->
+    <string name="query_files_title">क्वेरी फ़ाइलें</string>
+    <string name="query_files_empty_state">अभी तक कोई सहेजी गई क्वेरी फ़ाइल नहीं है</string>
+    <string name="query_files_fab_description">नई क्वेरी</string>
 </resources>

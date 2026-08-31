@@ -293,4 +293,10 @@
     <string name="query_storage_migration_confirm">نسخ</string>
     <string name="query_storage_migration_decline">عدم النسخ</string>
     <string name="query_storage_migration_partial_failure">تعذر نسخ بعض الملفات</string>
+    <string name="query_storage_saf_fallback_notice">المجلد المحدد غير متاح. سيتم استخدام مجلد التطبيق الافتراضي بدلاً منه.</string>
+
+    <!-- Query Files list screen (change query-files-storage) -->
+    <string name="query_files_title">ملفات الاستعلامات</string>
+    <string name="query_files_empty_state">لا توجد ملفات استعلامات محفوظة بعد</string>
+    <string name="query_files_fab_description">استعلام جديد</string>
 </resources>

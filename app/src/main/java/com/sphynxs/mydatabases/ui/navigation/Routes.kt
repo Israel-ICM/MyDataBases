@@ -358,4 +358,23 @@ sealed class Routes(val route: String) {
             return "connection/$connectionId/run_script"
         }
     }
+
+    /**
+     * Pantalla de lista de archivos de query (change `query-files-storage`) — muestra los
+     * archivos `.sql` de la carpeta gestionada, particionada por `DatabaseType` de la conexión
+     * activa. El FAB abre el `NewQueryOptionsSheet` ya existente (overlay, no route propia).
+     *
+     * @property route Template con argumento `connectionId`
+     */
+    data object QueryFiles : Routes("connection/{connectionId}/query_files") {
+        /**
+         * Crea la ruta completa reemplazando el argumento connectionId.
+         *
+         * @param connectionId ID de la conexión activa
+         * @return Ruta navegable (ej: "connection/abc-123/query_files")
+         */
+        fun createRoute(connectionId: String): String {
+            return "connection/$connectionId/query_files"
+        }
+    }
 }

@@ -364,4 +364,10 @@
     <string name="query_storage_migration_confirm">Copy</string>
     <string name="query_storage_migration_decline">Don\'t copy</string>
     <string name="query_storage_migration_partial_failure">Some files could not be copied</string>
+    <string name="query_storage_saf_fallback_notice">The selected folder is unavailable. Using the default app folder instead.</string>
+
+    <!-- Query Files list screen (change query-files-storage) -->
+    <string name="query_files_title">Query Files</string>
+    <string name="query_files_empty_state">No saved query files yet</string>
+    <string name="query_files_fab_description">New query</string>
 </resources>

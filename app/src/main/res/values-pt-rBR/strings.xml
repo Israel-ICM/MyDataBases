@@ -293,4 +293,10 @@
     <string name="query_storage_migration_confirm">Copiar</string>
     <string name="query_storage_migration_decline">Não copiar</string>
     <string name="query_storage_migration_partial_failure">Alguns arquivos não puderam ser copiados</string>
+    <string name="query_storage_saf_fallback_notice">A pasta selecionada não está disponível. Usando a pasta padrão do app.</string>
+
+    <!-- Query Files list screen (change query-files-storage) -->
+    <string name="query_files_title">Arquivos de consultas</string>
+    <string name="query_files_empty_state">Ainda não há arquivos de consulta salvos</string>
+    <string name="query_files_fab_description">Nova consulta</string>
 </resources>
