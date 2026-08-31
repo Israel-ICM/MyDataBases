@@ -1,5 +1,6 @@
 package com.sphynxs.mydatabases.data.repositories
 
+import android.net.Uri
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
@@ -28,6 +29,7 @@ class SettingsRepositoryImpl @Inject constructor(
     companion object {
         private val BRANDED_PALETTE_KEY = booleanPreferencesKey("branded_palette_enabled")
         private val THEME_MODE_KEY = stringPreferencesKey("theme_mode")
+        private val QUERY_STORAGE_TREE_URI_KEY = stringPreferencesKey("query_storage_tree_uri")
     }
     
     override fun observeBrandedPaletteEnabled(): Flow<Boolean> =
@@ -51,6 +53,21 @@ class SettingsRepositoryImpl @Inject constructor(
     override suspend fun setThemeMode(mode: ThemeMode) {
         dataStore.edit { prefs ->
             prefs[THEME_MODE_KEY] = mode.name
+        }
+    }
+
+    override fun observeQueryStorageTreeUri(): Flow<Uri?> =
+        dataStore.data.map { prefs ->
+            prefs[QUERY_STORAGE_TREE_URI_KEY]?.let { Uri.parse(it) }
+        }
+
+    override suspend fun setQueryStorageTreeUri(uri: Uri?) {
+        dataStore.edit { prefs ->
+            if (uri == null) {
+                prefs.remove(QUERY_STORAGE_TREE_URI_KEY)
+            } else {
+                prefs[QUERY_STORAGE_TREE_URI_KEY] = uri.toString()
+            }
         }
     }
 }

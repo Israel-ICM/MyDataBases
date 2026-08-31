@@ -2,9 +2,11 @@ package com.sphynxs.mydatabases.core.di
 
 import com.sphynxs.mydatabases.data.repositories.ConnectionRepositoryImpl
 import com.sphynxs.mydatabases.data.repositories.FolderRepositoryImpl
+import com.sphynxs.mydatabases.data.repositories.QueryFileStoreImpl
 import com.sphynxs.mydatabases.data.repositories.SettingsRepositoryImpl
 import com.sphynxs.mydatabases.domain.repositories.ConnectionRepository
 import com.sphynxs.mydatabases.domain.repositories.FolderRepository
+import com.sphynxs.mydatabases.domain.repositories.QueryFileStore
 import com.sphynxs.mydatabases.domain.repositories.SettingsRepository
 import dagger.Binds
 import dagger.Module
@@ -59,4 +61,17 @@ abstract class RepositoryModule {
     abstract fun bindFolderRepository(
         impl: FolderRepositoryImpl
     ): FolderRepository
+
+    /**
+     * Vincula QueryFileStore con su implementación única sobre la raíz resuelta por
+     * QueryStorageResolver (privada o SAF) — change `query-files-storage`.
+     *
+     * @param impl Implementación del store
+     * @return Interfaz del store
+     */
+    @Binds
+    @Singleton
+    abstract fun bindQueryFileStore(
+        impl: QueryFileStoreImpl
+    ): QueryFileStore
 }

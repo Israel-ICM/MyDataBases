@@ -1,5 +1,6 @@
 package com.sphynxs.mydatabases.domain.repositories
 
+import android.net.Uri
 import com.sphynxs.mydatabases.domain.models.ThemeMode
 import kotlinx.coroutines.flow.Flow
 
@@ -44,4 +45,20 @@ interface SettingsRepository {
      * @param mode Modo de tema a persistir (LIGHT, DARK o SYSTEM)
      */
     suspend fun setThemeMode(mode: ThemeMode)
+
+    /**
+     * Observa la Uri de árbol SAF (`OpenDocumentTree`) elegida por el usuario para el
+     * almacenamiento de query files (change `query-files-storage`).
+     *
+     * @return Flow<Uri?> — null cuando no hay preferencia guardada (usa la carpeta privada
+     *   de la app por defecto)
+     */
+    fun observeQueryStorageTreeUri(): Flow<Uri?>
+
+    /**
+     * Persiste (o limpia, si [uri] es null) la Uri de árbol SAF elegida por el usuario.
+     *
+     * @param uri Uri de árbol SAF persistente, o null para volver al default privado
+     */
+    suspend fun setQueryStorageTreeUri(uri: Uri?)
 }

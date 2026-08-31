@@ -13,13 +13,16 @@ import androidx.documentfile.provider.DocumentFile
  */
 sealed class RootResolution {
 
+    /** The resolved storage root — always present, regardless of which variant this is. */
+    abstract val root: DocumentFile
+
     /** Normal resolution — either the app-private default or a valid, granted SAF tree. */
-    data class Resolved(val root: DocumentFile) : RootResolution()
+    data class Resolved(override val root: DocumentFile) : RootResolution()
 
     /**
      * The configured SAF tree could not be used (permission lost, tree removed, grant revoked) —
      * [root] is the app-private default used as a fallback. [reason] is a short, non-localized
      * diagnostic string (the UI layer maps this to a localized notice, not this raw text).
      */
-    data class Fallback(val root: DocumentFile, val reason: String) : RootResolution()
+    data class Fallback(override val root: DocumentFile, val reason: String) : RootResolution()
 }

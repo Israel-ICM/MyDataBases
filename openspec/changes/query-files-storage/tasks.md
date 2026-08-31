@@ -57,33 +57,33 @@ User must choose (or confirm) the chain strategy before `sdd-apply` proceeds (de
 
 ## Phase 3: Data — Root Provider & Resolver (TDD)
 
-- [ ] 3.1 Create `data/storage/QueryStorageRootProvider.kt`: sealed provider with `Private(context)` variant returning `DocumentFile.fromFile(context.getExternalFilesDir(null))` and `Saf(context, treeUri)` variant returning `DocumentFile.fromTreeUri(context, treeUri)`
-- [ ] 3.2 RED: write `QueryStorageResolverTest.kt` (Mockk `SettingsRepository`, fake `DocumentFile`/provider) — null pref → `RootResolution.Resolved` over `Private`; valid persisted SAF tree → `RootResolution.Resolved` over `Saf`; SAF tree unavailable (`DocumentFile.exists() == false` or `null` from `fromTreeUri`) → `RootResolution.Fallback(privateRoot, reason)`; check runs on every call (not cached) so mid-session grant loss is detected
-- [ ] 3.3 GREEN: create `data/storage/QueryStorageResolver.kt`: `suspend fun resolveRoot(): RootResolution` reads `SettingsRepository.observeQueryStorageTreeUri()` (first value), tries SAF root when non-null, falls back to `Private` on any failure/unavailability, always returns a usable root
-- [ ] 3.4 Every fallback path in `QueryStorageResolver` MUST surface via `RootResolution.Fallback(reason)` on EVERY call where the condition is detected — NOT one-time/suppressible; no "seen" flag, no persisted or in-memory suppression state (confirmed decision, supersedes design.md's flagged open question)
+- [x] 3.1 Created `data/storage/QueryStorageRootProvider.kt`: **interface** (not sealed class as originally sketched — an interface with `privateRoot()`/`safRoot(treeUri)` is simpler to mock in `QueryStorageResolverTest` than a sealed-variant design) + `DefaultQueryStorageRootProvider` real implementation using `getExternalFilesDir`/`DocumentFile.fromTreeUri`
+- [x] 3.2 RED: wrote `QueryStorageResolverTest.kt` — 6 tests: null pref → private; valid SAF → SAF root; SAF provider returns null → Fallback; SAF exists()==false → Fallback; SAF canWrite()==false → Fallback; re-checks every call (not cached), demonstrated by flipping the mock between two calls on the same resolver instance
+- [x] 3.3 GREEN: created `data/storage/QueryStorageResolver.kt`: `resolveRoot()` reads the pref via `.first()`, tries SAF when non-null, falls back to private on any unavailability
+- [x] 3.4 Confirmed by test 6 (re-check every call) — no suppression state exists anywhere in `QueryStorageResolver`, matches the confirmed decision exactly
 
 ## Phase 4: Data — `QueryFileStoreImpl`
 
-- [ ] 4.1 Create `data/repositories/QueryFileStoreImpl.kt`: single implementation over `QueryStorageResolver.resolveRoot()`, resolves `{root}/{engineType}/queries/` lazily via `DocumentFile.findFile`/`createDirectory` per segment, creates missing subfolders on first `write`
-- [ ] 4.2 Implement `list(engineType)`: `DocumentFile.listFiles()` filtered by `.sql` suffix (case-insensitive), maps to `QueryFileInfo(name, uri, lastModified)`, wraps `RootResolution.Fallback` case transparently (still returns the fallback folder's contents, not an error)
-- [ ] 4.3 Implement `read(uri)`: `contentResolver.openInputStream(uri)` → read full text
-- [ ] 4.4 Implement `write(engineType, fileName, content)`: creates file under the resolved `{engineType}/queries/` via `DocumentFile.createFile`, writes via `contentResolver.openOutputStream`, returns the new `Uri`
-- [ ] 4.5 Implement `delete(uri)`: resolves the `DocumentFile` for `uri` and calls `.delete()`
-- [ ] 4.6 Write `QueryFileStoreImplTest.kt` (Mockk `QueryStorageResolver` + fake `DocumentFile` tree): `.sql` filter is case-insensitive, non-`.sql` files excluded, missing engine subfolder created lazily on first write, per-engine isolation (write under `MYSQL` does not appear in `list(POSTGRESQL)`)
-- [ ] 4.7 Populate (do not execute) `app/src/androidTest/.../QueryFileStoreImplInstrumentedTest.kt` covering real `DocumentFile`/`ContentResolver` I/O for both `file://` and `content://` paths — same limitation as prior changes: no `./gradlew connectedAndroidTest` per HARD RULE, no device available
+- [x] 4.1 Created `data/repositories/QueryFileStoreImpl.kt`: single implementation over `resolver.resolveRoot().root`, lazy `{engineSegment}/queries/` resolution via `AppFolder.segmentFor` + `DocumentFile.findFile`/`createDirectory`
+- [x] 4.2 Implemented `list(engineType)`: filtered by `.sql` suffix (case-insensitive), maps to `QueryFileInfo`; `RootResolution.Fallback` case handled transparently via the common `root` property added to the sealed base (see deviation below)
+- [x] 4.3 Implemented `read(uri)`: `contentResolver.openInputStream`
+- [x] 4.4 Implemented `write(engineType, fileName, content)`: `findFile` first (overwrite-in-place, no duplicate), else `createFile`; `contentResolver.openOutputStream(uri, "wt")`
+- [x] 4.5 Implemented `delete(uri)`: `DocumentFile.fromSingleUri(context, uri)?.delete()`
+- [x] 4.6 Wrote `QueryFileStoreImplTest.kt` — 6 tests: case-insensitive `.sql` filter, missing-subfolder-returns-empty (not created by `list`), `Fallback` resolution still returns `Success` with the fallback folder's contents, per-engine isolation, lazy folder creation on `write`, overwrite-in-place on existing filename
+- [x] 4.7 Populated (not executed — no device) `QueryFileStoreImplInstrumentedTest.kt`: write→list, write→read round-trip, delete→list, engine isolation, all against the real app-private root; noted a SAF-tree variant needs an interactively-granted tree and is left as a manual-extension note for whoever runs this
+
+**Deviation**: `RootResolution` (from PR-1) needed a common `abstract val root: DocumentFile` added to its sealed base — the original PR-1 design only declared `root` per-subclass, which doesn't let callers write `resolver.resolveRoot().root` without an exhaustive `when`. Small, backward-compatible addition (both existing subclasses already had a same-named/-typed property, just needed `override`).
 
 ## Phase 5: DI Wiring & Dependency
 
-- [ ] 5.1 Add `androidx.documentfile:documentfile` to `app/build.gradle.kts`
-- [ ] 5.2 Modify `core/di/RepositoryModule.kt`: add `@Binds abstract fun bindQueryFileStore(impl: QueryFileStoreImpl): QueryFileStore`
-- [ ] 5.3 Create `core/di/QueryStorageModule.kt`: `@Provides` for `QueryStorageResolver` (and `QueryStorageRootProvider` factory if needed), scoped `@Singleton` consistent with `RepositoryModule`'s existing bindings
-- [ ] 5.4 Run `./gradlew test` and `./gradlew assembleDebug`, confirm PR-1/PR-2 additions compile and no new unit-test regressions beyond pre-existing unrelated failures
+- [x] 5.1 `androidx.documentfile:documentfile:1.0.1` was already added in PR-1 (see that phase's note — a domain model needed it to compile)
+- [x] 5.2 Modified `core/di/RepositoryModule.kt`: added `@Binds abstract fun bindQueryFileStore(impl: QueryFileStoreImpl): QueryFileStore`
+- [x] 5.3 Created `core/di/QueryStorageModule.kt`: `@Binds` for `QueryStorageRootProvider` → `DefaultQueryStorageRootProvider`. `QueryStorageResolver`/`QueryFileStoreImpl` need no explicit binding — Hilt constructs them directly via their `@Inject` constructors once their dependencies resolve
+- [x] 5.4 Ran `./gradlew test` and `./gradlew assembleDebug` — both succeed; 329 total tests (15 new: 3 Settings + 6 Resolver + 6 Store), same 23 pre-existing unrelated failures, no new regressions
 
 ## Phase 6: Settings — Repository & DataStore Pref (TDD)
 
-- [ ] 6.1 RED: extend `SettingsRepositoryImplTest.kt` — `observeQueryStorageTreeUri()` defaults to `null` when unset, round-trips a set `Uri` string via `stringPreferencesKey`, `setQueryStorageTreeUri(null)` clears the pref (reset-to-default path)
-- [ ] 6.2 GREEN: add to `domain/repositories/SettingsRepository.kt`: `fun observeQueryStorageTreeUri(): Flow<Uri?>`, `suspend fun setQueryStorageTreeUri(uri: Uri?)`
-- [ ] 6.3 GREEN: implement in `data/repositories/SettingsRepositoryImpl.kt` following the existing `THEME_MODE_KEY`/`stringPreferencesKey` pattern — new `QUERY_STORAGE_TREE_URI_KEY = stringPreferencesKey("query_storage_tree_uri")`, map to/from `Uri.parse(...)`/`.toString()`, `null` when absent or explicitly cleared
+- [x] 6.1-6.3 **Pulled forward into PR-2**, not PR-3 as originally grouped: `QueryStorageResolver` (PR-2/Phase 3) already calls `SettingsRepository.observeQueryStorageTreeUri()` in real (non-mocked) code, so the interface + `SettingsRepositoryImpl` implementation had to exist for PR-2 to compile. Done: RED (3 new tests in `SettingsRepositoryImplTest.kt` — default null, round-trip, clear-on-null) → GREEN (`observeQueryStorageTreeUri()`/`setQueryStorageTreeUri()` added to the interface and implemented via `QUERY_STORAGE_TREE_URI_KEY = stringPreferencesKey(...)`, `Uri.parse`/`.toString()`). PR-3 only needs the UI + migration use case + `takePersistableUriPermission` wiring below.
 
 ## Phase 7: Settings — `takePersistableUriPermission` & Migration Use Case (TDD)
 
