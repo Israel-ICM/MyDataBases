@@ -299,4 +299,6 @@
     <string name="query_files_title">Fichiers de requêtes</string>
     <string name="query_files_empty_state">Aucun fichier de requête enregistré pour le moment</string>
     <string name="query_files_fab_description">Nouvelle requête</string>
+    <string name="query_save_error_title">Impossible d\'enregistrer la requête</string>
+    <string name="query_save_error_generic">Une erreur inconnue s\'est produite lors de l\'enregistrement</string>
 </resources>

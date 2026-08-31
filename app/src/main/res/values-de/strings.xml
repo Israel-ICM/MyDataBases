@@ -299,4 +299,6 @@
     <string name="query_files_title">Abfragedateien</string>
     <string name="query_files_empty_state">Noch keine gespeicherten Abfragedateien</string>
     <string name="query_files_fab_description">Neue Abfrage</string>
+    <string name="query_save_error_title">Abfrage konnte nicht gespeichert werden</string>
+    <string name="query_save_error_generic">Beim Speichern ist ein unbekannter Fehler aufgetreten</string>
 </resources>

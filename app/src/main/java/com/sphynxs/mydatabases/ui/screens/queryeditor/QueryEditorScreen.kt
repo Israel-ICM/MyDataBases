@@ -51,12 +51,7 @@ import com.sphynxs.mydatabases.R
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.ui.platform.LocalContext
-import android.content.ContentValues
-import android.os.Build
-import android.provider.MediaStore
 import java.io.BufferedReader
-import java.io.File
-import java.io.FileOutputStream
 import java.io.InputStreamReader
 import com.sphynxs.mydatabases.domain.editor.EditorSnapshot
 import com.sphynxs.mydatabases.ui.components.ResultGrid
@@ -186,6 +181,9 @@ fun QueryEditorScreen(
     val context = LocalContext.current
     var showSaveDialog by remember { mutableStateOf(false) }
     var savedFileName by remember { mutableStateOf("") }
+    // Cambio `query-files-storage` (Fase 15): guardado ahora puede fallar visiblemente en vez
+    // de solo loguear — mensaje de error a mostrar, null cuando no hay error pendiente.
+    var saveErrorMessage by remember { mutableStateOf<String?>(null) }
     
     // Splitter state: editor weight (0.0 to 1.0, default 0.5 = 50% each)
     var editorWeight by remember { mutableStateOf(0.5f) }
@@ -455,47 +453,26 @@ fun QueryEditorScreen(
                                 }
                             }
                             com.sphynxs.mydatabases.domain.editor.ShortcutAction.Save -> {
+                                // Cambio `query-files-storage` (Fase 15, convergencia de guardado):
+                                // reemplaza el guardado legacy inline (MediaStore/Environment.
+                                // getExternalStorageDirectory) por QueryFileStore, via el
+                                // ViewModel (Context-free — resuelve DatabaseType y delega el
+                                // I/O real, que vive dentro de la implementacion del store).
+                                // "Guardar como..." (saveFileLauncher, CreateDocument) queda
+                                // intacto, no se toca en este cambio.
                                 if (sqlText.text.isNotBlank()) {
-                                    // Trigger save (same as Save button click)
-                                    try {
-                                        val timestamp = java.text.SimpleDateFormat("yyyyMMdd_HHmmss", java.util.Locale.getDefault()).format(java.util.Date())
-                                        val fileName = "query_$timestamp.sql"
-                                        
-                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                                            val resolver = context.contentResolver
-                                            val contentValues = ContentValues().apply {
-                                                put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
-                                                put(MediaStore.MediaColumns.MIME_TYPE, "text/plain")
-                                                put(MediaStore.MediaColumns.RELATIVE_PATH, "Documents/MyDatabase/query")
-                                            }
-                                            
-                                            val uri = resolver.insert(MediaStore.Files.getContentUri("external"), contentValues)
-                                            uri?.let {
-                                                resolver.openOutputStream(it)?.use { outputStream ->
-                                                    outputStream.write(sqlText.text.toByteArray())
-                                                }
+                                    scope.launch {
+                                        viewModel.saveQuery(connectionId, sqlText.text).fold(
+                                            onSuccess = { fileName ->
                                                 savedFileName = fileName
                                                 showSaveDialog = true
+                                            },
+                                            onFailure = { error ->
+                                                android.util.Log.e("QueryEditorScreen", "❌ Error saving file", error)
+                                                saveErrorMessage = error.message
+                                                    ?: context.getString(R.string.query_save_error_generic)
                                             }
-                                        } else {
-                                            val storageDir = android.os.Environment.getExternalStorageDirectory()
-                                            val myDatabaseDir = File(storageDir, "MyDatabase")
-                                            val queryDir = File(myDatabaseDir, "query")
-                                            
-                                            if (!queryDir.exists()) {
-                                                queryDir.mkdirs()
-                                            }
-                                            
-                                            val file = File(queryDir, fileName)
-                                            FileOutputStream(file).use { outputStream ->
-                                                outputStream.write(sqlText.text.toByteArray())
-                                            }
-                                            
-                                            savedFileName = fileName
-                                            showSaveDialog = true
-                                        }
-                                    } catch (e: Exception) {
-                                        android.util.Log.e("QueryEditorScreen", "❌ Error saving file", e)
+                                        )
                                     }
                                 }
                             }
@@ -812,6 +789,22 @@ fun QueryEditorScreen(
                     }
                 ) {
                     Text(stringResource(R.string.save_dialog_continue))
+                }
+            }
+        )
+    }
+
+    // Cambio `query-files-storage` (Fase 15): dialogo de error visible para un guardado
+    // fallido — antes solo se logueaba silenciosamente.
+    val pendingSaveError = saveErrorMessage
+    if (pendingSaveError != null) {
+        AlertDialog(
+            onDismissRequest = { saveErrorMessage = null },
+            title = { Text(stringResource(R.string.query_save_error_title)) },
+            text = { Text(pendingSaveError) },
+            confirmButton = {
+                TextButton(onClick = { saveErrorMessage = null }) {
+                    Text(stringResource(R.string.action_ok))
                 }
             }
         )

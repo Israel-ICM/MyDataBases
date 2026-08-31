@@ -299,4 +299,6 @@
     <string name="query_files_title">Arquivos de consultas</string>
     <string name="query_files_empty_state">Ainda não há arquivos de consulta salvos</string>
     <string name="query_files_fab_description">Nova consulta</string>
+    <string name="query_save_error_title">Não foi possível salvar a consulta</string>
+    <string name="query_save_error_generic">Ocorreu um erro desconhecido ao salvar</string>
 </resources>

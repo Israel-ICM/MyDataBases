@@ -11,8 +11,10 @@ import com.sphynxs.mydatabases.domain.editor.EditorHistory
 import com.sphynxs.mydatabases.domain.editor.EditorSnapshot
 import com.sphynxs.mydatabases.domain.editor.MultiCursorEngine
 import com.sphynxs.mydatabases.domain.models.StatementResult
+import com.sphynxs.mydatabases.domain.repositories.ConnectionRepository
 import com.sphynxs.mydatabases.domain.usecases.ExecuteBatchStatementsUseCase
 import com.sphynxs.mydatabases.domain.usecases.LoadSchemaSnapshotUseCase
+import com.sphynxs.mydatabases.domain.usecases.queryfiles.SaveQueryFileUseCase
 import com.sphynxs.mydatabases.ui.screens.queryeditor.components.SqlToken
 import com.sphynxs.mydatabases.ui.screens.queryeditor.components.SqlTokenizer
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -46,13 +48,39 @@ import javax.inject.Inject
 @HiltViewModel
 class QueryEditorViewModel @Inject constructor(
     private val executeBatchStatementsUseCase: ExecuteBatchStatementsUseCase,
-    private val loadSchemaSnapshotUseCase: LoadSchemaSnapshotUseCase
+    private val loadSchemaSnapshotUseCase: LoadSchemaSnapshotUseCase,
+    private val saveQueryFileUseCase: SaveQueryFileUseCase,
+    private val connectionRepository: ConnectionRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<QueryEditorUiState>(QueryEditorUiState.Idle)
     val uiState: StateFlow<QueryEditorUiState> = _uiState.asStateFlow()
 
     private var executionJob: Job? = null
+
+    /**
+     * Saves [content] under an auto-generated timestamped `.sql` name into the active
+     * connection's managed queries folder (change `query-files-storage` — save convergence,
+     * Phase 15). Replaces the legacy `MediaStore`/`Environment.getExternalStorageDirectory()`
+     * inline write; explicit "Save As" export is untouched, unaffected by this change.
+     *
+     * Context-free: resolves the [com.sphynxs.mydatabases.core.database.engine.DatabaseType]
+     * via [ConnectionRepository] and delegates the actual write to [SaveQueryFileUseCase] —
+     * `QueryFileStore`'s `Context` dependency is internal to its implementation, never needed
+     * by this ViewModel.
+     *
+     * @return The generated file name on success, or the failure otherwise
+     */
+    suspend fun saveQuery(connectionId: String, content: String): Result<String> {
+        val connection = connectionRepository.getById(connectionId)
+            ?: return Result.failure(IllegalStateException("Connection not found: $connectionId"))
+
+        val timestamp = java.text.SimpleDateFormat("yyyyMMdd_HHmmss", java.util.Locale.getDefault())
+            .format(java.util.Date())
+        val fileName = "query_$timestamp.sql"
+
+        return saveQueryFileUseCase(connection.type, fileName, content).map { fileName }
+    }
     
     // Editor history for undo/redo
     private val editorHistory = EditorHistory(maxSnapshots = 100, coalescingWindowMs = 500)

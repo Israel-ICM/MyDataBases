@@ -299,4 +299,6 @@
     <string name="query_files_title">ملفات الاستعلامات</string>
     <string name="query_files_empty_state">لا توجد ملفات استعلامات محفوظة بعد</string>
     <string name="query_files_fab_description">استعلام جديد</string>
+    <string name="query_save_error_title">تعذر حفظ الاستعلام</string>
+    <string name="query_save_error_generic">حدث خطأ غير معروف أثناء الحفظ</string>
 </resources>

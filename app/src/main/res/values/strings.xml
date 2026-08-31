@@ -370,4 +370,6 @@
     <string name="query_files_title">Query Files</string>
     <string name="query_files_empty_state">No saved query files yet</string>
     <string name="query_files_fab_description">New query</string>
+    <string name="query_save_error_title">Couldn\'t save the query</string>
+    <string name="query_save_error_generic">An unknown error occurred while saving</string>
 </resources>

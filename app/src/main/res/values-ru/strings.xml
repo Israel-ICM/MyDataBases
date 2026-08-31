@@ -299,5 +299,7 @@
     <string name="query_files_title">Файлы запросов</string>
     <string name="query_files_empty_state">Пока нет сохранённых файлов запросов</string>
     <string name="query_files_fab_description">Новый запрос</string>
+    <string name="query_save_error_title">Не удалось сохранить запрос</string>
+    <string name="query_save_error_generic">При сохранении произошла неизвестная ошибка</string>
 </resources>
 

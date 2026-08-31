@@ -299,4 +299,6 @@
     <string name="query_files_title">クエリファイル</string>
     <string name="query_files_empty_state">保存されたクエリファイルはまだありません</string>
     <string name="query_files_fab_description">新しいクエリ</string>
+    <string name="query_save_error_title">クエリを保存できませんでした</string>
+    <string name="query_save_error_generic">保存中に不明なエラーが発生しました</string>
 </resources>

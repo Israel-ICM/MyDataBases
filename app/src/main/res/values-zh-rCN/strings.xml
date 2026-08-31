@@ -299,4 +299,6 @@
     <string name="query_files_title">查询文件</string>
     <string name="query_files_empty_state">暂无已保存的查询文件</string>
     <string name="query_files_fab_description">新建查询</string>
+    <string name="query_save_error_title">无法保存查询</string>
+    <string name="query_save_error_generic">保存时发生未知错误</string>
 </resources>

@@ -299,4 +299,6 @@
     <string name="query_files_title">क्वेरी फ़ाइलें</string>
     <string name="query_files_empty_state">अभी तक कोई सहेजी गई क्वेरी फ़ाइल नहीं है</string>
     <string name="query_files_fab_description">नई क्वेरी</string>
+    <string name="query_save_error_title">क्वेरी सहेजी नहीं जा सकी</string>
+    <string name="query_save_error_generic">सहेजते समय एक अज्ञात त्रुटि हुई</string>
 </resources>

@@ -368,4 +368,6 @@
     <string name="query_files_title">Archivos de consultas</string>
     <string name="query_files_empty_state">Todavía no hay archivos de consultas guardados</string>
     <string name="query_files_fab_description">Nueva consulta</string>
+    <string name="query_save_error_title">No se pudo guardar la consulta</string>
+    <string name="query_save_error_generic">Ocurrió un error desconocido al guardar</string>
 </resources>
