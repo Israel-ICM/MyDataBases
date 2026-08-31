@@ -152,8 +152,14 @@ fun ConnectionsListScreen(
             if (uiState is ConnectionsUiState.Success) {
                 FloatingActionButton(
                     onClick = {
+                        // Fix: NO llamar sheetState.show()/expand() manualmente junto al
+                        // booleano - ModalBottomSheet ya se muestra solo al entrar en
+                        // composicion. Llamarlo a mano ademas del booleano deja el SheetState
+                        // en un estado inconsistente la segunda vez que se reusa la misma
+                        // instancia (funciona la primera vez, se cuelga despues) - mismo
+                        // patron que ya funciona bien en showFolderFormSheet/showMoveToFolderSheet
+                        // en este mismo archivo, que nunca llaman show()/expand() a mano.
                         showTypeSelectorSheet = true
-                        scope.launch { typeSelectorSheetState.show() }
                     }
                 ) {
                     Icon(PhosphorAppIcons.Action.add, contentDescription = "Add connection")
@@ -336,10 +342,10 @@ fun ConnectionsListScreen(
                                                     connection = connection,
                                                     isReorderMode = isReorderMode,
                                                     onEditClick = {
+                                                        // Fix: sin llamar expand() a mano (ver comentario en el FAB de +).
                                                         editingConnectionId = connection.id
                                                         preselectedType = null
                                                         showFormSheet = true
-                                                        scope.launch { formSheetState.expand() }
                                                     },
                                                     onDeleteClick = {
                                                         connectionToDelete = connection
@@ -407,10 +413,10 @@ fun ConnectionsListScreen(
                                             connection = connection,
                                             isReorderMode = isReorderMode,
                                             onEditClick = {
+                                                // Fix: sin llamar expand() a mano (ver comentario en el FAB de +).
                                                 editingConnectionId = connection.id
                                                 preselectedType = null
                                                 showFormSheet = true
-                                                scope.launch { formSheetState.expand() }
                                             },
                                             onDeleteClick = {
                                                 connectionToDelete = connection
@@ -670,13 +676,16 @@ fun ConnectionsListScreen(
                     DatabaseTypeSelectorCard(
                         type = type,
                         onClick = {
+                            // Fix: esperar a que termine la animacion de cierre del selector
+                            // (hide() es suspend) antes de tocar el estado del form sheet, y
+                            // sin llamar expand() a mano (ver comentario en el FAB de +).
                             scope.launch {
                                 typeSelectorSheetState.hide()
+                            }.invokeOnCompletion {
                                 showTypeSelectorSheet = false
                                 preselectedType = type
                                 editingConnectionId = null
                                 showFormSheet = true
-                                formSheetState.expand()
                             }
                         }
                     )
