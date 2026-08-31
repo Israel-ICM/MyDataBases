@@ -100,7 +100,16 @@ fun AdaptiveNavigationScaffold(
     content: @Composable () -> Unit,
 ) {
     val destinations = destinationsForContext(navigationContext, currentRoute)
-    
+
+    // Pantallas que YA SON un menú/lista propio y no deben mostrar además la navegación
+    // flotante (bottom bar/rail/drawer) redundante:
+    // - `Routes.DatabaseActionMenu` (termina en "/menu"): ya es un menú de navegación.
+    // - `Routes.QueryFiles` (change `query-files-storage`, termina en "/query_files"):
+    //   pantalla de lista con su propio FAB — el menú inferior no aporta nada ahí y el
+    //   usuario lo pidió explícitamente afuera.
+    val hideNavigationChrome = currentRoute?.endsWith("/menu") == true ||
+        currentRoute?.endsWith("/query_files") == true
+
     when (windowSizeClass.widthSizeClass) {
         WindowWidthSizeClass.Compact -> {
             // Compact: contenido full screen + card flotando al fondo
@@ -108,17 +117,13 @@ fun AdaptiveNavigationScaffold(
                 // Contenido principal ocupa toda la pantalla
                 content()
 
-                // Mostrar menú solo en pantallas "dentro" de la app. Se excluye
-                // explícitamente el menú de acciones de base de datos (`Routes
-                // .DatabaseActionMenu`, termina en "/menu") — esa pantalla YA ES un menú
-                // de navegación (Tablas/Vistas/Query's/Funciones/Automatizaciones/Backups),
-                // mostrar además el bottom nav ahí sería redundante y no cumpliría ningún
-                // propósito (feedback del usuario, change `database-action-menu`).
+                // Mostrar menú solo en pantallas "dentro" de la app — ver `hideNavigationChrome`
+                // arriba para las exclusiones (menú de acciones, Query Files).
                 val showMenu = currentRoute != null &&
                     currentRoute != Routes.Connections.route &&
                     currentRoute != Routes.Settings.route &&
                     !currentRoute.startsWith("connection_form") &&
-                    !currentRoute.endsWith("/menu")
+                    !hideNavigationChrome
 
                 AnimatedVisibility(
                     visible = showMenu,
@@ -137,9 +142,8 @@ fun AdaptiveNavigationScaffold(
         }
         
         WindowWidthSizeClass.Medium -> {
-            // Medium: NavigationRail — misma exclusión que Compact para el menú de
-            // acciones de base de datos (ver comentario en la rama Compact).
-            val showRail = currentRoute?.endsWith("/menu") != true
+            // Medium: NavigationRail — misma exclusión que Compact (ver `hideNavigationChrome`).
+            val showRail = !hideNavigationChrome
 
             Row(modifier = Modifier.fillMaxSize()) {
                 // NavigationRail a la izquierda, solo si no estamos en el menú de acciones
@@ -170,8 +174,8 @@ fun AdaptiveNavigationScaffold(
         
         WindowWidthSizeClass.Expanded -> {
             // Expanded: PermanentNavigationDrawer — misma exclusión que Compact/Medium
-            // para el menú de acciones de base de datos (ver comentario en la rama Compact).
-            if (currentRoute?.endsWith("/menu") == true) {
+            // (ver `hideNavigationChrome`).
+            if (hideNavigationChrome) {
                 content()
             } else {
                 PermanentNavigationDrawer(
