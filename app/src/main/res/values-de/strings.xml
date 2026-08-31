@@ -281,4 +281,16 @@
     <string name="folder_collapse">Ordner reduzieren</string>
     <string name="action_more">Weitere Optionen</string>
     <string name="action_reorder">Neu anordnen</string>
+
+    <!-- Query storage location (change query-files-storage) -->
+    <string name="query_storage_location_title">Speicherort für Abfragen</string>
+    <string name="query_storage_location_default_summary">App-privater Ordner (Standard)</string>
+    <string name="query_storage_location_custom_summary">Benutzerdefinierter Ordner</string>
+    <string name="query_storage_change_folder">Ordner ändern</string>
+    <string name="query_storage_reset_default">Auf Standard zurücksetzen</string>
+    <string name="query_storage_migration_prompt_title">Vorhandene Abfragedateien kopieren?</string>
+    <string name="query_storage_migration_prompt_message">Am aktuellen Speicherort sind bereits Abfragedateien vorhanden. In den neuen Ordner kopieren? Die Originale werden nicht gelöscht.</string>
+    <string name="query_storage_migration_confirm">Kopieren</string>
+    <string name="query_storage_migration_decline">Nicht kopieren</string>
+    <string name="query_storage_migration_partial_failure">Einige Dateien konnten nicht kopiert werden</string>
 </resources>

@@ -281,4 +281,16 @@
     <string name="folder_collapse">Recolher pasta</string>
     <string name="action_more">Mais opções</string>
     <string name="action_reorder">Reordenar</string>
+
+    <!-- Query storage location (change query-files-storage) -->
+    <string name="query_storage_location_title">Local de armazenamento de consultas</string>
+    <string name="query_storage_location_default_summary">Pasta privada do app (padrão)</string>
+    <string name="query_storage_location_custom_summary">Pasta personalizada</string>
+    <string name="query_storage_change_folder">Alterar pasta</string>
+    <string name="query_storage_reset_default">Redefinir para padrão</string>
+    <string name="query_storage_migration_prompt_title">Copiar arquivos de consulta existentes?</string>
+    <string name="query_storage_migration_prompt_message">Já existem arquivos de consulta no local atual. Copiá-los para a nova pasta? Os originais não serão excluídos.</string>
+    <string name="query_storage_migration_confirm">Copiar</string>
+    <string name="query_storage_migration_decline">Não copiar</string>
+    <string name="query_storage_migration_partial_failure">Alguns arquivos não puderam ser copiados</string>
 </resources>

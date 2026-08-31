@@ -281,4 +281,16 @@
     <string name="folder_collapse">フォルダを折りたたむ</string>
     <string name="action_more">その他のオプション</string>
     <string name="action_reorder">並べ替え</string>
+
+    <!-- Query storage location (change query-files-storage) -->
+    <string name="query_storage_location_title">クエリの保存場所</string>
+    <string name="query_storage_location_default_summary">アプリ専用フォルダ（デフォルト）</string>
+    <string name="query_storage_location_custom_summary">カスタムフォルダ</string>
+    <string name="query_storage_change_folder">フォルダを変更</string>
+    <string name="query_storage_reset_default">デフォルトに戻す</string>
+    <string name="query_storage_migration_prompt_title">既存のクエリファイルをコピーしますか?</string>
+    <string name="query_storage_migration_prompt_message">現在の場所にクエリファイルが既に存在します。新しいフォルダにコピーしますか?元のファイルは削除されません。</string>
+    <string name="query_storage_migration_confirm">コピー</string>
+    <string name="query_storage_migration_decline">コピーしない</string>
+    <string name="query_storage_migration_partial_failure">一部のファイルをコピーできませんでした</string>
 </resources>

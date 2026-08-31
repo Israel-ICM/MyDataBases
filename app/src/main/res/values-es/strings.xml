@@ -350,4 +350,16 @@
     <string name="new_query_option_new">Consulta nueva</string>
     <string name="new_query_option_open_file">Abrir archivo de consulta</string>
     <string name="new_query_option_run_script">Ejecutar script (sin editar)</string>
+
+    <!-- Ubicación de almacenamiento de queries (cambio query-files-storage) -->
+    <string name="query_storage_location_title">Ubicación de almacenamiento de consultas</string>
+    <string name="query_storage_location_default_summary">Carpeta privada de la app (por defecto)</string>
+    <string name="query_storage_location_custom_summary">Carpeta personalizada</string>
+    <string name="query_storage_change_folder">Cambiar carpeta</string>
+    <string name="query_storage_reset_default">Restablecer por defecto</string>
+    <string name="query_storage_migration_prompt_title">¿Copiar archivos de consultas existentes?</string>
+    <string name="query_storage_migration_prompt_message">Ya existen archivos de consultas en la ubicación actual. ¿Copiarlos a la nueva carpeta? Los originales no se eliminarán.</string>
+    <string name="query_storage_migration_confirm">Copiar</string>
+    <string name="query_storage_migration_decline">No copiar</string>
+    <string name="query_storage_migration_partial_failure">Algunos archivos no se pudieron copiar</string>
 </resources>

@@ -281,4 +281,16 @@
     <string name="folder_collapse">折叠文件夹</string>
     <string name="action_more">更多选项</string>
     <string name="action_reorder">重新排序</string>
+
+    <!-- Query storage location (change query-files-storage) -->
+    <string name="query_storage_location_title">查询存储位置</string>
+    <string name="query_storage_location_default_summary">应用专属文件夹（默认）</string>
+    <string name="query_storage_location_custom_summary">自定义文件夹</string>
+    <string name="query_storage_change_folder">更改文件夹</string>
+    <string name="query_storage_reset_default">恢复默认</string>
+    <string name="query_storage_migration_prompt_title">复制现有查询文件？</string>
+    <string name="query_storage_migration_prompt_message">当前位置已存在查询文件。是否将其复制到新文件夹？原始文件不会被删除。</string>
+    <string name="query_storage_migration_confirm">复制</string>
+    <string name="query_storage_migration_decline">不复制</string>
+    <string name="query_storage_migration_partial_failure">部分文件无法复制</string>
 </resources>

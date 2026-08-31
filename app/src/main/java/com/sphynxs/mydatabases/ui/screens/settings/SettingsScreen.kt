@@ -1,10 +1,14 @@
 package com.sphynxs.mydatabases.ui.screens.settings
 
+import android.content.Intent
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -13,14 +17,20 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -46,7 +56,52 @@ fun SettingsScreen(
 ) {
     val brandedPaletteEnabled by viewModel.brandedPaletteEnabled.collectAsState()
     val themeMode by viewModel.themeMode.collectAsState()
-    
+    val queryStorageTreeUri by viewModel.queryStorageTreeUri.collectAsState()
+    val migrationPrompt by viewModel.migrationPrompt.collectAsState()
+    val lastMigrationFailureCount by viewModel.lastMigrationFailureCount.collectAsState()
+
+    val context = LocalContext.current
+    val snackbarHostState = remember { SnackbarHostState() }
+    val failureMessage = stringResource(R.string.query_storage_migration_partial_failure)
+
+    val openTreeLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocumentTree()
+    ) { uri ->
+        if (uri != null) {
+            context.contentResolver.takePersistableUriPermission(
+                uri,
+                Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+            )
+            viewModel.onStorageTreeSelected(uri)
+        }
+    }
+
+    LaunchedEffect(lastMigrationFailureCount) {
+        val count = lastMigrationFailureCount
+        if (count != null) {
+            snackbarHostState.showSnackbar("$failureMessage: $count")
+            viewModel.consumeLastMigrationFailureCount()
+        }
+    }
+
+    if (migrationPrompt is MigrationPromptState.Shown) {
+        AlertDialog(
+            onDismissRequest = { viewModel.declineMigration() },
+            title = { Text(stringResource(R.string.query_storage_migration_prompt_title)) },
+            text = { Text(stringResource(R.string.query_storage_migration_prompt_message)) },
+            confirmButton = {
+                TextButton(onClick = { viewModel.confirmMigration() }) {
+                    Text(stringResource(R.string.query_storage_migration_confirm))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { viewModel.declineMigration() }) {
+                    Text(stringResource(R.string.query_storage_migration_decline))
+                }
+            }
+        )
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -62,7 +117,8 @@ fun SettingsScreen(
                     }
                 }
             )
-        }
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -111,6 +167,36 @@ fun SettingsScreen(
                 onSelect = { mode -> viewModel.setThemeMode(mode) },
                 modifier = Modifier.fillMaxWidth()
             )
+
+            Spacer(modifier = Modifier.padding(vertical = 12.dp))
+
+            // Query storage location (change `query-files-storage`)
+            Text(
+                text = stringResource(R.string.query_storage_location_title),
+                style = MaterialTheme.typography.titleMedium
+            )
+            Text(
+                text = if (queryStorageTreeUri == null) {
+                    stringResource(R.string.query_storage_location_default_summary)
+                } else {
+                    stringResource(R.string.query_storage_location_custom_summary)
+                },
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            Spacer(modifier = Modifier.padding(vertical = 4.dp))
+
+            Row(modifier = Modifier.fillMaxWidth()) {
+                TextButton(onClick = { openTreeLauncher.launch(null) }) {
+                    Text(stringResource(R.string.query_storage_change_folder))
+                }
+                if (queryStorageTreeUri != null) {
+                    TextButton(onClick = { viewModel.onStorageTreeSelected(null) }) {
+                        Text(stringResource(R.string.query_storage_reset_default))
+                    }
+                }
+            }
         }
     }
 }

@@ -87,22 +87,22 @@ User must choose (or confirm) the chain strategy before `sdd-apply` proceeds (de
 
 ## Phase 7: Settings — `takePersistableUriPermission` & Migration Use Case (TDD)
 
-- [ ] 7.1 RED: write `MigrateQueryFilesUseCaseTest.kt` (fake `QueryFileStore` for old/new root pair, or Mockk `QueryFileStore` twice) — scans all 4 `DatabaseType` engine subfolders in the old location for `.sql` files, returns a no-op result (no prompt signal) when none exist, copies (via `read` then `write`, never delete) each found file into the new location preserving per-engine partitioning when confirmed, leaves originals untouched, reports per-file failures by count without aborting remaining copies
-- [ ] 7.2 GREEN: create `domain/usecases/queryfiles/MigrateQueryFilesUseCase.kt` implementing the above contract
-- [ ] 7.3 Modify Settings storage-location change handler: on `OpenDocumentTree` result, call `takePersistableUriPermission` before persisting via `setQueryStorageTreeUri(uri)`
+- [x] 7.1 RED: wrote `MigrateQueryFilesUseCaseTest.kt` — 3 tests. **Deviation**: signature is `invoke(oldRoot: DocumentFile, readContent, writeContent)`, no `newRoot`/no direct `QueryFileStore` dependency — the use case is a pure `DocumentFile` tree walker; the caller (Settings ViewModel) supplies `readContent`/`writeContent` typically backed by `QueryFileStore.read/write` called AFTER the pref switch, so writes naturally land in the new location without this use case needing to reference it
+- [x] 7.2 GREEN: created `domain/usecases/queryfiles/MigrateQueryFilesUseCase.kt`
+- [x] 7.3 Modified `SettingsScreen.kt`'s `OpenDocumentTree` launcher result handler: calls `context.contentResolver.takePersistableUriPermission(uri, FLAG_GRANT_READ|WRITE_URI_PERMISSION)` before calling `viewModel.onStorageTreeSelected(uri)`
 
 ## Phase 8: Settings — UI (Storage Row, Reset, Migration Prompt)
 
-- [ ] 8.1 Modify `ui/screens/settings/SettingsScreen.kt` + its ViewModel: add "Query storage location" row showing current mode (app-private default vs. SAF path summary), "Change folder" action launching `OpenDocumentTree`, and a "Reset to default" action calling `setQueryStorageTreeUri(null)`
-- [ ] 8.2 Wire `OpenDocumentTree` result: before persisting the new pref, invoke `MigrateQueryFilesUseCase` to check the old location for `.sql` files; if any exist, show the one-time copy-prompt dialog ("Copy existing query files to the new location?") with Confirm/Decline; persist the new pref regardless of the user's choice per spec
-- [ ] 8.3 Wire "Reset to default" the same way: check the current SAF location for files before reverting to `null`, same copy-prompt flow, same persist-regardless behavior
-- [ ] 8.4 Report partial-copy failures via a snackbar showing the failed-file count; succeeded files remain, old files stay untouched
-- [ ] 8.5 Write/extend `SettingsViewModelTest.kt` (or equivalent) covering: prompt shown only when old location has `.sql` files, prompt skipped when old location is empty, confirm triggers copy, decline leaves new location empty without touching old files
+- [x] 8.1 Modified `SettingsScreen.kt` + `SettingsViewModel.kt`: added "Query storage location" row (current mode summary + "Change folder"/"Reset to default" actions)
+- [x] 8.2-8.3 **Deviation from "one-time copy-prompt"**: the has-files check is a cheap structural scan (`SettingsViewModel.rootHasQueryFiles`, no content read) run BEFORE persisting — if files exist, shows the prompt and does NOT persist yet; `confirmMigration()`/`declineMigration()` both persist the new pref, only `confirmMigration()` also runs `MigrateQueryFilesUseCase`. Same flow for both "Change folder" and "Reset to default" (`onStorageTreeSelected(null)`)
+- [x] 8.4 Partial-copy failures reported via `SnackbarHostState` (`lastMigrationFailureCount` StateFlow + `LaunchedEffect`, self-consuming so it doesn't re-show)
+- [x] 8.5 Wrote `SettingsViewModelQueryStorageTest.kt` — 4 tests: prompt shown only with existing files, prompt skipped when empty (persists directly), confirm persists-then-copies, decline persists-without-copying. Also updated the pre-existing `SettingsViewModelTest.kt` (3 tests) for the new constructor params — confirmed still green, no regression
 
 ## Phase 9: Settings & SAF-Fallback Localization
 
-- [ ] 9.1 Add to `res/values/strings.xml`: storage-location row title, current-location summary label, "Change folder" action, "Reset to default" action, migration prompt title/message/confirm/decline, SAF permission-loss fallback notice text, partial-copy-failure snackbar message
-- [ ] 9.2 Add the same keys translated to all 10 locales: `values-es`, `values-ar`, `values-de`, `values-fr`, `values-hi`, `values-ja`, `values-pt-rBR`, `values-ru`, `values-zh-rCN` (per android-dev skill's required locale set — confirmed as this project's actual shipped set)
+- [x] 9.1 Added to `res/values/strings.xml`: `query_storage_location_title`, `_default_summary`, `_custom_summary`, `_change_folder`, `_reset_default`, `_migration_prompt_title/_message/_confirm/_decline`, `_migration_partial_failure`. **SAF permission-loss fallback notice text deferred** — `QueryStorageResolver` (PR-2) surfaces `RootResolution.Fallback(reason)` structurally, but no UI currently consumes/displays it (the List screen, PR-4, is where a user would notice the effect of a fallback — e.g. an unexpectedly-empty or different list); flagged as a gap to close in PR-4, not silently dropped
+- [x] 9.2 Added the same 10 keys to all 10 locales (`values`, `es`, `ar`, `de`, `fr`, `hi`, `ja`, `pt-rBR`, `ru`, `zh-rCN`) — confirmed via `assembleDebug` succeeding (valid XML across all locale resource merges)
+- [x] Ran `./gradlew test` and `./gradlew assembleDebug` — both succeed; 336 total tests, same 23 pre-existing unrelated failures, no new regressions
 - [ ] 9.3 Every new string in the Settings storage row and migration dialog goes through `stringResource(...)` — run the android-dev hardcoded-`Text()` audit on the modified files, zero results
 
 ## Phase 10: Query Files List — ViewModel (TDD)

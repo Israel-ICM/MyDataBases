@@ -281,4 +281,16 @@
     <string name="folder_collapse">طي المجلد</string>
     <string name="action_more">المزيد من الخيارات</string>
     <string name="action_reorder">إعادة ترتيب</string>
+
+    <!-- Query storage location (change query-files-storage) -->
+    <string name="query_storage_location_title">موقع تخزين الاستعلامات</string>
+    <string name="query_storage_location_default_summary">مجلد خاص بالتطبيق (افتراضي)</string>
+    <string name="query_storage_location_custom_summary">مجلد مخصص</string>
+    <string name="query_storage_change_folder">تغيير المجلد</string>
+    <string name="query_storage_reset_default">إعادة الضبط للافتراضي</string>
+    <string name="query_storage_migration_prompt_title">نسخ ملفات الاستعلامات الحالية؟</string>
+    <string name="query_storage_migration_prompt_message">توجد بالفعل ملفات استعلامات في الموقع الحالي. هل تريد نسخها إلى المجلد الجديد؟ لن يتم حذف الملفات الأصلية.</string>
+    <string name="query_storage_migration_confirm">نسخ</string>
+    <string name="query_storage_migration_decline">عدم النسخ</string>
+    <string name="query_storage_migration_partial_failure">تعذر نسخ بعض الملفات</string>
 </resources>

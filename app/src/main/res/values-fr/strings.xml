@@ -281,4 +281,16 @@
     <string name="folder_collapse">Réduire le dossier</string>
     <string name="action_more">Plus d\'options</string>
     <string name="action_reorder">Réorganiser</string>
+
+    <!-- Query storage location (change query-files-storage) -->
+    <string name="query_storage_location_title">Emplacement de stockage des requêtes</string>
+    <string name="query_storage_location_default_summary">Dossier privé de l\'application (par défaut)</string>
+    <string name="query_storage_location_custom_summary">Dossier personnalisé</string>
+    <string name="query_storage_change_folder">Changer de dossier</string>
+    <string name="query_storage_reset_default">Réinitialiser par défaut</string>
+    <string name="query_storage_migration_prompt_title">Copier les fichiers de requêtes existants ?</string>
+    <string name="query_storage_migration_prompt_message">Des fichiers de requêtes existent déjà à l\'emplacement actuel. Les copier vers le nouveau dossier ? Les originaux ne seront pas supprimés.</string>
+    <string name="query_storage_migration_confirm">Copier</string>
+    <string name="query_storage_migration_decline">Ne pas copier</string>
+    <string name="query_storage_migration_partial_failure">Certains fichiers n\'ont pas pu être copiés</string>
 </resources>

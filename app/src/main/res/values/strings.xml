@@ -352,4 +352,16 @@
     <string name="new_query_option_new">New Query</string>
     <string name="new_query_option_open_file">Open Query File</string>
     <string name="new_query_option_run_script">Run Script (No Edit)</string>
+
+    <!-- Query storage location (change query-files-storage) -->
+    <string name="query_storage_location_title">Query storage location</string>
+    <string name="query_storage_location_default_summary">App-private folder (default)</string>
+    <string name="query_storage_location_custom_summary">Custom folder</string>
+    <string name="query_storage_change_folder">Change folder</string>
+    <string name="query_storage_reset_default">Reset to default</string>
+    <string name="query_storage_migration_prompt_title">Copy existing query files?</string>
+    <string name="query_storage_migration_prompt_message">Query files already exist in the current location. Copy them to the new folder? The originals will not be deleted.</string>
+    <string name="query_storage_migration_confirm">Copy</string>
+    <string name="query_storage_migration_decline">Don\'t copy</string>
+    <string name="query_storage_migration_partial_failure">Some files could not be copied</string>
 </resources>

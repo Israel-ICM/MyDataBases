@@ -281,5 +281,17 @@
     <string name="folder_collapse">Свернуть папку</string>
     <string name="action_more">Дополнительно</string>
     <string name="action_reorder">Изменить порядок</string>
+
+    <!-- Query storage location (change query-files-storage) -->
+    <string name="query_storage_location_title">Место хранения запросов</string>
+    <string name="query_storage_location_default_summary">Приватная папка приложения (по умолчанию)</string>
+    <string name="query_storage_location_custom_summary">Пользовательская папка</string>
+    <string name="query_storage_change_folder">Изменить папку</string>
+    <string name="query_storage_reset_default">Сбросить по умолчанию</string>
+    <string name="query_storage_migration_prompt_title">Скопировать существующие файлы запросов?</string>
+    <string name="query_storage_migration_prompt_message">В текущем расположении уже есть файлы запросов. Скопировать их в новую папку? Оригиналы не будут удалены.</string>
+    <string name="query_storage_migration_confirm">Копировать</string>
+    <string name="query_storage_migration_decline">Не копировать</string>
+    <string name="query_storage_migration_partial_failure">Некоторые файлы не удалось скопировать</string>
 </resources>
 
