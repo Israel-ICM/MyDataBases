@@ -94,10 +94,19 @@ Este proyecto usa **SDD (Spec-Driven Development)**. Ver `.atl/standards/sdd-wor
 ### Comandos SDD
 
 ```bash
-/sdd-init-jos              # Inicializar SDD
-/sdd-new <feature>         # Nueva feature
-/sdd-apply                 # Implementar
-/sdd-verify                # Verificar
+# Setup (una sola vez por proyecto)
+/sdd-init-jos               # Inicializar contexto SDD (stack, testing, skill registry)
+
+# Meta-comandos (orquestador) — planificación
+/sdd-new <feature>          # Nuevo change: exploración + propuesta
+/sdd-ff <feature>           # Fast-forward: propuesta -> spec -> design -> tasks
+/sdd-continue [feature]     # Continuar con la siguiente fase pendiente
+
+# Fases individuales (delegadas por el orquestador, no se invocan sueltas normalmente)
+/sdd-explore-jos <feature>  # Explorar el problema y alternativas
+/sdd-apply-jos [feature]    # Implementar las tasks
+/sdd-verify-jos [feature]   # Verificar contra spec/design/tasks
+/sdd-archive-jos [feature]  # Archivar el change completado
 ```
 
 ## 🌐 Multilenguaje
