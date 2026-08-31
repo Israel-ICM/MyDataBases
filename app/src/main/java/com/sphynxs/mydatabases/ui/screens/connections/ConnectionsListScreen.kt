@@ -38,6 +38,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -50,6 +51,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -136,6 +138,16 @@ fun ConnectionsListScreen(
         skipPartiallyExpanded = true,
         confirmValueChange = { true }
     )
+
+    // Ancho del sheet del formulario: sin limite en Compact (telefono, "sin margen lateral"
+    // fue la intencion original), pero acotado al maximo de Material3 en Medium/Expanded
+    // (tablet) para que no se estire de borde a borde - eso hace ilegible el formulario.
+    val configuration = LocalConfiguration.current
+    val formSheetMaxWidth = if (configuration.screenWidthDp < 600) {
+        10000.dp
+    } else {
+        BottomSheetDefaults.SheetMaxWidth
+    }
     
     // Reset sheet state when closing
     LaunchedEffect(showFormSheet) {
@@ -710,7 +722,7 @@ fun ConnectionsListScreen(
             },
             sheetState = formSheetState,
             containerColor = LocalDesignTokens.current.backgroundPrimary,
-            sheetMaxWidth = 10000.dp,
+            sheetMaxWidth = formSheetMaxWidth,
             scrimColor = LocalDesignTokens.current.backdropScrim,
             tonalElevation = 16.dp
         ) {
