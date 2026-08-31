@@ -282,6 +282,28 @@
     <string name="action_more">المزيد من الخيارات</string>
     <string name="action_reorder">إعادة ترتيب</string>
 
+    <!-- Run Script + New Query selector (change large-sql-script-execution) -->
+    <string name="action_ok">موافق</string>
+    <string name="run_script_prescanning_label">جارٍ تحليل السكربت... تم فحص %1$d جملة (السطر %2$d)</string>
+    <string name="run_script_executing_label">جارٍ التنفيذ... الجملة %1$d (السطر %2$d)</string>
+    <string name="run_script_confirm_title">تم العثور على جمل خطرة</string>
+    <string name="run_script_confirm_intro">يحتوي هذا السكربت على جمل تتطلب تأكيدك قبل التنفيذ:</string>
+    <string name="run_script_confirm_category_row">%1$s: %2$d (الأسطر %3$s)</string>
+    <string name="run_script_risk_category_ddl">تغييرات في البنية (CREATE/ALTER/DROP/TRUNCATE/RENAME)</string>
+    <string name="run_script_risk_category_delete">جمل DELETE</string>
+    <string name="run_script_risk_category_update_no_where">UPDATE بدون WHERE</string>
+    <string name="run_script_confirm_button">متابعة</string>
+    <string name="run_script_decline_button">رفض</string>
+    <string name="run_script_success_title">اكتمل السكربت</string>
+    <string name="run_script_success_summary">تم تنفيذ %1$d جملة</string>
+    <string name="run_script_error_title">توقف التنفيذ</string>
+    <string name="run_script_cancelled_title">ألغيت</string>
+    <string name="run_script_partial_update_warning">قد تكون قاعدة البيانات محدثة جزئيًا.</string>
+    <string name="new_query_options_title">ماذا تريد أن تفعل؟</string>
+    <string name="new_query_option_new">استعلام جديد</string>
+    <string name="new_query_option_open_file">فتح ملف استعلام</string>
+    <string name="new_query_option_run_script">تشغيل سكربت (بدون تحرير)</string>
+
     <!-- Query storage location (change query-files-storage) -->
     <string name="query_storage_location_title">موقع تخزين الاستعلامات</string>
     <string name="query_storage_location_default_summary">مجلد خاص بالتطبيق (افتراضي)</string>

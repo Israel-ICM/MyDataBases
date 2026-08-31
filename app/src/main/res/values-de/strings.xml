@@ -282,6 +282,28 @@
     <string name="action_more">Weitere Optionen</string>
     <string name="action_reorder">Neu anordnen</string>
 
+    <!-- Run Script + New Query selector (change large-sql-script-execution) -->
+    <string name="action_ok">OK</string>
+    <string name="run_script_prescanning_label">Skript wird analysiert… %1$d Anweisungen geprüft (Zeile %2$d)</string>
+    <string name="run_script_executing_label">Wird ausgeführt… Anweisung %1$d (Zeile %2$d)</string>
+    <string name="run_script_confirm_title">Riskante Anweisungen gefunden</string>
+    <string name="run_script_confirm_intro">Dieses Skript enthält Anweisungen, die vor der Ausführung bestätigt werden müssen:</string>
+    <string name="run_script_confirm_category_row">%1$s: %2$d (Zeilen %3$s)</string>
+    <string name="run_script_risk_category_ddl">Strukturänderungen (CREATE/ALTER/DROP/TRUNCATE/RENAME)</string>
+    <string name="run_script_risk_category_delete">DELETE-Anweisungen</string>
+    <string name="run_script_risk_category_update_no_where">UPDATE ohne WHERE</string>
+    <string name="run_script_confirm_button">Fortfahren</string>
+    <string name="run_script_decline_button">Ablehnen</string>
+    <string name="run_script_success_title">Skript abgeschlossen</string>
+    <string name="run_script_success_summary">%1$d Anweisungen ausgeführt</string>
+    <string name="run_script_error_title">Ausführung gestoppt</string>
+    <string name="run_script_cancelled_title">Abgebrochen</string>
+    <string name="run_script_partial_update_warning">Die Datenbank wurde möglicherweise teilweise aktualisiert.</string>
+    <string name="new_query_options_title">Was möchtest du tun?</string>
+    <string name="new_query_option_new">Neue Abfrage</string>
+    <string name="new_query_option_open_file">Abfragedatei öffnen</string>
+    <string name="new_query_option_run_script">Skript ausführen (ohne Bearbeiten)</string>
+
     <!-- Query storage location (change query-files-storage) -->
     <string name="query_storage_location_title">Speicherort für Abfragen</string>
     <string name="query_storage_location_default_summary">App-privater Ordner (Standard)</string>

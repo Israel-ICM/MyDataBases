@@ -282,6 +282,28 @@
     <string name="action_more">Plus d\'options</string>
     <string name="action_reorder">Réorganiser</string>
 
+    <!-- Run Script + New Query selector (change large-sql-script-execution) -->
+    <string name="action_ok">OK</string>
+    <string name="run_script_prescanning_label">Analyse du script… %1$d instructions analysées (ligne %2$d)</string>
+    <string name="run_script_executing_label">Exécution… instruction %1$d (ligne %2$d)</string>
+    <string name="run_script_confirm_title">Instructions à risque détectées</string>
+    <string name="run_script_confirm_intro">Ce script contient des instructions qui nécessitent votre confirmation avant l\'exécution :</string>
+    <string name="run_script_confirm_category_row">%1$s : %2$d (lignes %3$s)</string>
+    <string name="run_script_risk_category_ddl">Modifications de structure (CREATE/ALTER/DROP/TRUNCATE/RENAME)</string>
+    <string name="run_script_risk_category_delete">Instructions DELETE</string>
+    <string name="run_script_risk_category_update_no_where">UPDATE sans WHERE</string>
+    <string name="run_script_confirm_button">Continuer</string>
+    <string name="run_script_decline_button">Refuser</string>
+    <string name="run_script_success_title">Script terminé</string>
+    <string name="run_script_success_summary">%1$d instructions exécutées</string>
+    <string name="run_script_error_title">Exécution arrêtée</string>
+    <string name="run_script_cancelled_title">Annulé</string>
+    <string name="run_script_partial_update_warning">La base de données a peut-être été partiellement mise à jour.</string>
+    <string name="new_query_options_title">Que voulez-vous faire ?</string>
+    <string name="new_query_option_new">Nouvelle requête</string>
+    <string name="new_query_option_open_file">Ouvrir un fichier de requête</string>
+    <string name="new_query_option_run_script">Exécuter le script (sans modifier)</string>
+
     <!-- Query storage location (change query-files-storage) -->
     <string name="query_storage_location_title">Emplacement de stockage des requêtes</string>
     <string name="query_storage_location_default_summary">Dossier privé de l\'application (par défaut)</string>

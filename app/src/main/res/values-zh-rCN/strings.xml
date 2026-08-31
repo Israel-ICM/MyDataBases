@@ -282,6 +282,28 @@
     <string name="action_more">更多选项</string>
     <string name="action_reorder">重新排序</string>
 
+    <!-- Run Script + New Query selector (change large-sql-script-execution) -->
+    <string name="action_ok">确定</string>
+    <string name="run_script_prescanning_label">正在分析脚本…已扫描 %1$d 条语句（第 %2$d 行）</string>
+    <string name="run_script_executing_label">正在执行…语句 %1$d（第 %2$d 行）</string>
+    <string name="run_script_confirm_title">发现风险语句</string>
+    <string name="run_script_confirm_intro">此脚本包含需要您确认后才能执行的语句：</string>
+    <string name="run_script_confirm_category_row">%1$s：%2$d（第 %3$s 行）</string>
+    <string name="run_script_risk_category_ddl">结构更改（CREATE/ALTER/DROP/TRUNCATE/RENAME）</string>
+    <string name="run_script_risk_category_delete">DELETE 语句</string>
+    <string name="run_script_risk_category_update_no_where">不带 WHERE 的 UPDATE</string>
+    <string name="run_script_confirm_button">继续</string>
+    <string name="run_script_decline_button">拒绝</string>
+    <string name="run_script_success_title">脚本已完成</string>
+    <string name="run_script_success_summary">已执行 %1$d 条语句</string>
+    <string name="run_script_error_title">执行已停止</string>
+    <string name="run_script_cancelled_title">已取消</string>
+    <string name="run_script_partial_update_warning">数据库可能已部分更新。</string>
+    <string name="new_query_options_title">您想做什么？</string>
+    <string name="new_query_option_new">新建查询</string>
+    <string name="new_query_option_open_file">打开查询文件</string>
+    <string name="new_query_option_run_script">运行脚本（不编辑）</string>
+
     <!-- Query storage location (change query-files-storage) -->
     <string name="query_storage_location_title">查询存储位置</string>
     <string name="query_storage_location_default_summary">应用专属文件夹（默认）</string>

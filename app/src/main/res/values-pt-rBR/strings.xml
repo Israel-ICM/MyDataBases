@@ -282,6 +282,28 @@
     <string name="action_more">Mais opções</string>
     <string name="action_reorder">Reordenar</string>
 
+    <!-- Run Script + New Query selector (change large-sql-script-execution) -->
+    <string name="action_ok">OK</string>
+    <string name="run_script_prescanning_label">Analisando script… %1$d comandos verificados (linha %2$d)</string>
+    <string name="run_script_executing_label">Executando… comando %1$d (linha %2$d)</string>
+    <string name="run_script_confirm_title">Comandos arriscados encontrados</string>
+    <string name="run_script_confirm_intro">Este script contém comandos que precisam da sua confirmação antes de executar:</string>
+    <string name="run_script_confirm_category_row">%1$s: %2$d (linhas %3$s)</string>
+    <string name="run_script_risk_category_ddl">Mudanças de estrutura (CREATE/ALTER/DROP/TRUNCATE/RENAME)</string>
+    <string name="run_script_risk_category_delete">Comandos DELETE</string>
+    <string name="run_script_risk_category_update_no_where">UPDATE sem WHERE</string>
+    <string name="run_script_confirm_button">Continuar</string>
+    <string name="run_script_decline_button">Recusar</string>
+    <string name="run_script_success_title">Script concluído</string>
+    <string name="run_script_success_summary">%1$d comandos executados</string>
+    <string name="run_script_error_title">Execução interrompida</string>
+    <string name="run_script_cancelled_title">Cancelado</string>
+    <string name="run_script_partial_update_warning">O banco de dados pode ter sido parcialmente atualizado.</string>
+    <string name="new_query_options_title">O que você quer fazer?</string>
+    <string name="new_query_option_new">Nova consulta</string>
+    <string name="new_query_option_open_file">Abrir arquivo de consulta</string>
+    <string name="new_query_option_run_script">Executar script (sem editar)</string>
+
     <!-- Query storage location (change query-files-storage) -->
     <string name="query_storage_location_title">Local de armazenamento de consultas</string>
     <string name="query_storage_location_default_summary">Pasta privada do app (padrão)</string>

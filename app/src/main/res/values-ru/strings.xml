@@ -282,6 +282,28 @@
     <string name="action_more">Дополнительно</string>
     <string name="action_reorder">Изменить порядок</string>
 
+    <!-- Run Script + New Query selector (change large-sql-script-execution) -->
+    <string name="action_ok">ОК</string>
+    <string name="run_script_prescanning_label">Анализ скрипта… проверено %1$d инструкций (строка %2$d)</string>
+    <string name="run_script_executing_label">Выполнение… инструкция %1$d (строка %2$d)</string>
+    <string name="run_script_confirm_title">Обнаружены рискованные инструкции</string>
+    <string name="run_script_confirm_intro">Этот скрипт содержит инструкции, которые требуют вашего подтверждения перед выполнением:</string>
+    <string name="run_script_confirm_category_row">%1$s: %2$d (строки %3$s)</string>
+    <string name="run_script_risk_category_ddl">Изменения структуры (CREATE/ALTER/DROP/TRUNCATE/RENAME)</string>
+    <string name="run_script_risk_category_delete">Инструкции DELETE</string>
+    <string name="run_script_risk_category_update_no_where">UPDATE без WHERE</string>
+    <string name="run_script_confirm_button">Продолжить</string>
+    <string name="run_script_decline_button">Отклонить</string>
+    <string name="run_script_success_title">Скрипт завершён</string>
+    <string name="run_script_success_summary">Выполнено инструкций: %1$d</string>
+    <string name="run_script_error_title">Выполнение остановлено</string>
+    <string name="run_script_cancelled_title">Отменено</string>
+    <string name="run_script_partial_update_warning">База данных может быть обновлена частично.</string>
+    <string name="new_query_options_title">Что вы хотите сделать?</string>
+    <string name="new_query_option_new">Новый запрос</string>
+    <string name="new_query_option_open_file">Открыть файл запроса</string>
+    <string name="new_query_option_run_script">Выполнить скрипт (без редактирования)</string>
+
     <!-- Query storage location (change query-files-storage) -->
     <string name="query_storage_location_title">Место хранения запросов</string>
     <string name="query_storage_location_default_summary">Приватная папка приложения (по умолчанию)</string>

@@ -282,6 +282,28 @@
     <string name="action_more">その他のオプション</string>
     <string name="action_reorder">並べ替え</string>
 
+    <!-- Run Script + New Query selector (change large-sql-script-execution) -->
+    <string name="action_ok">OK</string>
+    <string name="run_script_prescanning_label">スクリプトを分析中…%1$d件のステートメントを確認済み（%2$d行目）</string>
+    <string name="run_script_executing_label">実行中…ステートメント %1$d（%2$d行目）</string>
+    <string name="run_script_confirm_title">リスクのあるステートメントが見つかりました</string>
+    <string name="run_script_confirm_intro">このスクリプトには実行前に確認が必要なステートメントが含まれています:</string>
+    <string name="run_script_confirm_category_row">%1$s: %2$d件（%3$s行目）</string>
+    <string name="run_script_risk_category_ddl">構造の変更（CREATE/ALTER/DROP/TRUNCATE/RENAME）</string>
+    <string name="run_script_risk_category_delete">DELETEステートメント</string>
+    <string name="run_script_risk_category_update_no_where">WHEREのないUPDATE</string>
+    <string name="run_script_confirm_button">続行</string>
+    <string name="run_script_decline_button">拒否</string>
+    <string name="run_script_success_title">スクリプトが完了しました</string>
+    <string name="run_script_success_summary">%1$d件のステートメントを実行しました</string>
+    <string name="run_script_error_title">実行が停止しました</string>
+    <string name="run_script_cancelled_title">キャンセルされました</string>
+    <string name="run_script_partial_update_warning">データベースが部分的に更新されている可能性があります。</string>
+    <string name="new_query_options_title">何をしますか?</string>
+    <string name="new_query_option_new">新しいクエリ</string>
+    <string name="new_query_option_open_file">クエリファイルを開く</string>
+    <string name="new_query_option_run_script">スクリプトを実行（編集なし）</string>
+
     <!-- Query storage location (change query-files-storage) -->
     <string name="query_storage_location_title">クエリの保存場所</string>
     <string name="query_storage_location_default_summary">アプリ専用フォルダ（デフォルト）</string>
